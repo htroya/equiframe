@@ -7,8 +7,8 @@ Fecha inicial: 2026-09-28. Estado de arquitectura: propuesta concreta para imple
 | A01 | Monorepo privado `htroya/equiframe` | Colaboración y cambios de contratos revisables; datos/tesis fuera de Git | Repositorio creado |
 | A02 | Dos distribuciones de Hernán: `equiframe` y `equiframe-benchmark` | Evitar dependencias experimentales y etiquetas dentro de biblioteca operacional | Diseño propuesto |
 | A03 | Paquetes/servicio propios para José y dominio propio para Jhair | Dependencias dirigidas, propiedad explícita e integración por formatos | Diseño propuesto para acordar |
-| A04 | Python 3.12, `src/`, tipado, pyproject y extras | Instalación profesional y versiones comprobables; ARM64 requiere prueba | A implementar en paso 1 |
-| A05 | Contratos estrictos y versionados | Borrador evoluciona sin reglas implícitas ni coerción con pérdida | Diseño propuesto |
+| A04 | Python 3.12, `src/`, tipado, pyproject y extras | Instalación profesional y versiones comprobables; ARM64 requiere prueba | Base implementada; extras se difieren a sus pasos |
+| A05 | Contratos estrictos y versionados | Borrador evoluciona sin reglas implícitas ni coerción con pérdida | Implementado en paso 1, esquema 1.0 |
 | A06 | R/M/B/H separados de O | Evitar circularidad y fuga de etiquetas | Requisito de tesis |
 | A07 | H con tres estados y disponibilidad | Fallo o falta de modelo no equivalen a corrección | Requisito de tesis |
 | A08 | Snapshots inmutables y coordinación central de escrituras | Lectura estable y escritores controlados; puede haber espera de cola | Propuesta a José |
@@ -16,6 +16,16 @@ Fecha inicial: 2026-09-28. Estado de arquitectura: propuesta concreta para imple
 | A10 | Configuración piloto vs congelación final | No fijar prematuramente alpha/cohorte/precisión/grupos | Requisito de tesis |
 | A11 | Implementación íntegra a cargo de Sol en diez pasos | Preparación actual contiene solo diseño y gestión del repositorio | Instrucción expresa de Hernán |
 | A12 | `htroya` propietario; invitaciones pendientes de logins | GitHub personal no permite tres propietarios/admin equivalentes | Limitación verificada |
+| A13 | Runtime del paso 1: Pydantic, Typer y tzdata; uv 0.11.6 con lock universal | Arrow/motores/ML no se usan todavía; evitar dependencias y extras sin implementación. Runtime/dev/backend separados y fijados por hashes | Ingeniería, Sol, 2026-09-28; implementado |
+| A14 | Formato 1.0 y canónico `equiframe-metadata-json-v1` | Defaults/nulls incluidos, objetos ordenados, arrays preservados, UTF-8 sin normalización; Decimal textual y timestamps hasta ns con offset/zona. SHA-256 identifica metadatos, no equivalencia tabular | Ingeniería, Sol, 2026-09-28; implementado |
+| A15 | Un único Protocol `ArtifactStore` en paso 1 | `ArtifactRef` está completo; snapshots/observaciones/resultados/features aún no. No introducir `Any`, tipos incompletos ni implementaciones ficticias | Ingeniería, Sol, 2026-09-28; implementado |
+| A16 | Seis especificaciones cerradas de reglas y precondiciones | Validar parámetros, referencias y compatibilidad sin ejecutar expresiones ni crear registro operativo. Nuevas formas incompatibles requieren versión de esquema | Ingeniería, Sol, 2026-09-28; implementado |
+| A17 | Decimal con precisión 1–76, escala no negativa y comparación exacta; unidad explícita | Capacidad genérica, no escala SERCOP ni garantía por motores. Tolerancias justificadas en integer/float; nunca en decimal exacto | Ingeniería, Sol, 2026-09-28; dominio/escala real pendientes |
+| A18 | Coherencia de reglas declarativas sin conversiones implícitas | Joins/grupos preservan unidades; sum/min/max preservan unidad; sum admite ampliación dentro de familia sin reducir dominio y min/max mantienen tipo. OrderCheck usa la política significant completa. Float32 exacto requiere literal representable | Ingeniería, Sol, 2026-09-28; segunda revisión del paso 1 |
+| A19 | Zonas IANA exclusivamente desde tzdata bloqueado | La base del sistema puede diferir entre Windows/Ubuntu; cargar recursos del paquete evita que TZPATH cambie la validación. Actualizaciones de tzdata exigen revalidación | Ingeniería, Sol, 2026-09-28; segunda revisión del paso 1 |
+| A20 | Decimal canónico independiente del contexto y entrega probada fuera del checkout | Fijar capitals=1 localmente conserva bytes del formato inicial; ejecutar toda la batería contra el wheel instalado desde el sdist, además de API/CLI runtime-only y consumidor tipado | Ingeniería, Sol, 2026-09-28; segunda revisión del paso 1 |
+
+Estas decisiones del paso 1 no cambian requisitos metodológicos del borrador ni cierran cohorte, alpha, revisión humana o cantidades experimentales. La tesis conserva el hash registrado.
 
 ## Decisiones que impiden cerrar evaluación, pero no empezar a programar
 
@@ -34,5 +44,7 @@ Fecha inicial: 2026-09-28. Estado de arquitectura: propuesta concreta para imple
 - [Permisos de repositorio personal GitHub](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/repository-access-and-collaboration/permission-levels-for-a-personal-account-repository): propietario y colaboradores.
 - [IsolationForest](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html): puntuación y parámetros.
 - [Guía pyproject](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/): declaración de distribuciones y dependencias.
+- [Contexto Decimal de Python 3.12](https://docs.python.org/3.12/library/decimal.html): capitalización de exponentes y contexto local, comprobados por propiedades.
+- [ZoneInfo de Python 3.12](https://docs.python.org/3.12/library/zoneinfo.html): precedencia de TZPATH y carga desde archivo; prueba aislada con base del host alterada.
 
 La consulta técnica no sustituye la prueba contra las versiones que Sol seleccione y bloquee.

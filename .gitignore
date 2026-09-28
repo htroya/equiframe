@@ -2,11 +2,16 @@
 __pycache__/
 *.py[cod]
 .venv/
+.tools/
+.wheelcheck/
+.sdistcheck/
+.cache/
 venv/
 *.egg-info/
 build/
 dist/
 .pytest_cache/
+.pytest-tmp/
 .mypy_cache/
 .ruff_cache/
 .hypothesis/

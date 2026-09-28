@@ -1,6 +1,6 @@
 # Arquitectura de EquiFrame
 
-Versión de diseño: 0.1, 2026-09-28. Estado: especificación para implementación. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md).
+Versión de diseño: 0.1, 2026-09-28. Estado: paso 1 implementado; componentes de pasos posteriores siguen siendo especificación. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md).
 
 ## 1. Propósito y alcance
 
@@ -24,7 +24,7 @@ Los nombres de distribución son internos hasta comprobar disponibilidad y acord
 
 Base propuesta: Python 3.12. El paso 1 verifica Windows x64 y Linux x64; ARM64 se valida antes de declarar soporte para la VM A1. `pyproject.toml`, estructura `src/`, marcadores `py.typed`, wheel/sdist y versiones semánticas. Durante 0.x los cambios incompatibles requieren changelog y migración explícita.
 
-Dependencias previstas del núcleo: Pydantic 2 para formatos estrictos, PyArrow para intercambio tabular, `tzdata` para zonas IANA en Windows y Typer para CLI. Extras `pandas`, `polars`, `duckdb`, `ml` (NumPy/scikit-learn y formato seguro de persistencia), `all`; herramientas de desarrollo separadas. Las versiones exactas se resuelven, prueban y bloquean en el paso 1, no se copian ciegamente del entorno global. Pandas/Polars/DuckDB/scikit-learn no se importan al hacer `import equiframe`.
+Dependencias del paso 1: Pydantic 2 para formatos estrictos, `tzdata` como base IANA exclusiva en Windows/Ubuntu y Typer para CLI. Versiones de ejecución, desarrollo y backend resueltas y fijadas con hashes en `packages/equiframe/uv.lock`. PyArrow y extras `pandas`, `polars`, `duckdb`, `ml`, `all` siguen previstos para los pasos que los utilizan; no se declaran extras vacíos. Pandas/Polars/DuckDB/scikit-learn/NumPy/PyArrow no se importan al hacer `import equiframe`.
 
 El almacenamiento tabular Arrow no reemplaza la semántica del contrato. La extracción conserva tipo físico, tipo lógico, máscara de ausencia y NaN antes de cualquier conversión. Un adaptador que no pueda preservar una distinción exigida debe informar incompatibilidad; no adivinarla.
 

@@ -1,54 +1,105 @@
 # API Python y contratos de intercambio
 
-Especificación propuesta v0.1. No describe funciones ya implementadas. Los nombres se congelan tras las pruebas del paso 1 y cualquier ajuste queda registrado.
+Versión implementada: `equiframe 0.1.0`, esquema `1.0`, paso 1. El [README del
+paquete](../packages/equiframe/README.md) contiene instalación, comandos y un
+ejemplo Python ejecutable. Los componentes siguientes siguen en la hoja de ruta.
 
-## 1. Principios
+## 1. API disponible
 
-API síncrona para cálculos locales y objetos inmutables de configuración/resultados. La espera de trabajos remotos pertenece al cliente de José. No mantener una conexión global ni estado compartido implícito. Serialización estricta: campos desconocidos rechazados, coerciones con pérdida rechazadas y versión de esquema obligatoria.
-
-Los formatos de intercambio se generan desde los modelos tipados y se verifican con ejemplos válidos e inválidos. Los JSON no contienen callbacks, expresiones Python, SQL arbitrario, contraseñas ni rutas ejecutables. Una transformación se referencia por ID y se resuelve en un registro explícito de código confiable.
-
-## 2. Tipos públicos mínimos
-
-| Tipo | Campos y restricciones |
+| Servicio | Comportamiento comprobable |
 |---|---|
-| `LogicalType` | Unión discriminada: boolean, integer con tamaño/signo, string, decimal con precisión/escala, float con ancho, date, timestamp con unidad/zona. Tipos adicionales requieren versión y soporte del adaptador |
-| `ColumnSpec` | `name`, `logical_type`, `nullable`, política NaN cuando corresponda. Nombres únicos en el esquema |
-| `KeySpec` | Columnas existentes, unicidad requerida, política de claves incompletas y alcance de identificación |
-| `NullPolicy` | Representaciones que cuentan como ausencia, política independiente de NaN; nunca cadena vacía/cero implícitos |
-| `NumericPolicy` | Exactitud, redondeo explícito si aplica, tolerancia por columna con unidad y motivo |
-| `TemporalPolicy` | Zona IANA, granularidad, tratamiento de timestamps sin offset, errores y límites de intervalos |
-| `Contract` | `schema_version`, `contract_id`, `revision`, familia, esquemas de entradas/salida, claves, multiplicidad, orden, políticas, precondiciones y `RuleSpec[]` |
-| `RuleSpec` | ID, tipo registrado, parámetros validados, columnas/etapas, severidad informativa y aplicabilidad. El resultado de alerta no se deriva de una severidad visual |
-| `ArtifactRef` | URI sin secretos, SHA-256, formato, bytes, esquema asociado; semántica inmutable. Hash real requerido al ejecutar |
-| `SnapshotManifest` | Versión, `snapshot_id`, revisión, archivos con hashes/cobertura/licencia, exclusiones y procedencia; distingue raw de tablas derivadas |
-| `TableArtifact` | Referencia a tabla materializada, esquema físico y lógico, filas, metadatos de ausencia/NaN, particiones y procedencia |
-| `RunContext` | IDs de corrida/ejecución, semillas, directorio de trabajo, límites, deadline, versión de código y ambiente |
-| `ExecutionPlan` | Contrato, snapshot, ID de transformación, adaptador, versión/configuración, parámetros tipados y referencias de entrada |
-| `ExecutionResult` | Estado, entradas/salida, tiempos por etapa, conversiones, esquema observado y error tipado si aplica |
-| `RuleResult` | ID/revisión, decisión, valor observado/esperado, motivo, referencias de evidencia y completitud |
-| `FeatureValue` | Nombre, valor opcional, aplicabilidad, numerador/denominador cuando corresponda, razón de ausencia y etapa |
-| `ExecutionProfile` | Familia, versión de features, valores por orden fijo y procedencia. No incluye etiquetas en la matriz |
-| `DetectorBundle` | Detector/familia, versiones, features y orden, imputación, parámetros, hashes de ajuste/calibración, semilla, alpha y umbral o motivo no estimable |
-| `DecisionResult` | Método, decisión, score/umbral si existen, motivo y disponibilidad de componentes |
-| `ComparisonResult` | `equivalent`, `different` o `not_evaluable`; conteos, localización, evidencia, normalización aplicada y recorrido completo |
-| `OracleRecord` | Etiqueta, resultado esperado y su hash, comparación, controles del dominio, revisores y resolución |
-| `RunReport` | Composición de resultados con referencias; no colapsa alerta, diferencia y etiqueta en un booleano |
-| `FreezeManifest` | Hashes de contratos/reglas/features/splits/etiquetas/configuración/modelos, decisiones resueltas, fecha y responsables |
+| `validate_contract(document) -> Contract` | Texto JSON, bytes UTF-8 o mapping compatible con JSON; validación estricta y cruzada |
+| `read_contract(path) -> Contract` | Lee un archivo y usa el mismo validador |
+| `write_contract(contract, path) -> None` | Revalida y escribe exactamente los bytes canónicos |
+| `canonical_contract_bytes(contract) -> bytes` | Representación de metadatos canónica v1 |
+| `contract_fingerprint(contract) -> str` | SHA-256 hexadecimal de esos bytes; no equivalencia tabular |
+| `contract_json_schema() -> dict[str, object]` | JSON Schema generado desde `Contract` |
 
-Decimal en JSON se expresa con representación textual y tipo/escala declarados. Infinitos y NaN se codifican como objetos etiquetados; nunca como tokens JSON no estándar. Timestamps conservan offset/zona y los días se representan como fechas. `null` significa ausencia del campo de resultado según el esquema, no un cero estadístico.
+La API explícita está en `equiframe.__all__`; `__version__` es `0.1.0`.
+Los constructores usan Pydantic estricto/inmutable, rechazan extras y conservan
+colecciones como tuplas. La validación de JSON permite arrays sin introducir
+coerciones numéricas con pérdida. No se interpreta código en documentos.
 
-## 3. Estados independientes
+## 2. Modelos materializados
 
-- Ejecución: `completed`, `invalid_input`, `failed`, `timeout`, `resource_exhausted`, `cancelled`.
-- Decisión de detector/reglas: `alert`, `no_alert`, `not_evaluable`.
-- Etiqueta del oráculo: `correct`, `divergent`, `pending`, `not_evaluable`.
-- Ajuste/calibración: `ready`, `not_estimable`, `incompatible`.
-- Trabajo remoto: `queued`, `running`, `succeeded`, `failed`, `cancelled`.
+| Tipo | Campos y restricciones de este paso |
+|---|---|
+| `LogicalType` | Unión discriminada: `BooleanType`, `IntegerType(bits, signed)`, `StringType`, `DecimalType(precision, scale)`, `FloatType(bits)`, `DateType`, `TimestampType(unit, timezone)` |
+| `ColumnSpec` | `name`, `logical_type`, `nullable`, `null_policy`, `nan_policy`, `numeric_policy`, `temporal_policy`, `allowed_values` |
+| `NullPolicy` | Representaciones explícitas `null`, `empty_string`, `zero`; equivalencias requieren justificación y columna nullable |
+| `NaNPolicy` | `forbid`, `distinct`, `as_null`; solo floats, equivalencia justificada |
+| `NumericPolicy` | Comparación exacta/aproximada, unidad, redondeo decimal justificado y tolerancia opcional |
+| `Tolerance` | Límites decimal-textuales absoluto/relativo no negativos, unidad y justificación obligatorias |
+| `TemporalPolicy` | Unión de `DatePolicy` y `TimestampPolicy`; granularidad, zona/política sin offset, DST e intervalos explícitos |
+| `KeySpec` | Nombre, columnas, `unique`, política `incomplete`, ámbito `KeyScope` global/tabla/columnas |
+| `TableSchema` | Columnas, claves, `multiplicity` y `order`; referencias locales verificadas |
+| `TableSpec` | `name`, `schema_spec`; nombres de entrada/salida distintos |
+| `OrderPolicy` | `IgnoredOrder` o `SignificantOrder(by, ties)`; `SortSpec(column, direction, nulls)` |
+| `Contract` | Versión obligatoria, ID, revisión positiva, familia, `inputs`, `output`, `preconditions`, `rules` |
+| `PreconditionSpec` | ID y `requirement` declarativo, con referencias verificadas |
+| `RuleSpec` | ID/revisión, `specification`, severidad, obligatoriedad, referencias `applicability` a precondiciones |
+| `RuleDefinition` | Formas cerradas `SchemaCheck`, `KeyCheck`, `CardinalityCheck`, `JoinCheck`, `OrderCheck`, `AggregateCheck` |
+| `ScalarValue` | Literales etiquetados de ausencia, NaN, infinito, booleano, entero, cadena, decimal, float, día y timestamp |
+| `SchemaRef` | ID, revisión y SHA-256 de un esquema declarado |
+| `ArtifactRef` | Versión, URI sin credenciales/query/fragmento, SHA-256, formato, `media_type`, `size_bytes`, esquema opcional |
 
-Un mutante sin efecto es metadato de la variante; si O verifica su corrección, su etiqueta es `correct`. No se marca divergente por haber sido generado como mutación.
+La validación comprueba nombres únicos, claves/ámbitos/columnas existentes,
+referencias a tablas/precondiciones, parejas y tipos de joins, medidas/grupos
+agregados, precisión/escala, políticas compatibles, unidades, zonas IANA e
+intervalos coherentes. No procesa tablas, comprueba unicidad real, aplica
+redondeo ni ejecuta las reglas declaradas. Nuevas formas incompatibles exigen
+versión de esquema y migración expresa; no hay migración automática.
 
-Tabla completa de H:
+Joins y agrupaciones numéricos requieren unidades iguales. `sum`/`min`/`max`
+conservan la unidad; `sum` admite tipos más amplios de la misma familia sin
+reducir rango entero, capacidad entera/escala decimal ni bits de float.
+`min`/`max` conservan el tipo lógico. No se declaran conversiones implícitas.
+`OrderCheck.columns` coincide con todas las columnas de la política
+`SignificantOrder.by`, en el mismo orden. La política define dirección,
+posición de ausencias y empates. Un literal float32 exacto no puede requerir
+redondeo ni subdesbordamiento. Son restricciones de metadatos, no pruebas de datos.
+
+`allowed_values` es una restricción declarativa tipada. Los contratos en
+`examples/` son fixtures sintéticos para las cinco familias; no escenarios
+científicos revisados ni datos del benchmark. Sus decisiones no fijan valores SERCOP.
+
+## 3. Serialización y versiones
+
+`schema_version`, `revision` y versión del paquete tienen funciones separadas:
+formato, significado del contrato y API. Se admite únicamente esquema `1.0`.
+JSON de miembros duplicados, tokens NaN/Infinity y UTF-8 inválido se rechaza.
+
+`equiframe-metadata-json-v1` incluye defaults/nulls, ordena miembros de objetos
+por puntos de código Unicode, preserva arrays, usa UTF-8 sin BOM/normalización,
+sin espacios ni salto final. No es JCS/RFC 8785. El hash incluye ID y revisión.
+Decimal usa texto `str(Decimal)` con capitalización `E` fijada en contexto local,
+conservando signo, dígitos y exponente/escala,
+sin float intermedio. Instantes conservan texto ISO hasta ns, offset y zona;
+los días siguen siendo días. No se admiten leap seconds ni offset `-00:00`.
+Especiales se representan como objetos etiquetados, nunca tokens no estándar.
+El contexto decimal del consumidor no cambia la huella. Las zonas IANA se
+resuelven exclusivamente con `tzdata` bloqueado, independientemente de la base
+del sistema o `PYTHONTZPATH`. Actualizar esa dependencia requiere revalidación.
+La especificación completa y las limitaciones están en el README del paquete.
+
+JSON Schema estructural se genera en `schemas/`; referencias cruzadas,
+coherencia entre campos y zonas/DST requieren `validate_contract`.
+La huella de metadatos no verifica artefactos reales ni tablas equivalentes.
+
+## 4. Estados públicos separados
+
+Los estados son alias `Literal` públicos, sin funciones de decisión en este paso:
+
+- `ExecutionState`: `completed`, `invalid_input`, `failed`, `timeout`, `resource_exhausted`, `cancelled`.
+- `DecisionState`: `alert`, `no_alert`, `not_evaluable`.
+- `ComparisonState`: `equivalent`, `different`, `not_evaluable`.
+- `OracleState`: `correct`, `divergent`, `pending`, `not_evaluable`.
+- `FitState`: `ready`, `not_estimable`, `incompatible`.
+- `JobState`: `queued`, `running`, `succeeded`, `failed`, `cancelled`.
+
+Un fallo o componente no estimable nunca se define como ausencia de alerta.
+La composición H = R OR M y la agregación de reglas son requisitos de pasos
+posteriores. La tabla prevista se conserva para implementación:
 
 | R | M | H | Evaluación completa |
 |---|---|---|---|
@@ -62,86 +113,48 @@ Tabla completa de H:
 | not_evaluable | no_alert | not_evaluable | no |
 | not_evaluable | not_evaluable | not_evaluable | no |
 
-R agrega sus reglas con el mismo principio: cualquier incumplimiento probado alerta; solo `no_alert` cuando todas las reglas obligatorias aplicables se evaluaron y pasaron. Una regla no aplicable debe tener precondición documentada, no eliminarse silenciosamente. Un conjunto vacío de reglas no acredita evaluación: `not_evaluable` con motivo `no_applicable_rules`.
+Un conjunto vacío de reglas no acredita evaluación. Mutante sin efecto es
+metadato; la etiqueta depende de O, nunca del origen de la variante.
 
-## 4. Puertos e interfaces
+## 5. Integración actual y futura
 
-Firmas de diseño, a materializar como `typing.Protocol` y modelos tipados:
+Solo `ArtifactStore` está materializado como `typing.Protocol`:
+`put(path: Path, *, media_type: str) -> ArtifactRef` y
+`get(ref: ArtifactRef, destination: Path) -> Path`. No hay implementaciones
+ficticias, descargas ni comprobación de hashes de contenido en el paso 1.
 
-```python
-class DataSource(Protocol):
-    def resolve_snapshot(self, snapshot_id: str) -> SnapshotManifest: ...
-    def materialize(self, artifact: ArtifactRef, destination: Path) -> Path: ...
+`DataSource`, `EngineAdapter`, `Rule`, `Profiler` y `Detector` se materializarán
+cuando existan sus tipos completos. `SnapshotManifest`, `TableArtifact`,
+`RunContext`, planes/resultados/observaciones, perfiles, bundles, reportes,
+oráculo y freeze siguen siendo diseño en [arquitectura](ARCHITECTURE.md) y
+[hoja de ruta](HERNAN_ROADMAP.md). No están expuestos como APIs vacías.
+Observaciones/perfiles futuros no contienen etiqueta O, mutación ni salidas de
+otro motor. La integración compartida se acuerda por PR con José/Jhair.
 
-class ArtifactStore(Protocol):
-    def put(self, path: Path, *, media_type: str) -> ArtifactRef: ...
-    def get(self, ref: ArtifactRef, destination: Path) -> Path: ...
+## 6. CLI funcional y errores
 
-class EngineAdapter(Protocol):
-    def capabilities(self) -> EngineCapabilities: ...
-    def execute(self, plan: ExecutionPlan, context: RunContext) -> ExecutionResult: ...
+`equiframe contract validate <archivo>` usa `read_contract` de la API pública.
 
-class Rule(Protocol):
-    def evaluate(self, observation: ExecutionObservation,
-                 spec: RuleSpec) -> RuleResult: ...
-
-class Profiler(Protocol):
-    def compute(self, observation: ExecutionObservation,
-                spec: FeatureSetSpec) -> ExecutionProfile: ...
-
-class Detector(Protocol):
-    def fit(self, training: ProfileMatrix, spec: FitSpec) -> FittedDetector: ...
-    def calibrate(self, fitted: FittedDetector,
-                  calibration: ProfileMatrix, spec: CalibrationSpec) -> DetectorBundle: ...
-    def score(self, profile: ExecutionProfile,
-              bundle: DetectorBundle) -> DecisionResult: ...
-```
-
-`ExecutionObservation` contiene las entradas, la salida y medidas de una única ejecución. No contiene resultado esperado, otro motor, etiqueta ni mutación. `ProfileMatrix` contiene solo columnas permitidas y un manifiesto de procedencia separado de la matriz. `EngineCapabilities` declara versión y tipos/operaciones admitidos; el plan se rechaza cuando no es realizable fielmente.
-
-Servicios públicos previstos:
-
-```python
-validate_contract(document) -> Contract
-run(plan, *, source, artifacts, adapters) -> RunReport
-compare(expected, actual, *, contract, limits) -> ComparisonResult
-evaluate_rules(observation, *, contract) -> tuple[RuleResult, ...]
-profile(observation, *, feature_spec) -> ExecutionProfile
-decide_hybrid(rules_decision, model_decision) -> DecisionResult
-render_report(report, *, destination, format) -> ArtifactRef
-```
-
-`run` recibe dependencias explícitas y configuración; no abre una base remota de manera implícita. Para callbacks, se registra ID y versión del código antes de ejecutar. Las transformaciones confiables usan DataFrames/SQL nativos y deben devolver salidas nuevas o declarar cualquier mutación del objeto de entrada.
-
-## 5. CLI prevista
-
-| Comando | Función |
+| Salida | Semántica de este comando |
 |---|---|
-| `equiframe contract validate <archivo>` | Validar contrato y emitir errores localizables |
-| `equiframe run --config <archivo>` | Ejecutar plan operacional versionado |
-| `equiframe compare --config <archivo>` | Comparación completa con contrato |
-| `equiframe report <run-id> --format json\|html` | Renderizar evidencia existente |
-| `equiframe-benchmark catalog validate <ruta>` | Integridad del catálogo y procedencia |
-| `equiframe-benchmark split --config <archivo>` | Construir/verificar grupos y particiones |
-| `equiframe-benchmark fit --config <archivo>` | Ajustar detectores con normales de entrenamiento |
-| `equiframe-benchmark calibrate --config <archivo>` | Calibrar con normales separados |
-| `equiframe-benchmark freeze --config <archivo>` | Verificar y congelar requisitos de evaluación |
-| `equiframe-benchmark evaluate --freeze <archivo>` | Evaluación final y métricas |
+| 0 | Contrato válido; ID/revisión y huella de metadatos en stdout |
+| 2 | Argumentos, JSON, contrato o versión inválidos |
+| 3 | Fallo de lectura del archivo |
 
-Reconciliación del DW: Jhair registra una operación de dominio invocable por configuración; Hernán provee el mecanismo y el reporte, no SQL SERCOP dentro del núcleo. No se publica un comando vacío de reconciliación.
+El comando no usa 1: no evalúa alerta/diferencia. Errores a stderr con rutas
+JSON, código y mensaje, sin volcar documentos completos.
+`ContractValidationError.issues` es una tupla de `ValidationIssue` inmutables:
+`code`, `location`, `message`, propiedad `path`.
+`SchemaVersionError` y `ContractParseError` son subclases específicas;
+`ContractIOError` cubre lectura/escritura. Todas derivan de `EquiFrameError`.
+Construcción directa de modelos usa `pydantic.ValidationError`; las funciones
+públicas traducen errores de validación a la jerarquía EquiFrame.
+Las rutas de miembros JSON duplicados incluyen objetos/arrays anidados y
+escapan claves no imprimibles. Errores temporales mantienen causa específica
+en `allowed_values`. Los textos de errores directos omiten las entradas;
+la API de Pydantic `.errors()` y las causas pueden conservarlas.
 
-Códigos de salida operacionales: 0 evaluación completada sin alerta/diferencia según el comando; 1 alerta o diferencia observada; 2 configuración/entrada inválida; 3 fallo de ejecución, recurso o resultado no evaluable. Para benchmark, 0 significa ejecución experimental completa aunque existan divergencias; el JSON contiene decisiones y cobertura. Cuando coexisten alerta y fallo, el reporte conserva ambos y el código 3 tiene prioridad. La CLI documenta esta diferencia para automatización.
-
-## 6. Errores y recuperación
-
-Jerarquía prevista: `EquiFrameError` con código estable y detalles tipados; `ContractValidationError`, `InputValidationError`, `UnsupportedEngineFeature`, `ArtifactIntegrityError`, `SchemaVersionError`, `ExecutionFailure`, `ResourceLimitError`, `ModelCompatibilityError` y `RemoteDataError`.
-
-Errores de construcción/configuración se lanzan al invocar la API; errores de una ejecución iniciada se registran en `ExecutionResult` y `RunReport`. Nunca capturar `Exception` y devolver éxito. Los adaptadores preservan la causa saneada, sin secretos. Una opción explícita de la API puede relanzar después de persistir evidencia.
-
-Reintentos: solo lecturas idempotentes y operaciones remotas con clave de idempotencia comprobada. Timeout del cliente no prueba que una escritura falló; consultar su trabajo antes de repetirla.
-
-## 7. Versiones, extensibilidad y recursos
-
-`schema_version` gobierna la lectura de formatos; revisión del contrato gobierna significado; versión de paquete gobierna API. Cambios incompatibles se rechazan o migran mediante función explícita con evidencia. Los hashes se calculan sobre representación canónica documentada, no `repr()` ni `hash()` de Python.
-
-Límites de memoria/tiempo, hilos, disco temporal, tamaño de lote y máximo de diferencias mostradas pertenecen al plan. La cancelación debe cerrar recursos y registrar artefactos parciales. `RunContext` no contiene secretos; el proveedor de credenciales del servicio permanece fuera de la evidencia.
+Otros comandos (`run`, `compare`, `report`, entrenamiento/evaluación) y errores
+de ejecución/recursos/modelos se definen en sus pasos. No hay subcomandos vacíos.
+Los códigos operacionales futuros mantienen distinción entre alerta/diferencia
+(1), entrada inválida (2) y fallo/no evaluable (3), con evidencia independiente.

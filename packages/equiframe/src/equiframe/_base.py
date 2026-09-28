@@ -1,0 +1,55 @@
+"""Shared strict configuration and validation helpers (not public API)."""
+
+from typing import Annotated, Never
+
+from pydantic import (
+    AfterValidator,
+    BaseModel,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    ValidationError,
+)
+from pydantic_core import PydanticCustomError
+
+
+class FrozenModel(BaseModel):
+    model_config = ConfigDict(
+        strict=True,
+        frozen=True,
+        extra="forbid",
+        validate_default=True,
+        revalidate_instances="always",
+        allow_inf_nan=False,
+        hide_input_in_errors=True,
+    )
+
+
+def _text(value: str) -> str:
+    if not value.strip() or value != value.strip():
+        raise ValueError("text must be nonempty and have no surrounding whitespace")
+    if any(0xD800 <= ord(char) <= 0xDFFF for char in value):
+        raise ValueError("text must contain valid Unicode scalar values")
+    return value
+
+
+Text = Annotated[str, StringConstraints(min_length=1), AfterValidator(_text)]
+Identifier = Annotated[Text, StringConstraints(pattern=r"^[A-Za-z][A-Za-z0-9_.-]*$")]
+PositiveInt = Annotated[int, Field(gt=0)]
+NonNegativeInt = Annotated[int, Field(ge=0)]
+
+
+def fail(code: str, message: str, *location: str | int) -> Never:
+    """Attach a cross-field failure to its actual field, including nested paths."""
+    raise ValidationError.from_exception_data(
+        "EquiFrame",
+        [{"type": PydanticCustomError(code, message), "loc": location, "input": None}],
+    )
+
+
+def unique(values: tuple[str, ...], field: str) -> None:
+    seen: set[str] = set()
+    for index, value in enumerate(values):
+        if value in seen:
+            fail("duplicate_reference", "repeated reference: " + value, field, index)
+        seen.add(value)
