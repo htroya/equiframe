@@ -1,6 +1,6 @@
 # Calidad, pruebas y operación
 
-Requisitos de desarrollo para Sol. El paso 1 incorpora pruebas reales de contratos, serialización, propiedades, tiempo y CLI; tipado/estilo, build e instalación limpia se ejecutan también en CI. [Comandos del paquete](../packages/equiframe/README.md). Las áreas de pasos posteriores de la matriz siguen siendo requisitos pendientes, no controles ya implementados.
+Requisitos de desarrollo para Sol. Los pasos 1 y 2 incorporan pruebas reales de contratos, serialización, propiedades, tiempo y CLI; tipado/estilo, build e instalación limpia se ejecutan también en CI. [Comandos del paquete](../packages/equiframe/README.md). Las áreas de pasos posteriores de la matriz siguen siendo requisitos pendientes, no controles ya implementados.
 
 ## 1. Contrato de entrega por incremento
 
@@ -59,3 +59,22 @@ Paso 10 entrega wheel/sdist probado desde instalación limpia, documentación AP
 ## 7. Colaboración reproducible
 
 Cada integrante trabaja en su clon y rama. Los datos compartidos se identifican por snapshot, no por una ruta mutable. La rama principal recibe PR revisables. Las convenciones de revisión no se presentan como protecciones técnicas si GitHub no las tiene configuradas.
+
+
+## 8. Controles del paso 2
+
+CI Python 3.12 x64 Windows Server 2022/Ubuntu 24.04 ejecuta la suite anterior y
+regresiones de motores instalados, sin reemplazarlos por mocks ni saltarlos. La
+instalación de desarrollo usa `uv sync --locked --all-extras`; comandos `uv run`
+conservan ese perfil. La matriz tiene triggers de push y pull_request para
+`hernan/step-**`, incluida base dependiente del paso 1.
+
+El verificador instala el wheel en entornos runtime-only fuera del checkout: base,
+arrow, pandas, polars, duckdb y engines, con versiones del lock. Comprueba extras
+reales, import ligero, API/CLI, ejemplos externos, consumidor mypy y toda la suite
+contra wheel reconstruido desde sdist, además de identidad de todos sus bytes.
+Las regresiones instrumentan conexiones DuckDB reales para demostrar cierre; las
+pruebas de recursos registran el alcance cooperativo y límites nativos efectivos.
+
+Evidencia/versiones/cantidades/checks del commit entregado: `STEP_02_REVIEW.md`.
+Ningún resultado sintético acredita el benchmark, el DW o compatibilidad ARM64.

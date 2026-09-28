@@ -1,6 +1,6 @@
 # API Python y contratos de intercambio
 
-Versión implementada: `equiframe 0.1.0`, esquema `1.0`, paso 1. El [README del
+Versión implementada: `equiframe 0.2.0`, formatos `1.0`, pasos 1 y 2. El [README del
 paquete](../packages/equiframe/README.md) contiene instalación, comandos y un
 ejemplo Python ejecutable. Los componentes siguientes siguen en la hoja de ruta.
 
@@ -15,7 +15,7 @@ ejemplo Python ejecutable. Los componentes siguientes siguen en la hoja de ruta.
 | `contract_fingerprint(contract) -> str` | SHA-256 hexadecimal de esos bytes; no equivalencia tabular |
 | `contract_json_schema() -> dict[str, object]` | JSON Schema generado desde `Contract` |
 
-La API explícita está en `equiframe.__all__`; `__version__` es `0.1.0`.
+La API explícita está en `equiframe.__all__`; `__version__` es `0.2.0`.
 Los constructores usan Pydantic estricto/inmutable, rechazan extras y conservan
 colecciones como tuplas. La validación de JSON permite arrays sin introducir
 coerciones numéricas con pérdida. No se interpreta código en documentos.
@@ -118,14 +118,11 @@ metadato; la etiqueta depende de O, nunca del origen de la variante.
 
 ## 5. Integración actual y futura
 
-Solo `ArtifactStore` está materializado como `typing.Protocol`:
+`ArtifactStore` conserva su firma materializada como `typing.Protocol`:
 `put(path: Path, *, media_type: str) -> ArtifactRef` y
-`get(ref: ArtifactRef, destination: Path) -> Path`. No hay implementaciones
-ficticias, descargas ni comprobación de hashes de contenido en el paso 1.
+`get(ref: ArtifactRef, destination: Path) -> Path`. El paso 2 aporta `LocalArtifactStore`: copias exclusivas, hash/tamaño comprobados y URI locales. No hay descargas.
 
-`DataSource`, `EngineAdapter`, `Rule`, `Profiler` y `Detector` se materializarán
-cuando existan sus tipos completos. `SnapshotManifest`, `TableArtifact`,
-`RunContext`, planes/resultados/observaciones, perfiles, bundles, reportes,
+`DataSource` y `EngineAdapter` tienen tipos completos e implementaciones desde el paso 2. `Rule`, `Profiler` y `Detector` quedan para sus pasos. `SnapshotManifest`, observaciones semánticas, perfiles, bundles, reportes completos,
 oráculo y freeze siguen siendo diseño en [arquitectura](ARCHITECTURE.md) y
 [hoja de ruta](HERNAN_ROADMAP.md). No están expuestos como APIs vacías.
 Observaciones/perfiles futuros no contienen etiqueta O, mutación ni salidas de
@@ -158,3 +155,45 @@ Otros comandos (`run`, `compare`, `report`, entrenamiento/evaluación) y errores
 de ejecución/recursos/modelos se definen en sus pasos. No hay subcomandos vacíos.
 Los códigos operacionales futuros mantienen distinción entre alerta/diferencia
 (1), entrada inválida (2) y fallo/no evaluable (3), con evidencia independiente.
+
+
+## 7. API de ejecución disponible (producto 0.2)
+
+Reutilización general, instalación pip local y alias `ef` son requisitos de producto
+nuevos; conservan el objetivo científico pero no se atribuyen al texto del borrador.
+Publicación PyPI pendiente del paso 10. Ejemplo íntegro y ejecutable, instalación y
+matriz de tipos: [README](../packages/equiframe/README.md).
+
+| Tipo/servicio | Contrato implementado |
+|---|---|
+| `execute(plan, *, source, registry, adapter, artifact_store, work_dir, cancellation)` | Defaults opcionales; ejecuta una implementación registrada y devuelve `ExecutionResult` |
+| `ExecutionPlan` | Contrato, motor, ID/revisión de transformación, parámetros `ScalarValue`, opciones estrictas |
+| `ExecutionOptions` | Tiempo cooperativo, presupuestos de filas/buffers, memoria/hilos/zona DuckDB |
+| `RunContext` | IDs/carpeta/plan/store, parámetros, token/deadline, checkpoints y mediciones por etapa |
+| `EngineCapabilities` | Precisión decimal, unidades temporales/zoned, lazy, cancelación, controles y dependencias |
+| `ExecutionResult` | Formato 1.0; plan/huella, IDs, código, versiones/configuración, estados/diagnóstico, tiempos, entradas/salida |
+| `TableArtifact` / `PhysicalColumn` | Referencia de datos/origen/índice, filas, esquema físico motor/Arrow, NULL/NaN y notas; sin cast al contrato |
+| `TransformationRegistry` | Instancia explícita; `register(Transformation)` y `resolve(plan)`; no reemplaza la misma clave |
+| `PandasTransformation` / `PolarsTransformation` | ID, revisión, code_version y callback nativo tipado `(tables, context)` |
+| `DuckDBTransformation` | ID, revisión, code_version y SELECT/WITH SQL confiable; `$nombre` de valores del plan |
+| `DataSource` | `table_names` y `resolve(name, *, context) -> LoadedTable` |
+| `EngineAdapter` | `engine`, `capabilities()` y `execute(transformation, inputs, context) -> LoadedTable` |
+| `LocalDataSource` | Entradas nombradas `ArrowInput`/`PandasInput`/`PolarsInput`/`ArtifactRef`; local sin conexión implícita |
+| `LocalArtifactStore` | Mismo `ArtifactStore.put/get`; solo formatos declarados/locales y copias con hash/tamaño |
+| `read_table(ref)` | Lee Arrow IPC file/Parquet local tras verificar integridad; sin modificación ni descarga |
+
+Errores completos: `InvalidExecutionInput`, `CapabilityError`,
+`MissingDependencyError`, `ArtifactIntegrityError`, `ArtifactIOError`,
+`ExecutionCancelled`, `ExecutionTimeout`, `ResourceLimitError`; todos reutilizan
+`EquiFrameError`. Operaciones fallidas dentro de una corrida se traducen a estados
+existentes, con código/etapa/tipo; plan inválido y fallos de carpeta/publicación se
+elevan. Los esquemas JSON de plan/resultado son generados, independientes del
+formato de contrato conservado del paso 1. El resultado se revalida al construir;
+completed requiere artefacto de salida y ningún problema.
+
+No ejecuta reglas/precondiciones ni corrige discrepancias de datos con el contrato.
+Salida completed puede ser diferente o anómala; no existe comparación o etiqueta O
+en estos modelos. IDs únicos impiden mezclar corridas locales independientes.
+Arrow no recupera offset textual por fila, signo decimal cero o None perdido al
+construir una tabla; notas/capacidades exponen esas limitaciones. Ningún límite
+cooperativo se describe como timeout duro o sandbox.

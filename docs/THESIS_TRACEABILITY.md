@@ -76,3 +76,32 @@ La [segunda revisión del paso 1](STEP_01_REVIEW.md) registra correcciones y
 regresiones sin modificar el diseño experimental.
 Escalas/unidades/fechas de fixtures no se transfieren a SERCOP. No se modificó
 la tesis ni se resolvieron por defecto sus decisiones metodológicas pendientes.
+
+
+## Requisitos adicionales de producto, versión 0.2 (2026-09-28)
+
+Estos requisitos vienen del pedido de Hernán para el paso 2; no son citas ni
+contenido ya incorporado a la tesis. No modifican la independencia R/M/B/H/O,
+el experimento reproducible, las cinco familias ni el caso DW SERCOP.
+
+| ID | Requisito adicional | Paso/evidencia |
+|---|---|---|
+| P01 | Biblioteca general para desarrolladores, analistas y arquitectos; contratos configurables | 2: API/ejemplos en comercio y telemetría sin nombres de dominio obligatorios |
+| P02 | Instalación base útil y `import equiframe as ef` ligero | 1/2: contratos/store/registro; wheel base fuera del checkout sin motores/ML |
+| P03 | Tres motores opcionales con extensibilidad/inyección explícita | 2: puertos completos, registro por instancia, extras instalados individualmente |
+| P04 | Ejecutar desde scripts/notebooks de otro proyecto sin VM o sys.path | 2: `ef.execute`, wheel instalado y ejemplos externos |
+| P05 | Esquema esperado y salida física separados; no ocultar diferencias | 2: artefactos, máscaras NULL/NaN, tipos nativos, límites decimal/tiempo e índice |
+| P06 | Distribución pública verificable por pip/PyPI | 10: licencia acordada, disponibilidad/control del nombre, metadatos/versiones y publicación; pendiente |
+
+Evidencia del paso 2 para T01/T02/T03/T05/T09/T11/T22: implementaciones nativas,
+entradas locales identificadas/verificadas, captura de evidencia, tipos y aislamiento
+local, pruebas pequeñas con esperados explícitos y límites reales. T05/T11 continúan
+parcialmente pendientes de comparación/normalización/reducción. No se acredita
+snapshot real SERCOP, comparador completo, R, perfiles, detectores, benchmark,
+aprobación/revisión científica, VM ni mejora experimental de H. Las cantidades de
+pruebas y plataformas verificadas se registran en `STEP_02_REVIEW.md` después de
+los controles; los ejemplos no cuentan como los 60 escenarios previstos.
+
+A21–A26 registran motivos y consecuencias de ingeniería. El DOCX no se edita;
+conserva el hash declarado arriba. Las decisiones experimentales abiertas siguen
+pendientes del piloto/equipo; la distribución pública no se adelanta a esta tarea.

@@ -1,12 +1,12 @@
 # Arquitectura de EquiFrame
 
-Versión de diseño: 0.1, 2026-09-28. Estado: paso 1 implementado; componentes de pasos posteriores siguen siendo especificación. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md).
+Versión de diseño: 0.2, 2026-09-28. Estado: pasos 1 y 2 implementados; componentes de pasos posteriores siguen siendo especificación. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md).
 
 ## 1. Propósito y alcance
 
 EquiFrame permite a programadores y analistas expresar qué debe conservar una transformación tabular, ejecutarla con motores concretos, obtener evidencia de incumplimientos y comparar resultados. Su evaluación estudia si Isolation Forest aporta detecciones frente a reglas operativas limitadas y cuánto cuestan esas detecciones. No garantiza equivalencia universal ni interpreta anomalías como corrupción.
 
-Se diseña como biblioteca Python tipada, importable desde scripts y notebooks, con CLI reproducible. El dominio SERCOP es un consumidor de las interfaces. No se requiere interfaz web, Kubernetes, procesamiento distribuido, servicio de modelos ni traductor universal de ETL.
+Se implementa como biblioteca Python de propósito general con contratos configurables, API `import equiframe as ef`, tipos e inyección de dependencias para proyectos externos, scripts y notebooks. La instalación base tiene utilidad propia; los motores son extras. El objetivo `pip install equiframe` exige una publicación verificable posterior, no disponible en este paso. Estos son requisitos nuevos del producto acordados por Hernán; no se atribuyen como texto ya presente en la tesis. Desarrolladores, analistas y arquitectos pueden reutilizar el núcleo sin SERCOP/OCI/DW. El soporte inicial verificable abarca tres motores, no todas las herramientas o problemas de ciencia de datos. El dominio SERCOP es un consumidor de las interfaces. No se requiere interfaz web, Kubernetes, procesamiento distribuido, servicio de modelos ni traductor universal de ETL.
 
 ## 2. Distribuciones y dependencias
 
@@ -24,7 +24,7 @@ Los nombres de distribución son internos hasta comprobar disponibilidad y acord
 
 Base propuesta: Python 3.12. El paso 1 verifica Windows x64 y Linux x64; ARM64 se valida antes de declarar soporte para la VM A1. `pyproject.toml`, estructura `src/`, marcadores `py.typed`, wheel/sdist y versiones semánticas. Durante 0.x los cambios incompatibles requieren changelog y migración explícita.
 
-Dependencias del paso 1: Pydantic 2 para formatos estrictos, `tzdata` como base IANA exclusiva en Windows/Ubuntu y Typer para CLI. Versiones de ejecución, desarrollo y backend resueltas y fijadas con hashes en `packages/equiframe/uv.lock`. PyArrow y extras `pandas`, `polars`, `duckdb`, `ml`, `all` siguen previstos para los pasos que los utilizan; no se declaran extras vacíos. Pandas/Polars/DuckDB/scikit-learn/NumPy/PyArrow no se importan al hacer `import equiframe`.
+Dependencias del paso 1: Pydantic 2 para formatos estrictos, `tzdata` como base IANA exclusiva en Windows/Ubuntu y Typer para CLI. Versiones de ejecución, desarrollo y backend resueltas y fijadas con hashes en `packages/equiframe/uv.lock`. Paso 2 añade extras funcionales `arrow`, `pandas`, `polars`, `duckdb` y `engines`; cada motor requiere PyArrow. ML no tiene extra anticipado. Cada perfil de instalación se verifica desde wheel fuera del checkout. Pandas/Polars/DuckDB/scikit-learn/NumPy/PyArrow no se importan al hacer `import equiframe`.
 
 El almacenamiento tabular Arrow no reemplaza la semántica del contrato. La extracción conserva tipo físico, tipo lógico, máscara de ausencia y NaN antes de cualquier conversión. Un adaptador que no pueda preservar una distinción exigida debe informar incompatibilidad; no adivinarla.
 
@@ -78,11 +78,11 @@ No existe flecha desde O, etiquetas o mutaciones hacia los perfiles o detectores
 
 ## 5. Flujo de una ejecución
 
-1. Validar contrato, configuración, versión de esquema, disponibilidad del adaptador y precondiciones.
+1. Paso 2: validar metadatos de contrato/configuración, versión, registro, disponibilidad/capacidades y nombres de entradas. Precondiciones ejecutables y validadores quedan para sus pasos.
 2. Resolver una versión inmutable de entrada; comprobar hashes y permisos de lectura. Nunca resolver `latest` de nuevo a mitad de la corrida.
 3. Registrar `run_id`, `execution_id`, escenario/variante fuera del vector del modelo, hashes, versión del código y entorno.
-4. Ejecutar la implementación registrada en un contexto propio. DuckDB recibe conexión propia a una base temporal o de solo lectura; Polars lazy se materializa antes de detener el cronómetro de transformación.
-5. Capturar salida y métricas de conversión. Registrar esquema físico antes de normalizar, cantidad de filas y artefacto tabular.
+4. Ejecutar la implementación registrada en un contexto propio. DuckDB recibe conexión propia a una base temporal o de solo lectura; Polars lazy registra planificación y materialización separadas; el tiempo total incluye ambas y solo se declara completed después de collect.
+5. Capturar salida fiel, tipos físicos nativos/Arrow, índices, ausencias/NaN, filas y artefacto tabular. Esquema esperado del contrato y esquema observado permanecen separados; no hay normalización en el paso 2.
 6. Aplicar precondiciones posteriores, R y perfil. Evaluar M y B solo si sus bundles son compatibles. Componer H con estado de disponibilidad.
 7. Persistir evidencia por escritura temporal y publicación atómica del manifiesto final. Un fallo deja estado fallido y diagnóstico, nunca un resultado exitoso incompleto.
 8. En evaluación, calcular O desde el resultado esperado revisado y comparar métodos únicamente después. En uso operacional, O puede omitirse; el reporte dirá que no se confirmó equivalencia.
@@ -104,7 +104,7 @@ Una limitación de memoria o tiempo produce comparación `not_evaluable`, no equ
 
 ## 7. Persistencia y trazabilidad
 
-Una corrida produce, según el modo, `run.json`, `environment.json`, `events.jsonl`, `rules.json`, `profile.json`, `decisions.json`, `comparison.json`, `report.html` y referencias a entradas/salidas. El benchmark agrega manifiestos de splits, revisiones, métricas y costos. Cada formato tiene `schema_version`.
+Paso 2 produce `run.json`, entradas capturadas y salida Arrow con referencias, tamaños y SHA-256 en un directorio propio. Los demás archivos siguientes pertenecen a modos futuros: `run.json`, `environment.json`, `events.jsonl`, `rules.json`, `profile.json`, `decisions.json`, `comparison.json`, `report.html` y referencias a entradas/salidas. El benchmark agrega manifiestos de splits, revisiones, métricas y costos. Cada formato tiene `schema_version`.
 
 Artefactos grandes: Arrow/Parquet con esquema y hashes; JSON para metadatos y valores especiales etiquetados. Un hash de archivo verifica bytes; un digest lógico versionado puede resumir contenido canónico, pero no reemplaza la prueba exacta. El manifiesto final contiene hashes de sus artefactos y el estado de completitud.
 
@@ -135,3 +135,44 @@ Para medir rendimiento se ejecuta un experimento a la vez, con recursos y caché
 El código admite contratos y configuraciones versionados. Fecha de cohorte, escala decimal, reglas de claves incompletas, alpha, familias estimables y tamaños de grupos se fijan con evidencia durante el piloto. El modo final exige un `FreezeManifest` completo. Modificar una decisión congelada crea una nueva versión experimental y no reescribe las métricas anteriores.
 
 La calidad del software puede ser profesional aunque el estudio siga exploratorio. No se declara uso productivo en SERCOP ni una ventaja de H hasta obtener resultados.
+
+
+## 11. API y alcance implementado del paso 2
+
+`ef.execute(plan, *, source, registry, adapter=None, artifact_store=None,
+work_dir=None, cancellation=None) -> ExecutionResult` es la entrada funcional.
+Se ajusta el runner completo previsto: ahora solo resuelve datos, ejecuta código
+registrado, materializa y persiste evidencia. La orquestación R/perfiles/modelos/
+comparación permanece en pasos 3–8. Contratos JSON contienen declaraciones,
+nunca callbacks o SQL; estos se registran explícitamente como código confiable.
+
+`ExecutionPlan`, `ExecutionOptions`, `ExecutionResult`, `EngineCapabilities`,
+`PhysicalColumn`, `TableArtifact`, parámetros/timings/versiones son modelos frozen
+estrictos. `RunContext`, `CancellationToken`, registro y `LoadedTable` son objetos
+runtime por corrida/consumidor. `ArtifactStore`, `DataSource` y `EngineAdapter`
+son puertos completos; no hay registro, conexión o runner global.
+
+Entradas Arrow/locales o nativas explícitas: `ArrowInput`, `PandasInput`,
+`PolarsInput`, `ArtifactRef`. Almacén local verifica copia/hash/tamaño y publica
+sin sobrescritura por enlace duro. Arrow IPC file es la salida principal; Parquet
+es entrada soportada. No hay lector SQL sobre base compartida, descargas ni URI
+remotas implícitas. Extender `DataSource` después permitirá integrar el cliente de
+José, sin importarlo desde el núcleo. Contratos de Jhair siguen fuera del núcleo.
+
+Pandas protege datos/índice del consumidor; Polars materializa lazy y mide
+planificación/captura; DuckDB abre `:memory:` propio, parametriza valores, controla
+nombres y desactiva SQL externo/extensiones descargadas. Cada motor usa su código
+nativo. La [matriz de transporte](../packages/equiframe/README.md) delimita decimal,
+NULL/NaN, fechas, ns, zonas, índices y objetos no capturables. La política temporal
+del contrato usa tzdata Python; los motores registran su proveedor real y no se
+asume igualdad de versiones IANA.
+
+Los presupuestos de tabla son checkpoints tras materialización, no cuotas de
+asignación/RSS. Timeout/cancelación de callbacks y Polars collect son cooperativos;
+DuckDB además interrumpe consulta y une el monitor antes de cerrar. No se abandona
+un callback propio ejecutándose para aparentar un timeout duro. El manifiesto usa
+los estados del paso 1 y no emite juicio semántico ni alerta.
+
+Distribución pública se incorpora al paso 10: licencia acordada, nombre disponible
+o bajo control del equipo, metadatos, versiones soportadas y publicación comprobada
+en PyPI. Este paso no publica ni garantiza instalación desde el índice público.

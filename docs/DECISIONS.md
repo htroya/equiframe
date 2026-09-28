@@ -48,3 +48,21 @@ Estas decisiones del paso 1 no cambian requisitos metodológicos del borrador ni
 - [ZoneInfo de Python 3.12](https://docs.python.org/3.12/library/zoneinfo.html): precedencia de TZPATH y carga desde archivo; prueba aislada con base del host alterada.
 
 La consulta técnica no sustituye la prueba contra las versiones que Sol seleccione y bloquee.
+
+
+## Decisiones del paso 2 — producto 0.2, Sol, 2026-09-28
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A21 | Biblioteca de propósito general, API ef y distribución pública en paso 10 | Pedido nuevo de Hernán, separado del texto científico; base útil, extras y contratos sin SERCOP/OCI/VM. Mantiene diez pasos e independencia experimental |
+| A22 | `execute` limita orquestación a ejecución/captura | Tipos completos y DI ahora; reglas/precondiciones operativas, comparación/perfiles/modelos esperan sus pasos. completed no acredita semántica |
+| A23 | Arrow IPC file como captura y Arrow/Parquet locales de entrada | Máscaras/NaN/decimal/épocas temporales, esquema físico separado; rechazo previo de objetos/exponentes/signed decimal zero/zoned ns DuckDB no representables. No reconstruye pérdidas anteriores |
+| A24 | Registro explícito por instancia y SQL confiable parametrizado | No evalúa contrato JSON, no globals; callbacks propios por motor. DuckDB solo conexión :memory: local con acceso externo/descargas/spill deshabilitados y cierre verificable |
+| A25 | Controles cooperativos; interrupción nativa de consulta DuckDB | Sin sandbox ni promesa de timeout duro para callbacks/collect; checkpoint de filas/buffers y memoria/hilos propios del motor no equivalen a RSS o cuotas remotas. Monitores se unen antes de cerrar |
+| A26 | Extras y wheel fuera del checkout, CI para PR dependientes | arrow/pandas/polars/duckdb/engines instalados y probados; import ligero; base del PR es step-01 mientras #11 siga abierto. Formato contrato/ArtifactRef 1.0 intacto; API 0.2 con changelog/lock |
+
+El paso 2 no publica en PyPI, no integra PR ni cambia carpetas de José/Jhair.
+Los proveedores temporales reales se registran: contrato tzdata Python, entrada
+Pandas tzinfo, Polars chrono-tz del runtime, DuckDB ICU del wheel. No se atribuye una
+versión IANA común o expuesta sin evidencia. Los enlaces técnicos del README apoyan
+las limitaciones; pruebas contra el lock fijan el comportamiento de esta entrega.

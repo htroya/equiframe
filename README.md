@@ -8,7 +8,7 @@ Tablero privado de trabajo: <https://github.com/users/htroya/projects/1>. Los di
 
 ## Estado real
 
-El **paso 1** implementa `equiframe 0.1.0`: contratos semánticos estrictos e inmutables, tipos públicos, validación cruzada, JSON canónico, SHA-256 de metadatos, esquemas JSON y CLI funcional. Hay cinco contratos sintéticos y pruebas de comportamiento/propiedades, tipado, empaquetado e instalación limpia. Adaptadores, comparador, reglas ejecutables, modelos y benchmark siguen pendientes. El paquete no está publicado en PyPI.
+Los **pasos 1 y 2** implementan `equiframe 0.2.0`: contratos semánticos estrictos e inmutables, tipos públicos, validación cruzada, JSON canónico, SHA-256 de metadatos, esquemas JSON y CLI funcional. Hay cinco contratos sintéticos y pruebas de comportamiento/propiedades, tipado, empaquetado e instalación limpia. La API `import equiframe as ef` ejecuta transformaciones nativas con Pandas, Polars y DuckDB local, mediante extras. Comparador, reglas ejecutables, modelos y benchmark siguen pendientes. El paquete no está publicado en PyPI.
 
 Instalación, API y comandos de verificación: [README del paquete](packages/equiframe/README.md). Python inicial: 3.12; matriz CI x64 Windows/Ubuntu. ARM64 no está verificado.
 
@@ -28,6 +28,7 @@ La fuente metodológica es `TFM_EquiFrame_ACTUAL.docx`, revisada el 2026-09-28. 
 | [Plan de Hernán](docs/HERNAN_ROADMAP.md) | Diez pasos con entregables y criterios de aceptación |
 | [Calidad y operación](docs/QUALITY.md) | Pruebas, recursos, compatibilidad, seguridad y releases |
 | [Segunda revisión del paso 1](docs/STEP_01_REVIEW.md) | Hallazgos, matriz del alcance y comprobaciones ejecutadas |
+| [Revisión del paso 2](docs/STEP_02_REVIEW.md) | Alcance, evidencia y límites de ejecución/distribución |
 | [Decisiones](docs/DECISIONS.md) | Decisiones de arquitectura y asuntos abiertos |
 | [Colaboración](CONTRIBUTING.md) | Ramas, revisiones y permisos |
 
@@ -56,12 +57,14 @@ infra/                        infraestructura de José
 
 ## Inicio de la implementación
 
-Sol ha implementado únicamente el paso 1 de [la hoja de ruta](docs/HERNAN_ROADMAP.md). La CI ejecuta controles reales con permisos `contents: read`, acciones fijadas por commit y dependencias bloqueadas. Los siguientes nueve pasos siguen pendientes.
+Sol ha implementado los pasos 1 y 2 de [la hoja de ruta](docs/HERNAN_ROADMAP.md). La CI ejecuta controles reales con permisos `contents: read`, acciones fijadas por commit y dependencias bloqueadas. Los siguientes ocho pasos siguen pendientes.
 
 ## Datos y permisos
 
-Código, especificaciones y pequeños casos sintéticos se versionan en Git. Datos SERCOP, archivos DuckDB, modelos y resultados de corridas van al almacén de artefactos con hashes y manifiestos. Ningún integrante comparte sus tokens con los demás.
+Código, especificaciones y pequeños casos sintéticos se versionan en Git. Datos SERCOP, archivos DuckDB, modelos y resultados de corridas van al almacén de artefactos con hashes y manifiestos. En el paso 2, cada corrida local produce su salida y `run.json`; `completed` acredita ejecución, no corrección semántica. Ningún integrante comparte sus tokens con los demás.
 
 `htroya` es propietario. Las invitaciones de José y Jhair están pendientes de conocer sus usuarios. En un repositorio personal GitHub permite colaboradores con escritura, pero reserva al propietario la administración completa. Si se necesitan tres administradores se debe acordar el traslado a una organización.
 
 La licencia de distribución del software está pendiente de decisión de los autores. Este repositorio privado no implica autorización para publicar un paquete en PyPI.
+
+El objetivo de distribución pública es `pip install equiframe`, con licencia/nombre bajo control del equipo y publicación verificable en el paso 10. No está publicado: use el wheel del equipo. Ejemplos genéricos: [ejecución nativa](packages/equiframe/examples/execute_native.py); API y límites: [README del paquete](packages/equiframe/README.md).
