@@ -43,9 +43,31 @@ los rangos de metadatos no certifican todas sus combinaciones.
 | Wheel instalado | Import ligero, API/CLI y errores, perfiles individuales, combinación, ejemplos copiados y mínimo del README ejecutado literalmente |
 | Sdist | Wheel reconstruido idéntico byte a byte, batería completa contra site-packages, assets y consumidor mypy externo |
 
-Los comandos reproducibles están en el README del paquete. La evidencia de CI por
-plataforma y commit se añadirá después de verificar sus checks; no se atribuye el
+Los comandos reproducibles están en el README del paquete. No se atribuye el
 resultado local a Ubuntu ni se declara ARM64 u otras versiones de Python.
+
+## CI verificada
+
+El commit `ac92cac433306fd2343279baed7d69d1336ddf9a` contiene toda la implementación
+y documentación de alcance. Los workflows de
+[PR](https://github.com/htroya/equiframe/actions/runs/36489628830) y
+[push](https://github.com/htroya/equiframe/actions/runs/36489623851) terminaron
+con success en las dos plataformas el 2026-09-28.
+
+| Plataforma x64 | Python efectivo | Suite | Suite contra wheel del sdist | Evidencia del PR |
+|---|---|---|---|---|
+| Ubuntu 24.04 | CPython 3.12.14 | 321 passed | 321 passed | [Job Ubuntu](https://github.com/htroya/equiframe/actions/runs/36489628830/job/109154847878) |
+| Windows Server 2022 | CPython 3.12.10 | 321 passed | 321 passed | [Job Windows](https://github.com/htroya/equiframe/actions/runs/36489628830/job/109154847644) |
+
+Ambos jobs también verificaron Ruff/formato, mypy strict, nueve assets, build,
+base y cada extra runtime-only, import/API/CLI, ejemplos externos y mínimo del
+README, consumidor tipado y reconstrucción del wheel idéntica byte a byte.
+
+El [PR #12](https://github.com/htroya/equiframe/pull/12) está vinculado al issue #2 y
+su base sigue siendo `hernan/step-01-foundations`, dependiente del PR #11 abierto.
+El commit que añade esta evidencia solo modifica este informe; los
+[checks del HEAD](https://github.com/htroya/equiframe/pull/12/checks) se comprueban
+nuevamente antes de entregar. No se integra el PR automáticamente.
 
 ## Regresiones y decisiones relevantes
 
