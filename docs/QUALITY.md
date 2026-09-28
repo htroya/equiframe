@@ -1,6 +1,6 @@
 # Calidad, pruebas y operación
 
-Requisitos de desarrollo para Sol; todavía no se han ejecutado pruebas de biblioteca porque no hay implementación.
+Requisitos de desarrollo para Sol. El paso 1 incorpora pruebas reales de contratos, serialización, propiedades, tiempo y CLI; tipado/estilo, build e instalación limpia se ejecutan también en CI. [Comandos del paquete](../packages/equiframe/README.md). Las áreas de pasos posteriores de la matriz siguen siendo requisitos pendientes, no controles ya implementados.
 
 ## 1. Contrato de entrega por incremento
 

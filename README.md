@@ -8,7 +8,9 @@ Tablero privado de trabajo: <https://github.com/users/htroya/projects/1>. Los di
 
 ## Estado real
 
-Este primer incremento contiene la arquitectura, los contratos de integración, el plan de implementación y las normas del proyecto. **La biblioteca todavía no está implementada ni publicada.** Las interfaces documentadas son la especificación de desarrollo, no funciones ya disponibles. No hay resultados experimentales ni modelos entrenados.
+El **paso 1** implementa `equiframe 0.1.0`: contratos semánticos estrictos e inmutables, tipos públicos, validación cruzada, JSON canónico, SHA-256 de metadatos, esquemas JSON y CLI funcional. Hay cinco contratos sintéticos y pruebas de comportamiento/propiedades, tipado, empaquetado e instalación limpia. Adaptadores, comparador, reglas ejecutables, modelos y benchmark siguen pendientes. El paquete no está publicado en PyPI.
+
+Instalación, API y comandos de verificación: [README del paquete](packages/equiframe/README.md). Python inicial: 3.12; matriz CI x64 Windows/Ubuntu. ARM64 no está verificado.
 
 La fuente metodológica es `TFM_EquiFrame_ACTUAL.docx`, revisada el 2026-09-28. Su identidad, requisitos y decisiones pendientes están en [trazabilidad](docs/THESIS_TRACEABILITY.md). El documento de tesis y los datos originales no se copian a este repositorio.
 
@@ -46,11 +48,11 @@ infra/                        infraestructura de José
 .github/                      plantillas de colaboración
 ```
 
-En este incremento las carpetas de paquetes contienen su especificación de responsabilidad. Los directorios `src/`, las distribuciones Python, los bloqueos de dependencias y sus pruebas se crean en el paso 1 de implementación de Hernán o por el responsable correspondiente.
+`packages/equiframe` contiene `src/`, `pyproject.toml`, `uv.lock`, pruebas, fixtures y esquemas generados. Los otros paquetes y servicios conservan sus especificaciones de responsabilidad.
 
 ## Inicio de la implementación
 
-Sol realizará toda la implementación, comenzando por el paso 1 de [la hoja de ruta](docs/HERNAN_ROADMAP.md). Esta preparación no incorpora código de biblioteca, modelos, tests ni pipelines CI ficticios. El paso 1 incorporará empaquetado, tipos, validación y las primeras pruebas y comprobaciones CI reales.
+Sol ha implementado únicamente el paso 1 de [la hoja de ruta](docs/HERNAN_ROADMAP.md). La CI ejecuta controles reales con permisos `contents: read`, acciones fijadas por commit y dependencias bloqueadas. Los siguientes nueve pasos siguen pendientes.
 
 ## Datos y permisos
 

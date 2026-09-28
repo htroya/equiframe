@@ -63,3 +63,14 @@ El archivo original está en la carpeta padre del proyecto local. No se modifica
 6. En el capítulo 4 informar lo construido y probado, junto con los componentes no estimables o pendientes. No incorporar resultados de ejemplo como observaciones.
 
 Las decisiones de empaquetado, Python 3.12, formatos de API y organización del repo son propuestas de ingeniería de esta arquitectura, no afirmaciones de que el borrador ya las exige.
+
+## Evidencia de implementación del paso 1
+
+`packages/equiframe` aporta contratos/fixtures sintéticos para T01/T05, metadatos
+de artefacto para la parte declarativa de T03, API/CLI y un Protocol completo
+para la parte inicial de T09, y propiedades de serialización para T11.
+Esto no acredita validación de datos, un snapshot real, reglas evaluadas,
+independencia/revisión del oráculo ni resultados experimentales.
+Las decisiones de formato, dependencias y ámbito (A13–A17) son de ingeniería.
+Escalas/unidades/fechas de fixtures no se transfieren a SERCOP. No se modificó
+la tesis ni se resolvieron por defecto sus decisiones metodológicas pendientes.
