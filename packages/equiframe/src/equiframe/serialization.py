@@ -3,6 +3,7 @@
 import hashlib
 import json
 from collections.abc import Mapping
+from dataclasses import dataclass
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -23,13 +24,30 @@ def _parse_issue(code: str, message: str) -> ContractParseError:
     return ContractParseError((ValidationIssue(code, (), message),))
 
 
-def _pairs(pairs: list[tuple[str, object]]) -> dict[str, object]:
-    result: dict[str, object] = {}
-    for key, value in pairs:
-        if key in result:
-            raise _parse_issue("duplicate_json_key", "duplicate JSON object key: " + key)
-        result[key] = value
-    return result
+@dataclass
+class _JsonObject:
+    pairs: list[tuple[str, object]]
+
+
+def _unique_objects(value: object, location: tuple[str | int, ...] = ()) -> object:
+    if isinstance(value, _JsonObject):
+        result: dict[str, object] = {}
+        for key, member in value.pairs:
+            if key in result:
+                raise ContractParseError(
+                    (
+                        ValidationIssue(
+                            "duplicate_json_key",
+                            (*location, key),
+                            "duplicate JSON object key: " + json.dumps(key, ensure_ascii=True),
+                        ),
+                    )
+                )
+            result[key] = _unique_objects(member, (*location, key))
+        return result
+    if isinstance(value, list):
+        return [_unique_objects(member, (*location, index)) for index, member in enumerate(value)]
+    return value
 
 
 def _constant(value: str) -> object:
@@ -45,7 +63,9 @@ def validate_contract(document: str | bytes | Mapping[str, object]) -> Contract:
             raw = document
         else:
             raw = json.dumps(dict(document), ensure_ascii=False, allow_nan=False)
-        parsed: object = json.loads(raw, object_pairs_hook=_pairs, parse_constant=_constant)
+        parsed = _unique_objects(
+            json.loads(raw, object_pairs_hook=_JsonObject, parse_constant=_constant)
+        )
     except (UnicodeError, TypeError, ValueError, RecursionError) as exc:
         if isinstance(exc, json.JSONDecodeError):
             raise _parse_issue(
@@ -105,8 +125,8 @@ def contract_fingerprint(contract: Contract) -> str:
 def read_contract(path: str | Path) -> Contract:
     try:
         document = Path(path).read_bytes()
-    except OSError as exc:
-        raise ContractIOError("cannot read contract file: " + str(path)) from exc
+    except (OSError, ValueError) as exc:
+        raise ContractIOError("cannot read contract file: " + ascii(str(path))) from exc
     return validate_contract(document)
 
 
@@ -114,8 +134,8 @@ def write_contract(contract: Contract, path: str | Path) -> None:
     data = canonical_contract_bytes(contract)
     try:
         Path(path).write_bytes(data)
-    except OSError as exc:
-        raise ContractIOError("cannot write contract file: " + str(path)) from exc
+    except (OSError, ValueError) as exc:
+        raise ContractIOError("cannot write contract file: " + ascii(str(path))) from exc
 
 
 def contract_json_schema() -> dict[str, object]:

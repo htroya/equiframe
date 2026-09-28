@@ -3,11 +3,11 @@
 import struct
 from datetime import UTC, date, datetime
 from typing import Annotated, Literal, Self
-from zoneinfo import ZoneInfo
 
 from pydantic import Field, ValidationError, model_validator
 
 from equiframe._base import FrozenModel, Identifier, NonNegativeInt, PositiveInt, Text, fail, unique
+from equiframe._timezones import timezone
 from equiframe.values import (
     DateValue,
     ExactDecimal,
@@ -192,7 +192,7 @@ class TimestampPolicy(FrozenModel):
             if self.timezone is not None:
                 stamp = datetime.fromisoformat(value.value)
                 try:
-                    actual_offset = stamp.astimezone(ZoneInfo(self.timezone)).utcoffset()
+                    actual_offset = stamp.astimezone(timezone(self.timezone)).utcoffset()
                 except (OverflowError, ValueError):
                     fail("timestamp_range", "zoned instant exceeds calendar range", field, "value")
                 if actual_offset != stamp.utcoffset():
@@ -395,9 +395,20 @@ class ColumnSpec(FrozenModel):
             and self.logical_type.bits == 32
         ):
             try:
-                struct.pack("!f", value.value)
+                represented = struct.unpack("!f", struct.pack("!f", value.value))[0]
             except OverflowError:
                 fail("float_range", "literal exceeds float32 range", *location, "value")
+            if (
+                self.numeric_policy is not None
+                and self.numeric_policy.comparison == "exact"
+                and represented != value.value
+            ):
+                fail(
+                    "float_precision",
+                    "exact float32 literal would require rounding or underflow",
+                    *location,
+                    "value",
+                )
         if isinstance(self.temporal_policy, DatePolicy) and value.kind == "date":
             policy = self.temporal_policy
             lower = date.fromisoformat(policy.lower.value).toordinal() if policy.lower else None
@@ -415,12 +426,9 @@ class ColumnSpec(FrozenModel):
                 upper = (
                     stamp_policy._bound(stamp_policy.upper, "upper") if stamp_policy.upper else None
                 )
-            except ValidationError:
-                fail(
-                    "timestamp_literal",
-                    "literal is incompatible with the temporal policy",
-                    *location,
-                )
+            except ValidationError as exc:
+                issue = exc.errors(include_url=False, include_input=False)[0]
+                fail(issue["type"], issue["msg"], *location, *issue["loc"][1:])
             self._interval(point, lower, upper, stamp_policy.closed, index)
 
     @staticmethod
@@ -719,15 +727,23 @@ class Contract(FrozenModel):
             right = table(definition.right_table, "right_table")
             columns(definition.left_table, definition.left_columns, "left_columns")
             columns(definition.right_table, definition.right_columns, "right_columns")
-            left_types = {col.name: col.logical_type for col in left.columns}
-            right_types = {col.name: col.logical_type for col in right.columns}
+            left_columns = {col.name: col for col in left.columns}
+            right_columns = {col.name: col for col in right.columns}
             for index, (lcol, rcol) in enumerate(
                 zip(definition.left_columns, definition.right_columns, strict=True)
             ):
-                if left_types[lcol] != right_types[rcol]:
+                if left_columns[lcol].logical_type != right_columns[rcol].logical_type:
                     fail(
                         "join_type",
                         "join columns require identical logical types",
+                        *location,
+                        "right_columns",
+                        index,
+                    )
+                if not _same_units(left_columns[lcol], right_columns[rcol]):
+                    fail(
+                        "join_unit",
+                        "join columns require identical numeric units",
                         *location,
                         "right_columns",
                         index,
@@ -739,6 +755,15 @@ class Contract(FrozenModel):
                 fail("unknown_key", "unknown key: " + definition.key, *location, "key")
         elif isinstance(definition, OrderCheck):
             columns(definition.table, definition.columns, "columns")
+            if not isinstance(schema.order, SignificantOrder) or definition.columns != tuple(
+                item.column for item in schema.order.by
+            ):
+                fail(
+                    "order_policy",
+                    "order check must reference the complete declared significant order",
+                    *location,
+                    "columns",
+                )
         elif isinstance(definition, AggregateCheck):
             output = table(definition.output_table, "output_table")
             columns(definition.table, definition.group_by, "group_by")
@@ -746,13 +771,22 @@ class Contract(FrozenModel):
             columns(definition.output_table, (definition.output_column,), "output_column")
             source = {col.name: col for col in schema.columns}
             target = {col.name: col for col in output.columns}
-            for name in definition.group_by:
+            for index, name in enumerate(definition.group_by):
                 if source[name].logical_type != target[name].logical_type:
                     fail(
                         "aggregate_group_type",
                         "grouping types must be preserved",
                         *location,
                         "group_by",
+                        index,
+                    )
+                if not _same_units(source[name], target[name]):
+                    fail(
+                        "aggregate_group_unit",
+                        "grouping units must be preserved",
+                        *location,
+                        "group_by",
+                        index,
                     )
             if definition.measure is not None:
                 columns(definition.table, (definition.measure,), "measure")
@@ -763,12 +797,16 @@ class Contract(FrozenModel):
                     "float",
                 ):
                     fail("aggregate_type", "sum requires a numeric measure", *location, "measure")
-                if target[definition.output_column].logical_type.kind not in (
-                    "integer",
-                    "decimal",
-                    "float",
+                if not _sum_type(
+                    source[definition.measure].logical_type,
+                    target[definition.output_column].logical_type,
                 ):
-                    fail("aggregate_type", "sum output must be numeric", *location, "output_column")
+                    fail(
+                        "aggregate_type",
+                        "sum must preserve numeric family without narrowing its value domain",
+                        *location,
+                        "output_column",
+                    )
             if (
                 definition.function == "count"
                 and target[definition.output_column].logical_type.kind != "integer"
@@ -786,3 +824,39 @@ class Contract(FrozenModel):
                     *location,
                     "output_column",
                 )
+            if (
+                definition.function in ("sum", "min", "max")
+                and definition.measure is not None
+                and not _same_units(source[definition.measure], target[definition.output_column])
+            ):
+                fail(
+                    "aggregate_unit",
+                    "sum/min/max must preserve numeric units",
+                    *location,
+                    "output_column",
+                )
+
+
+def _same_units(source: ColumnSpec, target: ColumnSpec) -> bool:
+    return (
+        source.numeric_policy is None
+        or target.numeric_policy is None
+        or source.numeric_policy.unit == target.numeric_policy.unit
+    )
+
+
+def _sum_type(source: LogicalType, target: LogicalType) -> bool:
+    if isinstance(source, IntegerType) and isinstance(target, IntegerType):
+        source_lower = -(2 ** (source.bits - 1)) if source.signed else 0
+        target_lower = -(2 ** (target.bits - 1)) if target.signed else 0
+        source_upper = 2 ** (source.bits - int(source.signed)) - 1
+        target_upper = 2 ** (target.bits - int(target.signed)) - 1
+        return target_lower <= source_lower and target_upper >= source_upper
+    if isinstance(source, DecimalType) and isinstance(target, DecimalType):
+        return (
+            target.scale >= source.scale
+            and target.precision - target.scale >= source.precision - source.scale
+        )
+    if isinstance(source, FloatType) and isinstance(target, FloatType):
+        return target.bits >= source.bits
+    return False

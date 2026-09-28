@@ -12,6 +12,9 @@ El **paso 1** implementa `equiframe 0.1.0`: contratos semánticos estrictos e in
 
 Instalación, API y comandos de verificación: [README del paquete](packages/equiframe/README.md). Python inicial: 3.12; matriz CI x64 Windows/Ubuntu. ARM64 no está verificado.
 
+La [segunda revisión completa del paso 1](docs/STEP_01_REVIEW.md) registra fallos
+reproducidos, correcciones, 51 regresiones nuevas y evidencia de distribución.
+
 La fuente metodológica es `TFM_EquiFrame_ACTUAL.docx`, revisada el 2026-09-28. Su identidad, requisitos y decisiones pendientes están en [trazabilidad](docs/THESIS_TRACEABILITY.md). El documento de tesis y los datos originales no se copian a este repositorio.
 
 ## Documentos de trabajo
@@ -24,6 +27,7 @@ La fuente metodológica es `TFM_EquiFrame_ACTUAL.docx`, revisada el 2026-09-28. 
 | [Diseño experimental](docs/EXPERIMENT_DESIGN.md) | Oráculo, independencia, perfiles, modelos, particiones y métricas |
 | [Plan de Hernán](docs/HERNAN_ROADMAP.md) | Diez pasos con entregables y criterios de aceptación |
 | [Calidad y operación](docs/QUALITY.md) | Pruebas, recursos, compatibilidad, seguridad y releases |
+| [Segunda revisión del paso 1](docs/STEP_01_REVIEW.md) | Hallazgos, matriz del alcance y comprobaciones ejecutadas |
 | [Decisiones](docs/DECISIONS.md) | Decisiones de arquitectura y asuntos abiertos |
 | [Colaboración](CONTRIBUTING.md) | Ramas, revisiones y permisos |
 

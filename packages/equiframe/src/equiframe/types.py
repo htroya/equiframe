@@ -39,6 +39,7 @@ class ArtifactRef(FrozenModel):
         try:
             parts = urlsplit(self.uri)
             host = parts.hostname
+            port = parts.port
         except ValueError:
             fail("artifact_uri", "invalid artifact URI", "uri")
         if parts.scheme not in ("https", "file", "s3", "gs"):
@@ -58,6 +59,10 @@ class ArtifactRef(FrozenModel):
             fail(
                 "artifact_uri", "artifact URI must not contain whitespace/control characters", "uri"
             )
+        if "\\" in self.uri or re.search(r"%(?![0-9a-fA-F]{2})", self.uri):
+            fail("artifact_uri", "artifact URI has an invalid separator or percent escape", "uri")
+        if parts.scheme != "https" and port is not None:
+            fail("artifact_uri", "only HTTPS artifact URIs may declare a port", "uri")
         if parts.scheme != "file" and not host:
             fail("artifact_uri", "remote artifact URI requires a host/bucket", "uri")
         if parts.scheme == "file" and not parts.path.startswith("/"):

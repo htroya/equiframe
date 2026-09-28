@@ -3,9 +3,8 @@
 import math
 import re
 from datetime import date, datetime, timedelta
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, localcontext
 from typing import Annotated, Literal, Self
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from pydantic import (
     AfterValidator,
@@ -17,6 +16,7 @@ from pydantic import (
 )
 
 from equiframe._base import FrozenModel, Text, fail
+from equiframe._timezones import timezone
 
 
 def _decimal(value: object) -> Decimal:
@@ -36,10 +36,16 @@ def _decimal(value: object) -> Decimal:
     return result
 
 
+def _decimal_text(value: Decimal) -> str:
+    # str(Decimal) consults context.capitals even though it never rounds.
+    with localcontext(capitals=1):
+        return str(value)
+
+
 ExactDecimal = Annotated[
     Decimal,
     BeforeValidator(_decimal),
-    PlainSerializer(str, return_type=str),
+    PlainSerializer(_decimal_text, return_type=str),
     WithJsonSchema(
         {
             "type": "string",
@@ -50,10 +56,7 @@ ExactDecimal = Annotated[
 
 
 def _zone(value: str) -> str:
-    try:
-        ZoneInfo(value)
-    except (ZoneInfoNotFoundError, ValueError) as exc:
-        raise ValueError("unknown IANA time zone: " + value) from exc
+    timezone(value)
     return value
 
 
@@ -168,7 +171,7 @@ class TimestampValue(FrozenModel):
             if instant.tzinfo is None:
                 fail("missing_offset", "a zoned literal requires an explicit offset", "value")
             try:
-                actual_offset = instant.astimezone(ZoneInfo(self.zone)).utcoffset()
+                actual_offset = instant.astimezone(timezone(self.zone)).utcoffset()
             except (OverflowError, ValueError):
                 fail("timestamp_range", "zoned instant exceeds supported calendar range", "value")
             if actual_offset != instant.utcoffset():
@@ -202,7 +205,7 @@ class TimestampValue(FrozenModel):
 
     def in_zone(self, zone: str, *, fold: int) -> datetime:
         """Used only to validate an explicitly declared naive-time policy."""
-        return datetime.fromisoformat(self.value).replace(tzinfo=ZoneInfo(zone), fold=fold)
+        return datetime.fromisoformat(self.value).replace(tzinfo=timezone(zone), fold=fold)
 
 
 ScalarValue = Annotated[

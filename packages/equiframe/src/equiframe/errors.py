@@ -1,4 +1,4 @@
-"""Stable API error codes and JSON paths, without retaining input documents."""
+"""Stable API error codes and printable JSON paths; issues omit rejected inputs."""
 
 import json
 from dataclasses import dataclass
@@ -19,7 +19,7 @@ class ValidationIssue:
             elif part.isidentifier():
                 path += "." + part
             else:
-                path += "[" + json.dumps(part, ensure_ascii=False) + "]"
+                path += "[" + json.dumps(part, ensure_ascii=True) + "]"
         return path
 
 

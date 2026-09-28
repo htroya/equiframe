@@ -113,7 +113,11 @@ def test_decimal_sign_and_exponent_survive_json(coefficient: int, scale: int) ->
 def test_ambiguous_nonstandard_or_non_utf8_json_is_rejected(raw: str | bytes) -> None:
     with pytest.raises(ContractParseError) as caught:
         validate_contract(raw)
-    assert caught.value.issues[0].path == "$"
+    issue = caught.value.issues[0]
+    if issue.code == "duplicate_json_key":
+        assert issue.path in ("$.schema_version", "$.nested.x")
+    else:
+        assert issue.path == "$"
 
 
 def test_lone_surrogates_are_rejected_as_values() -> None:

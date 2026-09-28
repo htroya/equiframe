@@ -50,6 +50,15 @@ intervalos coherentes. No procesa tablas, comprueba unicidad real, aplica
 redondeo ni ejecuta las reglas declaradas. Nuevas formas incompatibles exigen
 versión de esquema y migración expresa; no hay migración automática.
 
+Joins y agrupaciones numéricos requieren unidades iguales. `sum`/`min`/`max`
+conservan la unidad; `sum` admite tipos más amplios de la misma familia sin
+reducir rango entero, capacidad entera/escala decimal ni bits de float.
+`min`/`max` conservan el tipo lógico. No se declaran conversiones implícitas.
+`OrderCheck.columns` coincide con todas las columnas de la política
+`SignificantOrder.by`, en el mismo orden. La política define dirección,
+posición de ausencias y empates. Un literal float32 exacto no puede requerir
+redondeo ni subdesbordamiento. Son restricciones de metadatos, no pruebas de datos.
+
 `allowed_values` es una restricción declarativa tipada. Los contratos en
 `examples/` son fixtures sintéticos para las cinco familias; no escenarios
 científicos revisados ni datos del benchmark. Sus decisiones no fijan valores SERCOP.
@@ -63,10 +72,14 @@ JSON de miembros duplicados, tokens NaN/Infinity y UTF-8 inválido se rechaza.
 `equiframe-metadata-json-v1` incluye defaults/nulls, ordena miembros de objetos
 por puntos de código Unicode, preserva arrays, usa UTF-8 sin BOM/normalización,
 sin espacios ni salto final. No es JCS/RFC 8785. El hash incluye ID y revisión.
-Decimal usa texto `str(Decimal)`, conservando signo, dígitos y exponente/escala,
+Decimal usa texto `str(Decimal)` con capitalización `E` fijada en contexto local,
+conservando signo, dígitos y exponente/escala,
 sin float intermedio. Instantes conservan texto ISO hasta ns, offset y zona;
 los días siguen siendo días. No se admiten leap seconds ni offset `-00:00`.
 Especiales se representan como objetos etiquetados, nunca tokens no estándar.
+El contexto decimal del consumidor no cambia la huella. Las zonas IANA se
+resuelven exclusivamente con `tzdata` bloqueado, independientemente de la base
+del sistema o `PYTHONTZPATH`. Actualizar esa dependencia requiere revalidación.
 La especificación completa y las limitaciones están en el README del paquete.
 
 JSON Schema estructural se genera en `schemas/`; referencias cruzadas,
@@ -136,6 +149,10 @@ JSON, código y mensaje, sin volcar documentos completos.
 `ContractIOError` cubre lectura/escritura. Todas derivan de `EquiFrameError`.
 Construcción directa de modelos usa `pydantic.ValidationError`; las funciones
 públicas traducen errores de validación a la jerarquía EquiFrame.
+Las rutas de miembros JSON duplicados incluyen objetos/arrays anidados y
+escapan claves no imprimibles. Errores temporales mantienen causa específica
+en `allowed_values`. Los textos de errores directos omiten las entradas;
+la API de Pydantic `.errors()` y las causas pueden conservarlas.
 
 Otros comandos (`run`, `compare`, `report`, entrenamiento/evaluación) y errores
 de ejecución/recursos/modelos se definen en sus pasos. No hay subcomandos vacíos.

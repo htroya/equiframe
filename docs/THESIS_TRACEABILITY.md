@@ -71,6 +71,8 @@ de artefacto para la parte declarativa de T03, API/CLI y un Protocol completo
 para la parte inicial de T09, y propiedades de serialización para T11.
 Esto no acredita validación de datos, un snapshot real, reglas evaluadas,
 independencia/revisión del oráculo ni resultados experimentales.
-Las decisiones de formato, dependencias y ámbito (A13–A17) son de ingeniería.
+Las decisiones de formato, dependencias y ámbito (A13–A20) son de ingeniería.
+La [segunda revisión del paso 1](STEP_01_REVIEW.md) registra correcciones y
+regresiones sin modificar el diseño experimental.
 Escalas/unidades/fechas de fixtures no se transfieren a SERCOP. No se modificó
 la tesis ni se resolvieron por defecto sus decisiones metodológicas pendientes.

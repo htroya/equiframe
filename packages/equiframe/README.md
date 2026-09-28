@@ -97,18 +97,32 @@ separada, sin float ni truncamiento a microsegundos. No se admiten leap seconds
 ni offset desconocido `-00:00`. Se validan calendario, granularidad, offset/zona,
 intervalos y política de timestamps sin offset. Asignar zona exige resolución
 explícita de horas ambiguas; huecos DST se rechazan. Fechas siguen siendo días.
+Las reglas IANA se leen exclusivamente del paquete `tzdata` fijado en `uv.lock`,
+también en Ubuntu. La base del sistema y `PYTHONTZPATH` no alteran la validación;
+actualizar `tzdata` exige revisar políticas y repetir las pruebas.
 `allowed_values` declara restricciones tipadas, no tablas de prueba.
 
 Reglas/precondiciones: seis formas cerradas (`schema`, `key`, `cardinality`,
 `join`, `order`, `aggregate`), con referencias verificadas, revisión, severidad,
 obligatoriedad y aplicabilidad. No se ejecutan ni aceptan callbacks/SQL/expresiones.
 Todavía no hay registro de reglas ejecutables.
+Joins y grupos numéricos conservan unidades. `sum`, `min` y `max` conservan
+la unidad de la medida; `min`/`max` también su tipo lógico. Una suma admite
+ampliación explícita dentro de la misma familia numérica, sin reducir el dominio
+del tipo fuente: rango entero, dígitos enteros/escala decimal o bits de float.
+Esto no garantiza que datos concretos sumados quepan en el resultado.
+No hay conversiones implícitas de moneda ni de decimal a float. `OrderCheck`
+remite a todas las columnas, en su orden, de la política `significant`, que
+aporta dirección, ausencias y empates. Los literales float32 de comparación
+exacta deben ser representables sin redondeo ni subdesbordamiento.
 
 `ArtifactRef` describe URI, SHA-256, formato, tamaño y esquema opcional. Rechaza
 credenciales, query y fragmentos de URI. Solo declara metadatos: no descarga ni
 verifica contenido. `ArtifactStore` es el único Protocol materializado, porque
 sus tipos están completos. Snapshots, adaptadores, resultados, reglas
 ejecutables, perfiles y detectores se definen en pasos posteriores.
+Se valida sintaxis de puertos, separadores y escapes porcentuales; solo HTTPS
+admite puerto explícito. Se aceptan IPv6 y rutas con espacios codificados.
 
 ## JSON canónico y huella
 
@@ -119,11 +133,14 @@ sin normalización Unicode, espacios ni salto final. No es RFC 8785/JCS.
 Floats finitos usan `json.dumps` de Python 3.12; no se repara precisión perdida
 antes de validar. La CLI usa la misma lógica que la API.
 
-Decimal usa `str(Decimal)`: conserva signo (incluido cero negativo), dígitos y
+Decimal usa `str(Decimal)` con `capitals=1` en un contexto local: conserva signo
+(incluido cero negativo), dígitos y
 exponente/escala. `"1.0"` y `"1.00"` pueden tener huellas distintas. Timestamps
 mantienen texto, fracción, offset y zona, sin conversión a UTC. Valores
 especiales etiquetados: `{"kind":"null"}`, `{"kind":"nan"}` y
 `{"kind":"infinity","sign":"positive"}`; vacío y cero siguen separados.
+Cambiar precisión, capitalización, límites de exponentes o flags del contexto
+decimal del consumidor no cambia los bytes canónicos ni modifica su contexto.
 
 `contract_fingerprint` es SHA-256 de los bytes canónicos e incluye ID/revisión.
 El orden/espaciado de miembros del JSON original no cambia la huella; el orden
@@ -154,6 +171,11 @@ no evalúa alertas/diferencias. `ContractValidationError.issues` contiene ubicac
 código y mensaje; `SchemaVersionError` y `ContractParseError` son subclases.
 `ContractIOError` identifica I/O fallida. Constructores directos usan
 `pydantic.ValidationError`; los servicios públicos traducen errores de validación.
+Miembros JSON duplicados identifican su ruta anidada; claves con controles o
+surrogates se escapan para que el diagnóstico se pueda imprimir. Errores de
+literales temporales conservan el código específico y su ubicación. Los mensajes
+de constructores omiten valores de entrada; `ValidationError.errors()` y la
+cadena de causas pueden conservarlos y no se deben registrar indiscriminadamente.
 
 ## Verificación y distribución
 
@@ -175,6 +197,9 @@ Build produce `dist/equiframe-0.1.0-py3-none-any.whl` y
 proyecto, instala dependencias runtime del lock y el wheel sin editable,
 comprueba `py.typed` e importación sin motores/ML/dev, valida cinco ejemplos por
 CLI y reconstruye desde el sdist comparando todos los bytes del wheel.
+También comprueba roundtrips de API y errores/códigos de CLI instalada, ejecuta
+la batería completa y la regeneración de assets desde el sdist contra el wheel
+instalado, y verifica un consumidor de la API con mypy estricto.
 Acepta `--uv /ruta/al/uv` si el gestor no está en PATH.
 
 Regeneración intencional de esquemas/fixtures:
