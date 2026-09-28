@@ -1,5 +1,6 @@
-"""EquiFrame step 1: explicit public contract API, independent of engines and ML."""
+"""Typed contracts and local native execution; import does not load engines/ML."""
 
+from equiframe.adapters import DuckDBAdapter, PandasAdapter, PolarsAdapter
 from equiframe.contracts import (
     SCHEMA_VERSION,
     AggregateCheck,
@@ -43,14 +44,43 @@ from equiframe.contracts import (
     Tolerance,
 )
 from equiframe.errors import (
+    ArtifactIntegrityError,
+    ArtifactIOError,
+    CapabilityError,
     ContractIOError,
     ContractParseError,
     ContractValidationError,
     EquiFrameError,
+    ExecutionCancelled,
+    ExecutionTimeout,
+    InvalidExecutionInput,
+    MissingDependencyError,
+    ResourceLimitError,
     SchemaVersionError,
     ValidationIssue,
 )
-from equiframe.ports import ArtifactStore
+from equiframe.execution import CancellationToken, RunContext, execute
+from equiframe.execution_types import (
+    EngineCapabilities,
+    ExecutionOptions,
+    ExecutionPlan,
+    ExecutionProblem,
+    ExecutionResult,
+    Parameter,
+    PhysicalColumn,
+    StageTiming,
+    TableArtifact,
+    VersionInfo,
+)
+from equiframe.local import LocalArtifactStore
+from equiframe.ports import ArtifactStore, DataSource, EngineAdapter
+from equiframe.registry import (
+    DuckDBTransformation,
+    PandasTransformation,
+    PolarsTransformation,
+    Transformation,
+    TransformationRegistry,
+)
 from equiframe.serialization import (
     CANONICALIZATION,
     canonical_contract_bytes,
@@ -59,6 +89,15 @@ from equiframe.serialization import (
     read_contract,
     validate_contract,
     write_contract,
+)
+from equiframe.tables import (
+    ArrowInput,
+    ArtifactInput,
+    LoadedTable,
+    LocalDataSource,
+    PandasInput,
+    PolarsInput,
+    read_table,
 )
 from equiframe.types import (
     ArtifactRef,
@@ -88,16 +127,22 @@ from equiframe.values import (
     TimeZone,
 )
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "CANONICALIZATION",
     "SCHEMA_VERSION",
     "AggregateCheck",
+    "ArrowInput",
+    "ArtifactIOError",
+    "ArtifactInput",
+    "ArtifactIntegrityError",
     "ArtifactRef",
     "ArtifactStore",
     "BooleanType",
     "BooleanValue",
+    "CancellationToken",
+    "CapabilityError",
     "CardinalityCheck",
     "ColumnKeyScope",
     "ColumnSpec",
@@ -106,15 +151,26 @@ __all__ = [
     "ContractIOError",
     "ContractParseError",
     "ContractValidationError",
+    "DataSource",
     "DatePolicy",
     "DateType",
     "DateValue",
     "DecimalType",
     "DecimalValue",
     "DecisionState",
+    "DuckDBAdapter",
+    "DuckDBTransformation",
+    "EngineAdapter",
+    "EngineCapabilities",
     "EquiFrameError",
     "ExactDecimal",
+    "ExecutionCancelled",
+    "ExecutionOptions",
+    "ExecutionPlan",
+    "ExecutionProblem",
+    "ExecutionResult",
     "ExecutionState",
+    "ExecutionTimeout",
     "Family",
     "FitState",
     "FloatType",
@@ -124,12 +180,17 @@ __all__ = [
     "InfinityValue",
     "IntegerType",
     "IntegerValue",
+    "InvalidExecutionInput",
     "JobState",
     "JoinCheck",
     "KeyCheck",
     "KeyScope",
     "KeySpec",
+    "LoadedTable",
+    "LocalArtifactStore",
+    "LocalDataSource",
     "LogicalType",
+    "MissingDependencyError",
     "Multiplicity",
     "NaNPolicy",
     "NaNValue",
@@ -139,9 +200,19 @@ __all__ = [
     "OracleState",
     "OrderCheck",
     "OrderPolicy",
+    "PandasAdapter",
+    "PandasInput",
+    "PandasTransformation",
+    "Parameter",
+    "PhysicalColumn",
+    "PolarsAdapter",
+    "PolarsInput",
+    "PolarsTransformation",
     "PreconditionSpec",
+    "ResourceLimitError",
     "RuleDefinition",
     "RuleSpec",
+    "RunContext",
     "ScalarValue",
     "SchemaCheck",
     "SchemaRef",
@@ -149,8 +220,10 @@ __all__ = [
     "Sha256",
     "SignificantOrder",
     "SortSpec",
+    "StageTiming",
     "StringType",
     "StringValue",
+    "TableArtifact",
     "TableKeyScope",
     "TableSchema",
     "TableSpec",
@@ -161,12 +234,17 @@ __all__ = [
     "TimestampType",
     "TimestampValue",
     "Tolerance",
+    "Transformation",
+    "TransformationRegistry",
     "ValidationIssue",
+    "VersionInfo",
     "__version__",
     "canonical_contract_bytes",
     "contract_fingerprint",
     "contract_json_schema",
+    "execute",
     "read_contract",
+    "read_table",
     "validate_contract",
     "write_contract",
 ]

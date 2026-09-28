@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.0 — 2026-09-28
+
+- Paso 2: `ef.execute`, planes/resultados estrictos, contexto, capacidades y registro por instancia.
+- Adaptadores nativos Pandas, Polars lazy materializado y SQL DuckDB local parametrizado.
+- Fuentes Arrow/Pandas/Polars/locales y almacén con integridad y publicación exclusiva.
+- Evidencia separada del esquema esperado, índices Pandas y diferencias conservadas.
+- Cancelación/timeout cooperativos, interrupción DuckDB y presupuestos documentados.
+- Extras arrow/pandas/polars/duckdb/engines; importación base ligera y versión/lock actualizados.
+- Ejemplos de comercio/telemetría, cinco familias, integración real y distribución fuera del checkout.
+- CI Windows/Ubuntu para ramas de pasos y PR dependientes, base y cada extra instalado.
+
+Contratos y ArtifactRef siguen en formato 1.0; el nuevo manifiesto de ejecución usa
+su propio formato 1.0. Actualizar desde 0.1 requiere instalar extras para procesar
+tablas; la API declarativa se conserva. Sin comparación general, R, ML o benchmark;
+sin publicación PyPI ni cambios de tesis/DW/servicio remoto.
+
 ## 0.1.0 — 2026-09-28
 
 - Primera API pública del paso 1: contratos semánticos estrictos, inmutables y versionados.

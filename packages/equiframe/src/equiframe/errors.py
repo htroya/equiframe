@@ -45,3 +45,35 @@ class ContractParseError(ContractValidationError):
 
 class ContractIOError(EquiFrameError):
     code = "contract_io_error"
+
+
+class InvalidExecutionInput(EquiFrameError):
+    code = "invalid_execution_input"
+
+
+class CapabilityError(InvalidExecutionInput):
+    code = "unsupported_capability"
+
+
+class MissingDependencyError(CapabilityError):
+    code = "missing_optional_dependency"
+
+
+class ArtifactIntegrityError(InvalidExecutionInput):
+    code = "artifact_integrity_error"
+
+
+class ArtifactIOError(EquiFrameError):
+    code = "artifact_io_error"
+
+
+class ExecutionCancelled(EquiFrameError):
+    code = "execution_cancelled"
+
+
+class ExecutionTimeout(EquiFrameError):
+    code = "execution_timeout"
+
+
+class ResourceLimitError(EquiFrameError):
+    code = "resource_limit"

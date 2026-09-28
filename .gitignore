@@ -59,3 +59,7 @@ credentials*.json
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Execution defaults (consumer artifacts, never source)
+equiframe-runs/
+example-runs/

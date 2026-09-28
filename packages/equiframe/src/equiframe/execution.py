@@ -1,0 +1,288 @@
+"""Local execution only: no semantic validators, comparator or detector orchestration."""
+
+from __future__ import annotations
+
+import os
+import platform
+import time
+from collections.abc import Iterator, Mapping
+from contextlib import contextmanager
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
+from importlib.metadata import PackageNotFoundError, version
+from pathlib import Path
+from threading import Event
+from typing import TYPE_CHECKING
+from uuid import uuid4
+
+from pydantic import ValidationError
+
+from equiframe.contracts import DecimalType, TimestampType
+from equiframe.errors import (
+    CapabilityError,
+    EquiFrameError,
+    ExecutionCancelled,
+    ExecutionTimeout,
+    InvalidExecutionInput,
+    ResourceLimitError,
+)
+from equiframe.execution_types import (
+    EngineCapabilities,
+    ExecutionPlan,
+    ExecutionProblem,
+    ExecutionResult,
+    Parameter,
+    StageTiming,
+    TableArtifact,
+    VersionInfo,
+)
+from equiframe.local import LocalArtifactStore
+from equiframe.registry import TransformationRegistry
+from equiframe.serialization import contract_fingerprint
+from equiframe.tables import LoadedTable, capture_artifact, require_dependency
+from equiframe.types import ExecutionState
+from equiframe.values import InfinityValue, NaNValue, NullValue, StringValue
+
+if TYPE_CHECKING:
+    import pyarrow as pa
+
+    from equiframe.ports import ArtifactStore, DataSource, EngineAdapter
+
+
+class CancellationToken:
+    """A caller-owned cooperative cancellation signal; no background callback threads."""
+
+    def __init__(self) -> None:
+        self._event = Event()
+
+    def cancel(self) -> None:
+        self._event.set()
+
+    @property
+    def cancelled(self) -> bool:
+        return self._event.is_set()
+
+
+@dataclass
+class RunContext:
+    run_id: str
+    execution_id: str
+    plan: ExecutionPlan
+    directory: Path
+    store: ArtifactStore
+    cancellation: CancellationToken
+    deadline: float | None
+    timings: list[StageTiming] = field(default_factory=list)
+    effective_configuration: list[Parameter] = field(default_factory=list)
+    stage: str = "preflight"
+
+    @property
+    def parameters(self) -> Mapping[str, object]:
+        # Temporal literals stay ISO text; trusted SQL/callbacks must choose explicit casts.
+        def scalar(item: Parameter) -> object:
+            if isinstance(item.value, NullValue):
+                return None
+            if isinstance(item.value, NaNValue):
+                return float("nan")
+            if isinstance(item.value, InfinityValue):
+                return float("inf") if item.value.sign == "positive" else -float("inf")
+            return item.value.value
+
+        return {item.name: scalar(item) for item in self.plan.parameters}
+
+    def check(self) -> None:
+        if self.cancellation.cancelled:
+            raise ExecutionCancelled("cancellation requested; execution stopped at a checkpoint")
+        if self.deadline is not None and time.perf_counter() >= self.deadline:
+            raise ExecutionTimeout(
+                "time budget exceeded; execution returned/stopped at a checkpoint"
+            )
+
+    def check_table(self, table: pa.Table, *, output: bool, enforce_rows: bool = True) -> None:
+        self.check()
+        options = self.plan.options
+        rows = options.max_output_rows if output else options.max_input_rows
+        if enforce_rows and rows is not None and table.num_rows > rows:
+            raise ResourceLimitError("materialized table exceeds row budget")
+        if options.max_transport_bytes is not None and table.nbytes > options.max_transport_bytes:
+            raise ResourceLimitError("materialized table exceeds Arrow buffer byte budget")
+
+    def record_configuration(self, name: str, value: str) -> None:
+        self.effective_configuration.append(Parameter(name=name, value=StringValue(value=value)))
+
+    @contextmanager
+    def measure(self, stage: str) -> Iterator[None]:
+        self.stage = stage
+        self.check()
+        start = time.perf_counter()
+        try:
+            yield
+            self.check()
+        finally:
+            self.timings.append(StageTiming(stage=stage, seconds=time.perf_counter() - start))
+
+
+def _versions(engine: str) -> tuple[VersionInfo, ...]:
+    result = [VersionInfo(name="python", version=platform.python_version())]
+    for name in ("equiframe", "pydantic", "tzdata", "pyarrow", engine, "polars-runtime-32"):
+        if name == "polars-runtime-32" and engine != "polars":
+            continue
+        try:
+            installed = version(name)
+        except PackageNotFoundError:
+            installed = "not-installed"
+        result.append(VersionInfo(name=name, version=installed))
+    return tuple(result)
+
+
+def _contract_capabilities(plan: ExecutionPlan, capabilities: EngineCapabilities) -> None:
+    for table in (*plan.contract.inputs, plan.contract.output):
+        for column in table.schema_spec.columns:
+            dtype = column.logical_type
+            if isinstance(dtype, DecimalType) and dtype.precision > capabilities.decimal_precision:
+                raise CapabilityError(
+                    f"{plan.engine} cannot execute declared decimal precision {dtype.precision}"
+                )
+            if isinstance(dtype, TimestampType):
+                supported = (
+                    capabilities.zoned_timestamp_units
+                    if dtype.timezone
+                    else capabilities.timestamp_units
+                )
+                if dtype.unit not in supported:
+                    raise CapabilityError(
+                        f"{plan.engine} cannot preserve declared timestamp unit/zone {dtype.unit}"
+                    )
+                if (
+                    plan.engine == "duckdb"
+                    and dtype.timezone
+                    and dtype.timezone != plan.options.duckdb_timezone
+                ):
+                    raise CapabilityError(
+                        "DuckDB zoned columns require the explicitly configured session timezone"
+                    )
+
+
+def execute(
+    plan: ExecutionPlan,
+    *,
+    source: DataSource,
+    registry: TransformationRegistry,
+    adapter: EngineAdapter | None = None,
+    artifact_store: ArtifactStore | None = None,
+    work_dir: Path | None = None,
+    cancellation: CancellationToken | None = None,
+) -> ExecutionResult:
+    """Execute trusted native code synchronously and persist run.json in a fresh directory.
+
+    Invalid plan objects and failure to create/publish the run directory raise;
+    operational failures inside a run become typed results. completed is not a
+    statement of semantic correctness. Callback timeouts are cooperative.
+    """
+    plan = ExecutionPlan.model_validate(plan)
+    if adapter is None:
+        from equiframe.adapters import native_adapter
+
+        adapter = native_adapter(plan.engine)
+    capabilities = adapter.capabilities()
+    run_id, execution_id = "run_" + uuid4().hex, "exec_" + uuid4().hex
+    directory = (work_dir or Path.cwd() / "equiframe-runs").resolve() / run_id / execution_id
+    directory.mkdir(parents=True, exist_ok=False)
+    store = (
+        artifact_store
+        if artifact_store is not None
+        else LocalArtifactStore(directory / "artifacts")
+    )
+    started = datetime.now(UTC).isoformat()
+    start = time.perf_counter()
+    timeout = plan.options.timeout_seconds
+    context = RunContext(
+        run_id,
+        execution_id,
+        plan,
+        directory,
+        store,
+        cancellation if cancellation is not None else CancellationToken(),
+        start + timeout if timeout is not None else None,
+    )
+    context.record_configuration(
+        "control_scope", "synchronous cooperative checkpoints; no callback preemption or sandbox"
+    )
+    context.record_configuration(
+        "contract_timezone_source",
+        "locked Python tzdata package; engine timezone rules recorded separately",
+    )
+    inputs: list[TableArtifact] = []
+    output: TableArtifact | None = None
+    state: ExecutionState = "completed"
+    problem: ExecutionProblem | None = None
+    implementation_version: str | None = None
+    try:
+        with context.measure("preflight"):
+            if adapter.engine != plan.engine or capabilities.engine != plan.engine:
+                raise InvalidExecutionInput("adapter engine does not match execution plan")
+            if set(source.table_names) != {item.name for item in plan.contract.inputs}:
+                raise InvalidExecutionInput("source tables must match declared input names")
+            transformation = registry.resolve(plan)
+            for dependency in capabilities.required_packages:
+                require_dependency(dependency, plan.engine)
+            implementation_version = transformation.code_version
+            _contract_capabilities(plan, capabilities)
+        tables: dict[str, LoadedTable] = {}
+        with context.measure("input_load"):
+            for item in plan.contract.inputs:
+                tables[item.name] = source.resolve(item.name, context=context)
+                context.check_table(tables[item.name].table, output=False)
+                inputs.append(capture_artifact(item.name, tables[item.name], context))
+        loaded = adapter.execute(transformation, tables, context)
+        with context.measure("output_capture"):
+            context.check_table(loaded.table, output=True)
+            output = capture_artifact(plan.contract.output.name, loaded, context)
+    except Exception as error:
+        if isinstance(error, ExecutionCancelled):
+            state = "cancelled"
+        elif isinstance(error, ExecutionTimeout):
+            state = "timeout"
+        elif isinstance(error, (MemoryError, ResourceLimitError)):
+            state = "resource_exhausted"
+        elif isinstance(error, (InvalidExecutionInput, ValidationError)):
+            state = "invalid_input"
+        else:
+            state = "failed"
+        problem = ExecutionProblem(
+            code=error.code if isinstance(error, EquiFrameError) else state,
+            stage=context.stage,
+            exception_type=type(error).__name__,
+            message=str(error)
+            if isinstance(error, EquiFrameError)
+            else "trusted implementation or local operation failed; inspect exception type/stage",
+        )
+    result = ExecutionResult(
+        run_id=run_id,
+        execution_id=execution_id,
+        plan=plan,
+        contract_sha256=contract_fingerprint(plan.contract),
+        implementation_version=implementation_version,
+        state=state,
+        started_at=started,
+        finished_at=datetime.now(UTC).isoformat(),
+        elapsed_seconds=time.perf_counter() - start,
+        timings=tuple(context.timings),
+        versions=_versions(plan.engine),
+        capabilities=capabilities,
+        effective_configuration=tuple(context.effective_configuration),
+        inputs=tuple(inputs),
+        output=output,
+        problem=problem,
+    )
+    # Directory is owned by this execution. Exclusive publication never replaces a previous run.
+    temporary = directory / "run.part.json"
+    try:
+        with temporary.open("x", encoding="utf-8", newline="\n") as manifest:
+            manifest.write(result.model_dump_json())
+            manifest.flush()
+            os.fsync(manifest.fileno())
+        os.link(temporary, directory / "run.json")
+    finally:
+        temporary.unlink(missing_ok=True)
+    return result
