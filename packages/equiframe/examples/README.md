@@ -14,3 +14,6 @@ Desde `packages/equiframe`:
 uv run --locked equiframe contract validate examples/nulls_types.json
 uv run --locked python tools/generate_assets.py --check
 ```
+
+
+`execute_native.py` ejecuta las cinco familias con código propio de cada motor y esperados explícitos, en comercio y telemetría. Con wheel + [engines]: `python execute_native.py --work-dir my-runs`; con un extra individual añada `--engine pandas|polars|duckdb`. Estos casos prueban ejecución/transporte, no comparador ni benchmark científico.

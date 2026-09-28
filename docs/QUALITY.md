@@ -1,12 +1,12 @@
 # Calidad, pruebas y operación
 
-Requisitos de desarrollo para Sol. El paso 1 incorpora pruebas reales de contratos, serialización, propiedades, tiempo y CLI; tipado/estilo, build e instalación limpia se ejecutan también en CI. [Comandos del paquete](../packages/equiframe/README.md). Las áreas de pasos posteriores de la matriz siguen siendo requisitos pendientes, no controles ya implementados.
+Requisitos de desarrollo y verificación. Los pasos 1 y 2 incorporan pruebas reales de contratos, serialización, propiedades, tiempo y CLI; tipado/estilo, build e instalación limpia se ejecutan también en CI. [Comandos del paquete](../packages/equiframe/README.md). Las áreas de pasos posteriores de la matriz siguen siendo requisitos pendientes, no controles ya implementados.
 
 ## 1. Contrato de entrega por incremento
 
 Un incremento está terminado cuando cumple su alcance funcional, pruebas de comportamiento, tipado, estilo, documentación ejecutable y empaquetado correspondiente. Las pruebas deben detectar fallos relevantes, no reproducir línea por línea la implementación. Cobertura numérica por sí sola no prueba corrección.
 
-El paso 1 crea CI con permisos mínimos (`contents: read`), dependencias fijadas y acciones verificadas/pinadas. La CI valida Windows y Ubuntu en Python 3.12. La matriz se amplía cuando exista evidencia de compatibilidad; Linux x64 no certifica ARM64. Los controles de paquete opcional prueban también la importación sin motores o ML instalados.
+El paso 1 crea CI con permisos mínimos (`contents: read`), dependencias fijadas y acciones verificadas/pinadas. La CI usa Python 3.12. La matriz actual incluye Windows x64, Ubuntu x64/ARM64 y macOS Intel/Apple Silicon; la evidencia de cada entrega distingue configuración y checks completados. Los controles de paquete opcional prueban también la importación sin motores o ML instalados.
 
 ## 2. Matriz de pruebas requerida
 
@@ -59,3 +59,33 @@ Paso 10 entrega wheel/sdist probado desde instalación limpia, documentación AP
 ## 7. Colaboración reproducible
 
 Cada integrante trabaja en su clon y rama. Los datos compartidos se identifican por snapshot, no por una ruta mutable. La rama principal recibe PR revisables. Las convenciones de revisión no se presentan como protecciones técnicas si GitHub no las tiene configuradas.
+
+
+## 8. Controles del paso 2
+
+CI Python 3.12 en Windows x64, Ubuntu x64/ARM64 y macOS x64/ARM64 ejecuta la suite anterior y
+regresiones de motores instalados, sin reemplazarlos por mocks ni saltarlos. La
+instalación de desarrollo usa `uv sync --locked --all-extras`; comandos `uv run`
+conservan ese perfil. La matriz tiene triggers de push y pull_request para
+todas las ramas, incluidos colaboradores y PR dependientes.
+
+El verificador instala el wheel en entornos runtime-only fuera del checkout: base,
+arrow, pandas, polars, duckdb y engines, con versiones del lock. Comprueba extras
+reales, import ligero, API/CLI, ejemplos externos, consumidor mypy y toda la suite
+contra wheel reconstruido desde sdist, además de identidad de todos sus bytes.
+Las regresiones instrumentan conexiones DuckDB reales para demostrar cierre; las
+pruebas de recursos registran el alcance cooperativo y límites nativos efectivos.
+
+Evidencia/versiones/cantidades/checks: [revisión vigente](STEP_02_SECOND_REVIEW.md);
+el informe 0.2.0 se conserva como histórico. Ningún resultado sintético acredita
+el benchmark o el DW. Pruebas ARM64 en GitHub no acreditan integración OCI.
+
+
+La revisión 0.2.1 exige preservación de anchos/signo, máscara NULL/NaN, índices
+copiados, límites temporales exactos y rechazo de categorías/decimales no fieles.
+Las regresiones usan los tres motores reales, instrumentación de conexiones
+reales y fallos de almacén para verificar evidencia parcial y limpieza.
+
+Cada runner GitHub es temporal: el workflow construye y verifica el paquete,
+sin acceso a datos reales, claves OCI ni despliegue. El entorno OCI se valida
+por separado conforme a [su contrato de integración](OCI_INTEGRATION.md).

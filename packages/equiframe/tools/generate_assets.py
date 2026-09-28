@@ -18,6 +18,8 @@ from equiframe import (
     DateValue,
     DecimalType,
     DecimalValue,
+    ExecutionPlan,
+    ExecutionResult,
     Family,
     FloatType,
     FloatValue,
@@ -297,6 +299,12 @@ def main() -> None:
     assets[ROOT / "schemas" / "contract-1.0.schema.json"] = render_schema(contract_json_schema())
     assets[ROOT / "schemas" / "artifact-ref-1.0.schema.json"] = render_schema(
         ArtifactRef.model_json_schema()
+    )
+    assets[ROOT / "schemas" / "execution-plan-1.0.schema.json"] = render_schema(
+        ExecutionPlan.model_json_schema()
+    )
+    assets[ROOT / "schemas" / "execution-result-1.0.schema.json"] = render_schema(
+        ExecutionResult.model_json_schema()
     )
     failures = []
     for path, data in assets.items():

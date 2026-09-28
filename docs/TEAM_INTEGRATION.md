@@ -75,3 +75,34 @@ Hernán publica primero los esquemas y ejemplos de intercambio, y añade pruebas
 Revisión del oráculo: dos revisores no autores de la variante, decisiones ciegas y registro independiente; el tercero resuelve desacuerdos conforme a la tesis. Si el tercero es autor de la variante, registrar ese conflicto y resolver el procedimiento metodológico antes de declarar una adjudicación independiente. No fabricar firmas ni aprobaciones.
 
 Invitaciones GitHub pendientes de los nombres de usuario de José y Jhair. `htroya` conserva administración del repositorio personal; colaboradores tendrán lectura/escritura y gestión de PR/issues. Administración equivalente para los tres requiere organización y roles apropiados.
+
+
+## 7. Integración concreta tras el paso 2
+
+Hernán entrega `ef.DataSource`, `ef.EngineAdapter`, `ef.ArtifactStore`,
+`LoadedTable` y `TableArtifact` con tipos completos. Un consumidor externo puede
+adaptar después el cliente de José: fijar un snapshot una vez, materializar sus
+referencias verificadas y devolver tablas Arrow preservando procedencia. Las URI
+remotas no se resuelven desde `LocalDataSource`; su autenticación/transporte debe
+ser explícito y permanece bajo el componente de José, a integrar en el paso 9.
+
+`DuckDBAdapter` es ejecución analítica local de SELECT/WITH con conexión propia
+`:memory:` por corrida, no un cliente remoto ni escritor del DW compartido.
+`PandasInput` conserva índice separado; otros motores requieren la decisión
+explícita de convertirlo en columnas/descartarlo. `completed` no aprueba una carga.
+Jhair aportará contratos de esquema/negocio y tablas identificadas a este puerto;
+Hernán no agrega nombres/monedas/fechas SERCOP obligatorios al núcleo. Los ejemplos
+genéricos de comercio y sensores no son entregas del DW ni evidencia de VM.
+
+
+## 8. Ubicación del DW y del programa de conexión
+
+El DW, DuckDB real y su programa/biblioteca de conexión estarán en la VM OCI.
+`packages/equiframe-data` versiona el código de acceso a desplegar allí; un cliente
+ligero externo es opcional si se acuerda un servicio remoto. EquiFrame podrá
+instalarse y ejecutarse dentro de la VM, o consumir snapshots verificados mediante
+un proveedor externo. Abrir el archivo desde tres equipos no es la integración.
+
+Las garantías y las entregas técnicas están en [integración OCI](OCI_INTEGRATION.md).
+Este documento define interfaces; no implica que el servicio, la VM o el DW hayan
+sido implementados ni probados por la CI del núcleo.

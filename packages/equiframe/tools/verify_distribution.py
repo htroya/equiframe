@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import tomllib
 import zipfile
 from pathlib import Path
 
@@ -24,6 +25,80 @@ def single(pattern: str) -> Path:
     return paths[0]
 
 
+def verify_extras(uv: str, wheel: Path, work: Path, env: dict[str, str]) -> None:
+    for extra in ("arrow", "pandas", "polars", "duckdb", "engines"):
+        project = work / ("consumer-" + extra)
+        project.mkdir()
+        environment = project / ".venv"
+        profile_env = dict(env, UV_PROJECT_ENVIRONMENT=str(environment))
+        run(
+            [
+                uv,
+                "sync",
+                "--locked",
+                "--no-dev",
+                "--no-install-project",
+                "--extra",
+                extra,
+                "--python",
+                sys.executable,
+            ],
+            cwd=ROOT,
+            env=profile_env,
+        )
+        python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+        run(
+            [uv, "pip", "install", "--python", str(python), "--no-index", f"{wheel}[{extra}]"],
+            cwd=project,
+            env=profile_env,
+        )
+        run([uv, "pip", "check", "--python", str(python)], cwd=project, env=profile_env)
+        check = r"""
+import importlib.util, sys
+from pathlib import Path
+import equiframe as ef
+assert Path(ef.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
+assert not Path.cwd().resolve().is_relative_to(Path(sys.argv[2]).resolve())
+assert not any(n in sys.modules for n in ('pandas','polars','duckdb','numpy','pyarrow','sklearn'))
+extra=sys.argv[1]
+for engine in ('pandas','polars','duckdb'):
+    assert (importlib.util.find_spec(engine) is not None)==(extra in (engine,'engines'))
+assert importlib.util.find_spec('sklearn') is None
+print('Clean installed profile:',extra,'outside checkout; light import verified')
+"""
+        run([str(python), "-I", "-c", check, extra, str(ROOT)], cwd=project, env=profile_env)
+        if extra == "arrow":
+            arrow_check = r"""
+from pathlib import Path
+import pyarrow as pa
+import equiframe as ef
+path=Path('table.arrow')
+table=pa.table({'id':['001','001']})
+with path.open('wb') as output, pa.ipc.new_file(output,table.schema) as writer:
+    writer.write_table(table)
+ref=ef.LocalArtifactStore(Path('store')).put(path,media_type='application/vnd.apache.arrow.file')
+assert ef.read_table(ref).to_pylist()==[{'id':'001'},{'id':'001'}]
+"""
+            run([str(python), "-I", "-c", arrow_check], cwd=project, env=profile_env)
+        else:
+            example = project / "execute_native.py"
+            shutil.copyfile(ROOT / "examples" / "execute_native.py", example)
+            command = [str(python), "-I", str(example), "--work-dir", str(project / "runs")]
+            if extra != "engines":
+                command += ["--engine", extra]
+            run(command, cwd=project, env=profile_env)
+            if extra == "duckdb":
+                minimum = (
+                    (ROOT / "README.md")
+                    .read_text(encoding="utf-8")
+                    .split("```python\n", 1)[1]
+                    .split("```", 1)[0]
+                )
+                minimal_script = project / "readme_example.py"
+                minimal_script.write_text(minimum, encoding="utf-8")
+                run([str(python), "-I", str(minimal_script)], cwd=project, env=profile_env)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--uv", default="uv")
@@ -31,15 +106,18 @@ def main() -> None:
     uv = shutil.which(args.uv)
     if uv is None:
         parser.error("uv executable not found; use --uv /absolute/path/to/uv")
-    wheel = single("equiframe-*.whl")
-    sdist = single("equiframe-*.tar.gz")
+    package_version = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))[
+        "project"
+    ]["version"]
+    wheel = single(f"equiframe-{package_version}-*.whl")
+    sdist = single(f"equiframe-{package_version}.tar.gz")
     with zipfile.ZipFile(wheel) as archive:
         names = set(archive.namelist())
         if "equiframe/py.typed" not in names or "equiframe/__init__.py" not in names:
             raise RuntimeError("wheel is missing typed public package files")
     cache = ROOT / ".cache"
     cache.mkdir(exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix="distribution-", dir=cache) as directory:
+    with tempfile.TemporaryDirectory(prefix="equiframe-distribution-") as directory:
         work = Path(directory).resolve()
         runtime = work / "runtime"
         env = dict(os.environ, UV_PROJECT_ENVIRONMENT=str(runtime), UV_CACHE_DIR=str(cache / "uv"))
@@ -75,12 +153,12 @@ import equiframe
 root = Path(sys.prefix).resolve()
 assert Path(equiframe.__file__).resolve().is_relative_to(root), equiframe.__file__
 assert Path(equiframe.__file__).with_name('py.typed').is_file()
-assert equiframe.__version__ == importlib.metadata.version('equiframe') == '0.1.0'
+assert equiframe.__version__ == importlib.metadata.version('equiframe') == sys.argv[1]
 for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy', 'pyarrow', 'pytest', 'hypothesis'):
     assert importlib.util.find_spec(name) is None, name
 print('Installed wheel imports from clean site-packages without engines/ML/dev tools')
 """
-        run([str(python), "-I", "-c", check], cwd=work, env=env)
+        run([str(python), "-I", "-c", check, package_version], cwd=work, env=env)
         api_check = """
 from pathlib import Path
 import sys
@@ -137,6 +215,7 @@ print('Installed wheel API roundtrips all five fixtures exactly')
                 raise RuntimeError(
                     "installed CLI exposed a traceback or reported success on failure"
                 )
+        verify_extras(uv, wheel, work, env)
         source_dir = work / "sdist"
         source_dir.mkdir()
         with tarfile.open(sdist, "r:gz") as archive:
@@ -155,7 +234,15 @@ print('Installed wheel API roundtrips all five fixtures exactly')
         # Rebuild from the sdist with the same locked backend and compare all wheel bytes.
         source_env = dict(env, UV_PROJECT_ENVIRONMENT=str(work / "source-build"))
         run(
-            [uv, "sync", "--locked", "--no-install-project", "--python", sys.executable],
+            [
+                uv,
+                "sync",
+                "--locked",
+                "--all-extras",
+                "--no-install-project",
+                "--python",
+                sys.executable,
+            ],
             cwd=source,
             env=source_env,
         )
@@ -199,16 +286,32 @@ assert Path(equiframe.__file__).resolve().is_relative_to(Path(sys.prefix).resolv
             "    restored = validate_contract(canonical_contract_bytes(contract))\n"
             "    return restored, contract_fingerprint(restored)\n"
             "def publish(store: ArtifactStore, path: Path) -> ArtifactRef:\n"
-            "    return store.put(path, media_type='application/json')\n",
+            "    return store.put(path, media_type='application/json')\n"
+            "import equiframe as ef\n"
+            "def execute(\n"
+            "    plan: ef.ExecutionPlan, source: ef.DataSource,\n"
+            "    registry: ef.TransformationRegistry,\n"
+            ") -> ef.ExecutionResult:\n"
+            "    return ef.execute(plan, source=source, registry=registry)\n",
             encoding="utf-8",
         )
         run(
-            [str(source_python), "-I", "-m", "mypy", "--strict", str(consumer)],
+            [
+                str(source_python),
+                "-I",
+                "-m",
+                "mypy",
+                "--strict",
+                "--config-file",
+                str(source / "pyproject.toml"),
+                str(consumer),
+            ],
             cwd=work,
             env=source_env,
         )
     print(
-        "Verified installed wheel API/CLI, typed consumer, sdist tests and byte-identical rebuild"
+        "Verified base/extras outside checkout, API/CLI, typed consumer, "
+        "sdist tests and byte-identical wheel rebuild"
     )
 
 

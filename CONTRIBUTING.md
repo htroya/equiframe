@@ -1,27 +1,59 @@
-# Colaboración
+# Contribuir a EquiFrame
 
-Cada integrante clona <https://github.com/htroya/equiframe> usando su propia cuenta. No compartir token ni entorno virtual. José y Jhair se invitarán cuando Hernán disponga de sus usuarios; no hay invitaciones emitidas todavía.
+El repositorio es privado. Cada colaborador utiliza su propia cuenta de GitHub y
+un clon local; el propietario administra el acceso en **Settings → Collaborators**.
 
-Ramas sugeridas: `hernan/step-01-foundations`, `jose/data-access`, `jhair/dw-model`. Crear una rama por cambio coherente. Los cambios que afecten interfaces se acuerdan en PR con los responsables de ambos lados.
+## Preparar el entorno
 
-## Flujo
+Instale Git, Python 3.12 y un editor. Autentíquese en GitHub con su propia cuenta,
+clone el repositorio y abra la carpeta que contiene `.git`.
+Las instrucciones de entorno y los controles del paquete están en su
+[README](packages/equiframe/README.md#instalación-reproducible).
 
-1. Leer la arquitectura y el paso asignado; indicar alcance en el issue.
-2. Actualizar rama desde `main` y trabajar en el paquete propio.
-3. Implementar comportamiento, pruebas necesarias y documentación del resultado real.
-4. Ejecutar controles locales y CI existentes; registrar comandos y resultados.
-5. Abrir PR con problema, comportamiento resultante, validación y límites. Otro integrante revisa antes de integrar cuando esté disponible.
+La rama principal `main` contiene la API disponible. Cree las ramas de trabajo
+desde su versión actualizada; indique en el PR cualquier dependencia de otro cambio
+aún no integrado.
 
-Esta es una convención de equipo. La protección técnica de ramas/reviews depende del plan GitHub y se configurará/verificará cuando estén los colaboradores; no se declara habilitada.
+## Proponer un cambio
 
-## Archivos
+1. Describa el problema y el alcance en un issue o PR.
+2. Actualice la rama base y cree una rama por cambio, por ejemplo
+   `feat/snapshot-reader` o `fix/decimal-transport`.
+3. Implemente comportamiento real, documentación y las pruebas apropiadas.
+4. Ejecute los controles del componente afectado. Para el núcleo: Ruff, mypy,
+   assets, pytest, build y verificación del wheel/sdist.
+5. Suba la rama y abra un PR con el problema, el resultado del cambio, la
+   validación y los límites relevantes. Solicite revisión antes de integrar.
 
-Versionar código, configuración no secreta, documentación, manifests sin datos sensibles y fixtures sintéticos pequeños. Excluir snapshots reales, bases, modelos binarios, resultados privados, documentos de tesis, entornos y credenciales.
+Los cambios de interfaces compartidas se acuerdan con los responsables de ambos
+componentes. La [distribución de componentes](docs/TEAM_INTEGRATION.md) evita
+implementar infraestructura o reglas de dominio dentro del núcleo.
 
-Decisiones del piloto se registran en `docs/DECISIONS.md`; cambios de requisitos también en `docs/THESIS_TRACEABILITY.md`. Si una API descrita aún no existe, indicar especificación. No añadir funciones vacías para mostrar avance.
+La CI de EquiFrame se activa para ramas de cualquier colaborador y para PR.
+Las pruebas remotas necesitan un entorno autorizado aparte y no forman parte del
+workflow local de contratos y ejecución.
 
-## Permisos
+## Documentación y archivos
 
-GitHub distingue propietario y colaboradores en repositorios personales. Los colaboradores pueden leer/escribir y gestionar PR/issues; el propietario conserva ajustes administrativos. Para tres administradores se requiere una organización. Referencia: [permisos oficiales](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/repository-access-and-collaboration/permission-levels-for-a-personal-account-repository).
+Versione código, configuración no secreta, esquemas, documentación técnica y casos
+sintéticos pequeños. Mantenga bases, datos reales, modelos binarios, resultados
+privados, entornos y credenciales fuera de Git. `.env.example` puede contener
+nombres y valores ficticios; nunca credenciales válidas.
 
-No publicar en PyPI ni redistribuir datos sin la decisión correspondiente de los autores.
+Describa las APIs previstas como especificaciones hasta que estén implementadas y
+comprobadas. Registre decisiones técnicas en `docs/DECISIONS.md`. Los cambios
+metodológicos requieren también actualizar `docs/THESIS_TRACEABILITY.md`.
+
+Cada cambio de dependencias exige actualizar el lock y repetir sus controles.
+No publique paquetes ni redistribuya datos sin la decisión correspondiente de los autores.
+
+## Revisión y permisos
+
+El flujo de PR es una convención del equipo. A la fecha de esta revisión, el
+repositorio privado utiliza GitHub Free y no tiene protección técnica de ramas:
+GitHub exige Pro o Team para proteger ramas de repositorios privados.
+[Disponibilidad de protección](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
+
+La administración completa corresponde al propietario en un repositorio personal;
+los colaboradores tienen acceso según los permisos concedidos.
+[Permisos de repositorios personales](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/repository-access-and-collaboration/permission-levels-for-a-personal-account-repository).

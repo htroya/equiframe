@@ -14,9 +14,9 @@ Cada paso produce código funcional para su alcance, pruebas significativas, doc
 
 ## Paso 2. Ejecución y adaptadores nativos
 
-**Objetivo:** ejecutar transformaciones registradas con Pandas, Polars y DuckDB sobre entradas idénticas.
+**Objetivo:** ejecutar transformaciones registradas con Pandas, Polars y DuckDB sobre entradas idénticas, como biblioteca general importable mediante `import equiframe as ef` desde otro proyecto.
 
-**Trabajo:** puertos de datos/artefactos locales, registro explícito, `ExecutionPlan/Result`, contexto aislado, capacidades, importación opcional, conversiones fieles y materialización de salidas. Crear transformaciones sintéticas independientes, no conversiones de una salida común. Capturar tiempos/estados y cerrar recursos en fallos.
+**Trabajo:** puertos de datos/artefactos locales, registro explícito, `ExecutionPlan/Result`, contexto aislado, capacidades, importación opcional, conversiones fieles y materialización de salidas. Crear transformaciones sintéticas independientes, no conversiones de una salida común. Capturar tiempos/estados y cerrar recursos en fallos. Base útil, extras por motor, intercambio local explícito, salida observada separada del contrato y ejemplos genéricos de dos dominios. Documentar precisión, índices, bases temporales y controles cooperativos/exigibles.
 
 **Aceptación:** cada motor ejecuta código propio; preserva decimal/null/NaN/tiempo o informa incompatibilidad; entradas no se alteran; dos corridas aisladas no mezclan artefactos; fallo, cancelación y ausencia de extra generan diagnóstico verificable. Sin conexiones globales.
 
@@ -82,9 +82,9 @@ Cada paso produce código funcional para su alcance, pruebas significativas, doc
 
 **Objetivo:** entregar software utilizable y evidencia defendible para la tesis.
 
-**Trabajo:** resolver decisiones metodológicas, congelar manifests, ejecutar R/M/B/H en prueba, métricas pareadas/cobertura, incertidumbre por grupos si procede, costos controlados y tablas regenerables. Medir recursos, revisar API/documentación, construir distribuciones y bundle de reproducción; repetición independiente por compañero.
+**Trabajo:** preparar distribución pública: licencia acordada, nombre de paquete disponible o bajo control del equipo, metadatos completos, versiones soportadas y publicación verificable en PyPI con autorización expresa de los autores. Resolver decisiones metodológicas, congelar manifests, ejecutar R/M/B/H en prueba, métricas pareadas/cobertura, incertidumbre por grupos si procede, costos controlados y tablas regenerables. Medir recursos, revisar API/documentación, construir distribuciones y bundle de reproducción; repetición independiente por compañero.
 
-**Aceptación:** comparación principal usa misma intersección evaluable; métricas indefinidas explícitas; no se ajusta con prueba; resultados negativos se conservan; otro integrante reproduce contenido y decisiones. Wheel/sdist y dependencias exactas comprobados; soporte ARM64 solo si probado. Release interno etiquetado, licencia y publicación externa sujetas a decisión expresa de los autores. Capítulos 4/5 se redactan con resultados reales.
+**Aceptación:** comparación principal usa misma intersección evaluable; métricas indefinidas explícitas; no se ajusta con prueba; resultados negativos se conservan; otro integrante reproduce contenido y decisiones. Wheel/sdist y dependencias exactas comprobados; soporte ARM64 solo si probado. Release etiquetado y publicación pública verificable después de acordar licencia/nombre y autorización; un consumidor instala la versión publicada con pip y ejecuta ejemplos. Hasta entonces no se afirma que pip install equiframe obtenga el paquete del equipo. Capítulos 4/5 se redactan con resultados reales.
 
 ## Dependencias entre pasos
 
