@@ -1,0 +1,65 @@
+# Trazabilidad con la tesis en elaboración
+
+Fuente local: `TFM_EquiFrame_ACTUAL.docx`, revisada el 2026-09-28.
+
+SHA-256 del archivo revisado:
+
+```text
+c96f0edfcab839b2ccf357527f4a7937c4b1fd3570f491d702b4f01fde44b38d
+```
+
+El archivo original está en la carpeta padre del proyecto local. No se modifica ni se publica como parte de esta preparación. Si cambia su hash se revisan los requisitos afectados y se añade una entrada de decisión; no se supone que el borrador actual está finalizado.
+
+## Matriz de requisitos
+
+| ID | Sección | Requisito del borrador | Componente / paso de Hernán | Evidencia de aceptación |
+|---|---|---|---|---|
+| T01 | 1.3, 1.4, 3.3 | Cinco familias de divergencias | Contratos/catálogo, 1/4/6 | Casos y reglas por familia |
+| T02 | 1.4, 3.1 | Pandas-Polars y Pandas-DuckDB principales; tercera pareja adicional | Adaptadores/evaluación, 2/10 | Resultados separados por migración |
+| T03 | 3.2 | Snapshot original, SHA-256, inventario, cobertura/exclusiones | Puertos/manifiestos, 1/2/9; adquisición compartida con Jhair | Hashes y procedencia verificables |
+| T04 | 3.2, 3.5 | Compilación OCDS y cohorte temporal validada | Dominio de Jhair; consumo en 9 | Contrato de dominio y perfilado real |
+| T05 | 3.3 | Contratos independientes del motor; normalización permitida | Contratos/normalización, 1/3 | Pruebas de ausencia, precisión, orden y multiplicidad |
+| T06 | 3.3.1 | R fijada antes de mutantes finales | Reglas, 4/6 | Revisión/commit de reglas y catálogo |
+| T07 | 3.3.1, 3.3.4 | O independiente, doble revisión ciega | Benchmark, 6 | Esperados, decisiones A/B y resolución |
+| T08 | 3.3.3 | Comparación completa de valores y multiplicidades | Comparador, 3 | Diferencias completas, casos que conservan totales |
+| T09 | 3.4 | Módulos sustituibles y CLI | Núcleo/API, 1/2/8 | Protocols, pruebas de integración y CLI |
+| T10 | 3.4.1 | Perfil de una ejecución, R/M sin otra salida | Reglas/perfiles, 4/5 | Pruebas de dependencia y exclusión de fuga |
+| T11 | 3.4.2 | Evidencia, reducción acotada y Hypothesis | Evidencia, 3/8 | Pruebas por propiedades y presupuesto registrado |
+| T12 | 3.4.3 | H = R OR M con disponibilidad explícita | Decisiones, 7 | Nueve combinaciones y estado completo/parcial |
+| T13 | 3.5 | Grano adjudicación, puente sin monto, monedas separadas | Jhair; contrato/integración 9 | Unicidad, integridad y reconciliación |
+| T14 | 3.5 | Preparación antes de publicación, idempotencia | Jhair/José; integración 9 | Carga repetida y fallo sin cambiar versión vigente |
+| T15 | 3.6 | Features por familia, imputación solo en ajuste | Perfiles, 5 | Fórmulas, orden, medianas e indicadores |
+| T16 | 3.6 | IF y MAD con calibración externa | Modelos, 7 | Scores, umbrales, igualdad estricta y no estimable |
+| T17 | 3.7 | Dependencias transitivas dentro de una partición | Benchmark, 6 | Componentes conexos y ausencia de fuga |
+| T18 | 3.7, 3.9 | Piloto y congelación; prueba no selecciona parámetros | Benchmark, 6/7/10 | FreezeManifest y auditoría de cambios |
+| T19 | 3.8 | Métricas sobre intersección evaluable, cobertura y denominadores | Evaluación, 10 | Conteos y métricas regenerables |
+| T20 | 3.8 | Incertidumbre por grupos y costos desglosados | Evaluación, 10 | Remuestreo trazable y medición controlada |
+| T21 | 3.9 | Reproducción por otro integrante | Entrega, 10 | Registro independiente con contenido y decisiones |
+| T22 | 1.4, 3.5 | Ejecución local, sin plataforma distribuida | Arquitectura | Núcleo local y VM como apoyo colaborativo |
+
+## Decisiones todavía abiertas en la tesis
+
+| Decisión | Qué debe obtenerse antes de cerrarla | Tratamiento en el software |
+|---|---|---|
+| Cobertura anual 2025 y piloto enero-marzo | Inventario real y restricciones justificadas | Configuración versionada; no codificar año en el núcleo |
+| startDate y reserva release.date | Perfilado, significado por modalidad y selección de release | Política explícita de dominio; bloquear freeze si sigue pendiente |
+| Fechas sin offset / granularidad día | Evidencia de publicación y criterio acordado | Contrato temporal explícito; no convertir por conjetura |
+| Escala/precisión decimal | Perfilado de montos | Esquema configurable y exactitud comprobada |
+| Claves incompletas/contradictorias | Criterios de excepciones y procedencia | Política de contrato, no claves inventadas |
+| Alpha propuesto 5% | Justificación operativa y soporte de grupos | Sin default oculto en evaluación final |
+| Árboles/submuestras IF | Piloto normal | Configuración inicial revisable, bundle registra valor final |
+| Soporte de modelos por familia | Variación y cantidad de grupos de ajuste/calibración | `not_estimable` explícito |
+| 60 escenarios y reparto 30/10/20 | Catálogo, grupos transitivos y revisiones reales | Metas frente a cantidades realizadas; no fragmentar grupos |
+| Intervalos y tolerancia inferencial | Independencia y suficiencia | Descriptivos si no hay soporte; no atribuir garantías |
+| Revisores/arbitraje con tres autores | Asignación y tratamiento de conflictos | Registro ciego y pendientes, sin aprobaciones automáticas |
+
+## Ajustes sugeridos al texto, sin editarlo todavía
+
+1. En 1.4 y 3.5 explicar que el núcleo sigue siendo local y la VM apoya colaboración/publicación de snapshots; distinguir transporte compartido de evaluación distribuida.
+2. En 3.4 explicitar API tipada, estados independientes y separación del benchmark respecto de la biblioteca consumible.
+3. En 3.3.4 resolver la independencia del arbitraje cuando el tercer integrante es autor de la variante.
+4. En 3.6/3.7 dejar alpha, modelos por familia y tamaños como propuestas hasta observar soporte real.
+5. En 3.8 establecer que las mediciones comparativas requieren aislamiento de otras cargas de la VM.
+6. En el capítulo 4 informar lo construido y probado, junto con los componentes no estimables o pendientes. No incorporar resultados de ejemplo como observaciones.
+
+Las decisiones de empaquetado, Python 3.12, formatos de API y organización del repo son propuestas de ingeniería de esta arquitectura, no afirmaciones de que el borrador ya las exige.
