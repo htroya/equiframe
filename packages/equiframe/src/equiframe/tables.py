@@ -6,7 +6,6 @@ types never drive casts of observed data.
 
 from __future__ import annotations
 
-import math
 import tempfile
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -14,7 +13,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from importlib import import_module
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 from uuid import uuid4
 
 from equiframe.errors import CapabilityError, InvalidExecutionInput, MissingDependencyError
@@ -93,12 +92,22 @@ def detached_arrow(table: pa.Table) -> pa.Table:
         return cast("pa.Table", reader.read_all())
 
 
+def copy_pandas_frame(frame: pd.DataFrame) -> pd.DataFrame:
+    """Isolate both values and index/column buffers, including injected native frames."""
+    copied = frame.copy(deep=True)
+    copied.index = frame.index.copy(deep=True)
+    copied.columns = frame.columns.copy(deep=True)
+    return copied
+
+
 def pandas_capture(frame: pd.DataFrame) -> LoadedTable:
     import pandas as pd
     import pyarrow as pa
 
     if not isinstance(frame, pd.DataFrame):
         raise InvalidExecutionInput("Pandas transformation/input must produce a DataFrame")
+    if isinstance(frame.columns, pd.CategoricalIndex):
+        raise CapabilityError("categorical Pandas column labels cannot be captured faithfully")
     if (
         not all(isinstance(name, str) and name for name in frame.columns)
         or not frame.columns.is_unique
@@ -108,85 +117,90 @@ def pandas_capture(frame: pd.DataFrame) -> LoadedTable:
         raise CapabilityError(
             "Pandas tables with rows but zero columns cannot be captured faithfully"
         )
-    arrays = []
     notes = [
         "Pandas missing sentinels already conflated by input construction cannot be recovered."
     ]
-    for name in frame.columns:
-        series = frame[name]
-        if isinstance(series.dtype, pd.ArrowDtype):
-            array = series.array.__arrow_array__()
-            if pa.types.is_timestamp(series.dtype.pyarrow_dtype):
+
+    def array_of(series: pd.Series[Any], name: str) -> pa.Array | pa.ChunkedArray:
+        dtype = series.dtype
+        if isinstance(dtype, pd.CategoricalDtype):
+            raise CapabilityError("Pandas categories/ordering cannot be captured as scalar labels")
+        if isinstance(dtype, pd.ArrowDtype):
+            if pa.types.is_timestamp(dtype.pyarrow_dtype):
                 notes.append(
                     f"{name}: Arrow zone metadata; original offset/provider version absent."
                 )
-        elif pd.api.types.is_datetime64_any_dtype(series.dtype):
-            array = pa.array(series, from_pandas=True)
-            tzinfo = getattr(series.dtype, "tz", None)
+            return pa.array(series.array, from_pandas=False)
+        if pd.api.types.is_datetime64_any_dtype(dtype):
+            tzinfo = getattr(dtype, "tz", None)
             provider = type(tzinfo).__module__ + "." + type(tzinfo).__qualname__
             notes.append(f"{name}: input tzinfo provider={provider}; IANA release not exposed.")
-        elif pd.api.types.is_float_dtype(
-            series.dtype
-        ) and not pd.api.types.is_extension_array_dtype(series.dtype):
-            # NumPy float NaN is an observed value, not an implicit Arrow NULL.
-            array = pa.array(series.to_numpy(copy=True), from_pandas=False)
-            notes.append(
-                f"{name}: NumPy float has no independent NULL mask; observed NaNs retained."
+            return pa.array(series, from_pandas=True)
+        if (
+            pd.api.types.is_integer_dtype(dtype)
+            or pd.api.types.is_bool_dtype(dtype)
+            or pd.api.types.is_float_dtype(dtype)
+            or isinstance(dtype, pd.StringDtype)
+        ):
+            if pd.api.types.is_extension_array_dtype(dtype):
+                # Extension arrays expose physical widths and their independent validity mask.
+                return pa.array(series.array, from_pandas=False)
+            if pd.api.types.is_float_dtype(dtype):
+                notes.append(
+                    f"{name}: NumPy float has no independent NULL mask; observed NaNs retained."
+                )
+            return pa.array(series.to_numpy(copy=True), from_pandas=False)
+        if not pd.api.types.is_object_dtype(dtype):
+            raise CapabilityError("unsupported native Pandas dtype for faithful scalar transport")
+        values = [None if value is pd.NA or value is pd.NaT else value for value in series]
+        if any(isinstance(v, datetime) for v in values if v is not None):
+            raise CapabilityError(
+                "object timestamps need a temporal/Arrow dtype to preserve precision"
             )
-        else:
-            values = [None if value is pd.NA or value is pd.NaT else value for value in series]
-            if isinstance(series.dtype, pd.StringDtype):
-                values = [None if isinstance(v, float) and math.isnan(v) else v for v in values]
-            decimals = [v for v in values if isinstance(v, Decimal)]
-            if decimals:
-                if any(not v.is_finite() or (v.is_zero() and v.is_signed()) for v in decimals):
-                    raise CapabilityError(
-                        "Arrow decimal cannot retain nonfinite or signed-zero Decimal"
-                    )
-                if len({v.as_tuple().exponent for v in decimals}) != 1:
-                    raise CapabilityError(
-                        "Arrow fixed-scale decimal cannot retain per-cell exponent differences"
-                    )
-            if any(isinstance(v, datetime) for v in values if v is not None):
+        if any(
+            v is not None and not isinstance(v, (str, bool, int, float, Decimal, date))
+            for v in values
+        ):
+            raise CapabilityError(
+                "Pandas object columns support only immutable scalar transport values"
+            )
+        # Inferring a common float/decimal dtype would erase per-cell numeric kinds.
+        kinds = {type(v) for v in values if v is not None}
+        if len(kinds) > 1:
+            raise CapabilityError(
+                "heterogeneous Pandas object scalars require an explicit faithful dtype"
+            )
+        decimals = [v for v in values if isinstance(v, Decimal)]
+        if decimals:
+            if any(not v.is_finite() or (v.is_zero() and v.is_signed()) for v in decimals):
                 raise CapabilityError(
-                    "object timestamps need a temporal/Arrow dtype to preserve precision"
+                    "Arrow decimal cannot retain nonfinite or signed-zero Decimal"
                 )
-            if any(
-                v is not None and not isinstance(v, (str, bool, int, float, Decimal, date))
-                for v in values
-            ):
+            if len({v.as_tuple().exponent for v in decimals}) != 1:
                 raise CapabilityError(
-                    "Pandas object columns support only immutable scalar transport values"
+                    "Arrow fixed-scale decimal cannot retain per-cell exponent differences"
                 )
-            try:
-                array = pa.array(values, from_pandas=False)
-            except (pa.ArrowException, TypeError, ValueError) as error:
-                raise CapabilityError(
-                    "Pandas values cannot be captured faithfully as Arrow scalars"
-                ) from error
-        arrays.append(array)
-    table = pa.Table.from_arrays(arrays, names=list(frame.columns))
+        try:
+            return pa.array(values, from_pandas=False)
+        except (pa.ArrowException, TypeError, ValueError, OverflowError) as error:
+            raise CapabilityError(
+                "Pandas values cannot be captured faithfully as Arrow scalars"
+            ) from error
+
+    table = pa.Table.from_arrays(
+        [array_of(frame[n], n) for n in frame.columns], names=list(frame.columns)
+    )
     check_arrow(table)
     index_frame = frame.index.to_frame(index=False)
     index_frame.columns = [f"level_{i}" for i in range(len(index_frame.columns))]
-    # Reuse scalar capture without recursively capturing another index.
-    index_arrays = []
-    for column in index_frame.columns:
-        series = index_frame[column]
-        if isinstance(series.dtype, pd.ArrowDtype):
-            index_arrays.append(series.array.__arrow_array__())
-        elif pd.api.types.is_datetime64_any_dtype(series.dtype):
-            index_arrays.append(pa.array(series, from_pandas=True))
-        else:
-            vals = [None if v is pd.NA or v is pd.NaT else v for v in series]
-            if any(isinstance(v, (Decimal, datetime)) for v in vals if v is not None):
-                raise CapabilityError(
-                    "decimal/object temporal index requires explicit index columns"
-                )
-            index_arrays.append(pa.array(vals, from_pandas=False))
-    index = pa.Table.from_arrays(index_arrays, names=list(index_frame.columns))
+    index = pa.Table.from_arrays(
+        [array_of(index_frame[n], "index." + n) for n in index_frame.columns],
+        names=list(index_frame.columns),
+    )
     check_arrow(index)
     notes.append("Pandas index stored separately; names=" + repr(tuple(frame.index.names)))
+    notes.append("Pandas index dtypes=" + repr(tuple(str(t) for t in index_frame.dtypes)))
+    notes.append("Pandas column axis name=" + repr(frame.columns.name))
     meaningful = not (
         isinstance(frame.index, pd.RangeIndex)
         and frame.index.start == 0
@@ -203,12 +217,19 @@ def pandas_capture(frame: pd.DataFrame) -> LoadedTable:
     )
 
 
-def capture_artifact(name: str, loaded: LoadedTable, context: RunContext) -> TableArtifact:
+def capture_artifact(
+    name: str, loaded: LoadedTable, context: RunContext, *, output: bool = False
+) -> TableArtifact:
     import pyarrow as pa
     import pyarrow.compute as pc
 
     check_arrow(loaded.table)
-    context.check_table(loaded.table, output=False, enforce_rows=False)
+    context.check_table(loaded.table, output=output, enforce_rows=False)
+    if loaded.index is not None:
+        check_arrow(loaded.index)
+        if loaded.index.num_rows != loaded.table.num_rows:
+            raise InvalidExecutionInput("index row count must match table row count")
+        context.check_table(loaded.index, output=output, enforce_rows=False)
 
     def persist(table: pa.Table) -> ArtifactRef:
         path = context.directory / (uuid4().hex + ".arrow")
@@ -238,16 +259,50 @@ def capture_artifact(name: str, loaded: LoadedTable, context: RunContext) -> Tab
             for field in table.schema
         )
 
-    return TableArtifact(
+    from pydantic import TypeAdapter
+
+    from equiframe._base import Text
+
+    # Validate all metadata before publishing bytes. A successful data publication
+    # is retained in the failed result even if the separate index publication fails.
+    notes = TypeAdapter(tuple[Text, ...]).validate_python(loaded.notes, strict=True)
+    origin = ArtifactRef.model_validate(loaded.origin) if loaded.origin is not None else None
+    columns = describe(loaded.table, loaded.native_types)
+    index_columns = describe(loaded.index, ()) if loaded.index is not None else ()
+    artifact = TableArtifact(
         name=name,
         data=persist(loaded.table),
-        origin=loaded.origin,
+        origin=origin,
         row_count=loaded.table.num_rows,
-        columns=describe(loaded.table, loaded.native_types),
-        index=persist(loaded.index) if loaded.index is not None else None,
-        index_columns=describe(loaded.index, ()) if loaded.index is not None else (),
-        notes=loaded.notes,
+        columns=columns,
+        notes=notes
+        + (
+            ("Index capture incomplete; see execution failure.",)
+            if loaded.index is not None
+            else ()
+        ),
     )
+    if output:
+        context.captured_output = artifact
+    else:
+        context.captured_inputs.append(artifact)
+    if loaded.index is not None:
+        index_ref = persist(loaded.index)
+        artifact = TableArtifact(
+            name=name,
+            data=artifact.data,
+            origin=origin,
+            row_count=loaded.table.num_rows,
+            columns=columns,
+            index=index_ref,
+            index_columns=index_columns,
+            notes=notes,
+        )
+        if output:
+            context.captured_output = artifact
+        else:
+            context.captured_inputs[-1] = artifact
+    return artifact
 
 
 @dataclass(frozen=True)
@@ -280,9 +335,7 @@ class PandasInput:
         if self.index_policy not in ("preserve", "columns", "discard"):
             raise InvalidExecutionInput("unknown Pandas index policy")
         # Supported cells are immutable scalars; deep=True then isolates container mutation.
-        copied = self.frame.copy(deep=True)
-        copied.index = self.frame.index.copy(deep=True)
-        copied.columns = self.frame.columns.copy(deep=True)
+        copied = copy_pandas_frame(self.frame)
         if self.index_policy == "columns":
             copied = copied.reset_index()
         elif self.index_policy == "discard":
@@ -338,8 +391,8 @@ class ArtifactInput:
 
             raise ResourceLimitError("input artifact exceeds transport byte budget")
         path = context.directory / ("input_" + uuid4().hex + "." + self.ref.format)
-        context.store.get(self.ref, path)
         try:
+            context.store.get(self.ref, path)
             if self.ref.format == "parquet":
                 table = pq.read_table(path)
             else:

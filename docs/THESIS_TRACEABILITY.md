@@ -105,3 +105,17 @@ los controles; los ejemplos no cuentan como los 60 escenarios previstos.
 A21–A26 registran motivos y consecuencias de ingeniería. El DOCX no se edita;
 conserva el hash declarado arriba. Las decisiones experimentales abiertas siguen
 pendientes del piloto/equipo; la distribución pública no se adelanta a esta tarea.
+
+
+## Revisión de ingeniería 0.2.1 — 2026-09-28
+
+La segunda revisión del paso 2 añade 142 regresiones de transporte/ejecución,
+coherencia de manifiestos y cierre de recursos. Las decisiones A27–A32 registran
+los motivos y consecuencias. Se mantiene el alcance parcial de T01/T02/T03/T05/
+T09/T11/T22 y la independencia experimental; no se añaden resultados científicos.
+
+Se explicita que el DW y su programa de conexión residirán en OCI, con ejecución
+de EquiFrame dentro de la VM o acceso externo por snapshots verificados. Es una
+decisión de despliegue solicitada por el usuario; la conexión real sigue pendiente.
+La matriz CI ampliada no acredita funcionamiento en la VM real. El DOCX no se edita.
+Evidencia técnica: [segunda revisión del paso 2](STEP_02_SECOND_REVIEW.md).

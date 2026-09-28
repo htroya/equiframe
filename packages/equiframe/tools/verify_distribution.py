@@ -153,12 +153,12 @@ import equiframe
 root = Path(sys.prefix).resolve()
 assert Path(equiframe.__file__).resolve().is_relative_to(root), equiframe.__file__
 assert Path(equiframe.__file__).with_name('py.typed').is_file()
-assert equiframe.__version__ == importlib.metadata.version('equiframe') == '0.2.0'
+assert equiframe.__version__ == importlib.metadata.version('equiframe') == sys.argv[1]
 for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy', 'pyarrow', 'pytest', 'hypothesis'):
     assert importlib.util.find_spec(name) is None, name
 print('Installed wheel imports from clean site-packages without engines/ML/dev tools')
 """
-        run([str(python), "-I", "-c", check], cwd=work, env=env)
+        run([str(python), "-I", "-c", check, package_version], cwd=work, env=env)
         api_check = """
 from pathlib import Path
 import sys

@@ -1,5 +1,8 @@
 # Revisión del paso 2: ejecución genérica y adaptadores nativos
 
+Informe histórico de la entrega 0.2.0. La revisión vigente está en
+[segunda revisión del paso 2](STEP_02_SECOND_REVIEW.md).
+
 Versión: `equiframe 0.2.0`, 2026-09-28. Base verificada: paso 1 `b77d85e`;
 PR #11 continúa abierto al iniciar la entrega. Rama `hernan/step-02-execution`,
 PR dependiente hacia `hernan/step-01-foundations`. No se integra automáticamente.

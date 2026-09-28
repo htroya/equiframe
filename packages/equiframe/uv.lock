@@ -74,7 +74,7 @@ wheels = [
 
 [[package]]
 name = "equiframe"
-version = "0.2.0"
+version = "0.2.1"
 source = { editable = "." }
 dependencies = [
     { name = "pydantic" },
@@ -119,8 +119,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "duckdb", marker = "extra == 'duckdb'", specifier = ">=1.3,<2" },
-    { name = "duckdb", marker = "extra == 'engines'", specifier = ">=1.3,<2" },
+    { name = "duckdb", marker = "extra == 'duckdb'", specifier = ">=1.5.6,<2" },
+    { name = "duckdb", marker = "extra == 'engines'", specifier = ">=1.5.6,<2" },
     { name = "pandas", marker = "extra == 'engines'", specifier = ">=2.2,<4" },
     { name = "pandas", marker = "extra == 'pandas'", specifier = ">=2.2,<4" },
     { name = "polars", marker = "extra == 'engines'", specifier = ">=1.30,<2" },

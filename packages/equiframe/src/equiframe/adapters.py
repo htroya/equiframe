@@ -8,7 +8,12 @@ from collections.abc import Mapping
 from threading import Event, Thread
 from typing import TYPE_CHECKING, cast
 
-from equiframe.errors import CapabilityError, InvalidExecutionInput, ResourceLimitError
+from equiframe.errors import (
+    CapabilityError,
+    InvalidExecutionInput,
+    NativeEngineError,
+    ResourceLimitError,
+)
 from equiframe.execution import RunContext
 from equiframe.execution_types import EngineCapabilities
 from equiframe.registry import (
@@ -17,7 +22,13 @@ from equiframe.registry import (
     PolarsTransformation,
     Transformation,
 )
-from equiframe.tables import LoadedTable, check_arrow, pandas_capture, require_dependency
+from equiframe.tables import (
+    LoadedTable,
+    check_arrow,
+    copy_pandas_frame,
+    pandas_capture,
+    require_dependency,
+)
 
 if TYPE_CHECKING:
     import pyarrow as pa
@@ -37,8 +48,28 @@ def _input_capabilities(loaded: LoadedTable, engine: str, context: RunContext) -
         raise CapabilityError(
             "Pandas index requires index_policy='columns' or 'discard' for other engines"
         )
+    if loaded.table.num_columns == 0 and (
+        engine == "duckdb" or (engine == "pandas" and loaded.table.num_rows > 0)
+    ):
+        raise CapabilityError(f"{engine} does not support faithful zero-column table input")
     for field in loaded.table.schema:
         dtype = field.type
+        if (
+            engine != "pandas"
+            and pa.types.is_decimal(dtype)
+            and (pa.types.is_decimal256(dtype) or dtype.scale < 0)
+        ):
+            raise CapabilityError(f"{engine} requires decimal128 with a nonnegative scale")
+        if engine == "polars" and pa.types.is_timestamp(dtype) and dtype.unit == "s":
+            import pyarrow.compute as pc
+
+            bounds = pc.min_max(loaded.table[field.name].cast(pa.int64())).as_py()
+            if bounds["min"] is not None and (
+                bounds["min"] < -(2**63 // 1000) or bounds["max"] > (2**63 - 1) // 1000
+            ):
+                raise CapabilityError(
+                    "Polars seconds-to-milliseconds transport would overflow int64"
+                )
         if engine == "polars" and pa.types.is_date64(dtype):
             raise CapabilityError("Polars converts date64 to timestamp; use explicit date32 input")
         if engine != "pandas" and pa.types.is_decimal(dtype) and dtype.precision > 38:
@@ -52,6 +83,44 @@ def _input_capabilities(loaded: LoadedTable, engine: str, context: RunContext) -
             raise CapabilityError(
                 "DuckDB rejects zoned ns and zones different from its session timezone"
             )
+        if (
+            engine == "duckdb"
+            and pa.types.is_timestamp(dtype)
+            and dtype.tz
+            and dtype.unit in ("s", "ms")
+        ):
+            import pyarrow.compute as pc
+
+            factor = 1_000_000 if dtype.unit == "s" else 1_000
+            limit = (2**63 - 2) // factor
+            bounds = pc.min_max(loaded.table[field.name].cast(pa.int64())).as_py()
+            if bounds["min"] is not None and (bounds["min"] < -limit or bounds["max"] > limit):
+                raise CapabilityError(
+                    "DuckDB zoned timestamp transport requires finite int64 microseconds"
+                )
+
+
+def _duckdb_temporal_capabilities(table: pa.Table) -> None:
+    import pyarrow as pa
+    import pyarrow.compute as pc
+
+    for field in table.schema:
+        if pa.types.is_timestamp(field.type):
+            bounds = pc.min_max(table[field.name].cast(pa.int64())).as_py()
+            if bounds["min"] is not None and (
+                bounds["min"] <= -(2**63 - 1) or bounds["max"] >= 2**63 - 1
+            ):
+                raise CapabilityError(
+                    "DuckDB timestamp infinity/sentinel values cannot be represented "
+                    "faithfully in Arrow"
+                )
+        elif pa.types.is_date32(field.type):
+            values = table[field.name].cast(pa.int32())
+            sentinels = pa.array([-(2**31 - 1), 2**31 - 1], type=pa.int32())
+            if pc.any(pc.is_in(values, value_set=sentinels)).as_py():
+                raise CapabilityError(
+                    "DuckDB date infinity values cannot be represented faithfully in Arrow"
+                )
 
 
 class PandasAdapter:
@@ -83,7 +152,7 @@ class PandasAdapter:
             for name, loaded in inputs.items():
                 _input_capabilities(loaded, self.engine, context)
                 tables[name] = (
-                    loaded.native.copy(deep=True)
+                    copy_pandas_frame(loaded.native)
                     if isinstance(loaded.native, pd.DataFrame)
                     else loaded.table.to_pandas(types_mapper=pd.ArrowDtype, ignore_metadata=True)
                 )
@@ -117,6 +186,18 @@ class PolarsAdapter:
     ) -> LoadedTable:
         require_dependency("polars", "polars")
         require_dependency("pyarrow", "polars")
+        import polars as pl
+
+        try:
+            return self._execute_native(transformation, inputs, context)
+        except pl.exceptions.PanicException as error:
+            raise NativeEngineError(
+                "Polars native code panicked; execution did not complete"
+            ) from error
+
+    def _execute_native(
+        self, transformation: Transformation, inputs: Mapping[str, LoadedTable], context: RunContext
+    ) -> LoadedTable:
         import polars as pl
 
         if not isinstance(transformation, PolarsTransformation):
@@ -174,28 +255,20 @@ class DuckDBAdapter:
 
         if not isinstance(transformation, DuckDBTransformation):
             raise InvalidExecutionInput("DuckDB adapter requires a DuckDBTransformation")
-        for name, loaded in inputs.items():
-            if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", name) is None:
-                raise CapabilityError(
-                    "DuckDB input identifiers allow ASCII letters, digits and underscores"
-                )
-            _input_capabilities(loaded, self.engine, context)
+        with context.measure("input_capabilities"):
+            for name, loaded in inputs.items():
+                if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", name) is None:
+                    raise CapabilityError(
+                        "DuckDB input identifiers allow ASCII letters, digits and underscores"
+                    )
+                _input_capabilities(loaded, self.engine, context)
+                _duckdb_temporal_capabilities(loaded.table)
         options = context.plan.options
         stopped = Event()
-        context.stage = "engine_setup"
-        # Never accepts a path to a shared database; every call owns its in-memory connection.
-        connection = duckdb.connect(
-            ":memory:",
-            config={
-                "memory_limit": f"{options.duckdb_memory_mb}MB",
-                "threads": options.duckdb_threads,
-                "enable_external_access": False,
-                "autoinstall_known_extensions": False,
-                "max_temp_directory_size": "0B",
-            },
-        )
+        connection: duckdb.DuckDBPyConnection | None = None
 
         def watch() -> None:
+            assert connection is not None
             while not stopped.wait(0.01):
                 if context.cancellation.cancelled or (
                     context.deadline is not None and time.perf_counter() >= context.deadline
@@ -206,6 +279,16 @@ class DuckDBAdapter:
         watcher = Thread(target=watch, name=context.execution_id + "_interrupt", daemon=False)
         try:
             with context.measure("engine_setup"):
+                connection = duckdb.connect(
+                    ":memory:",
+                    config={
+                        "memory_limit": f"{options.duckdb_memory_mb}MB",
+                        "threads": options.duckdb_threads,
+                        "enable_external_access": False,
+                        "autoinstall_known_extensions": False,
+                        "max_temp_directory_size": "0B",
+                    },
+                )
                 connection.execute("SET TimeZone = ?", [options.duckdb_timezone])
                 connection.execute("SET autoload_known_extensions=false")
                 settings = connection.execute(
@@ -254,6 +337,7 @@ class DuckDBAdapter:
             with context.measure("materialization"):
                 table = cast("pa.Table", connection.to_arrow_table())
                 check_arrow(table)
+                _duckdb_temporal_capabilities(table)
             return LoadedTable(
                 table,
                 native_types=native_types,
@@ -270,7 +354,8 @@ class DuckDBAdapter:
             stopped.set()
             if watcher.ident is not None:
                 watcher.join()
-            connection.close()
+            if connection is not None:
+                connection.close()
 
 
 def native_adapter(engine: str) -> EngineAdapter:

@@ -93,3 +93,16 @@ explícita de convertirlo en columnas/descartarlo. `completed` no aprueba una ca
 Jhair aportará contratos de esquema/negocio y tablas identificadas a este puerto;
 Hernán no agrega nombres/monedas/fechas SERCOP obligatorios al núcleo. Los ejemplos
 genéricos de comercio y sensores no son entregas del DW ni evidencia de VM.
+
+
+## 8. Ubicación del DW y del programa de conexión
+
+El DW, DuckDB real y su programa/biblioteca de conexión estarán en la VM OCI.
+`packages/equiframe-data` versiona el código de acceso a desplegar allí; un cliente
+ligero externo es opcional si se acuerda un servicio remoto. EquiFrame podrá
+instalarse y ejecutarse dentro de la VM, o consumir snapshots verificados mediante
+un proveedor externo. Abrir el archivo desde tres equipos no es la integración.
+
+Las garantías y las entregas técnicas están en [integración OCI](OCI_INTEGRATION.md).
+Este documento define interfaces; no implica que el servicio, la VM o el DW hayan
+sido implementados ni probados por la CI del núcleo.

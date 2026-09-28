@@ -15,8 +15,9 @@ from threading import Event
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
-from pydantic import ValidationError
+from pydantic import TypeAdapter, ValidationError
 
+from equiframe._base import Identifier
 from equiframe.contracts import DecimalType, TimestampType
 from equiframe.errors import (
     CapabilityError,
@@ -75,6 +76,8 @@ class RunContext:
     timings: list[StageTiming] = field(default_factory=list)
     effective_configuration: list[Parameter] = field(default_factory=list)
     stage: str = "preflight"
+    captured_inputs: list[TableArtifact] = field(default_factory=list)
+    captured_output: TableArtifact | None = None
 
     @property
     def parameters(self) -> Mapping[str, object]:
@@ -100,6 +103,10 @@ class RunContext:
 
     def check_table(self, table: pa.Table, *, output: bool, enforce_rows: bool = True) -> None:
         self.check()
+        import pyarrow as pa
+
+        if not isinstance(table, pa.Table):
+            raise InvalidExecutionInput("data source must provide an Arrow Table")
         options = self.plan.options
         rows = options.max_output_rows if output else options.max_input_rows
         if enforce_rows and rows is not None and table.num_rows > rows:
@@ -112,14 +119,19 @@ class RunContext:
 
     @contextmanager
     def measure(self, stage: str) -> Iterator[None]:
+        previous = self.stage
         self.stage = stage
         self.check()
         start = time.perf_counter()
+        succeeded = False
         try:
             yield
             self.check()
+            succeeded = True
         finally:
             self.timings.append(StageTiming(stage=stage, seconds=time.perf_counter() - start))
+            if succeeded:
+                self.stage = previous
 
 
 def _versions(engine: str) -> tuple[VersionInfo, ...]:
@@ -184,7 +196,7 @@ def execute(
         from equiframe.adapters import native_adapter
 
         adapter = native_adapter(plan.engine)
-    capabilities = adapter.capabilities()
+    capabilities = EngineCapabilities.model_validate(adapter.capabilities())
     run_id, execution_id = "run_" + uuid4().hex, "exec_" + uuid4().hex
     directory = (work_dir or Path.cwd() / "equiframe-runs").resolve() / run_id / execution_id
     directory.mkdir(parents=True, exist_ok=False)
@@ -212,8 +224,6 @@ def execute(
         "contract_timezone_source",
         "locked Python tzdata package; engine timezone rules recorded separately",
     )
-    inputs: list[TableArtifact] = []
-    output: TableArtifact | None = None
     state: ExecutionState = "completed"
     problem: ExecutionProblem | None = None
     implementation_version: str | None = None
@@ -221,7 +231,12 @@ def execute(
         with context.measure("preflight"):
             if adapter.engine != plan.engine or capabilities.engine != plan.engine:
                 raise InvalidExecutionInput("adapter engine does not match execution plan")
-            if set(source.table_names) != {item.name for item in plan.contract.inputs}:
+            names = TypeAdapter(tuple[Identifier, ...]).validate_python(
+                source.table_names, strict=True
+            )
+            if len(set(names)) != len(names):
+                raise InvalidExecutionInput("source table names must be unique")
+            if set(names) != {item.name for item in plan.contract.inputs}:
                 raise InvalidExecutionInput("source tables must match declared input names")
             transformation = registry.resolve(plan)
             for dependency in capabilities.required_packages:
@@ -231,13 +246,19 @@ def execute(
         tables: dict[str, LoadedTable] = {}
         with context.measure("input_load"):
             for item in plan.contract.inputs:
-                tables[item.name] = source.resolve(item.name, context=context)
+                resolved = source.resolve(item.name, context=context)
+                if not isinstance(resolved, LoadedTable):
+                    raise InvalidExecutionInput("data source must return LoadedTable")
+                tables[item.name] = resolved
                 context.check_table(tables[item.name].table, output=False)
-                inputs.append(capture_artifact(item.name, tables[item.name], context))
+                capture_artifact(item.name, tables[item.name], context)
+        context.stage = "adapter_dispatch"
         loaded = adapter.execute(transformation, tables, context)
+        if not isinstance(loaded, LoadedTable):
+            raise InvalidExecutionInput("engine adapter must return LoadedTable")
         with context.measure("output_capture"):
             context.check_table(loaded.table, output=True)
-            output = capture_artifact(plan.contract.output.name, loaded, context)
+            capture_artifact(plan.contract.output.name, loaded, context, output=True)
     except Exception as error:
         if isinstance(error, ExecutionCancelled):
             state = "cancelled"
@@ -271,8 +292,8 @@ def execute(
         versions=_versions(plan.engine),
         capabilities=capabilities,
         effective_configuration=tuple(context.effective_configuration),
-        inputs=tuple(inputs),
-        output=output,
+        inputs=tuple(context.captured_inputs),
+        output=context.captured_output,
         problem=problem,
     )
     # Directory is owned by this execution. Exclusive publication never replaces a previous run.

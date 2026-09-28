@@ -22,7 +22,16 @@ ENGINES = ("pandas", "polars", "duckdb")
 
 
 def identity(
-    engine, table, tmp_path, *, logical=None, options=None, source=None, callback=None, sql=None
+    engine,
+    table,
+    tmp_path,
+    *,
+    logical=None,
+    options=None,
+    source=None,
+    callback=None,
+    sql=None,
+    **execution_kwargs,
 ):
     logical = logical or ef.StringType()
     columns = tuple(DEMO["column"](name, logical) for name in table.column_names)
@@ -51,9 +60,12 @@ def identity(
             transformation_id="identity",
             options=options or ef.ExecutionOptions(),
         ),
-        source=source or ef.LocalDataSource({"items": ef.ArrowInput(table)}),
+        source=source
+        if source is not None
+        else ef.LocalDataSource({"items": ef.ArrowInput(table)}),
         registry=registry,
         work_dir=tmp_path,
+        **execution_kwargs,
     )
 
 

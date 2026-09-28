@@ -55,6 +55,7 @@ from equiframe.errors import (
     ExecutionTimeout,
     InvalidExecutionInput,
     MissingDependencyError,
+    NativeEngineError,
     ResourceLimitError,
     SchemaVersionError,
     ValidationIssue,
@@ -127,7 +128,7 @@ from equiframe.values import (
     TimeZone,
 )
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 __all__ = [
     "CANONICALIZATION",
@@ -194,6 +195,7 @@ __all__ = [
     "Multiplicity",
     "NaNPolicy",
     "NaNValue",
+    "NativeEngineError",
     "NullPolicy",
     "NullValue",
     "NumericPolicy",

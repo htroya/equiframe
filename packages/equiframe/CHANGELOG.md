@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.2.1 — 2026-09-28
+
+- Conservación de anchos/signo NumPy y nullable Pandas, UInt64 extremo y máscaras Float32/64.
+- Rechazo previo de categorías e inferencia ambigua de objetos numéricos heterogéneos.
+- Límites explícitos de decimal256/escala negativa, segundos Polars y microsegundos zoned DuckDB.
+- Rechazo de infinito/sentinels temporales DuckDB en entradas y salidas, sin ocultarlos como fechas finitas.
+- Captura parcial referenciada si falla el índice; presupuesto de buffers del índice y limpieza de descargas.
+- Copia aislada de índices/columnas en fuentes inyectadas y cierre DuckDB durante setup cancelado.
+- Diagnóstico de pánicos nativos Polars; etapas anidadas y puertos runtime validados.
+- Coherencia estructural de manifiestos: huella, entradas, salida, formatos y conteos de ausencias.
+- DuckDB mínimo 1.5.6, versión comprobada con la API usada; formato JSON 1.0 conservado.
+- 142 regresiones adicionales de motores reales; documentación de producto e integración OCI.
+- CI extendida a macOS Intel/Apple Silicon y Ubuntu ARM64, con triggers para ramas de cualquier colaborador.
+
+La captura fiel puede rechazar entradas antes aceptadas mediante conversiones que
+perdían información. No incorpora comparador ni conexión remota al DW.
+
 ## 0.2.0 — 2026-09-28
 
 - Paso 2: `ef.execute`, planes/resultados estrictos, contexto, capacidades y registro por instancia.

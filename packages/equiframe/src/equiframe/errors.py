@@ -77,3 +77,7 @@ class ExecutionTimeout(EquiFrameError):
 
 class ResourceLimitError(EquiFrameError):
     code = "resource_limit"
+
+
+class NativeEngineError(EquiFrameError):
+    code = "native_engine_error"

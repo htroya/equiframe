@@ -112,7 +112,7 @@ La evidencia es append-only a nivel de corrida. Las revisiones generan registros
 
 ## 8. Integración con la VM y el DW
 
-La VM es un entorno opcional de colaboración. El núcleo funciona en Windows o Linux con archivos locales. El cliente de José entrega snapshots y recibos; un adaptador del lado consumidor implementa `DataSource` sin que EquiFrame importe el cliente al arrancar.
+La VM es un entorno opcional de colaboración. El núcleo usa archivos locales; la matriz CI incluye Windows, Linux y macOS. El cliente de José entrega snapshots y recibos; un adaptador del lado consumidor implementa `DataSource` sin que EquiFrame importe el cliente al arrancar.
 
 Propuesta para el servicio de José: un proceso propietario de la base mutable recibe trabajos, coordina transacciones y publica snapshots inmutables en directorios versionados. Los lectores usan la última versión publicada o una versión fijada; el escritor construye la siguiente. Un catálogo/puntero se publica solo después de los controles. No se reemplaza un archivo abierto, especialmente en Windows, ni se borran snapshots todavía utilizados.
 
@@ -176,3 +176,17 @@ los estados del paso 1 y no emite juicio semántico ni alerta.
 Distribución pública se incorpora al paso 10: licencia acordada, nombre disponible
 o bajo control del equipo, metadatos, versiones soportadas y publicación comprobada
 en PyPI. Este paso no publica ni garantiza instalación desde el índice público.
+
+
+## 12. Revisión 0.2.1 e integración OCI
+
+La captura conserva anchos/máscaras nativos y rechaza pérdidas conocidas antes de
+convertir. Los límites temporales y decimales son propios de cada motor; no se
+reduce el contrato para ajustarlo a una implementación. Evidencia parcial publicada
+se retiene en el manifiesto fallido cuando el guardado del índice se interrumpe.
+Puertos runtime y manifiestos se validan sin comparar salida y esquema esperado.
+
+El [contrato OCI](OCI_INTEGRATION.md) sitúa el DW y su programa de conexión dentro
+de la VM. EquiFrame puede ejecutarse allí o recibir snapshots por un proveedor
+externo explícito. CI verifica el mismo código en runners GitHub temporales;
+no despliega OCI ni acredita la integración real pendiente del paso 9.

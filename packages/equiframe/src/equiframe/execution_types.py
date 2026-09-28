@@ -70,6 +70,27 @@ class TableArtifact(FrozenModel):
     index_columns: tuple[PhysicalColumn, ...] = ()
     notes: tuple[Text, ...] = ()
 
+    @model_validator(mode="after")
+    def consistent_table(self) -> Self:
+        if self.data.format not in ("arrow", "parquet"):
+            fail("table_artifact_format", "table data requires Arrow/Parquet", "data")
+        if self.index is None and self.index_columns:
+            fail("missing_index_artifact", "index columns require an index artifact", "index")
+        if self.index is not None and self.index.format not in ("arrow", "parquet"):
+            fail("table_artifact_format", "index requires Arrow/Parquet", "index")
+        for location, columns in (("columns", self.columns), ("index_columns", self.index_columns)):
+            if len({c.name for c in columns}) != len(columns):
+                fail("duplicate_physical_column", "physical column names must be unique", location)
+            for position, column in enumerate(columns):
+                if column.null_count + column.nan_count > self.row_count:
+                    fail(
+                        "impossible_value_counts",
+                        "NULL/NaN counts exceed row count",
+                        location,
+                        position,
+                    )
+        return self
+
 
 class StageTiming(FrozenModel):
     stage: Text
@@ -113,4 +134,31 @@ class ExecutionResult(FrozenModel):
             fail("incomplete_result", "completed requires output and no problem", "state")
         if self.state != "completed" and self.problem is None:
             fail("missing_problem", "unsuccessful execution requires a diagnostic", "problem")
+        from equiframe.serialization import contract_fingerprint
+
+        if self.contract_sha256 != contract_fingerprint(self.plan.contract):
+            fail(
+                "contract_fingerprint_mismatch",
+                "fingerprint must match the embedded contract",
+                "contract_sha256",
+            )
+        names = tuple(table.name for table in self.inputs)
+        declared = {table.name for table in self.plan.contract.inputs}
+        if len(set(names)) != len(names) or not set(names) <= declared:
+            fail(
+                "invalid_input_evidence",
+                "captured inputs must be unique declared table names",
+                "inputs",
+            )
+        if self.state == "completed":
+            if set(names) != declared:
+                fail("missing_input_evidence", "completed requires every input artifact", "inputs")
+            if self.capabilities.engine != self.plan.engine:
+                fail(
+                    "engine_evidence_mismatch",
+                    "completed engine capabilities must match plan",
+                    "capabilities",
+                )
+            if self.output is not None and self.output.name != self.plan.contract.output.name:
+                fail("output_evidence_mismatch", "output table name must match the plan", "output")
         return self

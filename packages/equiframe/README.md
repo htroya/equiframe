@@ -1,10 +1,11 @@
-# EquiFrame 0.2.0 — contratos y ejecución nativa local
+# EquiFrame 0.2.1 — contratos y ejecución nativa local
 
-Los pasos 1 y 2 implementan contratos estrictos y ejecución local tipada
-con Pandas, Polars y DuckDB. Funciona localmente con Python 3.12 x64. No necesita VM,
-datos reales, cliente remoto, DW ni ML. Los motores se instalan mediante extras. La matriz CI prueba
-Windows Server 2022 y Ubuntu 24.04; ARM64 y otras versiones de Python no se
-declaran soportadas. Licencia y publicación externa pendientes; no hay paquete en PyPI.
+Contratos estrictos y ejecución local tipada con Pandas, Polars y DuckDB.
+Se requiere Python 3.12; los motores se instalan mediante extras. La configuración
+CI cubre Windows x64, Ubuntu x64/ARM64 y macOS Intel/Apple Silicon.
+La [evidencia de revisión y compatibilidad](../../docs/STEP_02_SECOND_REVIEW.md)
+registra los controles completados. No se requiere una VM ni un DW para usar el
+núcleo. Licencia y publicación externa pendientes; no hay paquete del equipo en PyPI.
 
 
 ## Instalación base y extras
@@ -14,8 +15,8 @@ la experiencia pública objetivo, pendiente del paso 10; podría resolver un
 paquete ajeno. Use el wheel del equipo o este checkout:
 
 ```bash
-python -m pip install ./dist/equiframe-0.2.0-py3-none-any.whl
-python -m pip install "./dist/equiframe-0.2.0-py3-none-any.whl[duckdb]"
+python -m pip install ./dist/equiframe-0.2.1-py3-none-any.whl
+python -m pip install "./dist/equiframe-0.2.1-py3-none-any.whl[duckdb]"
 # Alternativas: [arrow], [pandas], [polars] o [engines].
 # Desde el checkout del equipo:
 python -m pip install ".[engines]"
@@ -104,7 +105,8 @@ se registra planificación y `collect()` por separado. DuckDB: SQL confiable
 registrado, una consulta SELECT/WITH; valores `$nombre` parametrizados y nombres
 de entradas ASCII controlados. Conexión propia `:memory:`, ICU del wheel, acceso
 externo y descargas de extensiones deshabilitados, cierre en éxito/fallo/interrupción.
-No admite abrir una base DuckDB compartida ni es el cliente remoto de José.
+El adaptador no abre la base real del DW. El acceso al DW se integra mediante un
+proveedor externo; consulte el [contrato OCI](../../docs/OCI_INTEGRATION.md).
 
 La API admite `adapter`, `artifact_store`, `source`, `work_dir` y
 `cancellation` inyectados. Los Protocols completos están en `ef`.
@@ -117,10 +119,10 @@ su snapshot explícito; la implementación local rechaza URI remotas.
 | Tipo/formato | Pandas | Polars | DuckDB local |
 |---|---|---|---|
 | bool, enteros con signo/sin signo 8–64, texto, float32/64 | Sí | Sí | Sí |
-| decimal exacto Arrow | decimal128/256, hasta 76 dígitos | hasta 38 | hasta 38 |
+| decimal exacto Arrow | decimal128/256, hasta 76 dígitos | decimal128, escala no negativa, hasta 38 | decimal128, escala no negativa, hasta 38 |
 | fechas | date32/date64 de días enteros | date32; date64 rechazado | DATE; date64 de días enteros |
-| timestamp sin zona | s/ms/us/ns | s ingresa como ms; ms/us/ns | s/ms/us/ns |
-| timestamp con zona | s/ms/us/ns | s ingresa como ms; ms/us/ns | s/ms/us; zona igual a `duckdb_timezone` |
+| timestamp sin zona | s/ms/us/ns | s ingresa como ms si cabe en int64; ms/us/ns | s/ms/us/ns finitos |
+| timestamp con zona | s/ms/us/ns | s ingresa como ms si cabe en int64; ms/us/ns | s/ms/us representables en us; zona igual a `duckdb_timezone` |
 | Arrow IPC **file** / Parquet locales | Sí | Sí | Sí, vía Arrow registrado |
 | diccionarios/categorías, nested, binario, objetos arbitrarios, Arrow streams | No incluidos | No incluidos | No incluidos |
 
@@ -138,11 +140,15 @@ hubiera generado la transformación.
 
 Entradas: `ArrowInput`, `PandasInput`, `PolarsInput` o `ArtifactRef` local dentro de
 `LocalDataSource`. Arrow se desacopla de buffers mutables del consumidor mediante
-IPC; Pandas copia datos e índice y admite solo celdas escalares inmutables;
+IPC; Pandas copia datos, índice y etiquetas de columnas y admite solo celdas
+escalares inmutables;
 Polars usa su copia y materializa lazy de entrada. El índice de Pandas se conserva
 en un artefacto separado, con nombres en notas; otro motor exige
 `index_policy="columns"` o `"discard"` explícito si el índice tiene significado.
-No se convierte automáticamente el índice en una clave. `read_table(ref)` verifica
+Los dtypes NumPy/nullable conservan ancho y signo; Float32/Float64 nullable
+conservan su máscara. Se rechazan categorías también en índices/etiquetas y
+columnas `object` que mezclen tipos numéricos, antes de inferir un tipo que borre
+la distinción. No se convierte automáticamente el índice en una clave. `read_table(ref)` verifica
 hash/tamaño antes de leer y cierra archivos también en Windows.
 
 Arrow decimal no representa cero decimal negativo, NaN/Infinity Decimal ni
@@ -152,6 +158,12 @@ escala o distinciones que ya se perdieron al construir Arrow/Pandas/Polars.
 El float NumPy conserva NaN observado; carece de máscara NULL separada. ArrowDtype
 u objetos escalares con None/NaN separados permiten conservar las distinciones
 que sí existen. No se reconstruye None a partir de NaN.
+
+DuckDB rechaza los sentinels de infinito temporal en entradas y salidas: Arrow
+no puede distinguirlos de épocas finitas. Los timestamps zoned s/ms deben caber
+en microsegundos; Polars rechaza segundos que desborden al convertirlos en ms.
+Las tablas de cero columnas se conservan donde el motor retiene su cardinalidad
+o se rechazan explícitamente.
 
 Arrow representa instantes y una zona por columna, sin conservar el texto ISO ni
 el offset original por fila; para conservarlos, el consumidor debe aportar columnas
@@ -170,8 +182,18 @@ Entradas capturadas y salida son Arrow IPC con referencias SHA-256; el manifiest
 `run.json` incluye plan/contrato/huella, código, versiones, configuración efectiva,
 referencias originales, tipos observados, tiempos, estado y diagnóstico. Publicación
 exclusiva mediante temporal y enlace local atómico; nunca reemplaza otra corrida.
-El almacén requiere un sistema de archivos local con enlaces duros (compatibilidad comprobada por la matriz Windows/Ubuntu). Un fallo de publicación se eleva; no se retorna
+El almacén requiere un sistema de archivos local con enlaces duros (compatibilidad registrada en la matriz CI). Un fallo de publicación se eleva; no se retorna
 un éxito sin manifiesto. No hay reintentos automáticos ni servicio de concurrencia.
+Si falla el guardado del índice después de publicar datos, el resultado fallido
+conserva la referencia de datos y una nota de captura incompleta. Esa entrada o
+salida parcial no acredita una tabla íntegra; el diagnóstico identifica la etapa.
+Los fallos de descarga limpian sus temporales y los fallos durante el setup DuckDB
+cierran también la conexión creada. Un pánico FFI de Polars se registra como
+`failed` con código `native_engine_error`.
+
+El manifiesto verifica su huella contra el contrato incorporado, nombres de
+entradas/salida y coherencia de los conteos/esquemas físicos. Esos controles son
+estructurales: no comparan los datos con el esquema esperado.
 
 | Estado | Alcance |
 |---|---|
@@ -198,7 +220,7 @@ carga/captura Python. `duckdb_memory_mb` limita memoria administrada por el moto
 `duckdb_threads` controla hilos y spill está deshabilitado; no son un límite RSS
 para Arrow/Python. `max_input_rows`, `max_output_rows` y `max_transport_bytes` se
 comprueban por tabla materializada (bytes de buffers y tamaño declarado de archivo
-entrante); no impiden una asignación previa ni son cuotas agregadas de servicio.
+entrante, incluidos los buffers del índice); no impiden una asignación previa ni son cuotas agregadas de servicio.
 Callbacks/SQL son código confiable del usuario, no un sandbox.
 
 Ejemplos ejecutables de comercio y telemetría para cinco familias:
@@ -230,7 +252,7 @@ $uvEquiframe = (Resolve-Path ..\..\.tools\Scripts\uv.exe).Path
 No se reutiliza Anaconda como entorno de dependencias; puede proporcionar
 el intérprete base. `.tools` solo contiene el gestor uv fijado.
 
-Ubuntu, desde la raíz, con `python3.12` instalado:
+Linux o macOS, desde la raíz, con `python3.12` instalado:
 
 ```bash
 python3.12 -m venv .tools
@@ -241,7 +263,7 @@ cd packages/equiframe
 ```
 
 Los comandos siguientes usan `uv` en PATH; en Windows puede sustituirse por
-`& $uvEquiframe`, y en Ubuntu por `../../.tools/bin/uv`.
+`& $uvEquiframe`, y en Linux/macOS por `../../.tools/bin/uv`.
 
 ## API pública
 
@@ -395,8 +417,8 @@ uv run --locked --all-extras python tools/verify_distribution.py
 ```
 
 El backend y sus dependencias están en el lock; `--no-isolation` usa ese entorno.
-Build produce `dist/equiframe-0.2.0-py3-none-any.whl` y
-`dist/equiframe-0.2.0.tar.gz`. El verificador crea entornos temporales fuera del checkout, instala dependencias runtime del lock y el wheel sin editable,
+Build produce `dist/equiframe-0.2.1-py3-none-any.whl` y
+`dist/equiframe-0.2.1.tar.gz`. El verificador crea entornos temporales fuera del checkout, instala dependencias runtime del lock y el wheel sin editable,
 comprueba `py.typed` e importación sin motores/ML/dev, valida cinco ejemplos por
 CLI y reconstruye desde el sdist comparando todos los bytes del wheel.
 También instala cada extra y la combinación engines sin editable, ejecuta los ejemplos copiados fuera del checkout y comprueba roundtrips de API y errores/códigos de CLI instalada, ejecuta
@@ -411,11 +433,13 @@ uv run --locked --all-extras python tools/generate_assets.py
 ```
 
 Cambiar dependencias exige resolver un nuevo lock y repetir CI. `pip install
-dist/equiframe-0.2.0-py3-none-any.whl` funciona, pero solo el lock reproduce el
+dist/equiframe-0.2.1-py3-none-any.whl` funciona, pero solo el lock reproduce el
 entorno comprobado. Los fixtures no fijan cohorte, escala monetaria real, alpha
-ni tamaño del benchmark. La implementación se detiene en el paso 2.
+ni tamaño del benchmark. Comparación, reglas operativas y detectores permanecen fuera de esta versión.
 
-Las versiones concretas comprobadas son las del `uv.lock`, no todas las combinaciones admitidas por los rangos de metadatos. Las pruebas del paso 1 se conservan; la aserción de versión de CLI ahora corresponde a 0.2.0.
+Las versiones concretas comprobadas son las del `uv.lock`, no todas las combinaciones admitidas por los rangos de metadatos. La suite conserva los contratos anteriores y añade regresiones con motores reales.
+El mínimo de DuckDB es 1.5.6: versiones anteriores admitidas por 0.2.0 no
+ofrecían toda la API usada. No se certifican todas las versiones del intervalo.
 
 DuckDB rechaza columnas de entrada cuyos nombres coinciden ignorando mayúsculas
 y minúsculas, antes de registrarlas: el motor las renombraría automáticamente.

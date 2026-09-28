@@ -1,70 +1,108 @@
 # EquiFrame
 
-Biblioteca Python para comprobar requisitos semánticos y estudiar divergencias al migrar transformaciones ETL entre Pandas, Polars y DuckDB.
+Contratos semánticos tipados y ejecución de transformaciones tabulares con
+**Pandas, Polars y DuckDB**. Cada motor ejecuta su propia implementación;
+EquiFrame conserva los datos, tipos y diagnósticos necesarios para revisar el resultado.
 
-Repositorio privado del equipo: <https://github.com/htroya/equiframe>.
+## Funcionalidad
 
-Tablero privado de trabajo: <https://github.com/users/htroya/projects/1>. Los diez pasos de Hernán están registrados como issues; el primero es [Paso 01/10](https://github.com/htroya/equiframe/issues/1).
+- Contratos estrictos, inmutables y versionados para esquemas, claves, multiplicidad,
+  orden, decimales, ausencias y fechas.
+- API Python `import equiframe as ef`, registro explícito de transformaciones e
+  inyección de fuentes, adaptadores y almacenes.
+- Ejecución nativa de callbacks Pandas, DataFrame/LazyFrame Polars y consultas
+  DuckDB parametrizadas.
+- Entradas Arrow, Pandas, Polars, Arrow IPC y Parquet locales; artefactos verificables
+  mediante SHA-256 y un manifiesto por ejecución.
+- Estados y diagnósticos de fallo, cancelación, tiempo y recursos; CLI para validar contratos.
 
-## Estado real
+**Versión de desarrollo: 0.2.1.** Una ejecución `completed` confirma que la
+transformación terminó y se materializó. La comparación semántica, las reglas
+operativas, los detectores y el benchmark están previstos en la
+[hoja de ruta](docs/HERNAN_ROADMAP.md).
 
-Los **pasos 1 y 2** implementan `equiframe 0.2.0`: contratos semánticos estrictos e inmutables, tipos públicos, validación cruzada, JSON canónico, SHA-256 de metadatos, esquemas JSON y CLI funcional. Hay cinco contratos sintéticos y pruebas de comportamiento/propiedades, tipado, empaquetado e instalación limpia. La API `import equiframe as ef` ejecuta transformaciones nativas con Pandas, Polars y DuckDB local, mediante extras. Comparador, reglas ejecutables, modelos y benchmark siguen pendientes. El paquete no está publicado en PyPI.
+## Instalación
 
-Instalación, API y comandos de verificación: [README del paquete](packages/equiframe/README.md). Python inicial: 3.12; matriz CI x64 Windows/Ubuntu. ARM64 no está verificado.
+Se requiere **Python 3.12**. El paquete se instala desde este repositorio privado
+o desde un wheel del equipo; todavía no se distribuye en PyPI.
 
-La [segunda revisión completa del paso 1](docs/STEP_01_REVIEW.md) registra fallos
-reproducidos, correcciones, 51 regresiones nuevas y evidencia de distribución.
-
-La fuente metodológica es `TFM_EquiFrame_ACTUAL.docx`, revisada el 2026-09-28. Su identidad, requisitos y decisiones pendientes están en [trazabilidad](docs/THESIS_TRACEABILITY.md). El documento de tesis y los datos originales no se copian a este repositorio.
-
-## Documentos de trabajo
-
-| Documento | Uso |
-|---|---|
-| [Arquitectura](docs/ARCHITECTURE.md) | Componentes, dependencias, ejecución y decisiones técnicas |
-| [API y formatos](docs/API_CONTRACTS.md) | Interfaces Python, tipos, estados, errores y serialización |
-| [Integración del equipo](docs/TEAM_INTEGRATION.md) | Límites y entregas entre Hernán, José y Jhair |
-| [Diseño experimental](docs/EXPERIMENT_DESIGN.md) | Oráculo, independencia, perfiles, modelos, particiones y métricas |
-| [Plan de Hernán](docs/HERNAN_ROADMAP.md) | Diez pasos con entregables y criterios de aceptación |
-| [Calidad y operación](docs/QUALITY.md) | Pruebas, recursos, compatibilidad, seguridad y releases |
-| [Segunda revisión del paso 1](docs/STEP_01_REVIEW.md) | Hallazgos, matriz del alcance y comprobaciones ejecutadas |
-| [Revisión del paso 2](docs/STEP_02_REVIEW.md) | Alcance, evidencia y límites de ejecución/distribución |
-| [Decisiones](docs/DECISIONS.md) | Decisiones de arquitectura y asuntos abiertos |
-| [Colaboración](CONTRIBUTING.md) | Ramas, revisiones y permisos |
-
-## Responsabilidades
-
-- **Hernán:** `equiframe`, `equiframe-benchmark`, contratos genéricos, adaptadores de ejecución, comparación, reglas, perfiles, modelos, evidencia, CLI y evaluación.
-- **José:** VM, servicio de acceso a datos y cliente Python `equiframe-data`; controla concurrencia, autenticación, trabajos y publicación de versiones.
-- **Jhair:** modelo y construcción del DW, mapeos OCDS, preparación/carga del dominio, controles y reconciliación en `equiframe-sercop`.
-
-Los nombres de los paquetes de José y Jhair son convenciones propuestas para integrar el trabajo; cada responsable implementa su componente. Las interfaces compartidas se acuerdan por PR. Hernán implementa las transformaciones comparables del benchmark en los tres motores a partir de los contratos de negocio entregados por Jhair; no administra la carga productiva del DW.
-
-## Organización inicial
-
-```text
-docs/                          arquitectura y requisitos versionados
-packages/equiframe/            biblioteca de Hernán
-packages/equiframe-benchmark/  evaluación de Hernán
-packages/equiframe-data/       cliente de José
-packages/equiframe-sercop/     integración de dominio de Jhair
-services/data-gateway/         servicio de José
-infra/                        infraestructura de José
-.github/                      plantillas de colaboración
+```bash
+git clone https://github.com/htroya/equiframe.git
+cd equiframe/packages/equiframe
+python -m pip install ".[duckdb]"
 ```
 
-`packages/equiframe` contiene `src/`, `pyproject.toml`, `uv.lock`, pruebas, fixtures y esquemas generados. Los otros paquetes y servicios conservan sus especificaciones de responsabilidad.
+Extras disponibles: `arrow`, `pandas`, `polars`, `duckdb` y `engines`.
+La instalación base incluye contratos, CLI y metadatos; los motores son opcionales
+y no se cargan al importar el paquete.
 
-## Inicio de la implementación
+Para desarrollo reproducible se usa `uv.lock`. Los comandos de instalación y
+verificación están en el [README del paquete](packages/equiframe/README.md).
 
-Sol ha implementado los pasos 1 y 2 de [la hoja de ruta](docs/HERNAN_ROADMAP.md). La CI ejecuta controles reales con permisos `contents: read`, acciones fijadas por commit y dependencias bloqueadas. Los siguientes ocho pasos siguen pendientes.
+## Uso
 
-## Datos y permisos
+Una ejecución combina un contrato, una transformación registrada y una fuente de datos:
 
-Código, especificaciones y pequeños casos sintéticos se versionan en Git. Datos SERCOP, archivos DuckDB, modelos y resultados de corridas van al almacén de artefactos con hashes y manifiestos. En el paso 2, cada corrida local produce su salida y `run.json`; `completed` acredita ejecución, no corrección semántica. Ningún integrante comparte sus tokens con los demás.
+```text
+ExecutionPlan + DataSource + TransformationRegistry
+                    ↓ ef.execute(...)
+ExecutionResult + artefactos Arrow + run.json
+```
 
-`htroya` es propietario. Las invitaciones de José y Jhair están pendientes de conocer sus usuarios. En un repositorio personal GitHub permite colaboradores con escritura, pero reserva al propietario la administración completa. Si se necesitan tres administradores se debe acordar el traslado a una organización.
+El [ejemplo mínimo](packages/equiframe/README.md#ejecución-mínima-funcional) muestra
+una consulta parametrizada y la lectura de su salida. Los
+[ejemplos ejecutables](packages/equiframe/examples/execute_native.py) cubren cinco
+familias de transformaciones en comercio y telemetría con los tres motores.
 
-La licencia de distribución del software está pendiente de decisión de los autores. Este repositorio privado no implica autorización para publicar un paquete en PyPI.
+La salida observada se conserva separada del esquema esperado: EquiFrame no
+redondea, rellena ausencias, deduplica ni cambia tipos para ajustarla al contrato.
+Las capacidades incompatibles se informan explícitamente. Consulte la
+[matriz de transporte](packages/equiframe/README.md#transporte-fiel-y-capacidades-comprobadas).
 
-El objetivo de distribución pública es `pip install equiframe`, con licencia/nombre bajo control del equipo y publicación verificable en el paso 10. No está publicado: use el wheel del equipo. Ejemplos genéricos: [ejecución nativa](packages/equiframe/examples/execute_native.py); API y límites: [README del paquete](packages/equiframe/README.md).
+## Compatibilidad e integración
+
+La configuración de CI ejecuta el mismo paquete en Windows x64, Linux x64/ARM64
+y macOS Intel/Apple Silicon. Cada job comprueba tipos, pruebas con motores reales,
+construcción e instalación limpia del wheel.
+[Evidencia de compatibilidad y revisión](docs/STEP_02_SECOND_REVIEW.md).
+
+Los runners de GitHub son entornos temporales de prueba. El workflow no despliega
+servicios ni conecta con una VM de OCI.
+
+El núcleo funciona con datos locales y admite proveedores externos mediante
+`DataSource`. El DW, la base DuckDB real y su programa de conexión podrán residir
+en OCI: EquiFrame puede ejecutarse en esa VM o consumir snapshots publicados por
+un proveedor explícito. El [contrato de integración OCI](docs/OCI_INTEGRATION.md)
+describe los límites y las entregas necesarias; la conexión real sigue pendiente.
+
+## Documentación
+
+| Documento | Contenido |
+|---|---|
+| [API y ejemplos](packages/equiframe/README.md) | Instalación, ejecución, contratos, CLI y límites |
+| [Referencia de formatos](docs/API_CONTRACTS.md) | Tipos públicos, estados y serialización |
+| [Arquitectura](docs/ARCHITECTURE.md) | Componentes, dependencias y flujo de ejecución |
+| [Integración OCI](docs/OCI_INTEGRATION.md) | Acceso al DW, snapshots y coordinación de DuckDB |
+| [Calidad](docs/QUALITY.md) | Pruebas, recursos y distribución |
+| [Changelog](packages/equiframe/CHANGELOG.md) | Cambios por versión |
+| [Contribución](CONTRIBUTING.md) | Desarrollo, ramas y revisión de cambios |
+
+## Estructura del repositorio
+
+```text
+packages/equiframe/            biblioteca y pruebas
+packages/equiframe-benchmark/  especificación de evaluación
+packages/equiframe-data/       especificación de acceso a datos
+packages/equiframe-sercop/     especificación de integración de dominio
+services/data-gateway/         especificación del servicio de datos
+infra/                        especificación de infraestructura
+docs/                         documentación técnica
+.github/                      CI y plantillas de colaboración
+```
+
+Actualmente `packages/equiframe` contiene la implementación Python. Los otros
+componentes conservan sus especificaciones hasta que sus responsables los implementen.
+Código, esquemas y casos sintéticos pequeños se versionan en Git; las bases reales,
+credenciales, snapshots y resultados privados se almacenan fuera del repositorio.
+
+La licencia de distribución está pendiente de decisión de los autores.

@@ -7,6 +7,7 @@ from urllib.parse import unquote, urlsplit
 from urllib.request import url2pathname
 from uuid import uuid4
 
+from equiframe._base import Text
 from equiframe.errors import ArtifactIntegrityError, ArtifactIOError, CapabilityError
 from equiframe.types import ArtifactRef
 
@@ -54,6 +55,9 @@ class LocalArtifactStore:
         self.root = root.resolve()
 
     def put(self, path: Path, *, media_type: str) -> ArtifactRef:
+        from pydantic import TypeAdapter
+
+        media_type = TypeAdapter(Text).validate_python(media_type, strict=True)
         format_name = _FORMATS.get(path.suffix.lower())
         if format_name is None:
             raise CapabilityError("supported artifact suffixes: .json, .jsonl, .arrow, .parquet")

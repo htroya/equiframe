@@ -183,7 +183,7 @@ matriz de tipos: [README](../packages/equiframe/README.md).
 | `read_table(ref)` | Lee Arrow IPC file/Parquet local tras verificar integridad; sin modificación ni descarga |
 
 Errores completos: `InvalidExecutionInput`, `CapabilityError`,
-`MissingDependencyError`, `ArtifactIntegrityError`, `ArtifactIOError`,
+`MissingDependencyError`, `NativeEngineError`, `ArtifactIntegrityError`, `ArtifactIOError`,
 `ExecutionCancelled`, `ExecutionTimeout`, `ResourceLimitError`; todos reutilizan
 `EquiFrameError`. Operaciones fallidas dentro de una corrida se traducen a estados
 existentes, con código/etapa/tipo; plan inválido y fallos de carpeta/publicación se
@@ -197,3 +197,32 @@ en estos modelos. IDs únicos impiden mezclar corridas locales independientes.
 Arrow no recupera offset textual por fila, signo decimal cero o None perdido al
 construir una tabla; notas/capacidades exponen esas limitaciones. Ningún límite
 cooperativo se describe como timeout duro o sandbox.
+
+
+## 8. Validación y captura en 0.2.1
+
+Las fuentes externas declaran `table_names` como tupla estricta, sin duplicados,
+y resuelven `LoadedTable` con tabla Arrow. Los adaptadores inyectados exponen
+capacidades revalidadas y devuelven el mismo tipo de intercambio.
+
+El resultado verifica SHA-256 del contrato incorporado, nombres de entradas
+únicos/declarados y, para completed, todas las entradas, motor y nombre de salida.
+`TableArtifact` requiere datos/índice Arrow o Parquet, nombres físicos únicos,
+conteos NULL+NaN compatibles con filas e índice referenciado cuando declara columnas.
+La validación no exige que el esquema observado coincida con el esperado.
+
+Si publicar un índice falla después de guardar datos, el resultado fallido retiene
+la referencia parcial y una nota explícita; no presenta esa tabla como íntegra.
+`max_transport_bytes` comprueba los buffers de datos y del índice por tabla.
+Las mediciones anidadas restablecen la etapa del padre al terminar correctamente,
+y conservan la etapa interna cuando ocurre un fallo.
+
+Tipos NumPy/nullable Pandas conservan anchos, signo y máscaras; categorías y objetos
+numéricos de tipos mezclados se rechazan. Decimal256/escala negativa se rechaza en
+Polars/DuckDB. Segundos Polars y s/ms zoned DuckDB se comprueban contra los límites
+de la unidad destino. Infinito/sentinels temporales DuckDB no se exportan como
+épocas finitas. Un pánico FFI Polars produce `NativeEngineError`/estado failed.
+Los límites completos permanecen en la matriz de transporte del paquete.
+
+Estos controles no añaden campos ni cambian la versión de formato 1.0.
+Integración remota prevista: [OCI](OCI_INTEGRATION.md).
