@@ -51,7 +51,7 @@ versión ya publicada que migrar. Decisiones de ingeniería: A18–A20 en
 | Cinco familias | nulls_types, joins, duplicates_order, aggregations, dates; validación semántica y estructural | Conforme; fixtures sintéticos, sin aval científico |
 | Pruebas y calidad | Casos válidos/negativos, propiedades, strict mypy, Ruff y assets actuales | Conforme; 198 casos |
 | Distribución aislada | Runtime-only sin motores/ML/dev; API/CLI; sdist íntegro; batería contra instalación no editable; consumidor tipado | Conforme; wheel reconstruido idéntico |
-| CI | Matriz Windows Server 2022/Ubuntu 24.04 x64, Python 3.12, contents: read, acciones fijadas, lock y backend reproducible | Controles reales; resultados del nuevo commit en checks del PR |
+| CI | Matriz Windows Server 2022/Ubuntu 24.04 x64, Python 3.12, contents: read, acciones fijadas, lock y backend reproducible | Conforme; PR/push correctos sobre el commit de correcciones |
 | Documentación y límites | README/API/decisiones/changelog; ejemplo Python ejecutado literalmente; carpetas de compañeros y tesis fuera del cambio | Conforme; solo paso 1 |
 
 ## Verificación ejecutada
@@ -76,10 +76,21 @@ Local: Windows x64, CPython 3.12.4, entorno virtual del paquete y dependencias d
 | Reconstrucción wheel desde sdist | Igualdad de todos los bytes |
 | Hash del borrador de tesis | Sin cambio: `c96f0edfcab839b2ccf357527f4a7937c4b1fd3570f491d702b4f01fde44b38d` |
 
-La evidencia CI de esta revisión se consulta en
-[checks del PR #11](https://github.com/htroya/equiframe/pull/11/checks).
-Los resultados iniciales de 147 casos pertenecen a la base revisada y no se
-usan como prueba del nuevo código.
+La [CI del PR](https://github.com/htroya/equiframe/actions/runs/36476662461)
+y la [CI de push](https://github.com/htroya/equiframe/actions/runs/36476656220)
+terminaron correctamente sobre el commit de correcciones
+`5e8930270df051e3c7e46678e103c6913ec235c3`. Se inspeccionaron los logs por plataforma:
+
+| Plataforma | Intérprete | Batería de desarrollo | Batería contra wheel instalado desde sdist | Evidencia |
+|---|---|---|---|---|
+| Ubuntu 24.04 x64 | CPython 3.12.14 | 198 passed | 198 passed | [Job Ubuntu](https://github.com/htroya/equiframe/actions/runs/36476662461/job/109111968613) |
+| Windows Server 2022 x64 | CPython 3.12.10 | 198 passed | 198 passed | [Job Windows](https://github.com/htroya/equiframe/actions/runs/36476662461/job/109111968570) |
+
+En ambas plataformas también pasaron estilo/formato, mypy, assets, build,
+API/CLI instalada, consumidor tipado y reconstrucción byte a byte. Los resultados
+iniciales de 147 casos pertenecen a la base revisada y no se usan como prueba
+del código corregido. El estado del último commit, incluido el cierre documental
+de este informe, está en los [checks del PR #11](https://github.com/htroya/equiframe/pull/11/checks).
 
 ## Límites y decisiones pendientes
 
