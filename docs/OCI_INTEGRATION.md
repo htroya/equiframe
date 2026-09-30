@@ -114,7 +114,9 @@ controlar los hilos y medir la memoria de Ubuntu, Python, Arrow y el servicio.
 DuckDB recomienda 1–4 GB por hilo para buen rendimiento y puede volcar datos
 temporales a disco cuando corresponde.
 
-La referencia inicial elegida es Ampere A1 con **1 OCPU y 8 GB**, sujeta a
+La preferencia de aprovisionamiento es Ampere A1 con **1 OCPU y 12 GB**;
+si no hay capacidad, intentar **8 GB** y después **4 GB** como punto de partida
+limitado, sujeto a mediciones y posible ampliación. La creación depende de la
 disponibilidad en la región principal, espacio de disco y pruebas ARM64. La
 asignación Always Free publicada por Oracle para A1 equivale actualmente a
 2 OCPU y 12 GB; el almacenamiento gratuito combinado de volúmenes de arranque
@@ -130,11 +132,18 @@ nominal de USD 2/mes para el volumen de arranque, pero Oracle indica que ese
 estimador no aplica los tramos gratuitos. Se seleccionó Ubuntu 24.04, A1 Flex,
 volumen predeterminado, red pública existente y clave SSH propia; solo quedó
 activo el agente de métricas de instancia. El 2026-09-30 se intentó crear la VM
-con 2 OCPU/12 GB, después con 1 OCPU/12 GB y, finalmente, con **1 OCPU/8 GB**.
-OCI respondió `Out of capacity` para A1 Flex en AD-1, AD-2 y AD-3 con cada
+con 2 OCPU/12 GB y, después, con 1 OCPU y **12, 8 y 4 GB**. Se repitieron los
+intentos de 1 OCPU/12 GB y 1 OCPU/8 GB en los tres dominios. OCI respondió
+`Out of capacity` para A1 Flex en AD-1, AD-2 y AD-3 con cada
 configuración. **No se creó la VM** ni se modificaron límites de servicio.
 Hay que reintentar en Ashburn cuando exista capacidad, sin cambiar de plan ni
-activar recursos pagados.
+activar recursos pagados. Oracle limita las instancias Compute Always Free a la
+región principal de la cuenta; cambiar de región no conserva esta garantía.
+
+OCI permite ampliar RAM u OCPU de una A1 Flex ya creada sin reconstruir la VM,
+pero la operación reinicia una instancia encendida y requiere capacidad disponible.
+El conjunto de VM A1 debe permanecer dentro del total Always Free de 2 OCPU y
+12 GB. [Cambio de forma en OCI](https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/resizinginstances.htm).
 
 Cuando la VM exista, el administrador agregará usuarios Linux individuales para
 Jhair y José con sus claves públicas propias y comprobará SSH por el puerto 22.
