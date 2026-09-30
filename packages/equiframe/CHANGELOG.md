@@ -11,6 +11,9 @@
 - `ComparisonResult` rechaza manifiestos `equivalent` con conteos contradictorios
   y valida la coherencia de la estrategia/clave seleccionada.
 - Nuevos documentos/esquemas de R 1.0, contratos/ejecuciones 1.0 conservados.
+- Segunda revisión: la relectura de R rechaza decisión/completitud contradictorias,
+  la aplicabilidad prioriza una precondición verificablemente falsa y `SchemaCheck`
+  localiza tipos Arrow transportables incompatibles con el contrato.
 
 No incorpora perfiles, M/B/H, oráculo, benchmark final, DW ni publicación PyPI.
 Las estadísticas de conversiones anteriores a la captura requieren evidencia

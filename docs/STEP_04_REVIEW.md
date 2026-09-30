@@ -61,6 +61,28 @@ idéntica desde sdist, instalación runtime-only de cada extra y suite desde
 site-packages quedan pendientes; no se presentan como controles pasados. El
 lock solo cambia la versión propia 0.3.0→0.4.0, sin modificar dependencias.
 
+## Segunda revisión del paso 4
+
+Se revisaron de nuevo las rutas de evaluación y relectura del manifiesto. Se
+encontraron y corrigieron tres casos, cada uno con una prueba de regresión:
+
+- La relectura aceptaba una decisión o una marca de completitud contradictoria
+  con los chequeos. Ahora valida ambos valores derivados.
+- Una precondición verificablemente falsa quedaba eclipsada por otra no
+  evaluable. La regla dependiente queda `not_applicable` con el motivo falso.
+- Un tipo Arrow transportable cuya zona horaria no puede interpretarse para el
+  contrato hacía `not_evaluable` el chequeo de esquema. Ahora produce el
+  hallazgo `schema_type`.
+
+La nueva ejecución observada en Windows x64 con Python 3.12.4 pasó **561
+pruebas** en 99,02 s; Ruff, formato de 47 archivos, mypy en 25 archivos,
+los 18 assets generados y `python -m build --no-isolation` también pasaron.
+Se reinstaló el wheel 0.4.0 en el consumidor externo sin editable y las cinco
+familias sintéticas del catálogo dieron `no_alert`; `pip check` pasó. Ese
+consumidor aún toma las dependencias bloqueadas de la `.venv` del proyecto;
+no sustituye la verificación runtime-only pendiente por falta de `uv`.
+La huella de implementación del catálogo se regeneró tras corregir `rules.py`.
+
 ## Alcance y entrega remota
 
 Contratos, artefactos y ejecuciones 1.0 siguen intactos; los documentos de R

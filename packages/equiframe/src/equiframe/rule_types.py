@@ -140,28 +140,22 @@ class RuleEvaluation(FrozenModel):
         )
         if self.coverage != expected_coverage:
             fail("rule_coverage", "coverage does not match check results", "coverage")
-        if self.complete and (
-            not self.rules
-            or any(not item.complete for item in (*self.preconditions, *self.rules))
-            or not any(item.state in ("satisfied", "violated") for item in self.rules)
-            or self.execution_state != "completed"
-        ):
+        expected_complete = (
+            bool(self.rules)
+            and self.diagnostic is None
+            and self.execution_state == "completed"
+            and all(item.complete for item in (*self.preconditions, *self.rules))
+            and any(item.state in ("satisfied", "violated") for item in self.rules)
+        )
+        if self.complete != expected_complete:
             fail(
                 "rule_completeness",
-                "complete requires checked rules and completed execution",
+                "completeness does not match checked rules and execution",
                 "complete",
             )
-        if self.decision == "no_alert" and (
-            not self.complete
-            or any(
-                item.state != "satisfied" and item.state != "not_applicable" for item in self.rules
-            )
-        ):
-            fail(
-                "false_no_alert",
-                "no_alert requires a complete rule set without findings",
-                "decision",
-            )
-        if self.decision == "alert" and not any(item.state == "violated" for item in self.rules):
-            fail("false_alert", "alert requires a violated rule", "decision")
+        expected_decision: DecisionState = (
+            "alert" if alerts else "no_alert" if self.complete else "not_evaluable"
+        )
+        if self.decision != expected_decision:
+            fail("rule_decision", "decision does not match completed checks and alerts", "decision")
         return self

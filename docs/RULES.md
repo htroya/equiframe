@@ -34,7 +34,7 @@ Pandas, Polars y DuckDB no son dependencias de R. La importación base sigue lig
 
 | Forma | Observación y condición |
 |---|---|
-| `SchemaCheck` | Orden/nombres/tipos físicos exactos y, sobre valores tipados, nulabilidad, NaN, rango, precisión, conjunto permitido y límites temporales. La política de ausencias declarada se aplica antes de evaluar los valores. No fuerza conversiones. |
+| `SchemaCheck` | Orden/nombres y compatibilidad del tipo Arrow con el tipo lógico declarado; sobre valores tipados comprueba nulabilidad, NaN, rango, precisión, conjunto permitido y límites temporales. La política de ausencias declarada se aplica antes de evaluar los valores. No fuerza conversiones. Un tipo Arrow transportable pero no interpretable para el contrato es incumplimiento de esquema. |
 | `KeyCheck` | Columnas normalizadas y ámbito declarado. Una clave incompleta contiene alguna ausencia lógica, incluido NaN solo si `as_null`; `reject` alerta y `allow` omite esa fila **solo del control de unicidad**. `unique=false` comprueba únicamente incompletitud. `global` y `table` cubren todas las filas de esta tabla; `columns` particiona el ámbito por esos valores. |
 | `CardinalityCheck` | Número total de filas, no número de valores presentes ni distintos. Mínimo y máximo inclusivos. |
 | `JoinCheck` | En las dos entradas capturadas, `one_to_one` exige unicidad de ambos lados; `one_to_many` de la izquierda; `many_to_one` de la derecha; `many_to_many` no exige unicidad. Claves con ausencia lógica nunca emparejan. `unmatched=reject` revisa **ambas direcciones**, incluido NULL; `allow` admite faltas de pareja. Esta regla no afirma que la proyección de salida sea un join correcto. |
@@ -50,6 +50,9 @@ las reglas que la citan; una incumplida permite declarar esas reglas
 `not_applicable` con ID comprobable; si falta evidencia/implementación o se agota
 un límite, la aplicabilidad queda `not_evaluable`. Una regla sin referencias se
 evalúa igualmente. No se ejecutan expresiones arbitrarias de JSON.
+Si una regla cita varias precondiciones y alguna es verificablemente falsa,
+esa falsedad basta para omitirla; el motivo identifica la precondición falsa
+aunque otra no haya podido evaluarse.
 
 **Conversiones:** la captura final permite detectar tipos o valores inválidos y
 las reconciliaciones declaradas. No permite contar intentos de conversión fallidos
@@ -89,6 +92,9 @@ coherencia del manifiesto; `iter_rule_findings` verifica SHA-256 y tamaño de **
 el JSONL antes de exponer registros. La lectura estructural no acredita por sí sola
 los bytes de los artefactos referenciados. Lo mismo rige para `read_comparison` e
 `iter_differences`.
+La validación estructural rechaza también decisiones o marcas de completitud
+contradictorias con los estados de los chequeos; la comprobación de contenido
+de cada JSONL sigue siendo una operación separada.
 
 ## Catálogo y congelación técnica
 

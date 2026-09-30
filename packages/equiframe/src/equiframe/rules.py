@@ -269,7 +269,13 @@ def _schema(definition: RuleDefinition, context: RuleContext) -> None:
     for column in columns:
         if column.name not in table.column_names:
             continue
-        if not schema_compatible(table.schema.field(column.name).type, column, ComparisonPolicy()):
+        try:
+            compatible = schema_compatible(
+                table.schema.field(column.name).type, column, ComparisonPolicy()
+            )
+        except CapabilityError:
+            compatible = False
+        if not compatible:
             context.emit(
                 "schema_type",
                 definition.table,
@@ -691,10 +697,10 @@ def evaluate_rules(
             item.check_id for item in dependencies if item.state in ("violated", "not_applicable")
         ]
         reason = diagnostic
-        if unavailable:
-            reason = "unverified applicability: " + ", ".join(unavailable)
-        elif false:
+        if false:
             reason = "verified false precondition: " + ", ".join(false)
+        elif unavailable:
+            reason = "unverified applicability: " + ", ".join(unavailable)
         rules.append(
             _check(
                 rule.specification,

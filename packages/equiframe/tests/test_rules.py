@@ -201,6 +201,46 @@ def test_preconditions_missing_implementation_and_empty_set(tmp_path):
     assert "unverified applicability" in result.rules[0].reason
 
 
+def test_verified_false_precondition_is_decisive_even_when_another_is_unknown(tmp_path):
+    base = example("aggregations")
+    contract = base.model_copy(
+        update={
+            "preconditions": (
+                ef.PreconditionSpec(
+                    precondition_id="too_few",
+                    requirement=ef.CardinalityCheck(table="source", minimum=2),
+                ),
+                ef.PreconditionSpec(
+                    precondition_id="unknown_key",
+                    requirement=ef.KeyCheck(table="result", key="primary"),
+                ),
+            ),
+            "rules": (
+                rule(
+                    "output_present",
+                    ef.CardinalityCheck(table="result", minimum=1),
+                    applicability=("too_few", "unknown_key"),
+                ),
+            ),
+        }
+    )
+    source = pa.table(
+        {"currency": ["USD"], "amount": pa.array([Decimal("1")], type=pa.decimal128(38, 18))}
+    )
+    output = pa.table(
+        {"currency": ["USD"], "total": pa.array([Decimal("1")], type=pa.decimal128(38, 18))}
+    )
+    registry = ef.RuleRegistry()
+    cardinality = ef.default_rule_registry().resolve("cardinality")
+    assert cardinality is not None
+    registry.register("cardinality", cardinality.revision, cardinality.evaluate)
+    result = evaluate(contract, {"source": source}, output, tmp_path, registry=registry)
+    assert result.preconditions[0].state == "violated"
+    assert result.preconditions[1].state == "not_evaluable"
+    assert result.rules[0].state == "not_applicable"
+    assert result.rules[0].reason == "verified false precondition: too_few"
+
+
 def test_limits_cancellation_failure_and_tampering(tmp_path):
     base = example("aggregations")
     contract = base.model_copy(
@@ -302,6 +342,53 @@ def test_rule_manifest_structure_and_artifact_verification_are_distinct(tmp_path
     assert ef.read_rule_evaluation(manifest) == result
     with pytest.raises(ef.ArtifactIntegrityError):
         list(ef.iter_rule_findings(result.rules[0].findings))
+
+
+def test_rule_manifest_rejects_contradictory_decision_and_completeness(tmp_path):
+    base = example("aggregations")
+    contract = base.model_copy(
+        update={
+            "preconditions": (),
+            "rules": (rule("count", ef.CardinalityCheck(table="result", minimum=2)),),
+        }
+    )
+    source = pa.table(
+        {"currency": ["USD"], "amount": pa.array([Decimal("1")], type=pa.decimal128(38, 18))}
+    )
+    output = pa.table(
+        {"currency": ["USD"], "total": pa.array([Decimal("1")], type=pa.decimal128(38, 18))}
+    )
+    result = evaluate(contract, {"source": source}, output, tmp_path)
+    assert result.decision == "alert" and result.complete
+    manifest = tmp_path / "rules" / result.evaluation_id / "rules.json"
+    original = json.loads(manifest.read_text(encoding="utf8"))
+    for changes in (
+        {"decision": "not_evaluable"},
+        {"complete": False},
+        {"decision": "no_alert"},
+    ):
+        manifest.write_text(json.dumps(original | changes), encoding="utf8")
+        with pytest.raises(ValidationError):
+            ef.read_rule_evaluation(manifest)
+
+
+def test_schema_rule_reports_unsupported_captured_type_as_violation(tmp_path):
+    base = example("aggregations")
+    contract = base.model_copy(
+        update={"preconditions": (), "rules": (rule("schema", ef.SchemaCheck(table="result")),)}
+    )
+    source = pa.table(
+        {"currency": ["USD"], "amount": pa.array([Decimal("1")], type=pa.decimal128(38, 18))}
+    )
+    output = pa.table(
+        {
+            "currency": pa.array([0], type=pa.timestamp("s", tz="Mars/Phobos")),
+            "total": pa.array([Decimal("1")], type=pa.decimal128(38, 18)),
+        }
+    )
+    result = evaluate(contract, {"source": source}, output, tmp_path)
+    assert result.decision == "alert" and result.complete
+    assert "schema_type" in codes(result.rules[0])
 
 
 def test_schema_absence_nan_and_date_interval(tmp_path):

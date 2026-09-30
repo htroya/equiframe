@@ -5,7 +5,7 @@
 El DW, el archivo DuckDB real y la biblioteca o programa que abre sus conexiones
 residirán en una VM de OCI. Este documento fija la integración prevista; no
 representa un despliegue, un servicio remoto ya disponible ni una conexión probada.
-El núcleo EquiFrame 0.3.0 sigue siendo local e independiente de OCI y del esquema de dominio.
+El núcleo EquiFrame 0.4.0 sigue siendo local e independiente de OCI y del esquema de dominio.
 
 El adaptador DuckDB del núcleo abre una conexión propia `:memory:` para ejecutar
 transformaciones sobre entradas registradas. No abre el archivo del DW ni acepta
@@ -100,3 +100,45 @@ registrarán sistema, arquitectura, versiones y recursos de la VM real.
 La CI de GitHub usa runners temporales de Windows, Linux y macOS. Probar Linux
 ARM64 ayuda a detectar problemas de arquitectura; no certifica la imagen OCI,
 su red, el acceso al DW ni la capacidad de RAM. Ningún job actual despliega en OCI.
+
+## Dimensionamiento preliminar de la VM
+
+El DW, el archivo DuckDB y la API Python aún no existen; por tanto, faltan
+tamaño del archivo, cardinalidades, consultas, número de workers y simultaneidad
+de carga/lectura para medir memoria y disco. Para alojar juntos estos servicios,
+**4 GB no se consideran capacidad suficiente para el objetivo completo**.
+Solo podrían servir para un prototipo pequeño y secuencial con límites estrictos.
+DuckDB usa por defecto hasta el 80 % de RAM en su buffer manager, y ese límite
+no cubre todas sus asignaciones; en 4 GB dejaría una reserva nominal de solo
+0,8 GB para Ubuntu, Python, Arrow y el servicio. DuckDB recomienda 1–4 GB por
+hilo para buen rendimiento y reducir memoria/hilos ante OOM.
+
+La referencia inicial razonable es Ampere A1 con **2 OCPU y 12 GB**, sujeta a
+disponibilidad en la región principal, espacio de disco y pruebas ARM64. La
+asignación Always Free publicada por Oracle para A1 equivale actualmente a
+2 OCPU y 12 GB; el almacenamiento gratuito combinado de volúmenes de arranque
+y bloques es 200 GB en la región principal. Esto no certifica que 12 GB basten
+para cualquier DW o benchmark: José y Jhair deben medir volumen, picos de RSS,
+consultas, spill, snapshots y respaldos antes de fijar cuotas de servicio.
+
+En la cuenta Free Tier de OCI, región US East (Ashburn), se verificó un volumen
+de arranque Always Free de 47 GB y ningún volumen de bloques en el compartimento
+raíz. Una segunda VM con volumen predeterminado de 47 GB habría usado unos
+94 GB del total gratuito de 200 GB. El estimador del formulario mostró un costo
+nominal de USD 2/mes para el volumen de arranque, pero Oracle indica que ese
+estimador no aplica los tramos gratuitos. Se seleccionó Ubuntu 24.04, A1 Flex
+de 2 OCPU/12 GB, volumen predeterminado, red pública existente y clave SSH
+propia; solo quedó activo el agente de métricas de instancia. **No se creó la VM**:
+OCI respondió `Out of capacity` para A1 Flex en AD-2, AD-1 y AD-3 el
+2026-09-30. Hay que reintentar en Ashburn cuando exista capacidad, sin cambiar
+de plan ni activar recursos pagados.
+
+Cuando la VM exista, el administrador agregará usuarios Linux individuales para
+Jhair y José con sus claves públicas propias y comprobará SSH por el puerto 22.
+No se deben compartir la clave privada inicial ni las cuentas. El DW, el archivo
+DuckDB y la API Python se construirán después; no forman parte de este paso.
+
+Fuentes: [Oracle Always Free](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm),
+[estimación de costos de OCI](https://docs.oracle.com/en-us/iaas/Content/Billing/Tasks/signingup_topic-Estimating_Costs.htm),
+[DuckDB: memoria y OOM](https://duckdb.org/docs/current/guides/performance/oom),
+[DuckDB: rendimiento y memoria por hilo](https://duckdb.org/docs/current/guides/performance/my_workload_is_slow).
