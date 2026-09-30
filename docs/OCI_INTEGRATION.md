@@ -105,15 +105,16 @@ su red, el acceso al DW ni la capacidad de RAM. Ningún job actual despliega en 
 
 El DW, el archivo DuckDB y la API Python aún no existen; por tanto, faltan
 tamaño del archivo, cardinalidades, consultas, número de workers y simultaneidad
-de carga/lectura para medir memoria y disco. Para alojar juntos estos servicios,
-**4 GB no se consideran capacidad suficiente para el objetivo completo**.
-Solo podrían servir para un prototipo pequeño y secuencial con límites estrictos.
-DuckDB usa por defecto hasta el 80 % de RAM en su buffer manager, y ese límite
-no cubre todas sus asignaciones; en 4 GB dejaría una reserva nominal de solo
-0,8 GB para Ubuntu, Python, Arrow y el servicio. DuckDB recomienda 1–4 GB por
-hilo para buen rendimiento y reducir memoria/hilos ante OOM.
+de carga/lectura para medir memoria y disco. **DuckDB no requiere 12 GB**:
+4 GB pueden alcanzar para un prototipo pequeño, secuencial y con pocos hilos.
+No hay datos para afirmar que 4 GB basten para el DW, la API y las pruebas juntos.
+El límite predeterminado del buffer manager de DuckDB es el 80 % de RAM, pero
+no cubre todas sus asignaciones; en una VM de 4 GB habría que reducir ese límite,
+controlar los hilos y medir la memoria de Ubuntu, Python, Arrow y el servicio.
+DuckDB recomienda 1–4 GB por hilo para buen rendimiento y puede volcar datos
+temporales a disco cuando corresponde.
 
-La referencia inicial razonable es Ampere A1 con **2 OCPU y 12 GB**, sujeta a
+La referencia inicial elegida es Ampere A1 con **1 OCPU y 8 GB**, sujeta a
 disponibilidad en la región principal, espacio de disco y pruebas ARM64. La
 asignación Always Free publicada por Oracle para A1 equivale actualmente a
 2 OCPU y 12 GB; el almacenamiento gratuito combinado de volúmenes de arranque
@@ -126,12 +127,14 @@ de arranque Always Free de 47 GB y ningún volumen de bloques en el compartiment
 raíz. Una segunda VM con volumen predeterminado de 47 GB habría usado unos
 94 GB del total gratuito de 200 GB. El estimador del formulario mostró un costo
 nominal de USD 2/mes para el volumen de arranque, pero Oracle indica que ese
-estimador no aplica los tramos gratuitos. Se seleccionó Ubuntu 24.04, A1 Flex
-de 2 OCPU/12 GB, volumen predeterminado, red pública existente y clave SSH
-propia; solo quedó activo el agente de métricas de instancia. **No se creó la VM**:
-OCI respondió `Out of capacity` para A1 Flex en AD-2, AD-1 y AD-3 el
-2026-09-30. Hay que reintentar en Ashburn cuando exista capacidad, sin cambiar
-de plan ni activar recursos pagados.
+estimador no aplica los tramos gratuitos. Se seleccionó Ubuntu 24.04, A1 Flex,
+volumen predeterminado, red pública existente y clave SSH propia; solo quedó
+activo el agente de métricas de instancia. El 2026-09-30 se intentó crear la VM
+con 2 OCPU/12 GB, después con 1 OCPU/12 GB y, finalmente, con **1 OCPU/8 GB**.
+OCI respondió `Out of capacity` para A1 Flex en AD-1, AD-2 y AD-3 con cada
+configuración. **No se creó la VM** ni se modificaron límites de servicio.
+Hay que reintentar en Ashburn cuando exista capacidad, sin cambiar de plan ni
+activar recursos pagados.
 
 Cuando la VM exista, el administrador agregará usuarios Linux individuales para
 Jhair y José con sus claves públicas propias y comprobará SSH por el puerto 22.
