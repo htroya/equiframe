@@ -101,6 +101,24 @@ from equiframe.registry import (
     Transformation,
     TransformationRegistry,
 )
+from equiframe.rule_types import (
+    CheckResult,
+    CheckState,
+    RuleCoverage,
+    RuleEvaluation,
+    RuleFinding,
+    RuleOptions,
+)
+from equiframe.rules import (
+    RuleContext,
+    RuleImplementation,
+    RuleRegistry,
+    default_rule_registry,
+    evaluate_rules,
+    iter_rule_findings,
+    read_rule_evaluation,
+    rule_set_fingerprint,
+)
 from equiframe.serialization import (
     CANONICALIZATION,
     canonical_contract_bytes,
@@ -147,7 +165,7 @@ from equiframe.values import (
     TimeZone,
 )
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 __all__ = [
     "CANONICALIZATION",
@@ -165,6 +183,8 @@ __all__ = [
     "CancellationToken",
     "CapabilityError",
     "CardinalityCheck",
+    "CheckResult",
+    "CheckState",
     "ColumnKeyScope",
     "ColumnSpec",
     "ComparisonCounts",
@@ -242,7 +262,14 @@ __all__ = [
     "PolarsTransformation",
     "PreconditionSpec",
     "ResourceLimitError",
+    "RuleContext",
+    "RuleCoverage",
     "RuleDefinition",
+    "RuleEvaluation",
+    "RuleFinding",
+    "RuleImplementation",
+    "RuleOptions",
+    "RuleRegistry",
     "RuleSpec",
     "RunContext",
     "ScalarValue",
@@ -276,11 +303,16 @@ __all__ = [
     "comparison_fingerprint",
     "contract_fingerprint",
     "contract_json_schema",
+    "default_rule_registry",
+    "evaluate_rules",
     "execute",
     "iter_differences",
+    "iter_rule_findings",
     "read_comparison",
     "read_contract",
+    "read_rule_evaluation",
     "read_table",
+    "rule_set_fingerprint",
     "validate_contract",
     "write_contract",
 ]

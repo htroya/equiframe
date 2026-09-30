@@ -203,6 +203,12 @@ class ComparisonResult(FrozenModel):
             fail("comparison_counts", "matched rows exceed observed rows", "counts")
         if self.counts.contract_violations > self.counts.difference_records:
             fail("comparison_counts", "violations exceed difference records", "counts")
+        if (self.strategy == "key") != (self.selected_key is not None):
+            fail("comparison_strategy", "selected key must match key strategy", "selected_key")
+        if self.selected_key is not None and self.selected_key not in {
+            key.name for key in self.spec.contract.output.schema_spec.keys if key.unique
+        }:
+            fail("comparison_strategy", "selected key is not a declared unique key", "selected_key")
         if len(self.examples) > min(self.options.max_examples, self.counts.difference_records):
             fail(
                 "comparison_examples", "examples exceed their budget or recorded count", "examples"
@@ -210,7 +216,11 @@ class ComparisonResult(FrozenModel):
         if self.differences.format != "jsonl":
             fail("comparison_evidence", "difference artifact must be JSONL", "differences")
         if self.state == "equivalent" and (
-            not self.complete or self.counts.difference_records or self.diagnostics
+            not self.complete
+            or self.counts.difference_records
+            or self.diagnostics
+            or self.counts.matched_rows != self.counts.left_rows
+            or self.counts.matched_rows != self.counts.right_rows
         ):
             fail(
                 "false_equivalent",

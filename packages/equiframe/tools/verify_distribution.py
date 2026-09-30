@@ -83,6 +83,31 @@ ref=ef.LocalArtifactStore(Path('store')).put(path,media_type='application/vnd.ap
 assert ef.read_table(ref).to_pylist()==[{'id':'001'},{'id':'001'}]
 """
             run([str(python), "-I", "-c", arrow_check], cwd=project, env=profile_env)
+            rule_example = project / "rules_catalog.py"
+            shutil.copyfile(ROOT / "examples" / "rules_catalog.py", rule_example)
+            shutil.copytree(ROOT / "examples" / "rules", project / "rules")
+            for fixture in (ROOT / "examples").glob("*.json"):
+                shutil.copyfile(fixture, project / fixture.name)
+            run(
+                [str(python), "-I", str(rule_example), "--work-dir", str(project / "rule-runs")],
+                cwd=project,
+                env=profile_env,
+            )
+            reader_example = project / "rules_from_run.py"
+            shutil.copyfile(ROOT / "examples" / "rules_from_run.py", reader_example)
+            captured = next((project / "rule-runs").glob("nulls_types_*/run.json"))
+            run(
+                [
+                    str(python),
+                    "-I",
+                    str(reader_example),
+                    str(captured),
+                    "--work-dir",
+                    str(project / "rule-reader-runs"),
+                ],
+                cwd=project,
+                env=profile_env,
+            )
         else:
             example = project / "execute_native.py"
             shutil.copyfile(ROOT / "examples" / "execute_native.py", example)
@@ -162,6 +187,7 @@ for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy', 'pyarrow', 'pytes
 print('Installed wheel imports from clean site-packages without engines/ML/dev tools')
 assert equiframe.ComparisonOptions().batch_rows > 0
 assert callable(equiframe.compare) and callable(equiframe.iter_differences)
+assert callable(equiframe.evaluate_rules) and callable(equiframe.iter_rule_findings)
 """
         run([str(python), "-I", "-c", check, package_version], cwd=work, env=env)
         api_check = """
@@ -232,7 +258,11 @@ print('Installed wheel API roundtrips all five fixtures exactly')
             "src/equiframe/py.typed",
             "tests/test_contracts.py",
             "examples/dates.json",
+            "examples/rules/catalog-1.0.json",
+            "examples/rules_catalog.py",
+            "examples/rules_from_run.py",
             "schemas/contract-1.0.schema.json",
+            "schemas/rule-evaluation-1.0.schema.json",
         ):
             if not (source / path).is_file():
                 raise RuntimeError("sdist is missing " + path)

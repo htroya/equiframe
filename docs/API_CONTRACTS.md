@@ -1,6 +1,6 @@
 # API Python y contratos de intercambio
 
-Versión implementada: `equiframe 0.3.0`, formatos independientes `1.0`, pasos 1, 2 y 3. El [README del
+Versión implementada: `equiframe 0.4.0`, formatos independientes `1.0`, pasos 1 a 4. El [README del
 paquete](../packages/equiframe/README.md) contiene instalación, comandos y un
 ejemplo Python ejecutable. Los componentes siguientes siguen en la hoja de ruta.
 
@@ -15,7 +15,7 @@ ejemplo Python ejecutable. Los componentes siguientes siguen en la hoja de ruta.
 | `contract_fingerprint(contract) -> str` | SHA-256 hexadecimal de esos bytes; no equivalencia tabular |
 | `contract_json_schema() -> dict[str, object]` | JSON Schema generado desde `Contract` |
 
-La API explícita está en `equiframe.__all__`; `__version__` es `0.3.0`.
+La API explícita está en `equiframe.__all__`; `__version__` es `0.4.0`.
 Los constructores usan Pydantic estricto/inmutable, rechazan extras y conservan
 colecciones como tuplas. La validación de JSON permite arrays sin introducir
 coerciones numéricas con pérdida. No se interpreta código en documentos.
@@ -98,8 +98,9 @@ Los estados son alias `Literal` públicos; ejecución y comparación tienen APIs
 - `JobState`: `queued`, `running`, `succeeded`, `failed`, `cancelled`.
 
 Un fallo o componente no estimable nunca se define como ausencia de alerta.
-La composición H = R OR M y la agregación de reglas son requisitos de pasos
-posteriores. La tabla prevista se conserva para implementación:
+La composición H = R OR M sigue pendiente del paso 7. R ya agrega las reglas
+según la [tabla del paso 4](RULES.md#estados-cobertura-y-prioridad). La tabla
+prevista para H se conserva para implementación:
 
 | R | M | H | Evaluación completa |
 |---|---|---|---|
@@ -122,7 +123,7 @@ metadato; la etiqueta depende de O, nunca del origen de la variante.
 `put(path: Path, *, media_type: str) -> ArtifactRef` y
 `get(ref: ArtifactRef, destination: Path) -> Path`. El paso 2 aporta `LocalArtifactStore`: copias exclusivas, hash/tamaño comprobados y URI locales. No hay descargas.
 
-`DataSource` y `EngineAdapter` tienen tipos completos e implementaciones desde el paso 2. `Rule`, `Profiler` y `Detector` quedan para sus pasos. `SnapshotManifest`, observaciones semánticas, perfiles, bundles, reportes completos,
+`DataSource` y `EngineAdapter` tienen tipos completos e implementaciones desde el paso 2. El registro `RuleRegistry` y `RuleContext` funcionan desde el paso 4. `Profiler` y `Detector` quedan para sus pasos. `SnapshotManifest`, observaciones semánticas, perfiles, bundles, reportes completos,
 oráculo y freeze siguen siendo diseño en [arquitectura](ARCHITECTURE.md) y
 [hoja de ruta](HERNAN_ROADMAP.md). No están expuestos como APIs vacías.
 Observaciones/perfiles futuros no contienen etiqueta O, mutación ni salidas de
@@ -245,4 +246,16 @@ Integración remota prevista: [OCI](OCI_INTEGRATION.md).
 Semántica, estados, límites, permisos y ejemplos: [Comparación](COMPARISON.md).
 Modelos antiguos 1.0 conservan campos/bytes y validación; cuatro esquemas nuevos
 se generan por separado. `equivalent` no evalúa reglas/precondiciones operativas,
-ni produce una etiqueta O. El registro independiente de reglas queda en paso 4.
+ni produce una etiqueta O. El registro independiente de reglas está en
+[R](RULES.md).
+
+## 10. Reglas R disponibles en 0.4.0
+
+`evaluate_rules(execution, *, registry, options, work_dir, cancellation)`
+evalúa una sola captura `ExecutionResult` sin reejecutar el ETL. Exporta
+`RuleRegistry`, `RuleContext`, `RuleOptions`, `CheckResult`, `RuleFinding`,
+`RuleCoverage`, `RuleEvaluation`, `rule_set_fingerprint`,
+`read_rule_evaluation` e `iter_rule_findings`. Los documentos suplementarios
+`rule-options`, `rule-finding`, `rule-check-result` y `rule-evaluation` usan
+esquema 1.0 independiente; el contrato 1.0 no cambia. Véanse semántica,
+agregación, presupuestos y catálogo en [Reglas R](RULES.md).

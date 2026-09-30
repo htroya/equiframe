@@ -34,6 +34,11 @@ del wheel fuera del checkout. [Semántica](COMPARISON.md) y
 
 ## Paso 4. Reglas operativas R y catálogo de contratos
 
+**Estado:** implementación de ingeniería 0.4.0 con API, las seis formas de
+regla, precondiciones, cobertura, catálogo técnico de cinco familias y pruebas.
+[Semántica](RULES.md) e [informe](STEP_04_REVIEW.md). El benchmark revisado y el
+congelamiento experimental final permanecen en sus pasos previstos.
+
 **Objetivo:** disponer de una línea base determinista separada del comparador.
 
 **Trabajo:** registro de reglas de esquema, claves, cardinalidad, ausencias, conversiones y reconciliación seleccionada por contrato. Condiciones de aplicabilidad, evidencia observada/esperada y agregación de decisiones. Formalizar contratos de transformaciones antes de generar mutantes finales.

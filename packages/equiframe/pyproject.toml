@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "equiframe"
-version = "0.3.0"
-description = "Typed semantic contracts, native execution and complete tabular comparison"
+version = "0.4.0"
+description = "Typed semantic contracts, native execution, comparison and operational rules"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 authors = [{ name = "Hernán Troya" }]

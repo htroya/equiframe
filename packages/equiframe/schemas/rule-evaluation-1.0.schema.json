@@ -1,0 +1,654 @@
+{
+  "$defs": {
+    "ArtifactRef": {
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "enum": [
+            "json",
+            "jsonl",
+            "arrow",
+            "parquet"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "media_type": {
+          "minLength": 1,
+          "title": "Media Type",
+          "type": "string"
+        },
+        "schema_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SchemaRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        },
+        "uri": {
+          "minLength": 1,
+          "title": "Uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "uri",
+        "sha256",
+        "format",
+        "media_type",
+        "size_bytes"
+      ],
+      "title": "ArtifactRef",
+      "type": "object"
+    },
+    "CheckResult": {
+      "additionalProperties": false,
+      "properties": {
+        "check_id": {
+          "minLength": 1,
+          "title": "Check Id",
+          "type": "string"
+        },
+        "complete": {
+          "title": "Complete",
+          "type": "boolean"
+        },
+        "examined_rows": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Examined Rows",
+          "type": "integer"
+        },
+        "examples": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RuleFinding"
+          },
+          "title": "Examples",
+          "type": "array"
+        },
+        "findings": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ArtifactRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "implementation": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Implementation"
+        },
+        "kind": {
+          "enum": [
+            "precondition",
+            "rule"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required"
+        },
+        "revision": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Revision"
+        },
+        "severity": {
+          "anyOf": [
+            {
+              "enum": [
+                "info",
+                "warning",
+                "error"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Severity"
+        },
+        "state": {
+          "enum": [
+            "satisfied",
+            "violated",
+            "not_applicable",
+            "not_evaluable"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "violation_count": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Violation Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "check_id",
+        "kind",
+        "state",
+        "complete"
+      ],
+      "title": "CheckResult",
+      "type": "object"
+    },
+    "ComparisonValue": {
+      "additionalProperties": false,
+      "description": "Lossless scalar evidence. Numeric text; dates/instants use integer epochs.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "null",
+            "nan",
+            "infinity",
+            "boolean",
+            "integer",
+            "string",
+            "decimal",
+            "float",
+            "date",
+            "timestamp"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "timezone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timezone"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "s",
+                "ms",
+                "us",
+                "ns"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "ComparisonValue",
+      "type": "object"
+    },
+    "RuleCoverage": {
+      "additionalProperties": false,
+      "properties": {
+        "alerts": {
+          "minimum": 0,
+          "title": "Alerts",
+          "type": "integer"
+        },
+        "checked": {
+          "minimum": 0,
+          "title": "Checked",
+          "type": "integer"
+        },
+        "declared": {
+          "minimum": 0,
+          "title": "Declared",
+          "type": "integer"
+        },
+        "finding_count": {
+          "minimum": 0,
+          "title": "Finding Count",
+          "type": "integer"
+        },
+        "highest_alert_severity": {
+          "anyOf": [
+            {
+              "enum": [
+                "info",
+                "warning",
+                "error"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Highest Alert Severity"
+        },
+        "preconditions_declared": {
+          "minimum": 0,
+          "title": "Preconditions Declared",
+          "type": "integer"
+        },
+        "preconditions_unavailable": {
+          "minimum": 0,
+          "title": "Preconditions Unavailable",
+          "type": "integer"
+        },
+        "preconditions_verified": {
+          "minimum": 0,
+          "title": "Preconditions Verified",
+          "type": "integer"
+        },
+        "required_checked": {
+          "minimum": 0,
+          "title": "Required Checked",
+          "type": "integer"
+        },
+        "required_declared": {
+          "minimum": 0,
+          "title": "Required Declared",
+          "type": "integer"
+        },
+        "skipped": {
+          "minimum": 0,
+          "title": "Skipped",
+          "type": "integer"
+        },
+        "unavailable": {
+          "minimum": 0,
+          "title": "Unavailable",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "declared",
+        "checked",
+        "skipped",
+        "unavailable",
+        "required_declared",
+        "required_checked",
+        "alerts",
+        "finding_count",
+        "preconditions_declared",
+        "preconditions_verified",
+        "preconditions_unavailable"
+      ],
+      "title": "RuleCoverage",
+      "type": "object"
+    },
+    "RuleFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "check_id": {
+          "minLength": 1,
+          "title": "Check Id",
+          "type": "string"
+        },
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "column": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Column"
+        },
+        "expected": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ComparisonValue"
+          },
+          "title": "Expected",
+          "type": "array"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "observed": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ComparisonValue"
+          },
+          "title": "Observed",
+          "type": "array"
+        },
+        "position": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Position"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "table": {
+          "minLength": 1,
+          "title": "Table",
+          "type": "string"
+        }
+      },
+      "required": [
+        "check_id",
+        "code",
+        "table",
+        "message"
+      ],
+      "title": "RuleFinding",
+      "type": "object"
+    },
+    "RuleOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "max_artifact_bytes": {
+          "default": 134217728,
+          "exclusiveMinimum": 0,
+          "title": "Max Artifact Bytes",
+          "type": "integer"
+        },
+        "max_evidence_bytes": {
+          "default": 67108864,
+          "exclusiveMinimum": 0,
+          "title": "Max Evidence Bytes",
+          "type": "integer"
+        },
+        "max_examples": {
+          "default": 20,
+          "minimum": 0,
+          "title": "Max Examples",
+          "type": "integer"
+        },
+        "max_rows": {
+          "default": 1000000,
+          "exclusiveMinimum": 0,
+          "title": "Max Rows",
+          "type": "integer"
+        },
+        "max_work": {
+          "default": 10000000,
+          "exclusiveMinimum": 0,
+          "title": "Max Work",
+          "type": "integer"
+        },
+        "timeout_seconds": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timeout Seconds"
+        }
+      },
+      "title": "RuleOptions",
+      "type": "object"
+    },
+    "SchemaRef": {
+      "additionalProperties": false,
+      "properties": {
+        "revision": {
+          "exclusiveMinimum": 0,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "schema_id": {
+          "minLength": 1,
+          "title": "Schema Id",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_id",
+        "revision",
+        "sha256"
+      ],
+      "title": "SchemaRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "complete": {
+      "title": "Complete",
+      "type": "boolean"
+    },
+    "contract_id": {
+      "minLength": 1,
+      "title": "Contract Id",
+      "type": "string"
+    },
+    "contract_revision": {
+      "exclusiveMinimum": 0,
+      "title": "Contract Revision",
+      "type": "integer"
+    },
+    "contract_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Contract Sha256",
+      "type": "string"
+    },
+    "coverage": {
+      "$ref": "#/$defs/RuleCoverage"
+    },
+    "decision": {
+      "enum": [
+        "alert",
+        "no_alert",
+        "not_evaluable"
+      ],
+      "title": "Decision",
+      "type": "string"
+    },
+    "diagnostic": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Diagnostic"
+    },
+    "elapsed_seconds": {
+      "minimum": 0,
+      "title": "Elapsed Seconds",
+      "type": "number"
+    },
+    "evaluation_id": {
+      "minLength": 1,
+      "title": "Evaluation Id",
+      "type": "string"
+    },
+    "execution_id": {
+      "minLength": 1,
+      "title": "Execution Id",
+      "type": "string"
+    },
+    "execution_state": {
+      "minLength": 1,
+      "title": "Execution State",
+      "type": "string"
+    },
+    "options": {
+      "$ref": "#/$defs/RuleOptions"
+    },
+    "preconditions": {
+      "items": {
+        "$ref": "#/$defs/CheckResult"
+      },
+      "title": "Preconditions",
+      "type": "array"
+    },
+    "rule_set_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Rule Set Sha256",
+      "type": "string"
+    },
+    "rules": {
+      "items": {
+        "$ref": "#/$defs/CheckResult"
+      },
+      "title": "Rules",
+      "type": "array"
+    },
+    "run_id": {
+      "minLength": 1,
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "started_at": {
+      "minLength": 1,
+      "title": "Started At",
+      "type": "string"
+    },
+    "work_units": {
+      "minimum": 0,
+      "title": "Work Units",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "evaluation_id",
+    "run_id",
+    "execution_id",
+    "contract_id",
+    "contract_revision",
+    "contract_sha256",
+    "rule_set_sha256",
+    "execution_state",
+    "options",
+    "decision",
+    "complete",
+    "preconditions",
+    "rules",
+    "coverage",
+    "started_at",
+    "elapsed_seconds",
+    "work_units"
+  ],
+  "title": "RuleEvaluation",
+  "type": "object"
+}

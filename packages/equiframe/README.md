@@ -1,9 +1,9 @@
-# EquiFrame 0.3.0 — contratos, ejecución y comparación completa
+# EquiFrame 0.4.0 — contratos, ejecución, comparación y reglas R
 
 Contratos estrictos, comparación completa y ejecución local con Pandas, Polars y DuckDB.
 Se requiere Python 3.12; los motores se instalan mediante extras. La configuración
 CI cubre Windows x64, Ubuntu x64/ARM64 y macOS Intel/Apple Silicon.
-La [evidencia de revisión y compatibilidad](../../docs/STEP_03_REVIEW.md)
+La [evidencia de revisión](../../docs/STEP_04_REVIEW.md)
 registra los controles completados. No se requiere una VM ni un DW para usar el
 núcleo. Licencia y publicación externa pendientes; no hay paquete del equipo en PyPI.
 
@@ -15,8 +15,8 @@ la experiencia pública objetivo, pendiente del paso 10; podría resolver un
 paquete ajeno. Use el wheel del equipo o este checkout:
 
 ```bash
-python -m pip install ./dist/equiframe-0.3.0-py3-none-any.whl
-python -m pip install "./dist/equiframe-0.3.0-py3-none-any.whl[duckdb]"
+python -m pip install ./dist/equiframe-0.4.0-py3-none-any.whl
+python -m pip install "./dist/equiframe-0.4.0-py3-none-any.whl[duckdb]"
 # Alternativas: [arrow], [pandas], [polars] o [engines].
 # Desde el checkout del equipo:
 python -m pip install ".[engines]"
@@ -417,8 +417,8 @@ uv run --locked --all-extras python tools/verify_distribution.py
 ```
 
 El backend y sus dependencias están en el lock; `--no-isolation` usa ese entorno.
-Build produce `dist/equiframe-0.3.0-py3-none-any.whl` y
-`dist/equiframe-0.3.0.tar.gz`. El verificador crea entornos temporales fuera del checkout, instala dependencias runtime del lock y el wheel sin editable,
+Build produce `dist/equiframe-0.4.0-py3-none-any.whl` y
+`dist/equiframe-0.4.0.tar.gz`. El verificador crea entornos temporales fuera del checkout, instala dependencias runtime del lock y el wheel sin editable,
 comprueba `py.typed` e importación sin motores/ML/dev, valida cinco ejemplos por
 CLI y reconstruye desde el sdist comparando todos los bytes del wheel.
 También instala cada extra y la combinación engines sin editable, ejecuta los ejemplos copiados fuera del checkout y comprueba roundtrips de API y errores/códigos de CLI instalada, ejecuta
@@ -433,9 +433,9 @@ uv run --locked --all-extras python tools/generate_assets.py
 ```
 
 Cambiar dependencias exige resolver un nuevo lock y repetir CI. `pip install
-dist/equiframe-0.3.0-py3-none-any.whl` funciona, pero solo el lock reproduce el
+dist/equiframe-0.4.0-py3-none-any.whl` funciona, pero solo el lock reproduce el
 entorno comprobado. Los fixtures no fijan cohorte, escala monetaria real, alpha
-ni tamaño del benchmark. Reglas operativas y detectores permanecen fuera de esta versión.
+ni tamaño del benchmark. Detectores y perfiles permanecen fuera de esta versión.
 
 Las versiones concretas comprobadas son las del `uv.lock`, no todas las combinaciones admitidas por los rangos de metadatos. La suite conserva los contratos anteriores y añade regresiones con motores reales.
 El mínimo de DuckDB es 1.5.6: versiones anteriores admitidas por 0.2.0 no
@@ -449,6 +449,7 @@ y minúsculas, antes de registrarlas: el motor las renombraría automáticamente
 La nueva API solo necesita el extra `arrow`. Acepta `ArrowInput`, `ArtifactRef`,
 `Path` a Arrow IPC file/Parquet local, `TableArtifact` y `ExecutionResult` completed.
 No ejecuta de nuevo la transformación ni necesita los otros motores instalados.
+
 Desde otro proyecto, con un contrato y salidas locales propios:
 
 ```python
@@ -479,7 +480,7 @@ python examples/compare_local.py --work-dir comparison-runs
 defecto (índices separados no evaluables). Permisos suplementarios requieren
 justificación: `column_order="ignored"`, `physical_types="lossless"` o
 `index="ignore"`. Son parte de `ComparisonSpec`, documento independiente 1.0;
-no cambian bytes/huellas de Contract 1.0. La versión del paquete es 0.3.0 y la
+no cambian bytes/huellas de Contract 1.0. La versión del paquete es 0.4.0 y la
 revisión del contrato conserva su función propia.
 
 Se verifican datos y restricciones del esquema de salida, incluidas claves antes
@@ -508,3 +509,28 @@ perfiles, M/B/H ni revisión O. Dos motores pueden coincidir en un error. La CLI
 operacional y la evaluación experimental continúan en sus pasos posteriores.
 El verificador de distribución ejecuta estos ejemplos y la comparación entre
 motores desde wheel instalado fuera del checkout, además del consumidor mypy.
+
+## Reglas operativas R
+
+Con `run.json` y sus artefactos accesibles, el extra `arrow` es suficiente:
+
+```python
+from pathlib import Path
+import equiframe as ef
+
+run = ef.ExecutionResult.model_validate_json(Path("run.json").read_bytes())
+evaluation = ef.evaluate_rules(run, work_dir=Path("rule-evidence"))
+print(evaluation.decision, evaluation.complete, evaluation.coverage)
+for check in evaluation.rules:
+    if check.findings is not None:
+        for finding in ef.iter_rule_findings(check.findings):
+            print(finding.code, finding.table, finding.position)
+```
+
+La [semántica y tabla de decisiones](../../docs/RULES.md) especifica los seis
+chequeos, precondiciones, evidencia, límites y huellas. El
+[catálogo técnico](examples/rules/catalog-1.0.json) y
+[`rules_catalog.py`](examples/rules_catalog.py) ejecutan cinco controles
+sintéticos sin los tres motores.
+[`rules_from_run.py`](examples/rules_from_run.py) relee un `run.json` guardado
+y evalúa sus artefactos sin cargar motores.

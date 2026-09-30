@@ -141,3 +141,26 @@ recibe ni emite perfiles, etiquetas de entrenamiento o resultados de R/M/B/H.
 Dos motores coincidentes pueden compartir un error; O requiere revisión independiente.
 Decisiones A33–A40 y [semántica](COMPARISON.md); resultados efectivos en
 [informe del paso](STEP_03_REVIEW.md). Permanecen los diez pasos y sus responsables.
+
+## Paso 4 — 0.4.0, 2026-09-30
+
+El borrador exige una línea base R determinista, independiente de otras salidas,
+etiquetas y oráculo, fijada antes de las variantes finales (T06 y T10). El
+servicio `evaluate_rules` consume una ejecución capturada y sus referencias
+verificadas; evalúa las seis formas ya declaradas, precondiciones y
+aplicabilidad. Las pruebas distinguen incumplimiento, no aplicabilidad,
+imposibilidad de evaluación, controles correctos difíciles y el límite de
+esquema/suma global ante intercambio de montos. El catálogo técnico de cinco
+familias fija revisiones y huellas de R; no es el benchmark científico revisado.
+
+La corrección heredada del paso 3 refuerza T08/T11: un manifiesto `equivalent`
+con filas declaradas 1/2 y solo una emparejada se rechaza estructuralmente.
+La integridad de artefactos se comprueba al leerlos por separado. Nuevos modelos
+de evidencia R 1.0 no migran ni reinterpretan contratos 1.0.
+
+La semántica exacta de joins, ausencias, `count`, grupos vacíos, orden y
+reconciliación elegida es decisión de ingeniería A41–A47, documentada en
+[Reglas R](RULES.md). La cantidad de conversiones fallidas no es inferible de
+una salida capturada sin recibo adicional. Cohorte y fechas del DW, catálogo
+revisado, particiones, alpha y comparación experimental siguen abiertos.
+El DOCX permanece sin modificar.

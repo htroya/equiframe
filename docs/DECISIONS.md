@@ -98,3 +98,21 @@ No cambian el experimento, R/M/B/H/O ni el documento DOCX.
 La [especificación normativa de comparación](COMPARISON.md) documenta fórmula,
 mapa de tipos, índices, tiempo, capacidades y alcance `output_schema`. Estas
 decisiones precisan ingeniería; no congelan políticas SERCOP, experimentos ni O.
+
+## Paso 4 — ingeniería, Sol, 2026-09-30
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A41 | Corregir validación `equivalent` del paso 3 | La coherencia estructural exige recorrido completo, cero diferencias/diagnósticos y `matched_rows == left_rows == right_rows`, incluso al releer JSON; las referencias JSONL se verifican aparte |
+| A42 | R recibe una captura y usa registro explícito | `RuleContext` expone solo contrato y tablas verificadas de una ejecución. Los seis evaluadores no invocan el ETL ni `compare`; código y configuración entran en huella |
+| A43 | Precondiciones y cuatro estados por chequeo | Falso verificable habilita `not_applicable`; falta de evidencia/capacidad/implementación produce `not_evaluable`. Alerta observada persiste ante incompletitud; conjunto vacío no da `no_alert` |
+| A44 | `required` mide cobertura y `severity` prioridad, nunca ocultan hallazgos | Cualquier incumplimiento alerta; cualquier regla no evaluable impide `no_alert` completo, incluso opcional. Omisiones justificadas y cobertura obligatoria constan en el manifiesto |
+| A45 | Semántica de joins, grupos y ausencias fijada para contrato 1.0 | Claves NULL no emparejan; `unmatched=reject` comprueba ambas direcciones; `count` distingue filas y presentes; suma decimal exacta y float requiere tolerancia. No se amplía silenciosamente el contrato |
+| A46 | Catálogo técnico suplementario 1.0 | Cinco fixtures previos conservan bytes; catálogo fija huella de contrato, reglas, implementación y opciones antes de variantes finales. No constituye benchmark revisado ni validación del DW |
+| A47 | Conversiones fallidas anteriores a la captura no inferibles | SchemaCheck valida observación; una estadística de intentos/conversiones fallidas necesita recibo adicional versionado. Se informa falta de evidencia, no se fabrica un recuento |
+
+Estas decisiones implementan requisitos de tesis sobre R independiente y fijado
+antes de prueba final (T06/T10). La tabla de agregación, límites y
+reconciliaciones seleccionadas son ingeniería documentada en [R](RULES.md).
+No resuelven la cohorte/fecha, revisión humana, alpha, particiones ni
+políticas SERCOP pendientes del piloto. El DOCX no se edita.

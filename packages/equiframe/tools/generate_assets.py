@@ -1,6 +1,7 @@
 """Generate versioned schemas and synthetic contract fixtures; --check never writes."""
 
 import argparse
+import hashlib
 import json
 from decimal import Decimal
 from pathlib import Path
@@ -11,6 +12,7 @@ from equiframe import (
     BooleanType,
     BooleanValue,
     CardinalityCheck,
+    CheckResult,
     ColumnSpec,
     ComparisonDifference,
     ComparisonOptions,
@@ -42,6 +44,9 @@ from equiframe import (
     OrderPolicy,
     PreconditionSpec,
     RuleDefinition,
+    RuleEvaluation,
+    RuleFinding,
+    RuleOptions,
     RuleSpec,
     SchemaCheck,
     SignificantOrder,
@@ -56,7 +61,10 @@ from equiframe import (
     TimestampValue,
     Tolerance,
     canonical_contract_bytes,
+    contract_fingerprint,
     contract_json_schema,
+    default_rule_registry,
+    rule_set_fingerprint,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -292,14 +300,79 @@ def render_schema(schema: dict[str, object]) -> bytes:
     return (json.dumps(schema, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode("utf-8")
 
 
+def render_catalog(contracts: dict[str, Contract]) -> bytes:
+    """Technical R freeze; intentionally separate from the scientific benchmark."""
+    registry = default_rule_registry()
+    implementation_ids = dict(registry.identities())
+    options = RuleOptions()
+    limitations = {
+        "nulls_types": (
+            "Key and schema checks cannot reconstruct failed source-to-output conversions."
+        ),
+        "joins": (
+            "Join checks validate captured input relationships, not the full output projection."
+        ),
+        "duplicates_order": "Order check does not prove full multiplicity preservation.",
+        "aggregations": (
+            "Only declared sum by currency is reconciled; entity allocation is not checked."
+        ),
+        "dates": "Schema and row count do not prove every temporal value retains its entity.",
+    }
+    entries = []
+    for family, contract in contracts.items():
+        definitions = (
+            *[p.requirement for p in contract.preconditions],
+            *[r.specification for r in contract.rules],
+        )
+        entries.append(
+            {
+                "family": family,
+                "contract_file": "../" + family + ".json",
+                "contract_id": contract.contract_id,
+                "contract_revision": contract.revision,
+                "contract_sha256": contract_fingerprint(contract),
+                "rule_set_sha256": rule_set_fingerprint(contract, registry, options),
+                "preconditions": [p.model_dump(mode="json") for p in contract.preconditions],
+                "rules": [r.model_dump(mode="json") for r in contract.rules],
+                "implementations": {
+                    definition.kind: implementation_ids[definition.kind]
+                    for definition in definitions
+                },
+                "coverage": {
+                    "declared_rule_count": len(contract.rules),
+                    "declared_kinds": sorted({r.specification.kind for r in contract.rules}),
+                    "required_rule_ids": [r.rule_id for r in contract.rules if r.required],
+                },
+                "limitations": limitations[family],
+            }
+        )
+    document = {
+        "schema_version": "1.0",
+        "catalog_id": "equiframe.synthetic.rules",
+        "catalog_revision": 1,
+        "options": options.model_dump(mode="json"),
+        "entries": entries,
+        "status": "technical synthetic examples; not a reviewed benchmark or DW validation",
+    }
+    payload = json.dumps(
+        document, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf8")
+    document["catalog_sha256"] = hashlib.sha256(payload).hexdigest()
+    return (json.dumps(document, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode(
+        "utf8"
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
+    contracts = examples()
     assets = {
         ROOT / "examples" / (name + ".json"): canonical_contract_bytes(value)
-        for name, value in examples().items()
+        for name, value in contracts.items()
     }
+    assets[ROOT / "examples" / "rules" / "catalog-1.0.json"] = render_catalog(contracts)
     assets[ROOT / "schemas" / "contract-1.0.schema.json"] = render_schema(contract_json_schema())
     assets[ROOT / "schemas" / "artifact-ref-1.0.schema.json"] = render_schema(
         ArtifactRef.model_json_schema()
@@ -315,6 +388,10 @@ def main() -> None:
         ("comparison-options", ComparisonOptions),
         ("comparison-result", ComparisonResult),
         ("comparison-difference", ComparisonDifference),
+        ("rule-options", RuleOptions),
+        ("rule-finding", RuleFinding),
+        ("rule-check-result", CheckResult),
+        ("rule-evaluation", RuleEvaluation),
     ):
         assets[ROOT / "schemas" / (name + "-1.0.schema.json")] = render_schema(
             model.model_json_schema()

@@ -6,7 +6,8 @@ reglas son elecciones sintéticas para comprobar la API. No son escenarios
 científicos revisados, resultados de comparación ni políticas de SERCOP.
 
 `allowed_values` es una restricción declarativa, no una tabla de datos de prueba.
-Las reglas y precondiciones se validan estructuralmente; no se ejecutan en este paso.
+Las reglas y precondiciones del contrato 1.0 se evalúan desde el paso 4 con
+`ef.evaluate_rules` sobre una captura de una ejecución. Véase [R](../../../docs/RULES.md).
 
 Desde `packages/equiframe`:
 
@@ -29,3 +30,20 @@ compara sus salidas contra esperados explícitos y entre parejas con entradas
 verificadas idénticas. Usa permisos justificados para índices sin significado y
 anchos físicos que conservan valores. Ambos ejemplos se copian y ejecutan con
 el wheel instalado fuera del checkout por `tools/verify_distribution.py`.
+
+## Reglas R del paso 4
+
+`rules/catalog-1.0.json` fija las cinco entradas técnicas y sus huellas de R.
+`rules_catalog.py` crea capturas sintéticas de una fila, verifica esas huellas y
+evalúa con solo el extra `arrow`:
+
+```powershell
+python rules_catalog.py --work-dir my-rule-runs
+```
+
+Las capturas de demostración no son corridas ETL de los tres motores, el oráculo
+ni casos del benchmark revisado. Para una ejecución real, lea su `run.json` como
+`ef.ExecutionResult`, luego llame `ef.evaluate_rules(execution)`; la API verifica
+los artefactos referenciados sin importar los motores.
+`rules_from_run.py ruta/al/run.json` es el consumidor mínimo de esa captura;
+no necesita instalar Pandas, Polars ni DuckDB.

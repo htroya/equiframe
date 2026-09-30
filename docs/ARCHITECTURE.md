@@ -1,6 +1,6 @@
 # Arquitectura de EquiFrame
 
-Versión de diseño: 0.3, 2026-09-30. Estado: pasos 1, 2 y 3 implementados; componentes posteriores siguen siendo especificación. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md).
+Versión de diseño: 0.4, 2026-09-30. Estado: pasos 1 a 4 implementados; componentes posteriores siguen siendo especificación. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md).
 
 ## 1. Propósito y alcance
 
@@ -104,7 +104,7 @@ Una limitación de memoria o tiempo produce comparación `not_evaluable`, no equ
 
 ## 7. Persistencia y trazabilidad
 
-Paso 2 produce `run.json`, entradas capturadas y salida Arrow con referencias, tamaños y SHA-256 en un directorio propio. Paso 3 añade `comparison.json`, diferencias JSONL y snapshots en carpetas independientes. `environment.json`, `events.jsonl`, `rules.json`, `profile.json`, `decisions.json` y `report.html` pertenecen a pasos posteriores. El benchmark agregará manifiestos de splits, revisiones, métricas y costos. Cada formato tiene `schema_version`.
+Paso 2 produce `run.json`, entradas capturadas y salida Arrow con referencias, tamaños y SHA-256 en un directorio propio. Paso 3 añade `comparison.json`, diferencias JSONL y snapshots en carpetas independientes. Paso 4 añade `rules.json` y hallazgos JSONL en otra carpeta propia. `environment.json`, `events.jsonl`, `profile.json`, `decisions.json` y `report.html` pertenecen a pasos posteriores. El benchmark agregará manifiestos de splits, revisiones, métricas y costos. Cada formato tiene `schema_version`.
 
 Artefactos grandes: Arrow/Parquet con esquema y hashes; JSON para metadatos y valores especiales etiquetados. Un hash de archivo verifica bytes; un digest lógico versionado puede resumir contenido canónico, pero no reemplaza la prueba exacta. El manifiesto final contiene hashes de sus artefactos y el estado de completitud.
 

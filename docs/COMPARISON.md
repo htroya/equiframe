@@ -1,4 +1,4 @@
-# Comparación completa — EquiFrame 0.3.0
+# Comparación completa — introducida en EquiFrame 0.3.0
 
 Decisiones de ingeniería del paso 3, 2026-09-30. La API compara salidas ya
 materializadas; no ejecuta transformaciones, R, perfiles, M, B, H ni revisiones O.
@@ -49,7 +49,9 @@ compara cada motor con ellos y cada pareja con las mismas entradas verificadas.
 
 ## Versiones y autorización
 
-El paquete es **0.3.0**. `Contract`, `ExecutionPlan`, `ExecutionResult` y
+El paquete actual es **0.4.0**; la comparación se introdujo en 0.3.0 y 0.4.0
+refuerza la validación estructural de `equivalent` al releer manifiestos.
+`Contract`, `ExecutionPlan`, `ExecutionResult` y
 `ArtifactRef` conservan formato **1.0**, campos, defaults y bytes canónicos previos.
 La `revision` de cada contrato sigue identificando su revisión semántica.
 

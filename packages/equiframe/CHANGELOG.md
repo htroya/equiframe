@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.4.0 — 2026-09-30
+
+- Paso 4: `ef.evaluate_rules` verifica entradas y salida capturadas de una sola
+  ejecución, con registro explícito de las seis formas de regla y precondiciones.
+- Hallazgos JSONL completos, resumen acotado, cobertura, presupuesto y cancelación
+  cooperativa; alerta observada conserva su estado ante evaluación incompleta.
+- Catálogo técnico versionado para cinco familias y huella de contrato, código de
+  reglas y configuración; consumidor Arrow sin tres motores.
+- `ComparisonResult` rechaza manifiestos `equivalent` con conteos contradictorios
+  y valida la coherencia de la estrategia/clave seleccionada.
+- Nuevos documentos/esquemas de R 1.0, contratos/ejecuciones 1.0 conservados.
+
+No incorpora perfiles, M/B/H, oráculo, benchmark final, DW ni publicación PyPI.
+Las estadísticas de conversiones anteriores a la captura requieren evidencia
+adicional; no se reconstruyen de una salida final.
+
 ## 0.3.0 — 2026-09-30
 
 - Paso 3: `ef.compare`, modelos completos, lectura de manifiestos y diferencias verificables.
