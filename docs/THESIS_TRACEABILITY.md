@@ -119,3 +119,25 @@ de EquiFrame dentro de la VM o acceso externo por snapshots verificados. Es una
 decisión de despliegue solicitada por el usuario; la conexión real sigue pendiente.
 La matriz CI ampliada no acredita funcionamiento en la VM real. El DOCX no se edita.
 Evidencia técnica: [segunda revisión del paso 2](STEP_02_SECOND_REVIEW.md).
+
+## Paso 3 — 0.3.0, 2026-09-30
+
+Se volvió a leer el DOCX, especialmente 1.3, 3.3 y 3.4; conserva el SHA-256
+registrado. Sus primeros cuatro objetivos corresponden a OE1–OE4 del encargo;
+el archivo contiene además un párrafo específico de documentación y reproducción.
+No se modifica ni se presenta la distribución pública como requisito textual de la tesis.
+
+La entrega atiende principalmente **OE1 y OE3**, como fundamento técnico de **OE4**:
+T05 (normalización exclusivamente autorizada), T08 (contenido/multiplicidades
+completos), la API sustituible de T09 y evidencia/propiedades/presupuestos de T11.
+La reducción de casos de T11 y la CLI operacional de T09 quedan para el paso 8.
+Pruebas con esperados explícitos cubren las cinco familias, controles que conservan
+totales, valores extremos, inválidos, spill y tres motores reales. No son escenarios
+humanamente revisados, resultados científicos ni validación del DW.
+
+P02/P04 se extienden a consumidores externos de comparación con wheel base/extras;
+P06 conserva la aceptación de publicación pública en el paso 10. El comparador no
+recibe ni emite perfiles, etiquetas de entrenamiento o resultados de R/M/B/H.
+Dos motores coincidentes pueden compartir un error; O requiere revisión independiente.
+Decisiones A33–A40 y [semántica](COMPARISON.md); resultados efectivos en
+[informe del paso](STEP_03_REVIEW.md). Permanecen los diez pasos y sus responsables.

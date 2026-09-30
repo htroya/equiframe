@@ -12,6 +12,10 @@ from equiframe import (
     BooleanValue,
     CardinalityCheck,
     ColumnSpec,
+    ComparisonDifference,
+    ComparisonOptions,
+    ComparisonResult,
+    ComparisonSpec,
     Contract,
     DatePolicy,
     DateType,
@@ -306,6 +310,15 @@ def main() -> None:
     assets[ROOT / "schemas" / "execution-result-1.0.schema.json"] = render_schema(
         ExecutionResult.model_json_schema()
     )
+    for name, model in (
+        ("comparison-spec", ComparisonSpec),
+        ("comparison-options", ComparisonOptions),
+        ("comparison-result", ComparisonResult),
+        ("comparison-difference", ComparisonDifference),
+    ):
+        assets[ROOT / "schemas" / (name + "-1.0.schema.json")] = render_schema(
+            model.model_json_schema()
+        )
     failures = []
     for path, data in assets.items():
         if args.check:

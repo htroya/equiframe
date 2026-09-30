@@ -1,6 +1,6 @@
 # API Python y contratos de intercambio
 
-Versión implementada: `equiframe 0.2.0`, formatos `1.0`, pasos 1 y 2. El [README del
+Versión implementada: `equiframe 0.3.0`, formatos independientes `1.0`, pasos 1, 2 y 3. El [README del
 paquete](../packages/equiframe/README.md) contiene instalación, comandos y un
 ejemplo Python ejecutable. Los componentes siguientes siguen en la hoja de ruta.
 
@@ -15,7 +15,7 @@ ejemplo Python ejecutable. Los componentes siguientes siguen en la hoja de ruta.
 | `contract_fingerprint(contract) -> str` | SHA-256 hexadecimal de esos bytes; no equivalencia tabular |
 | `contract_json_schema() -> dict[str, object]` | JSON Schema generado desde `Contract` |
 
-La API explícita está en `equiframe.__all__`; `__version__` es `0.2.0`.
+La API explícita está en `equiframe.__all__`; `__version__` es `0.3.0`.
 Los constructores usan Pydantic estricto/inmutable, rechazan extras y conservan
 colecciones como tuplas. La validación de JSON permite arrays sin introducir
 coerciones numéricas con pérdida. No se interpreta código en documentos.
@@ -88,7 +88,7 @@ La huella de metadatos no verifica artefactos reales ni tablas equivalentes.
 
 ## 4. Estados públicos separados
 
-Los estados son alias `Literal` públicos, sin funciones de decisión en este paso:
+Los estados son alias `Literal` públicos; ejecución y comparación tienen APIs operativas:
 
 - `ExecutionState`: `completed`, `invalid_input`, `failed`, `timeout`, `resource_exhausted`, `cancelled`.
 - `DecisionState`: `alert`, `no_alert`, `not_evaluable`.
@@ -192,8 +192,8 @@ formato de contrato conservado del paso 1. El resultado se revalida al construir
 completed requiere artefacto de salida y ningún problema.
 
 No ejecuta reglas/precondiciones ni corrige discrepancias de datos con el contrato.
-Salida completed puede ser diferente o anómala; no existe comparación o etiqueta O
-en estos modelos. IDs únicos impiden mezclar corridas locales independientes.
+Salida completed puede ser diferente o anómala; no incluye comparación ni etiqueta O.
+`ef.compare` evalúa esas salidas por separado. IDs únicos impiden mezclar corridas.
 Arrow no recupera offset textual por fila, signo decimal cero o None perdido al
 construir una tabla; notas/capacidades exponen esas limitaciones. Ningún límite
 cooperativo se describe como timeout duro o sandbox.
@@ -226,3 +226,23 @@ Los límites completos permanecen en la matriz de transporte del paquete.
 
 Estos controles no añaden campos ni cambian la versión de formato 1.0.
 Integración remota prevista: [OCI](OCI_INTEGRATION.md).
+
+## 9. Comparación disponible en 0.3.0
+
+| API/modelo | Comportamiento |
+|---|---|
+| `compare(left, right, *, contract, policy, options, reference, work_dir, cancellation)` | Evalúa contenido completo ya capturado, sin motores; `reference="expected"` identifica esperado independiente a la derecha |
+| `ComparisonInput` | ArrowInput, ArtifactRef, Path local, TableArtifact o ExecutionResult |
+| `ComparisonSpec` / `ComparisonPolicy` | Documento propio 1.0 con contrato intacto y permisos explícitos de columnas/tipos/índices |
+| `ComparisonOptions` | Lotes, particiones, disco, trabajo, matching, tiempo y evidencia |
+| `ComparisonResult` / `ComparisonCounts` | Estado, completitud, alcance output_schema, referencias, huellas, estrategia, conteos y versiones |
+| `ComparisonSource` / `AppliedPolicy` | Esquema observado separado, referencia verificada y operaciones aplicadas |
+| `ComparisonDifference` / `ComparisonValue` | Clave/posición/columna, valores originales tipados y multiplicidades sin pérdida |
+| `ComparisonDiagnostic` | Fallo técnico/capacidad/recursos/cancelación o esperado inválido |
+| `comparison_fingerprint(spec)` | Identidad de la especificación completa; no prueba igualdad de datos |
+| `read_comparison(path)` / `iter_differences(ref)` | Revalidar manifiesto / verificar integridad y leer toda la evidencia |
+
+Semántica, estados, límites, permisos y ejemplos: [Comparación](COMPARISON.md).
+Modelos antiguos 1.0 conservan campos/bytes y validación; cuatro esquemas nuevos
+se generan por separado. `equivalent` no evalúa reglas/precondiciones operativas,
+ni produce una etiqueta O. El registro independiente de reglas queda en paso 4.

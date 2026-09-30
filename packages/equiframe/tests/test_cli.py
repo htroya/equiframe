@@ -88,4 +88,4 @@ print(equiframe.__version__)
     result = subprocess.run(
         [sys.executable, "-c", code], check=True, text=True, capture_output=True
     )
-    assert result.stdout.strip() == "0.2.1"
+    assert result.stdout.strip() == "0.3.0"

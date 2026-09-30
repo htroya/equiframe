@@ -63,3 +63,5 @@ Desktop.ini
 # Execution defaults (consumer artifacts, never source)
 equiframe-runs/
 example-runs/
+equiframe-comparisons/
+comparison-runs/

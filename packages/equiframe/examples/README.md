@@ -16,4 +16,16 @@ uv run --locked python tools/generate_assets.py --check
 ```
 
 
-`execute_native.py` ejecuta las cinco familias con código propio de cada motor y esperados explícitos, en comercio y telemetría. Con wheel + [engines]: `python execute_native.py --work-dir my-runs`; con un extra individual añada `--engine pandas|polars|duckdb`. Estos casos prueban ejecución/transporte, no comparador ni benchmark científico.
+`execute_native.py` ejecuta las cinco familias con código propio de cada motor y esperados explícitos, en comercio y telemetría. Con wheel + [engines]: `python execute_native.py --work-dir my-runs`; con un extra individual añada `--engine pandas|polars|duckdb`. Estos casos prueban ejecución, transporte y comparación; no son el benchmark científico.
+
+## Comparación del paso 3
+
+`compare_local.py` es un consumidor autocontenido del extra Arrow: compara montos
+con un esperado independiente, detecta intercambio que conserva la suma y lee
+toda la evidencia aunque el resumen contenga un solo ejemplo. No necesita motores.
+
+`execute_native.py` conserva las implementaciones nativas independientes; además
+compara sus salidas contra esperados explícitos y entre parejas con entradas
+verificadas idénticas. Usa permisos justificados para índices sin significado y
+anchos físicos que conservan valores. Ambos ejemplos se copian y ejecutan con
+el wheel instalado fuera del checkout por `tools/verify_distribution.py`.

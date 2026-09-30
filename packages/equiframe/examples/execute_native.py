@@ -248,12 +248,40 @@ def assert_expected(actual: list[dict[str, object]], expected: list[dict[str, ob
                 assert observed[key] == value, (observed, wanted)
 
 
+def expected_table(case: Case) -> pa.Table:
+    """Manually specified expected physical schemas, independent of normalization."""
+    schemas = {
+        "nulls_types": pa.schema(
+            [("id", pa.string()), ("amount", pa.decimal128(18, 2)), ("measurement", pa.float64())]
+        ),
+        "duplicates_order": pa.schema(
+            [("id", pa.string()), ("amount", pa.decimal128(18, 2)), ("measurement", pa.float64())]
+        ),
+        "joins": pa.schema(
+            [("id", pa.string()), ("product_id", pa.string()), ("category", pa.string())]
+        ),
+        "aggregations": pa.schema(
+            [("warehouse", pa.string()), ("total", pa.decimal128(38, 2)), ("rows", pa.int64())]
+        ),
+        "dates": pa.schema([("sensor_id", pa.string()), ("day", pa.date32())]),
+    }
+    return pa.Table.from_pylist(case.expected, schema=schemas[case.contract.family])
+
+
+COMPARISON_POLICY = ef.ComparisonPolicy(
+    physical_types="lossless",
+    index="ignore",
+    justification="Only declared columns carry meaning; lossless native widths allowed.",
+)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--engine", choices=("pandas", "polars", "duckdb"), action="append")
     parser.add_argument("--work-dir", type=Path, default=Path("example-runs"))
     args = parser.parse_args()
     registered = registry()
+    results: dict[str, list[ef.ExecutionResult]] = {}
     for engine in args.engine or ("pandas", "polars", "duckdb"):
         for case in cases():
             result = ef.execute(
@@ -269,7 +297,29 @@ def main() -> None:
             assert result.state == "completed", result.problem
             assert result.output is not None
             assert_expected(ef.read_table(result.output.data).to_pylist(), case.expected)
+            comparison = ef.compare(
+                result,
+                ef.ArrowInput(expected_table(case)),
+                contract=case.contract,
+                policy=COMPARISON_POLICY,
+                reference="expected",
+                work_dir=args.work_dir,
+            )
+            assert comparison.state == "equivalent", comparison
+            results.setdefault(case.contract.family, []).append(result)
             print(engine, case.contract.family, result.state, result.output.row_count)
+    for runs in results.values():
+        for index, left in enumerate(runs):
+            for right in runs[index + 1 :]:
+                comparison = ef.compare(
+                    left,
+                    right,
+                    contract=left.plan.contract,
+                    policy=COMPARISON_POLICY,
+                    work_dir=args.work_dir,
+                )
+                assert comparison.state == "equivalent", comparison
+                print(left.plan.engine, right.plan.engine, comparison.state)
 
 
 if __name__ == "__main__":

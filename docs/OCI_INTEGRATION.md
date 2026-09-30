@@ -5,7 +5,7 @@
 El DW, el archivo DuckDB real y la biblioteca o programa que abre sus conexiones
 residirán en una VM de OCI. Este documento fija la integración prevista; no
 representa un despliegue, un servicio remoto ya disponible ni una conexión probada.
-El núcleo EquiFrame 0.2.1 sigue siendo local e independiente de OCI y del esquema de dominio.
+El núcleo EquiFrame 0.3.0 sigue siendo local e independiente de OCI y del esquema de dominio.
 
 El adaptador DuckDB del núcleo abre una conexión propia `:memory:` para ejecutar
 transformaciones sobre entradas registradas. No abre el archivo del DW ni acepta

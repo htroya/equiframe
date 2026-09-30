@@ -1,6 +1,25 @@
 """Typed contracts and local native execution; import does not load engines/ML."""
 
 from equiframe.adapters import DuckDBAdapter, PandasAdapter, PolarsAdapter
+from equiframe.comparison import (
+    ComparisonInput,
+    compare,
+    comparison_fingerprint,
+    iter_differences,
+    read_comparison,
+)
+from equiframe.comparison_types import (
+    AppliedPolicy,
+    ComparisonCounts,
+    ComparisonDiagnostic,
+    ComparisonDifference,
+    ComparisonOptions,
+    ComparisonPolicy,
+    ComparisonResult,
+    ComparisonSource,
+    ComparisonSpec,
+    ComparisonValue,
+)
 from equiframe.contracts import (
     SCHEMA_VERSION,
     AggregateCheck,
@@ -128,12 +147,13 @@ from equiframe.values import (
     TimeZone,
 )
 
-__version__ = "0.2.1"
+__version__ = "0.3.0"
 
 __all__ = [
     "CANONICALIZATION",
     "SCHEMA_VERSION",
     "AggregateCheck",
+    "AppliedPolicy",
     "ArrowInput",
     "ArtifactIOError",
     "ArtifactInput",
@@ -147,7 +167,17 @@ __all__ = [
     "CardinalityCheck",
     "ColumnKeyScope",
     "ColumnSpec",
+    "ComparisonCounts",
+    "ComparisonDiagnostic",
+    "ComparisonDifference",
+    "ComparisonInput",
+    "ComparisonOptions",
+    "ComparisonPolicy",
+    "ComparisonResult",
+    "ComparisonSource",
+    "ComparisonSpec",
     "ComparisonState",
+    "ComparisonValue",
     "Contract",
     "ContractIOError",
     "ContractParseError",
@@ -242,9 +272,13 @@ __all__ = [
     "VersionInfo",
     "__version__",
     "canonical_contract_bytes",
+    "compare",
+    "comparison_fingerprint",
     "contract_fingerprint",
     "contract_json_schema",
     "execute",
+    "iter_differences",
+    "read_comparison",
     "read_contract",
     "read_table",
     "validate_contract",

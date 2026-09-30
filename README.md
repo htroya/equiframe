@@ -1,6 +1,6 @@
 # EquiFrame
 
-Contratos semánticos tipados y ejecución de transformaciones tabulares con
+Contratos semánticos tipados, comparación completa y ejecución de transformaciones con
 **Pandas, Polars y DuckDB**. Cada motor ejecuta su propia implementación;
 EquiFrame conserva los datos, tipos y diagnósticos necesarios para revisar el resultado.
 
@@ -15,10 +15,12 @@ EquiFrame conserva los datos, tipos y diagnósticos necesarios para revisar el r
 - Entradas Arrow, Pandas, Polars, Arrow IPC y Parquet locales; artefactos verificables
   mediante SHA-256 y un manifiesto por ejecución.
 - Estados y diagnósticos de fallo, cancelación, tiempo y recursos; CLI para validar contratos.
+- Comparación por clave, multiconjunto o secuencia, normalizaciones autorizadas,
+  tolerancias, spill y evidencia verificable; API `ef.compare` con solo el extra Arrow.
 
-**Versión de desarrollo: 0.2.1.** Una ejecución `completed` confirma que la
-transformación terminó y se materializó. La comparación semántica, las reglas
-operativas, los detectores y el benchmark están previstos en la
+**Versión de desarrollo: 0.3.0.** Una ejecución `completed` confirma que la
+transformación terminó y se materializó. La [comparación semántica](docs/COMPARISON.md)
+evalúa salidas materializadas. Las reglas operativas, detectores y benchmark siguen en la
 [hoja de ruta](docs/HERNAN_ROADMAP.md).
 
 ## Instalación
@@ -64,7 +66,7 @@ Las capacidades incompatibles se informan explícitamente. Consulte la
 La configuración de CI ejecuta el mismo paquete en Windows x64, Linux x64/ARM64
 y macOS Intel/Apple Silicon. Cada job comprueba tipos, pruebas con motores reales,
 construcción e instalación limpia del wheel.
-[Evidencia de compatibilidad y revisión](docs/STEP_02_SECOND_REVIEW.md).
+[Evidencia de compatibilidad y revisión](docs/STEP_03_REVIEW.md).
 
 Los runners de GitHub son entornos temporales de prueba. El workflow no despliega
 servicios ni conecta con una VM de OCI.
@@ -81,6 +83,7 @@ describe los límites y las entregas necesarias; la conexión real sigue pendien
 |---|---|
 | [API y ejemplos](packages/equiframe/README.md) | Instalación, ejecución, contratos, CLI y límites |
 | [Referencia de formatos](docs/API_CONTRACTS.md) | Tipos públicos, estados y serialización |
+| [Comparación](docs/COMPARISON.md) | API, autorizaciones, evidencia y presupuestos |
 | [Arquitectura](docs/ARCHITECTURE.md) | Componentes, dependencias y flujo de ejecución |
 | [Integración OCI](docs/OCI_INTEGRATION.md) | Acceso al DW, snapshots y coordinación de DuckDB |
 | [Calidad](docs/QUALITY.md) | Pruebas, recursos y distribución |

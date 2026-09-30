@@ -81,3 +81,20 @@ las limitaciones; pruebas contra el lock fijan el comportamiento de esta entrega
 
 A27–A31 corrigen ingeniería y pruebas; A32 explicita la ubicación de la integración.
 No cambian el experimento, R/M/B/H/O ni el documento DOCX.
+
+## Paso 3 — ingeniería, Sol, 2026-09-30
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A33 | Paquete 0.3.0, documentos de comparación 1.0 independientes | `ComparisonSpec` incorpora Contract 1.0 intacto y permisos nuevos; conserva huella antigua y registra huella compuesta. Sin cambio silencioso de significado ni migración de formatos existentes |
+| A34 | Orden de columnas significativo, tipos físicos exactos e índice rechazado por defecto | El contrato anterior no autoriza ignorarlos. `ComparisonPolicy` permite relajaciones explícitas justificadas; índices con significado deben ser columnas |
+| A35 | Todas las claves se comprueban antes/después de normalizar; primera única utilizable | Ámbitos por columnas entran en la clave; incompletas permitidas quedan en multiconjunto. No alineación aproximada, no deduplicación; distinct exige unicidad de filas |
+| A36 | Orden significativo es secuencia y validación del orden | Empates preserve conservan posición relativa; reject exige desempate. Esquema observado permanece separado y dos salidas inválidas no producen equivalent |
+| A37 | Aritmética racional exacta y tolerancia simétrica predeclarada | Sin float intermedio para decimales/enteros/tiempo, sin redondeo correctivo. NaN es categoría propia o ausencia autorizada. Matching máximo conserva multiplicidad sin asumir transitividad |
+| A38 | Lotes, SQLite privado y partición por valores exactos | Hash distribuye, BLOB completo decide; spill incluso para tablas pequeñas. Presupuestos cooperativos de trabajo/disco/representaciones y límites explícitos de grupos aproximados; no cuotas RSS ni reloj duro |
+| A39 | Evidencia completa JSONL y snapshots, resumen acotado | Conteos parciales se etiquetan; límites/cancelación fallan como not_evaluable. Esperado inválido tiene diagnóstico separado; comparación completa no equivale a oráculo científico |
+| A40 | Reloj controlado para timeout y verificación externa desde este incremento | La prueba de 50 ms mezclaba timeout previo y durante callback. Se prueban ambos sin sleeps arbitrarios. Base/extras/wheel/sdist y cinco plataformas conservan sus controles |
+
+La [especificación normativa de comparación](COMPARISON.md) documenta fórmula,
+mapa de tipos, índices, tiempo, capacidades y alcance `output_schema`. Estas
+decisiones precisan ingeniería; no congelan políticas SERCOP, experimentos ni O.

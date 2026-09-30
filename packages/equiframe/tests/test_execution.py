@@ -346,14 +346,19 @@ def test_materialized_resource_limits(engine, tmp_path):
     assert result.state == "resource_exhausted" and not result.inputs
 
 
-def test_callback_timeout_is_cooperative_and_returns_after_callback(tmp_path):
+def test_callback_timeout_is_cooperative_and_returns_after_callback(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    import equiframe.execution as execution
+
+    clock = [10.0]
+    monkeypatch.setattr(execution, "time", SimpleNamespace(perf_counter=lambda: clock[0]))
     finished = []
-    # Warm imports outside the budget.
     table = pa.table({"id": ["001"]})
-    data(identity("pandas", table, tmp_path))
 
     def slow(tables, context):
-        time.sleep(0.1)
+        assert context.deadline == 10.05
+        clock[0] = 10.25
         finished.append(True)
         return tables["items"]
 
@@ -361,7 +366,28 @@ def test_callback_timeout_is_cooperative_and_returns_after_callback(tmp_path):
         "pandas", table, tmp_path, callback=slow, options=ef.ExecutionOptions(timeout_seconds=0.05)
     )
     assert result.state == "timeout" and finished == [True] and result.output is None
-    assert result.elapsed_seconds >= 0.1
+    assert result.elapsed_seconds == 0.25
+
+
+def test_timeout_before_callback_does_not_start_callback(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    import equiframe.execution as execution
+
+    ticks = iter((10.0, 10.25))
+    monkeypatch.setattr(execution, "time", SimpleNamespace(perf_counter=lambda: next(ticks, 10.25)))
+
+    def never(tables, context):
+        raise AssertionError("expired execution must not enter callback")
+
+    result = identity(
+        "pandas",
+        pa.table({"id": ["001"]}),
+        tmp_path,
+        callback=never,
+        options=ef.ExecutionOptions(timeout_seconds=0.05),
+    )
+    assert result.state == "timeout" and result.output is None and not result.inputs
 
 
 def test_cancellation_at_callback_checkpoint(tmp_path):

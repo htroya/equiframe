@@ -1,6 +1,6 @@
 # Arquitectura de EquiFrame
 
-Versión de diseño: 0.2, 2026-09-28. Estado: pasos 1 y 2 implementados; componentes de pasos posteriores siguen siendo especificación. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md).
+Versión de diseño: 0.3, 2026-09-30. Estado: pasos 1, 2 y 3 implementados; componentes posteriores siguen siendo especificación. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md).
 
 ## 1. Propósito y alcance
 
@@ -98,13 +98,13 @@ No se reintenta automáticamente una transformación con efectos externos. Una c
 - Ausencia lógica, NaN, cadena vacía y cero: estados distintos salvo equivalencia explícita del contrato. Si el motor ya perdió información, queda registrado como incumplimiento o caso no evaluable según la evidencia.
 - Fechas: separar instante, zona y día. No asignar zona a timestamps sin offset sin política expresa. Preservar granularidad original.
 - Tolerancias aproximadas: por columna con unidad, absoluto/relativo y justificación. No se introducen para dinero exacto ni tras observar un fallo.
-- Grandes tablas: particionar por representación canónica de clave/fila; comparar contenido exacto dentro de particiones y permitir spill a disco. Los hashes sirven para distribuir y verificar integridad, no como sustituto de comparar los valores. La estrategia exacta se prueba en el paso 3.
+- Grandes tablas: particionar por representación canónica de clave/fila; comparar contenido exacto dentro de particiones con spill a disco. Los hashes sirven para distribuir y verificar integridad, no como sustituto de comparar valores. El paso 3 implementa índices SQLite de valores completos; véase [comparación](COMPARISON.md).
 
 Una limitación de memoria o tiempo produce comparación `not_evaluable`, no equivalencia. El resumen puede truncar los ejemplos de diferencias; el manifiesto registra conteos totales, artefacto de diferencias y si el recorrido se completó.
 
 ## 7. Persistencia y trazabilidad
 
-Paso 2 produce `run.json`, entradas capturadas y salida Arrow con referencias, tamaños y SHA-256 en un directorio propio. Los demás archivos siguientes pertenecen a modos futuros: `run.json`, `environment.json`, `events.jsonl`, `rules.json`, `profile.json`, `decisions.json`, `comparison.json`, `report.html` y referencias a entradas/salidas. El benchmark agrega manifiestos de splits, revisiones, métricas y costos. Cada formato tiene `schema_version`.
+Paso 2 produce `run.json`, entradas capturadas y salida Arrow con referencias, tamaños y SHA-256 en un directorio propio. Paso 3 añade `comparison.json`, diferencias JSONL y snapshots en carpetas independientes. `environment.json`, `events.jsonl`, `rules.json`, `profile.json`, `decisions.json` y `report.html` pertenecen a pasos posteriores. El benchmark agregará manifiestos de splits, revisiones, métricas y costos. Cada formato tiene `schema_version`.
 
 Artefactos grandes: Arrow/Parquet con esquema y hashes; JSON para metadatos y valores especiales etiquetados. Un hash de archivo verifica bytes; un digest lógico versionado puede resumir contenido canónico, pero no reemplaza la prueba exacta. El manifiesto final contiene hashes de sus artefactos y el estado de completitud.
 
@@ -190,3 +190,17 @@ El [contrato OCI](OCI_INTEGRATION.md) sitúa el DW y su programa de conexión de
 de la VM. EquiFrame puede ejecutarse allí o recibir snapshots por un proveedor
 externo explícito. CI verifica el mismo código en runners GitHub temporales;
 no despliega OCI ni acredita la integración real pendiente del paso 9.
+
+## 13. Comparación operativa en 0.3.0
+
+`ef.compare` consume salidas locales ya materializadas, valida el esquema de salida,
+aplica exclusivamente equivalencias declaradas y compara todo el contenido por
+secuencia, clave comprobada, multiconjunto exacto o emparejamiento máximo aproximado.
+Lectores por lotes y SQLite privado permiten spill sin materializar tablas completas.
+Publica `comparison.json`, diferencias JSONL completas y snapshots referenciados.
+Los estados incompletos conservan evidencia parcial y nunca equivalencia.
+
+La [especificación de comparación](COMPARISON.md) define políticas suplementarias
+versionadas, mapeos físicos/lógicos, alcance, algoritmos y presupuestos. Contratos
+1.0 y sus huellas no cambian. Índices separados requieren decisión expresa.
+No se implementan R, perfiles, detectores, benchmark, CLI operacional ni oráculo O.

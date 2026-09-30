@@ -89,3 +89,21 @@ reales y fallos de almacén para verificar evidencia parcial y limpieza.
 Cada runner GitHub es temporal: el workflow construye y verifica el paquete,
 sin acceso a datos reales, claves OCI ni despliegue. El entorno OCI se valida
 por separado conforme a [su contrato de integración](OCI_INTEGRATION.md).
+
+## 9. Controles del paso 3
+
+Comparaciones con esperados independientes y propiedades de las cinco familias;
+emparejamiento aproximado contrastado con permutaciones exhaustivas pequeñas;
+colisiones forzadas de partición, spill, sesgo, presupuestos, evidencia truncada
+solo en el resumen, alteraciones de artefactos, índices y tres motores reales.
+Los ejemplos instalados verifican comparación sin motores con el extra Arrow y
+con cada motor individual. Wheel base expone modelos/API sin importar motores.
+Los esquemas previos conservan bytes; se añaden cuatro esquemas independientes.
+
+La evidencia anterior del usuario fue **462 passed y un fallo** en la prueba de
+timeout de callback; su repetición aislada pasó. La CI del commit base
+`751063580fda5c072e693f0c51e4c80bb677ee96` pasó en cinco plataformas, según el
+contexto de entrega. Son evidencias distintas. El paso 3 sustituye el reloj real
+de aquella prueba por uno controlado y añade vencimiento previo al callback.
+Resultados del nuevo commit: [informe](STEP_03_REVIEW.md); la configuración de CI
+por sí sola no demuestra que sus checks hayan pasado.

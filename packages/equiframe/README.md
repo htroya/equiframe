@@ -1,9 +1,9 @@
-# EquiFrame 0.2.1 — contratos y ejecución nativa local
+# EquiFrame 0.3.0 — contratos, ejecución y comparación completa
 
-Contratos estrictos y ejecución local tipada con Pandas, Polars y DuckDB.
+Contratos estrictos, comparación completa y ejecución local con Pandas, Polars y DuckDB.
 Se requiere Python 3.12; los motores se instalan mediante extras. La configuración
 CI cubre Windows x64, Ubuntu x64/ARM64 y macOS Intel/Apple Silicon.
-La [evidencia de revisión y compatibilidad](../../docs/STEP_02_SECOND_REVIEW.md)
+La [evidencia de revisión y compatibilidad](../../docs/STEP_03_REVIEW.md)
 registra los controles completados. No se requiere una VM ni un DW para usar el
 núcleo. Licencia y publicación externa pendientes; no hay paquete del equipo en PyPI.
 
@@ -15,8 +15,8 @@ la experiencia pública objetivo, pendiente del paso 10; podría resolver un
 paquete ajeno. Use el wheel del equipo o este checkout:
 
 ```bash
-python -m pip install ./dist/equiframe-0.2.1-py3-none-any.whl
-python -m pip install "./dist/equiframe-0.2.1-py3-none-any.whl[duckdb]"
+python -m pip install ./dist/equiframe-0.3.0-py3-none-any.whl
+python -m pip install "./dist/equiframe-0.3.0-py3-none-any.whl[duckdb]"
 # Alternativas: [arrow], [pandas], [polars] o [engines].
 # Desde el checkout del equipo:
 python -m pip install ".[engines]"
@@ -309,7 +309,7 @@ no garantiza soporte de ese intervalo por un futuro adaptador.
 
 Los esquemas declaran claves/ámbito (`table`, `global`, `columns`), claves
 incompletas, multiplicidad y orden. `preserve` conserva multiplicidad;
-`distinct` declara semántica de conjunto. `significant` declara columnas,
+`distinct` exige filas normalizadas únicas, sin deduplicar. `significant` declara columnas,
 dirección, posición de ausencias y empates. El validador comprueba coherencia
 y referencias; no verifica datos ni unicidad real.
 
@@ -417,8 +417,8 @@ uv run --locked --all-extras python tools/verify_distribution.py
 ```
 
 El backend y sus dependencias están en el lock; `--no-isolation` usa ese entorno.
-Build produce `dist/equiframe-0.2.1-py3-none-any.whl` y
-`dist/equiframe-0.2.1.tar.gz`. El verificador crea entornos temporales fuera del checkout, instala dependencias runtime del lock y el wheel sin editable,
+Build produce `dist/equiframe-0.3.0-py3-none-any.whl` y
+`dist/equiframe-0.3.0.tar.gz`. El verificador crea entornos temporales fuera del checkout, instala dependencias runtime del lock y el wheel sin editable,
 comprueba `py.typed` e importación sin motores/ML/dev, valida cinco ejemplos por
 CLI y reconstruye desde el sdist comparando todos los bytes del wheel.
 También instala cada extra y la combinación engines sin editable, ejecuta los ejemplos copiados fuera del checkout y comprueba roundtrips de API y errores/códigos de CLI instalada, ejecuta
@@ -433,9 +433,9 @@ uv run --locked --all-extras python tools/generate_assets.py
 ```
 
 Cambiar dependencias exige resolver un nuevo lock y repetir CI. `pip install
-dist/equiframe-0.2.1-py3-none-any.whl` funciona, pero solo el lock reproduce el
+dist/equiframe-0.3.0-py3-none-any.whl` funciona, pero solo el lock reproduce el
 entorno comprobado. Los fixtures no fijan cohorte, escala monetaria real, alpha
-ni tamaño del benchmark. Comparación, reglas operativas y detectores permanecen fuera de esta versión.
+ni tamaño del benchmark. Reglas operativas y detectores permanecen fuera de esta versión.
 
 Las versiones concretas comprobadas son las del `uv.lock`, no todas las combinaciones admitidas por los rangos de metadatos. La suite conserva los contratos anteriores y añade regresiones con motores reales.
 El mínimo de DuckDB es 1.5.6: versiones anteriores admitidas por 0.2.0 no
@@ -443,3 +443,68 @@ ofrecían toda la API usada. No se certifican todas las versiones del intervalo.
 
 DuckDB rechaza columnas de entrada cuyos nombres coinciden ignorando mayúsculas
 y minúsculas, antes de registrarlas: el motor las renombraría automáticamente.
+
+## Comparación completa de salidas
+
+La nueva API solo necesita el extra `arrow`. Acepta `ArrowInput`, `ArtifactRef`,
+`Path` a Arrow IPC file/Parquet local, `TableArtifact` y `ExecutionResult` completed.
+No ejecuta de nuevo la transformación ni necesita los otros motores instalados.
+Desde otro proyecto, con un contrato y salidas locales propios:
+
+```python
+from pathlib import Path
+import equiframe as ef
+
+contract = ef.read_contract(Path("my-contract.json"))
+result = ef.compare(
+    Path("candidate.parquet"),
+    Path("independent-expected.parquet"),
+    contract=contract,
+    reference="expected",
+    work_dir=Path("comparison-evidence"),
+    options=ef.ComparisonOptions(batch_rows=4096, max_examples=20),
+)
+print(result.state, result.complete, result.counts)
+for difference in ef.iter_differences(result.differences):
+    print(difference.code, difference.key, difference.column)
+```
+
+Ejemplo autocontenido, sin archivos previos ni motores:
+
+```bash
+python examples/compare_local.py --work-dir comparison-runs
+```
+
+`ComparisonPolicy()` conserva orden de columnas, firma lógica e índices por
+defecto (índices separados no evaluables). Permisos suplementarios requieren
+justificación: `column_order="ignored"`, `physical_types="lossless"` o
+`index="ignore"`. Son parte de `ComparisonSpec`, documento independiente 1.0;
+no cambian bytes/huellas de Contract 1.0. La versión del paquete es 0.3.0 y la
+revisión del contrato conserva su función propia.
+
+Se verifican datos y restricciones del esquema de salida, incluidas claves antes
+y después de normalizar, multiplicidad y orden. Se alinean claves solo si se
+comprobaron únicas/completas; se comparan secuencias o multiconjuntos completos.
+Tolerancias usan `abs(a-b) <= max(abs_tol, rel_tol * max(abs(a), abs(b)))` con
+aritmética exacta sobre valores representados. En multiconjuntos se calcula un
+emparejamiento máximo, con límites explícitos por grupo, sin asumir transitividad.
+Decimales no se redondean para coincidir y timestamps conservan nanosegundos.
+
+`equivalent` exige completitud sin incumplimientos. `different` tiene evidencia
+completa; una referencia esperada inválida, incapacidad técnica, cancelación o
+presupuesto agotado produce `not_evaluable`. Los conteos incompletos llevan
+`final=False`. El resumen limita ejemplos, mientras `differences.jsonl` conserva
+todos los registros con valores tipados/multiplicidades y referencia SHA-256.
+
+La lectura es por lotes y el trabajo usa SQLite privado en disco. Lotes, filas,
+trabajo, disco, evidencia, parejas, tamaño de grupos y tiempo se configuran en
+`ComparisonOptions`. Son controles cooperativos y presupuestos contables, no
+cuotas RSS ni tiempos duros. IPC puede decodificar un lote almacenado antes de
+comprobar sus bytes. Los detalles normativos están en
+[semántica, estados y límites](../../docs/COMPARISON.md).
+
+El alcance declarado es `output_schema`: no ejecuta reglas/precondiciones R,
+perfiles, M/B/H ni revisión O. Dos motores pueden coincidir en un error. La CLI
+operacional y la evaluación experimental continúan en sus pasos posteriores.
+El verificador de distribución ejecuta estos ejemplos y la comparación entre
+motores desde wheel instalado fuera del checkout, además del consumidor mypy.

@@ -1,4 +1,4 @@
-name: EquiFrame contracts and execution
+name: EquiFrame contracts, execution and comparison
 
 on:
   push:
@@ -59,7 +59,7 @@ jobs:
         run: uv run --locked --all-extras mypy
       - name: Check generated schemas and fixtures
         run: uv run --locked --all-extras python tools/generate_assets.py --check
-      - name: Test contracts and three real native engines
+      - name: Test contracts, complete comparison and three real native engines
         run: uv run --locked --all-extras pytest -q
       - name: Build wheel and sdist with locked backend
         run: uv run --locked --all-extras python -m build --no-isolation

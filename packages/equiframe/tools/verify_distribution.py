@@ -67,6 +67,9 @@ assert importlib.util.find_spec('sklearn') is None
 print('Clean installed profile:',extra,'outside checkout; light import verified')
 """
         run([str(python), "-I", "-c", check, extra, str(ROOT)], cwd=project, env=profile_env)
+        comparison_example = project / "compare_local.py"
+        shutil.copyfile(ROOT / "examples" / "compare_local.py", comparison_example)
+        run([str(python), "-I", str(comparison_example)], cwd=project, env=profile_env)
         if extra == "arrow":
             arrow_check = r"""
 from pathlib import Path
@@ -157,6 +160,8 @@ assert equiframe.__version__ == importlib.metadata.version('equiframe') == sys.a
 for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy', 'pyarrow', 'pytest', 'hypothesis'):
     assert importlib.util.find_spec(name) is None, name
 print('Installed wheel imports from clean site-packages without engines/ML/dev tools')
+assert equiframe.ComparisonOptions().batch_rows > 0
+assert callable(equiframe.compare) and callable(equiframe.iter_differences)
 """
         run([str(python), "-I", "-c", check, package_version], cwd=work, env=env)
         api_check = """
@@ -292,7 +297,11 @@ assert Path(equiframe.__file__).resolve().is_relative_to(Path(sys.prefix).resolv
             "    plan: ef.ExecutionPlan, source: ef.DataSource,\n"
             "    registry: ef.TransformationRegistry,\n"
             ") -> ef.ExecutionResult:\n"
-            "    return ef.execute(plan, source=source, registry=registry)\n",
+            "    return ef.execute(plan, source=source, registry=registry)\n"
+            "def compare(a: ef.ArtifactRef, b: ef.ExecutionResult, "
+            "contract: ef.Contract) -> ef.ComparisonResult:\n"
+            "    options = ef.ComparisonOptions(batch_rows=2)\n"
+            "    return ef.compare(a, b, contract=contract, options=options)\n",
             encoding="utf-8",
         )
         run(

@@ -22,6 +22,10 @@ Cada paso produce código funcional para su alcance, pruebas significativas, doc
 
 ## Paso 3. Normalización y comparación exacta
 
+**Estado:** implementación funcional en 0.3.0, con API, pruebas, ejemplos y consumo
+del wheel fuera del checkout. [Semántica](COMPARISON.md) y
+[verificación de entrega](STEP_03_REVIEW.md). La revisión científica O sigue pendiente.
+
 **Objetivo:** comprobar contenido completo y localizar diferencias autorizando solo equivalencias del contrato.
 
 **Trabajo:** igualdad de esquema, alineación por clave comprobada, comparación de multiconjuntos y secuencias, tolerancias justificadas, decimales, ausencias y tiempo. Estrategia por lotes/particiones con spill y límites; evidencia de diferencias.
@@ -87,5 +91,11 @@ Cada paso produce código funcional para su alcance, pruebas significativas, doc
 **Aceptación:** comparación principal usa misma intersección evaluable; métricas indefinidas explícitas; no se ajusta con prueba; resultados negativos se conservan; otro integrante reproduce contenido y decisiones. Wheel/sdist y dependencias exactas comprobados; soporte ARM64 solo si probado. Release etiquetado y publicación pública verificable después de acordar licencia/nombre y autorización; un consumidor instala la versión publicada con pip y ejecuta ejemplos. Hasta entonces no se afirma que pip install equiframe obtenga el paquete del equipo. Capítulos 4/5 se redactan con resultados reales.
 
 ## Dependencias entre pasos
+
+Desde el paso 3, cada incremento verifica consumidores externos del wheel local.
+En el paso 10 se mantiene la aceptación pública final: `pip install equiframe`
+desde PyPI e `import equiframe as ef`, sin acceso al repositorio privado y dentro
+del soporte documentado. Pendientes: licencia, control del nombre, metadatos públicos
+y ampliación de versiones Python respaldada por CI; actualmente `>=3.12,<3.13`.
 
 `1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10` es el orden de entrega. Las revisiones humanas del catálogo y las entregas de compañeros deben coordinarse antes del paso 9; los metadatos de evidencia se introducen desde el paso 1 y se completan en 8. Ajustes del borrador se registran durante el piloto y no requieren rehacer infraestructura si se respetan las interfaces.

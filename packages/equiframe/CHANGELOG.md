@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.3.0 — 2026-09-30
+
+- Paso 3: `ef.compare`, modelos completos, lectura de manifiestos y diferencias verificables.
+- Esquema observado separado; validación de valores, claves/ámbitos, multiplicidad y orden.
+- Normalización autorizada de ausencias, NaN y tiempo; decimales/enteros/ns sin pérdida.
+- Alineación exacta por clave comprobada, secuencias, multiconjuntos y matching máximo aproximado.
+- Lotes y SQLite privado con spill; presupuestos, cancelación y completitud explícita.
+- Evidencia JSONL completa, ejemplos acotados, snapshots y corridas exclusivas.
+- `ComparisonSpec` y documentos propios 1.0; contratos/artefactos/ejecuciones 1.0 intactos.
+- Timeout de callback determinista mediante reloj controlado; caso previo al callback separado.
+- Esperados independientes, propiedades, tres motores y consumidores instalados base/extras.
+
+Instalar el nuevo wheel; ningún contrato antiguo se migra automáticamente. Los
+permisos adicionales se expresan mediante `ComparisonPolicy` con justificación.
+Soporte Python 3.12; sin publicación PyPI, despliegue OCI, R/ML/DW ni resultados
+científicos añadidos. El comparador evalúa `output_schema`, no certifica el oráculo.
+
 ## 0.2.1 — 2026-09-28
 
 - Conservación de anchos/signo NumPy y nullable Pandas, UInt64 extremo y máscaras Float32/64.
