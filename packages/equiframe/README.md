@@ -1,9 +1,9 @@
-# EquiFrame 0.4.0 — contratos, ejecución, comparación y reglas R
+# EquiFrame 0.5.0 — contratos, ejecución, reglas y perfiles
 
 Contratos estrictos, comparación completa y ejecución local con Pandas, Polars y DuckDB.
 Se requiere Python 3.12; los motores se instalan mediante extras. La configuración
 CI cubre Windows x64, Ubuntu x64/ARM64 y macOS Intel/Apple Silicon.
-La [evidencia de revisión](../../docs/STEP_04_REVIEW.md)
+La [evidencia de revisión](../../docs/STEP_05_REVIEW.md)
 registra los controles completados. No se requiere una VM ni un DW para usar el
 núcleo. Licencia y publicación externa pendientes; no hay paquete del equipo en PyPI.
 
@@ -15,8 +15,8 @@ la experiencia pública objetivo, pendiente del paso 10; podría resolver un
 paquete ajeno. Use el wheel del equipo o este checkout:
 
 ```bash
-python -m pip install ./dist/equiframe-0.4.0-py3-none-any.whl
-python -m pip install "./dist/equiframe-0.4.0-py3-none-any.whl[duckdb]"
+python -m pip install ./dist/equiframe-0.5.0-py3-none-any.whl
+python -m pip install "./dist/equiframe-0.5.0-py3-none-any.whl[duckdb]"
 # Alternativas: [arrow], [pandas], [polars] o [engines].
 # Desde el checkout del equipo:
 python -m pip install ".[engines]"
@@ -480,7 +480,7 @@ python examples/compare_local.py --work-dir comparison-runs
 defecto (índices separados no evaluables). Permisos suplementarios requieren
 justificación: `column_order="ignored"`, `physical_types="lossless"` o
 `index="ignore"`. Son parte de `ComparisonSpec`, documento independiente 1.0;
-no cambian bytes/huellas de Contract 1.0. La versión del paquete es 0.4.0 y la
+no cambian bytes/huellas de Contract 1.0. La versión del paquete es 0.5.0 y la
 revisión del contrato conserva su función propia.
 
 Se verifican datos y restricciones del esquema de salida, incluidas claves antes
@@ -534,3 +534,25 @@ chequeos, precondiciones, evidencia, límites y huellas. El
 sintéticos sin los tres motores.
 [`rules_from_run.py`](examples/rules_from_run.py) relee un `run.json` guardado
 y evalúa sus artefactos sin cargar motores.
+
+## Perfiles y preprocesamiento
+
+Con el extra `arrow`, `ef.profile_execution(run, spec=spec)` calcula las diez
+fórmulas de la sección 3.6 de la tesis según una especificación explícita por
+familia. Conserva conteos, denominadores, motivos y evidencia de una sola captura.
+Las conversiones fallidas exigen recibos instrumentados; no se infieren de NULL.
+
+`ef.fit_preprocessor` ajusta medianas solo con `NormalTrainingProfiles` y
+`ef.transform_profiles` produce una matriz numérica común para los futuros M/B.
+Medianas y orden persisten en JSON; los fallos técnicos no se imputan. La selección
+de entrenamiento normal necesita un manifiesto externo: el núcleo no valida O
+ni los grupos de procedencia. No se entrenan detectores en este paso.
+
+```bash
+python examples/profiles_from_run.py ruta/run.json examples/profiles/nulls_types.json
+python examples/preprocess_profiles.py --training ruta/profile.json --selection-manifest seleccion.json --score ruta/prueba/profile.json --output preprocessor.json
+```
+
+Las cinco especificaciones de `examples/profiles/` corresponden a las capturas
+sintéticas de `rules_catalog.py`. El verificador del wheel ejecuta todas y restaura
+el preprocesador fuera del checkout. [API, fórmulas, estados y límites](../../docs/PROFILES.md).

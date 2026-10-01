@@ -27,6 +27,7 @@ from equiframe import (
     ExecutionPlan,
     ExecutionResult,
     Family,
+    FeatureMatrix,
     FloatType,
     FloatValue,
     IgnoredOrder,
@@ -37,12 +38,17 @@ from equiframe import (
     KeySpec,
     NaNPolicy,
     NaNValue,
+    NormalTrainingProfiles,
     NullPolicy,
     NullValue,
     NumericPolicy,
     OrderCheck,
     OrderPolicy,
     PreconditionSpec,
+    PreprocessorBundle,
+    ProfileFeature,
+    ProfileResult,
+    ProfileSpec,
     RuleDefinition,
     RuleEvaluation,
     RuleFinding,
@@ -300,6 +306,89 @@ def render_schema(schema: dict[str, object]) -> bytes:
     return (json.dumps(schema, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode("utf-8")
 
 
+def profile_examples(contracts: dict[str, Contract]) -> dict[str, ProfileSpec]:
+    result = {}
+    for family, contract in contracts.items():
+        features = [ProfileFeature(name="rows", metric="log_filas", table="result")]
+        if family in ("joins", "duplicates_order", "aggregations"):
+            features.append(
+                ProfileFeature(
+                    name="row_ratio",
+                    metric="razon_salida_entrada",
+                    table="result",
+                    denominator_table=contract.inputs[0].name,
+                )
+            )
+        if family == "nulls_types":
+            features.extend(
+                (
+                    ProfileFeature(
+                        name="text_nulls", metric="tasa_nulos", table="result", columns=("text",)
+                    ),
+                    ProfileFeature(
+                        name="signal_nulls",
+                        metric="tasa_nulos",
+                        table="result",
+                        columns=("signal",),
+                    ),
+                    ProfileFeature(
+                        name="signal_nan", metric="tasa_nan", table="result", columns=("signal",)
+                    ),
+                )
+            )
+        if family == "joins":
+            features.extend(
+                (
+                    ProfileFeature(
+                        name="unmatched",
+                        metric="claves_sin_pareja",
+                        table="orders",
+                        columns=("supplier_id",),
+                        right_table="suppliers",
+                        right_columns=("supplier_id",),
+                        null_matches="never",
+                    ),
+                    ProfileFeature(
+                        name="name_nulls", metric="tasa_nulos", table="result", columns=("name",)
+                    ),
+                )
+            )
+        if family == "duplicates_order":
+            features.append(
+                ProfileFeature(
+                    name="duplicate_ids", metric="prop_duplicados", table="result", columns=("id",)
+                )
+            )
+        if family == "aggregations":
+            features.extend(
+                (
+                    ProfileFeature(
+                        name="currency_cardinality",
+                        metric="cardinalidad_rel",
+                        table="result",
+                        columns=("currency",),
+                    ),
+                    ProfileFeature(
+                        name="total_nulls", metric="tasa_nulos", table="result", columns=("total",)
+                    ),
+                )
+            )
+        if family == "dates":
+            for column in contract.output.schema_spec.columns:
+                if column.logical_type.kind in ("date", "timestamp"):
+                    features.append(
+                        ProfileFeature(
+                            name=column.name + "_invalid",
+                            metric="fechas_invalidas",
+                            table="result",
+                            columns=(column.name,),
+                            target=column,
+                        )
+                    )
+        result[family] = ProfileSpec(family=contract.family, features=tuple(features))
+    return result
+
+
 def render_catalog(contracts: dict[str, Contract]) -> bytes:
     """Technical R freeze; intentionally separate from the scientific benchmark."""
     registry = default_rule_registry()
@@ -373,6 +462,10 @@ def main() -> None:
         for name, value in contracts.items()
     }
     assets[ROOT / "examples" / "rules" / "catalog-1.0.json"] = render_catalog(contracts)
+    for name, spec in profile_examples(contracts).items():
+        assets[ROOT / "examples" / "profiles" / (name + ".json")] = render_schema(
+            spec.model_dump(mode="json")
+        )
     assets[ROOT / "schemas" / "contract-1.0.schema.json"] = render_schema(contract_json_schema())
     assets[ROOT / "schemas" / "artifact-ref-1.0.schema.json"] = render_schema(
         ArtifactRef.model_json_schema()
@@ -392,6 +485,11 @@ def main() -> None:
         ("rule-finding", RuleFinding),
         ("rule-check-result", CheckResult),
         ("rule-evaluation", RuleEvaluation),
+        ("profile-spec", ProfileSpec),
+        ("profile-result", ProfileResult),
+        ("normal-training-profiles", NormalTrainingProfiles),
+        ("preprocessor-bundle", PreprocessorBundle),
+        ("feature-matrix", FeatureMatrix),
     ):
         assets[ROOT / "schemas" / (name + "-1.0.schema.json")] = render_schema(
             model.model_json_schema()

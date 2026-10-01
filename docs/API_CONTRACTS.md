@@ -1,6 +1,6 @@
 # API Python y contratos de intercambio
 
-Versión implementada: `equiframe 0.4.0`, formatos independientes `1.0`, pasos 1 a 4. El [README del
+Versión implementada: `equiframe 0.5.0`, formatos independientes `1.0`, pasos 1 a 5. El [README del
 paquete](../packages/equiframe/README.md) contiene instalación, comandos y un
 ejemplo Python ejecutable. Los componentes siguientes siguen en la hoja de ruta.
 
@@ -15,7 +15,7 @@ ejemplo Python ejecutable. Los componentes siguientes siguen en la hoja de ruta.
 | `contract_fingerprint(contract) -> str` | SHA-256 hexadecimal de esos bytes; no equivalencia tabular |
 | `contract_json_schema() -> dict[str, object]` | JSON Schema generado desde `Contract` |
 
-La API explícita está en `equiframe.__all__`; `__version__` es `0.4.0`.
+La API explícita está en `equiframe.__all__`; `__version__` es `0.5.0`.
 Los constructores usan Pydantic estricto/inmutable, rechazan extras y conservan
 colecciones como tuplas. La validación de JSON permite arrays sin introducir
 coerciones numéricas con pérdida. No se interpreta código en documentos.
@@ -123,11 +123,13 @@ metadato; la etiqueta depende de O, nunca del origen de la variante.
 `put(path: Path, *, media_type: str) -> ArtifactRef` y
 `get(ref: ArtifactRef, destination: Path) -> Path`. El paso 2 aporta `LocalArtifactStore`: copias exclusivas, hash/tamaño comprobados y URI locales. No hay descargas.
 
-`DataSource` y `EngineAdapter` tienen tipos completos e implementaciones desde el paso 2. El registro `RuleRegistry` y `RuleContext` funcionan desde el paso 4. `Profiler` y `Detector` quedan para sus pasos. `SnapshotManifest`, observaciones semánticas, perfiles, bundles, reportes completos,
-oráculo y freeze siguen siendo diseño en [arquitectura](ARCHITECTURE.md) y
-[hoja de ruta](HERNAN_ROADMAP.md). No están expuestos como APIs vacías.
-Observaciones/perfiles futuros no contienen etiqueta O, mutación ni salidas de
-otro motor. La integración compartida se acuerda por PR con José/Jhair.
+`DataSource` y `EngineAdapter` tienen tipos completos e implementaciones desde el
+paso 2. `RuleRegistry` y `RuleContext` funcionan desde el paso 4. Los perfiles y
+bundles de preprocesamiento funcionan desde el paso 5 (sección 11), sin etiquetas,
+mutaciones ni otra salida de motor. `Detector`, `SnapshotManifest`, reportes
+completos, oráculo y freeze siguen en la [hoja de ruta](HERNAN_ROADMAP.md).
+No están expuestos como APIs vacías. La integración compartida se acuerda por PR
+con José/Jhair.
 
 ## 6. CLI funcional y errores
 
@@ -259,3 +261,23 @@ evalúa una sola captura `ExecutionResult` sin reejecutar el ETL. Exporta
 `rule-options`, `rule-finding`, `rule-check-result` y `rule-evaluation` usan
 esquema 1.0 independiente; el contrato 1.0 no cambia. Véanse semántica,
 agregación, presupuestos y catálogo en [Reglas R](RULES.md).
+
+## 11. Perfiles y preprocesamiento disponibles en 0.5.0
+
+| API/modelo | Comportamiento |
+|---|---|
+| `ProfileSpec`, `ProfileFeature` | Familia, versión, orden fijo y diez fórmulas cerradas |
+| `profile_execution(execution, *, spec, options, work_dir, cancellation, conversions)` | Perfil de una sola captura; persiste `profile.json` |
+| `FeatureObservation`, `FeatureSupport` | Valor, estado, numerador/denominador y conteos separados |
+| `ProfileResult`, `ProfileMetadata`, `ProfileVector` | Metadatos y estadísticas separados; sin etiquetas ni mutaciones |
+| `ConversionReceipt` | Intentos/fallos instrumentados, hashes y columna fuente; ausencia no se infiere desde output NULL |
+| `NormalTrainingProfiles` | Frontera de selección normal de entrenamiento con manifiesto externo |
+| `fit_preprocessor(training, *, spec, empty_policy)` | Medianas y retiro de variables ajustados una sola vez |
+| `PreprocessorBundle`, `FeatureFit` | Orden, medianas, soporte, huellas y estados ready/not_estimable |
+| `transform_profiles(bundle, profiles) -> FeatureMatrix` | Matriz finita común para los futuros M/B; errores no se imputan |
+| `profile_spec_fingerprint`, `read_profile`, `read_preprocessor`, `write_preprocessor` | Identidad y persistencia JSON estricta, sin sobrescritura |
+
+Los formatos nuevos conservan Contract/ExecutionResult/Comparison/Rules 1.0.
+`ProfileOptions` fija presupuestos cooperativos. Detalles y limitaciones:
+[Perfiles](PROFILES.md). Detectores, oráculo, benchmark y CLI integrada siguen
+en los pasos 6–8; los scripts de ejemplo ya son ejecutables.

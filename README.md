@@ -19,8 +19,10 @@ EquiFrame conserva los datos, tipos y diagnósticos necesarios para revisar el r
   tolerancias, spill y evidencia verificable; API `ef.compare` con solo el extra Arrow.
 - Reglas operativas R sobre una ejecución capturada, precondiciones, cobertura,
   catálogo versionado y evidencia propia; API `ef.evaluate_rules` con solo Arrow.
+- Perfiles de cinco familias con denominadores y recibos de conversión;
+  preprocesamiento con medianas congeladas y matriz común para los futuros M/B.
 
-**Versión de desarrollo: 0.4.0.** Una ejecución `completed` confirma que la
+**Versión de desarrollo: 0.5.0.** Una ejecución `completed` confirma que la
 transformación terminó y se materializó. La [comparación semántica](docs/COMPARISON.md)
 evalúa salidas materializadas. [R](docs/RULES.md) evalúa reglas seleccionadas del
 contrato sobre una captura. Los detectores y el benchmark siguen en la
@@ -88,6 +90,7 @@ describe los límites y las entregas necesarias; la conexión real sigue pendien
 | [Referencia de formatos](docs/API_CONTRACTS.md) | Tipos públicos, estados y serialización |
 | [Comparación](docs/COMPARISON.md) | API, autorizaciones, evidencia y presupuestos |
 | [Reglas R](docs/RULES.md) | Semántica, cobertura, catálogo y límites |
+| [Perfiles y preprocesamiento](docs/PROFILES.md) | Fórmulas, soporte, recibos y medianas congeladas |
 | [Arquitectura](docs/ARCHITECTURE.md) | Componentes, dependencias y flujo de ejecución |
 | [Integración OCI](docs/OCI_INTEGRATION.md) | Acceso al DW, snapshots y coordinación de DuckDB |
 | [Calidad](docs/QUALITY.md) | Pruebas, recursos y distribución |

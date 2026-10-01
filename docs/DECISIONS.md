@@ -116,3 +116,22 @@ antes de prueba final (T06/T10). La tabla de agregación, límites y
 reconciliaciones seleccionadas son ingeniería documentada en [R](RULES.md).
 No resuelven la cohorte/fecha, revisión humana, alpha, particiones ni
 políticas SERCOP pendientes del piloto. El DOCX no se edita.
+
+## Paso 5 — ingeniería, 2026-10-01
+
+Fuente contrastada: mismo SHA-256 del DOCX registrado en trazabilidad; §3.6/Tabla 13.
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A48 | Fórmulas cerradas, orden explícito y huella suplementaria 1.0 | Evita features arbitrarias tomadas de metadatos. Cambiar columnas, orden o políticas invalida compatibilidad; la selección definitiva por familia queda para el piloto |
+| A49 | Conservar conteos separados y no imputar errores técnicos | Vacío, cero válido, NULL, NaN y no aplicabilidad no se confunden. Las tasas usan denominadores por columna/etapa; no se normalizan datos para producir un perfil |
+| A50 | Recibos de conversión instrumentados ligados a fuente/columna/salida | Materializa A47: sin evidencia de intentos no se deduce una tasa a partir de NULL ni de un cast hipotético. El productor confiable responde por la veracidad/completitud del recibo |
+| A51 | Matriz única con medianas congeladas e indicadores para M/B | Ajuste recibe solo selección normal de entrenamiento, registra soporte y hash del manifiesto externo; inferencia jamás recalcula medianas. El núcleo no certifica normalidad ni grupos de procedencia |
+| A52 | Retiro documentado o no estimable cuando falta soporte | Por defecto retira la variable de ambos detectores futuros; política estricta puede declarar no estimable. Sin variables útiles no hay matriz. Ready del preprocesador no garantiza un modelo estimable |
+| A53 | Perfilado acotado en memoria, sin spill | Compatible con Arrow sin importar motores/ML. Cuenta bytes/filas/trabajo/distintos; no promete cuotas RSS ni tiempo duro. La limitación se medirá al contrastar H3 |
+| A54 | Distribución privada 0.5.0 para este despliegue | El paso 5 es biblioteca, no servicio. Se construyen wheel/sdist y se verifica consumo externo; PyPI, licencia final y mediciones científicas permanecen en el paso 10 |
+
+Estas decisiones precisan implementación de T10/T15; no fijan alpha, cohorte,
+resultados, etiquetas, grupos ni revisiones humanas. No alteran el DOCX ni
+los contratos/catálogos de R del paso 4. Un cambio posterior de fórmulas o
+selección experimental exige nueva versión y evaluación explícita.
