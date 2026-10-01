@@ -62,7 +62,32 @@ de perfiles con Arrow, preprocesador restaurado, ejecuciones nativas de cinco
 familias, consumidor tipado y reconstrucción byte a byte del wheel desde sdist.
 La verificación local de distribución pasó, incluyendo las 596 pruebas repetidas
 contra el wheel instalado desde el sdist y la reconstrucción idéntica byte a byte.
-La evidencia remota de CI se registra al cerrar esta entrega.
+
+## Publicación y evidencia remota
+
+El cambio se integró en `main` mediante el
+[PR #14](https://github.com/htroya/equiframe/pull/14), commit de implementación
+`ce933a8bbe10b592a40191ce48639fcde4b85343` y merge
+`994947a4d0c100a843d5269e5220a02b3ca88e85`.
+La [CI del merge](https://github.com/htroya/equiframe/actions/runs/36894666957)
+terminó correctamente en las cinco plataformas: Windows x64, Linux x64/ARM64
+y macOS x64/ARM64, con Python 3.12. También pasaron la CI de la rama y del PR.
+
+La [prepublicación privada v0.5.0](https://github.com/htroya/equiframe/releases/tag/v0.5.0)
+contiene los artefactos instalables verificados. Sus SHA-256, confirmados contra
+los digest de GitHub, son:
+
+| Artefacto | SHA-256 |
+|---|---|
+| `equiframe-0.5.0-py3-none-any.whl` | `a47a0e519f460cf3d166f9644aa85e73ea67132132895d2a906bb89f69442943` |
+| `equiframe-0.5.0.tar.gz` | `37544e8fad3293978fa416d2a2972c308e5e3e27541a42d836118937eb4acc98` |
+
+Después de publicar se completaron nueve intentos OCI: 1 OCPU y 12, 8, 4 GB,
+en ese orden, recorriendo AD-1, AD-2 y AD-3 para cada RAM. Por instrucción
+adicional se hicieron otros seis: primero 3 GB en los tres AD y después 2 GB.
+Los **15 intentos** recibieron `Out of host capacity`; no se creó una VM.
+El registro está en
+[OCI_INTEGRATION.md](OCI_INTEGRATION.md#reintentos-del-2026-10-01).
 
 ## Límites y tareas que siguen pendientes
 

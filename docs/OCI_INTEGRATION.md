@@ -145,6 +145,55 @@ pero la operación reinicia una instancia encendida y requiere capacidad disponi
 El conjunto de VM A1 debe permanecer dentro del total Always Free de 2 OCPU y
 12 GB. [Cambio de forma en OCI](https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/resizinginstances.htm).
 
+### Reintentos del 2026-10-01
+
+Tras publicar el paso 5 (`v0.5.0`), se reutilizó la única ventana de Chrome
+ya autenticada en OCI. Se enviaron nueve solicitudes de creación en Ashburn,
+respetando el orden de RAM y recorriendo los tres dominios en cada configuración.
+Todas usaron `VM.Standard.A1.Flex`, **1 OCPU**, Ubuntu 24.04 (build
+2026.09.18-0), el volumen de arranque predeterminado de **46,6 GB**, la VCN y
+subred pública existentes, y la clave pública SSH de EquiFrame ya disponible.
+Oracle eligió el dominio de fallos; solo se habilitó Compute Instance Monitoring.
+Se verificaron RAM y AD en el resumen antes de cada envío.
+
+| Orden | RAM | Dominio | Hora UTC | Resultado |
+|---|---|---|---|---|
+| 1 | 12 GB | AD-1 | 17:07:32 | Sin capacidad |
+| 2 | 12 GB | AD-2 | 17:09:01 | Sin capacidad |
+| 3 | 12 GB | AD-3 | 17:10:01 | Sin capacidad |
+| 4 | 8 GB | AD-1 | 17:11:37 | Sin capacidad |
+| 5 | 8 GB | AD-2 | 17:12:02 | Sin capacidad |
+| 6 | 8 GB | AD-3 | 17:12:16 | Sin capacidad |
+| 7 | 4 GB | AD-1 | 17:12:51 | Sin capacidad |
+| 8 | 4 GB | AD-2 | 17:12:58 | Sin capacidad |
+| 9 | 4 GB | AD-3 | 17:13:09 | Sin capacidad |
+
+Por instrucción adicional del usuario, se amplió la ronda con **3 GB primero
+y 2 GB después**, manteniendo 1 OCPU y la misma configuración. No se envió
+ningún intento de 2 GB antes de completar los tres de 3 GB. Ambas cantidades
+son válidas: [A1 Flex admite desde 1 GB por OCPU](https://docs.oracle.com/en-us/iaas/Content/Compute/References/computeshapes.htm).
+La validez de la forma no garantiza capacidad de alojamiento ni suficiencia
+para el futuro DW y su carga, todavía sin medir.
+
+| Orden | RAM | Dominio | Hora UTC | Resultado |
+|---|---|---|---|---|
+| 10 | 3 GB | AD-1 | 17:23:51 | Sin capacidad |
+| 11 | 3 GB | AD-2 | 17:24:43 | Sin capacidad |
+| 12 | 3 GB | AD-3 | 17:25:06 | Sin capacidad |
+| 13 | 2 GB | AD-1 | 17:26:35 | Sin capacidad |
+| 14 | 2 GB | AD-2 | 17:26:56 | Sin capacidad |
+| 15 | 2 GB | AD-3 | 17:27:16 | Sin capacidad |
+
+En las quince respuestas, OCI devolvió HTTP 500, código `InternalError` y
+mensaje `Out of host capacity.`; el formulario indicó falta de capacidad para
+A1 en el AD correspondiente. No fueron errores de clave SSH ni de ejecución de
+EquiFrame. El inventario final conservó únicamente la VM AMD existente,
+`labinvepn-dev`, encendida e intacta. **No se creó la VM de EquiFrame**, no se
+cambió de plan ni se solicitaron ampliaciones de límites. Chrome quedó abierto
+en la lista de instancias. La creación sigue pendiente de disponibilidad de OCI.
+
+### Accesos después del aprovisionamiento
+
 Cuando la VM exista, el administrador agregará usuarios Linux individuales para
 Jhair y José con sus claves públicas propias y comprobará SSH por el puerto 22.
 No se deben compartir la clave privada inicial ni las cuentas. El DW, el archivo
