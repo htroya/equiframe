@@ -138,3 +138,18 @@ El verificador de distribución añade `ml`: entrena en entorno con ese extra,
 restaura y puntúa desde la instalación base sin sklearn/NumPy. Conserva ejemplos
 de cada motor, tipado externo y wheel reconstruido desde sdist. GitHub ejecuta
 ambos paquetes en cinco plataformas. [Resultados efectivos](STEP_07_REVIEW.md).
+
+## 12. Controles del paso 8
+
+Integración nativa única, ausencia de reajuste en inferencia, decisiones parciales,
+comparación independiente ante fallo de perfil/modelo, cancelación, relanzamiento
+y concurrencia. Evidencia: hashes, cadena de eventos, procedencia, rutas relativas,
+reportes coherentes, JSON estricto, escape HTML y ausencia de datos/secretos del
+entorno en reportes/logs. Reductor: precondiciones entre tablas, decimales,
+multiplicidad, firma incorrecta, fallo/no determinismo del predicado, presupuesto
+exacto, tiempo cooperativo y mínimo local sin afirmación global.
+
+La distribución comprueba import base sin motores/ML, ejemplo del runner/reductor
+instalado fuera del checkout y reconstrucción idéntica desde sdist. El benchmark
+prueba CLI validate/split/pilot y el mismo piloto nativo, conservando sus revisiones
+pendientes. [Resultados ejecutados](STEP_08_REVIEW.md).

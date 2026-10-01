@@ -197,3 +197,19 @@ Se retiran las instalaciones locales de prueba de EquiFrame por petición de
 Hernán. Las verificaciones históricas de empaquetado conservan su valor técnico,
 pero no acreditan el objetivo de distribución pública. El código y las pruebas
 permanecen versionados; no hubo publicación en PyPI ni despliegue de servicios.
+
+## Paso 8 — orquestación y evidencia, 2026-10-01
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A72 | Runner compuesto sobre captura única con componentes independientes | No reejecuta ETL para medir ni entrena/calibra al inferir; fallos de una etapa no borran evidencia de otras |
+| A73 | Completitud de lo solicitado y códigos 0/1/2/3 | Alerta/diferencia completa es 1; fallo/no evaluable prevalece como 3 conservando alertas parciales; R sin detector no se presenta como H evaluable |
+| A74 | Journal SHA-256 sincronizado y manifiesto final exclusivo | Relanzar crea UUID; una interrupción sin manifiesto no declara éxito. Integridad local, sin promesa de firma/WORM ni recuperación tras avería de disco |
+| A75 | Reportes con campos seleccionados y escape HTML | No incluyen datos, parámetros ni texto de excepciones; los artefactos técnicos completos siguen siendo privados. Autenticación fuera del plan |
+| A76 | Reducción por eliminación de filas con predicado versionado y firma específica | Conserva precondiciones, orden, multiplicidad/esquema; presupuestos y repetición explícitos. Solo minimalidad de una fila para predicados deterministas; nunca mínimo global |
+| A77 | CLI operacional y experimental separadas, distribuciones 0.8.0 | Núcleo no importa benchmark; el piloto usa la orquestación sin crear etiquetas ni entrenamiento científico |
+| A78 | Compatibilidad declarativa de bundles 0.7/0.8 | Se registra versión emisora sin alterar IF/MAD 1.0; se mantienen fórmulas, alpha, R y particiones anteriores |
+
+Son decisiones de ingeniería. No modifican hipótesis, objetivos, DOCX, criterios
+humanos del oráculo o decisiones experimentales pendientes. A71 y el calendario
+de veinte pasos siguen vigentes. Uso: [orquestación](ORCHESTRATION.md).

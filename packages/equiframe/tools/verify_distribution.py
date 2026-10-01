@@ -178,6 +178,22 @@ assert ef.read_table(ref).to_pylist()==[{'id':'001'},{'id':'001'}]
                 command += ["--engine", extra]
             run(command, cwd=project, env=profile_env)
             if extra == "duckdb":
+                pipeline_example = project / "pipeline_local.py"
+                shutil.copyfile(ROOT / "examples" / "pipeline_local.py", pipeline_example)
+                shutil.copyfile(
+                    ROOT / "examples" / "duplicates_order.json", project / "duplicates_order.json"
+                )
+                run(
+                    [
+                        str(python),
+                        "-I",
+                        str(pipeline_example),
+                        "--output",
+                        str(project / "pipeline-runs"),
+                    ],
+                    cwd=project,
+                    env=profile_env,
+                )
                 minimum = (
                     (ROOT / "README.md")
                     .read_text(encoding="utf-8")
@@ -252,6 +268,8 @@ assert callable(equiframe.compare) and callable(equiframe.iter_differences)
 assert callable(equiframe.evaluate_rules) and callable(equiframe.iter_rule_findings)
 assert callable(equiframe.profile_execution) and callable(equiframe.fit_preprocessor)
 assert callable(equiframe.transform_profiles) and callable(equiframe.read_preprocessor)
+assert callable(equiframe.run_pipeline) and callable(equiframe.read_pipeline)
+assert callable(equiframe.reduce_case) and callable(equiframe.inspect_evidence)
 """
         run([str(python), "-I", "-c", check, package_version], cwd=work, env=env)
         api_check = """
@@ -334,6 +352,9 @@ print('Installed wheel API roundtrips all five fixtures exactly')
             "examples/preprocess_profiles.py",
             "examples/detectors_local.py",
             "schemas/detector-bundle-1.0.schema.json",
+            "schemas/pipeline-result-1.0.schema.json",
+            "schemas/reduction-result-1.0.schema.json",
+            "examples/pipeline_local.py",
         ):
             if not (source / path).is_file():
                 raise RuntimeError("sdist is missing " + path)

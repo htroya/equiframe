@@ -1,6 +1,6 @@
 # Arquitectura de EquiFrame
 
-Versión de diseño: 0.7, 2026-10-01. Estado: pasos 1 a 7 implementados en su alcance técnico; revisión científica y componentes posteriores pendientes. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md). La [arquitectura del paso 7](STEP_07_DESIGN.md) analiza la reorientación y sus límites.
+Versión de diseño: 0.8, 2026-10-01. Estado: pasos 1 a 8 implementados en su alcance técnico; revisión científica y componentes posteriores pendientes. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md). La [arquitectura del paso 8](STEP_08_DESIGN.md) describe orquestación, evidencia, reducción y límites.
 
 ## 1. Propósito y alcance
 
@@ -80,7 +80,8 @@ No existe flecha desde O, etiquetas o mutaciones hacia los perfiles o detectores
 
 `equiframe_benchmark` implementa catálogo/revisiones en `models`, `oracle`,
 `splits`, `selection`, `training_types`, `io`, `fixtures`, `mutations` y un
-piloto ejecutable. Evaluación de métricas/costos y CLI integrada siguen pendientes.
+piloto ejecutable. El paso 8 añade CLI validate/split/pilot y orquesta sus capturas.
+La evaluación de métricas/costos sigue pendiente.
 O no se importa desde las reglas o los detectores. Las revisiones reales
 no se sustituyen por las identidades ficticias de las pruebas.
 
@@ -112,7 +113,7 @@ Una limitación de memoria o tiempo produce comparación `not_evaluable`, no equ
 
 ## 7. Persistencia y trazabilidad
 
-Paso 2 produce `run.json`, entradas capturadas y salida Arrow con referencias, tamaños y SHA-256 en un directorio propio. Paso 3 añade `comparison.json`, diferencias JSONL y snapshots en carpetas independientes. Paso 4 añade `rules.json` y hallazgos JSONL en otra carpeta propia. Paso 5 añade `profile.json` y bundles JSON de preprocesamiento. `environment.json`, `events.jsonl`, `decisions.json` y `report.html` pertenecen a pasos posteriores. El benchmark agregará manifiestos de splits, revisiones, métricas y costos. Cada formato tiene `schema_version`.
+Paso 2 produce `run.json`, entradas capturadas y salida Arrow con referencias, tamaños y SHA-256 en un directorio propio. Paso 3 añade `comparison.json`, diferencias JSONL y snapshots en carpetas independientes. Paso 4 añade `rules.json` y hallazgos JSONL en otra carpeta propia. Paso 5 añade `profile.json` y bundles JSON de preprocesamiento. El paso 8 integra `environment.json`, `events.jsonl`, resultados de componentes y `report.html`, con manifiesto final exclusivo e inventario verificable. El benchmark conserva splits/revisiones y agregará métricas/costos en el paso 10. Cada formato tiene `schema_version`.
 
 Artefactos grandes: Arrow/Parquet con esquema y hashes; JSON para metadatos y valores especiales etiquetados. Un hash de archivo verifica bytes; un digest lógico versionado puede resumir contenido canónico, pero no reemplaza la prueba exacta. El manifiesto final contiene hashes de sus artefactos y el estado de completitud.
 

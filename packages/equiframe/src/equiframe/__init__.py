@@ -105,6 +105,7 @@ from equiframe.errors import (
     SchemaVersionError,
     ValidationIssue,
 )
+from equiframe.evidence import EvidenceEvent, inspect_evidence, read_pipeline, verify_events
 from equiframe.execution import CancellationToken, RunContext, execute
 from equiframe.execution_types import (
     EngineCapabilities,
@@ -119,6 +120,15 @@ from equiframe.execution_types import (
     VersionInfo,
 )
 from equiframe.local import LocalArtifactStore
+from equiframe.pipeline import run_pipeline
+from equiframe.pipeline_types import (
+    EvidenceFile,
+    PipelineInput,
+    PipelineRequest,
+    PipelineResult,
+    PipelineSpec,
+    StageRecord,
+)
 from equiframe.ports import ArtifactStore, DataSource, EngineAdapter
 from equiframe.preprocessing import (
     fit_preprocessor,
@@ -145,6 +155,14 @@ from equiframe.profile_types import (
     profile_spec_fingerprint,
 )
 from equiframe.profiles import profile_execution, read_profile
+from equiframe.reduction import (
+    ReducedTable,
+    ReductionObservation,
+    ReductionOptions,
+    ReductionResult,
+    read_reduction,
+    reduce_case,
+)
 from equiframe.registry import (
     DuckDBTransformation,
     PandasTransformation,
@@ -152,6 +170,7 @@ from equiframe.registry import (
     Transformation,
     TransformationRegistry,
 )
+from equiframe.reporting import pipeline_summary, render_report, write_report
 from equiframe.rule_types import (
     CheckResult,
     CheckState,
@@ -216,7 +235,7 @@ from equiframe.values import (
     TimeZone,
 )
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 
 __all__ = [
     "CANONICALIZATION",
@@ -277,6 +296,8 @@ __all__ = [
     "EngineAdapter",
     "EngineCapabilities",
     "EquiFrameError",
+    "EvidenceEvent",
+    "EvidenceFile",
     "ExactDecimal",
     "ExecutionCancelled",
     "ExecutionOptions",
@@ -329,6 +350,10 @@ __all__ = [
     "PandasTransformation",
     "Parameter",
     "PhysicalColumn",
+    "PipelineInput",
+    "PipelineRequest",
+    "PipelineResult",
+    "PipelineSpec",
     "PolarsAdapter",
     "PolarsInput",
     "PolarsTransformation",
@@ -341,6 +366,10 @@ __all__ = [
     "ProfileResult",
     "ProfileSpec",
     "ProfileVector",
+    "ReducedTable",
+    "ReductionObservation",
+    "ReductionOptions",
+    "ReductionResult",
     "ResourceLimitError",
     "RuleContext",
     "RuleCoverage",
@@ -359,6 +388,7 @@ __all__ = [
     "Sha256",
     "SignificantOrder",
     "SortSpec",
+    "StageRecord",
     "StageTiming",
     "StringType",
     "StringValue",
@@ -392,22 +422,31 @@ __all__ = [
     "execute",
     "fit_detectors",
     "fit_preprocessor",
+    "inspect_evidence",
     "iter_differences",
     "iter_rule_findings",
+    "pipeline_summary",
     "profile_execution",
     "profile_spec_fingerprint",
     "read_comparison",
     "read_contract",
     "read_detector_bundle",
+    "read_pipeline",
     "read_preprocessor",
     "read_profile",
+    "read_reduction",
     "read_rule_evaluation",
     "read_table",
+    "reduce_case",
+    "render_report",
     "rule_set_fingerprint",
+    "run_pipeline",
     "score_detectors",
     "transform_profiles",
     "validate_contract",
+    "verify_events",
     "write_contract",
     "write_detector_bundle",
     "write_preprocessor",
+    "write_report",
 ]
