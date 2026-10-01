@@ -10,6 +10,10 @@ Se implementa como biblioteca Python de propósito general con contratos configu
 
 ## 2. Distribuciones y dependencias
 
+Calendario vigente (A71): la disponibilidad pública mediante
+`pip install equiframe` se abordará después del paso 10 y una nueva ronda de revisión.
+Instalaciones locales o de CI no satisfacen este requisito de producto.
+
 Un monorepo, distribuciones separadas por responsabilidad:
 
 | Distribución / import | Responsable | Dependencias y finalidad |

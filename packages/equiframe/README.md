@@ -11,7 +11,7 @@ núcleo. Licencia y publicación externa pendientes; no hay paquete del equipo e
 ## Instalación base y extras
 
 La distribución todavía no está publicada en PyPI. `pip install equiframe` es
-la experiencia pública objetivo, pendiente del paso 10; podría resolver un
+la experiencia pública objetivo, posterior al paso 10 y a una nueva ronda de revisión; podría resolver un
 paquete ajeno. Use el wheel del equipo o este checkout:
 
 ```bash

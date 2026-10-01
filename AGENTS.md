@@ -14,5 +14,6 @@ Lee `README.md`, `docs/ARCHITECTURE.md`, `docs/API_CONTRACTS.md`, `docs/TEAM_INT
 - No subas credenciales, datos reales, bases, modelos serializados, entornos ni resultados privados. No uses tokens incrustados en remotes, código o comandos documentados.
 - No ejecutes callbacks, SQL, plugins o modelos obtenidos de fuentes no confiables. Esta biblioteca no es un sandbox.
 - Cada paso termina con pruebas apropiadas, documentación de uso y límites, y un commit revisable. Publicar en PyPI o desplegar servicios requiere una tarea explícita; subir cambios a este repositorio está autorizado en la tarea inicial.
+- `pip install equiframe` significa publicación pública en PyPI accesible a cualquier usuario. Solo se abordará después de completar el paso 10 y una nueva ronda de revisión indicada por Hernán. Instalar el paquete localmente o en CI no cumple ese objetivo ni es un entregable solicitado. No adelantar esa publicación ni instalaciones persistentes por este requisito.
 - No generes métodos vacíos o retornos ficticios para aparentar implementación. Los Protocol y tipos declarativos son válidos; las implementaciones públicas deben tener comportamiento comprobable.
 - Antes de subir, ejecuta los controles específicos del paquete afectado. En el paso 1 crea y verifica las comprobaciones CI reales; no anuncies comprobaciones que todavía no existen.

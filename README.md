@@ -35,6 +35,11 @@ la evaluación científica sigue en la
 
 ## Instalación
 
+**Objetivo futuro:** publicar EquiFrame en PyPI para que cualquier persona pueda
+usar `pip install equiframe`. Se abordará después de completar el paso 10 y
+una nueva ronda de revisión. Las instrucciones locales siguientes sirven para
+desarrollo; no representan el cumplimiento de ese objetivo ni una publicación.
+
 Se requiere **Python 3.12**. El paquete se instala desde este repositorio privado
 o desde un wheel del equipo; todavía no se distribuye en PyPI.
 

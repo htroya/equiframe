@@ -184,3 +184,16 @@ limpio (3 entradas válidas en 1,04 s), sin contraejemplo de partición. Se camb
 a máscaras de bits 1–127: conserva los 127 subconjuntos no vacíos de siete
 dependencias y las propiedades de fuga/orden, eliminando rechazo por duplicados.
 No se suprimen health checks ni se modifica el algoritmo de particiones.
+
+## A71 — aclaración de producto posterior al paso 7, 2026-10-01
+
+Hernán precisa que `pip install equiframe` significa disponibilidad pública en
+PyPI para cualquier persona, no instalar EquiFrame localmente ni en GitHub.
+Este objetivo se abordará después de completar el paso 10 y una nueva ronda
+de revisión. Sustituye el calendario de publicación propuesto en A21/A62/A69;
+no altera las fórmulas, objetivos científicos ni resultados de las pruebas.
+
+Se retiran las instalaciones locales de prueba de EquiFrame por petición de
+Hernán. Las verificaciones históricas de empaquetado conservan su valor técnico,
+pero no acreditan el objetivo de distribución pública. El código y las pruebas
+permanecen versionados; no hubo publicación en PyPI ni despliegue de servicios.

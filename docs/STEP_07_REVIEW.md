@@ -1,5 +1,10 @@
 # Verificación del paso 7
 
+**Aclaración posterior de Hernán (A71):** las instalaciones descritas aquí fueron
+comprobaciones técnicas, no el objetivo de producto. Se retiran las instalaciones
+locales de prueba. El objetivo es publicar en PyPI para todo el público después
+de completar el paso 10 y una nueva ronda de revisión; sigue pendiente.
+
 Fecha: 2026-10-01. Núcleo y benchmark 0.7.0. El paso 6 se integró primero
 en `main` mediante [PR 15](https://github.com/htroya/equiframe/pull/15), commit
 `e9bbda4`, después de verificar sus dos ejecuciones CI aprobadas para

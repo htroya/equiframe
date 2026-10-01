@@ -98,7 +98,7 @@ el experimento reproducible, las cinco familias ni el caso DW SERCOP.
 | P03 | Tres motores opcionales con extensibilidad/inyección explícita | 2: puertos completos, registro por instancia, extras instalados individualmente |
 | P04 | Ejecutar desde scripts/notebooks de otro proyecto sin VM o sys.path | 2: `ef.execute`, wheel instalado y ejemplos externos |
 | P05 | Esquema esperado y salida física separados; no ocultar diferencias | 2: artefactos, máscaras NULL/NaN, tipos nativos, límites decimal/tiempo e índice |
-| P06 | Distribución pública verificable por pip/PyPI | 10: licencia acordada, disponibilidad/control del nombre, metadatos/versiones y publicación; pendiente |
+| P06 | Distribución pública verificable por pip/PyPI y accesible a cualquier persona | Después de completar 10 y una nueva ronda de revisión: licencia acordada, control del nombre, metadatos/versiones y publicación; pendiente |
 
 Evidencia del paso 2 para T01/T02/T03/T05/T09/T11/T22: implementaciones nativas,
 entradas locales identificadas/verificadas, captura de evidencia, tipos y aislamiento

@@ -80,7 +80,8 @@ reorientación](STEP_07_DESIGN.md), [API y límites](DETECTORS.md) e
 [informe de verificación](STEP_07_REVIEW.md). Ajuste/calibración/inferencia
 separados, selección normal de calibración y auditoría de grupos. El piloto
 del paso 6 sigue sin soporte científico; no se declara entrenado un modelo
-experimental. Licencia y publicación pública siguen en el paso 10.
+experimental. La publicación pública queda para después del paso 10 y de una
+nueva ronda de revisión, conforme a la aclaración de Hernán.
 
 **Objetivo:** implementar M, B y H con estados estadísticos y técnicos correctos.
 
@@ -110,16 +111,22 @@ experimental. Licencia y publicación pública siguen en el paso 10.
 
 **Objetivo:** entregar software utilizable y evidencia defendible para la tesis.
 
-**Trabajo:** preparar distribución pública: licencia acordada, nombre de paquete disponible o bajo control del equipo, metadatos completos, versiones soportadas y publicación verificable en PyPI con autorización expresa de los autores. Resolver decisiones metodológicas, congelar manifests, ejecutar R/M/B/H en prueba, métricas pareadas/cobertura, incertidumbre por grupos si procede, costos controlados y tablas regenerables. Medir recursos, revisar API/documentación, construir distribuciones y bundle de reproducción; repetición independiente por compañero.
+**Trabajo:** completar la evaluación y preparar los requisitos para una distribución pública posterior: licencia, control del nombre, metadatos y versiones soportadas. Resolver decisiones metodológicas, congelar manifests, ejecutar R/M/B/H en prueba, métricas pareadas/cobertura, incertidumbre por grupos si procede, costos controlados y tablas regenerables. Medir recursos, revisar API/documentación, construir distribuciones y bundle de reproducción; repetición independiente por compañero. No publicar en PyPI en este paso: primero debe completarse y realizarse una nueva ronda de revisión.
 
-**Aceptación:** comparación principal usa misma intersección evaluable; métricas indefinidas explícitas; no se ajusta con prueba; resultados negativos se conservan; otro integrante reproduce contenido y decisiones. Wheel/sdist y dependencias exactas comprobados; soporte ARM64 solo si probado. Release etiquetado y publicación pública verificable después de acordar licencia/nombre y autorización; un consumidor instala la versión publicada con pip y ejecuta ejemplos. Hasta entonces no se afirma que pip install equiframe obtenga el paquete del equipo. Capítulos 4/5 se redactan con resultados reales.
+**Aceptación:** comparación principal usa misma intersección evaluable; métricas indefinidas explícitas; no se ajusta con prueba; resultados negativos se conservan; otro integrante reproduce contenido y decisiones. Wheel/sdist y dependencias exactas comprobados; soporte ARM64 solo si probado. Capítulos 4/5 se redactan con resultados reales. La publicación pública no es un criterio de cierre del paso 10: queda pendiente de la ronda de revisión posterior y de una tarea explícita de publicación.
 
 ## Dependencias entre pasos
 
 Desde el paso 3, cada incremento verifica consumidores externos del wheel local.
-En el paso 10 se mantiene la aceptación pública final: `pip install equiframe`
+Después del paso 10 y de una nueva ronda de revisión se abordará la aceptación
+pública final: `pip install equiframe`
 desde PyPI e `import equiframe as ef`, sin acceso al repositorio privado y dentro
 del soporte documentado. Pendientes: licencia, control del nombre, metadatos públicos
 y ampliación de versiones Python respaldada por CI; actualmente `>=3.12,<3.13`.
+
+Este objetivo requiere una publicación en el índice público de Python accesible
+a cualquier persona. Una instalación local, en un consumidor de prueba o en un
+runner de GitHub no lo satisface. El desarrollo y la publicación del código en
+Git conservan su función propia y no equivalen a distribución pública en PyPI.
 
 `1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10` es el orden de entrega. Las revisiones humanas del catálogo y las entregas de compañeros deben coordinarse antes del paso 9; los metadatos de evidencia se introducen desde el paso 1 y se completan en 8. Ajustes del borrador se registran durante el piloto y no requieren rehacer infraestructura si se respetan las interfaces.
