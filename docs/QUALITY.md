@@ -107,3 +107,19 @@ contexto de entrega. Son evidencias distintas. El paso 3 sustituye el reloj real
 de aquella prueba por uno controlado y añade vencimiento previo al callback.
 Resultados del nuevo commit: [informe](STEP_03_REVIEW.md); la configuración de CI
 por sí sola no demuestra que sus checks hayan pasado.
+
+## 10. Controles del paso 6
+
+El paquete experimental tiene su propio lock, tipado estricto, Ruff, esquemas y
+suite. Comprueba esperados independientes en cinco familias, tres motores reales,
+mutaciones sin efecto, conservación de suma con divergencia, paquetes ciegos,
+conflictos y cronología de revisión, fallos, integridad, JSON estricto,
+publicación concurrente exclusiva, grupos transitivos, propiedades de ausencia
+de fuga y rechazo de calibración/prueba en entrenamiento.
+
+CI ejecuta ambos paquetes en la matriz de cinco plataformas. La verificación
+de distribución instala wheels por nombre con pip en otro directorio,
+comprueba imports ligeros y rutas instaladas, ejecuta las pruebas/piloto contra
+el wheel y reconstruye el mismo wheel desde sdist. Identidades de tests son
+ficticias; sus decisiones nunca cuentan como revisiones de la tesis.
+Resultados ejecutados y límites: [informe del paso 6](STEP_06_REVIEW.md).

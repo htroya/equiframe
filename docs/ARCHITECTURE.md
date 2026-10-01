@@ -1,6 +1,6 @@
 # Arquitectura de EquiFrame
 
-Versión de diseño: 0.5, 2026-10-01. Estado: pasos 1 a 5 implementados; componentes posteriores siguen siendo especificación. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md).
+Versión de diseño: 0.6, 2026-10-01. Estado: pasos 1 a 6 implementados en su alcance técnico; revisión científica y componentes posteriores pendientes. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md). La [arquitectura del paso 6](STEP_06_DESIGN.md) analiza la reorientación y sus límites.
 
 ## 1. Propósito y alcance
 
@@ -74,7 +74,11 @@ No existe flecha desde O, etiquetas o mutaciones hacia los perfiles o detectores
 | `evidence` | Manifiestos, eventos, hashes, reportes JSON/HTML y reducción acotada | No sobrescribir corridas ni ejecutar contenido del reporte |
 | `cli` | Entradas operacionales estables sobre la misma API Python | Sin lógica semántica duplicada |
 
-`equiframe_benchmark` añade `catalog`, `oracle`, `reviews`, `provenance`, `splits`, `mutations`, `training`, `evaluation`, `costs` y su CLI. Sus dependencias de desarrollo pueden incluir Hypothesis, SciPy y monitorización de procesos. O no se importa desde `rules` o `models`.
+`equiframe_benchmark` implementa catálogo/revisiones en `models`, `oracle`,
+`splits`, `selection`, `training_types`, `io`, `fixtures`, `mutations` y un
+piloto ejecutable. Evaluación de métricas/costos y CLI integrada siguen pendientes.
+O no se importa desde las reglas o los futuros detectores. Las revisiones reales
+no se sustituyen por las identidades ficticias de las pruebas.
 
 ## 5. Flujo de una ejecución
 

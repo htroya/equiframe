@@ -135,3 +135,25 @@ Estas decisiones precisan implementación de T10/T15; no fijan alpha, cohorte,
 resultados, etiquetas, grupos ni revisiones humanas. No alteran el DOCX ni
 los contratos/catálogos de R del paso 4. Un cambio posterior de fórmulas o
 selección experimental exige nueva versión y evaluación explícita.
+
+## Paso 6 — ingeniería y alcance experimental, 2026-10-01
+
+Fuente contrastada: DOCX con el mismo SHA-256, §1.3, §3.3.4, §3.4 y §3.7.
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A55 | Distribución `equiframe-benchmark 0.6.0` sobre núcleo 0.5.0 intacto | Mantener etiquetas/revisiones fuera de la biblioteca general instalable; dependencias en una sola dirección |
+| A56 | Esperados manuales y comparación completa no confirman O automáticamente | O necesita dos revisiones, acuerdo con comparación y resolución independiente ante desacuerdo; mutación sin efecto no es divergencia |
+| A57 | Paquetes ciegos copiados con nombres neutros y asignación previa | Los nombres originales revelaban motor/mutación. Se incluyen entradas; hashes vinculan revisiones. Identidades/fechas siguen siendo declaraciones, no firmas |
+| A58 | Prohibir también autoría de esperado/escenario y árbitro | Criterio conservador de independencia: puede requerir otro revisor cuando tres autores no bastan. El equipo debe resolver disponibilidad, sin autoadjudicación |
+| A59 | Componentes transitivos antes de asignar con semilla/pesos explícitos | Dependencias declaradas más igualdad de artefactos; no romper grupos para conseguir 30/10/20. No garantiza balance por familia ni soporte suficiente |
+| A60 | Selección normal valida ejecución completa y persiste manifiesto | Corrige el riesgo de aceptar un hash de selección declarado sin comprobar O/splits. Se mantiene la interfaz del paso 5 y la matriz sin metadatos |
+| A61 | Piloto pequeño honesto y mutaciones de artefacto explícitas | Cinco escenarios y cuatro grupos no sostienen calibración por familia. Los 35 candidatos, 15 perfiles y revisiones pendientes son ingeniería, no evidencia científica ni 60/300 |
+| A62 | Verificar pip por nombre desde wheels y separar publicación Git/PyPI | Se conserva el objetivo público `pip install equiframe`. Licencia, control del nombre y publicación pública siguen pendientes; no se elige licencia unilateralmente |
+
+A55/A57/A60/A62 son decisiones de ingeniería. A56 implementa la revisión
+del borrador; A58 endurece independencia y exige resolver la composición real
+del equipo. A59 es un algoritmo versionado de piloto, no una aprobación del
+reparto final. A61 reduce el alcance observado a lo comprobado y obliga a ampliar
+grupos antes del experimento. No cambian objetivos, hipótesis ni DOCX. Cambios
+metodológicos finales y apertura de prueba se registrarán en una versión nueva.

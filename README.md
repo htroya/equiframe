@@ -19,13 +19,16 @@ EquiFrame conserva los datos, tipos y diagnósticos necesarios para revisar el r
   tolerancias, spill y evidencia verificable; API `ef.compare` con solo el extra Arrow.
 - Reglas operativas R sobre una ejecución capturada, precondiciones, cobertura,
   catálogo versionado y evidencia propia; API `ef.evaluate_rules` con solo Arrow.
+- Benchmark separado con esperados independientes, revisión ciega, grupos
+  transitivos, particiones auditables y selección normal para entrenamiento.
 - Perfiles de cinco familias con denominadores y recibos de conversión;
   preprocesamiento con medianas congeladas y matriz común para los futuros M/B.
 
-**Versión de desarrollo: 0.5.0.** Una ejecución `completed` confirma que la
+**Versiones: núcleo 0.5.0; benchmark 0.6.0 (paso 6).** Una ejecución `completed` confirma que la
 transformación terminó y se materializó. La [comparación semántica](docs/COMPARISON.md)
 evalúa salidas materializadas. [R](docs/RULES.md) evalúa reglas seleccionadas del
-contrato sobre una captura. Los detectores y el benchmark siguen en la
+contrato sobre una captura. El benchmark técnico conserva revisiones pendientes;
+los detectores y la evaluación científica siguen en la
 [hoja de ruta](docs/HERNAN_ROADMAP.md).
 
 ## Instalación
@@ -92,6 +95,8 @@ describe los límites y las entregas necesarias; la conexión real sigue pendien
 | [Reglas R](docs/RULES.md) | Semántica, cobertura, catálogo y límites |
 | [Perfiles y preprocesamiento](docs/PROFILES.md) | Fórmulas, soporte, recibos y medianas congeladas |
 | [Arquitectura](docs/ARCHITECTURE.md) | Componentes, dependencias y flujo de ejecución |
+| [Diseño del paso 6](docs/STEP_06_DESIGN.md) | Reorientación después de 1–5, objetivos de tesis y arquitectura experimental |
+| [Uso del benchmark](packages/equiframe-benchmark/README.md) | Piloto, revisión, particiones, selección y distribución |
 | [Integración OCI](docs/OCI_INTEGRATION.md) | Acceso al DW, snapshots y coordinación de DuckDB |
 | [Calidad](docs/QUALITY.md) | Pruebas, recursos y distribución |
 | [Changelog](packages/equiframe/CHANGELOG.md) | Cambios por versión |
@@ -101,7 +106,7 @@ describe los límites y las entregas necesarias; la conexión real sigue pendien
 
 ```text
 packages/equiframe/            biblioteca y pruebas
-packages/equiframe-benchmark/  especificación de evaluación
+packages/equiframe-benchmark/  catálogo, oráculo, revisión, particiones y pruebas
 packages/equiframe-data/       especificación de acceso a datos
 packages/equiframe-sercop/     especificación de integración de dominio
 services/data-gateway/         especificación del servicio de datos
@@ -110,8 +115,9 @@ docs/                         documentación técnica
 .github/                      CI y plantillas de colaboración
 ```
 
-Actualmente `packages/equiframe` contiene la implementación Python. Los otros
-componentes conservan sus especificaciones hasta que sus responsables los implementen.
+Actualmente `packages/equiframe` y `packages/equiframe-benchmark` contienen
+implementaciones Python. Los componentes de acceso a datos, dominio e infraestructura
+conservan sus especificaciones hasta que sus responsables los implementen.
 Código, esquemas y casos sintéticos pequeños se versionan en Git; las bases reales,
 credenciales, snapshots y resultados privados se almacenan fuera del repositorio.
 

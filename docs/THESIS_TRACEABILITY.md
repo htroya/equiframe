@@ -171,3 +171,30 @@ reconciliación elegida es decisión de ingeniería A41–A47, documentada en
 una salida capturada sin recibo adicional. Cohorte y fechas del DW, catálogo
 revisado, particiones, alpha y comparación experimental siguen abiertos.
 El DOCX permanece sin modificar.
+
+## Paso 6 — benchmark 0.6.0, 2026-10-01
+
+Se contrastaron los objetivos de §1.3 y la revisión/partición de §3.3.4/§3.7;
+el SHA-256 del DOCX permanece idéntico. El [diseño del paso](STEP_06_DESIGN.md)
+explica la relación con OE1–OE4 y el objetivo adicional de reproducción.
+
+T01/T02 se ejercitan con cinco familias y quince ejecuciones nativas. T06
+registra huellas reales de R antes de candidatos, sin modificar el catálogo del
+paso 4. T07 incorpora revisión asignada, paquetes ciegos, conflictos, desacuerdos
+y estados pendientes; las aprobaciones científicas siguen sin realizarse.
+T17 implementa grupos transitivos y auditoría de fuga. T15 conecta la selección
+normal revisada con el preprocesador existente, comprobando la captura exacta.
+T18 aporta versiones de catálogo/splits y conserva pendientes; **no implementa
+el FreezeManifest final** con modelos, alpha, corpus y protocolo de costos.
+
+El piloto tiene 5 escenarios, 35 candidatos y 15 perfiles, en 4 grupos, con
+35 revisiones pendientes y cero etiquetas científicas confirmadas. No se
+cuentan como la meta 60/300. Sus mutaciones de artefactos no son implementaciones
+ETL mutadas. R mínima y features del piloto son configuración técnica y deben
+revisarse antes de congelar el experimento. No se acredita snapshot/DW SERCOP,
+modelo entrenado, métricas ni mejora del híbrido.
+
+P02/P04 se verifican con imports y consumo externo de distribuciones; P06 mantiene
+como aceptación pública final `pip install equiframe` desde PyPI. La prueba
+local con pip y wheels no acredita publicación en ese índice. A55–A62 registran
+motivos, versión y consecuencias. Resultados efectivos: [informe](STEP_06_REVIEW.md).
