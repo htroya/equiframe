@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.7.0 — 2026-10-01
+
+- Paso 7: Isolation Forest y MAD por familia sobre el mismo preprocesamiento,
+  soporte explícito, calibración normal independiente y alpha decimal obligatorio.
+- Cuantil empírico exacto sin interpolación, desigualdad estricta, MAD cero e
+  infinito y estados no estimables; ninguna excepción se convierte en no alerta.
+- H = R OR M con tres estados y conservación de alertas parciales.
+- Árboles declarativos y bundles JSON verificables, sin cargar pickle/joblib;
+  inferencia base sin ML y ajuste opcional mediante `equiframe[ml]`.
+- Benchmark 0.7.0 incorpora selección normal de calibración y auditoría de grupos.
+  Conserva contratos, perfiles y reglas 1.0. La API añade formatos independientes.
+- Wheel/sdist, consumidor externo, tipado y pruebas. No publica en PyPI ni
+  entrena modelos científicos con el piloto pendiente de revisión humana.
+
 ## 0.5.0 — 2026-10-01
 
 - Perfiles de una captura para las cinco familias y diez métricas de la Tabla 13.

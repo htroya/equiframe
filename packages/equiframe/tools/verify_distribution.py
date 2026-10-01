@@ -26,7 +26,7 @@ def single(pattern: str) -> Path:
 
 
 def verify_extras(uv: str, wheel: Path, work: Path, env: dict[str, str]) -> None:
-    for extra in ("arrow", "pandas", "polars", "duckdb", "engines"):
+    for extra in ("arrow", "pandas", "polars", "duckdb", "engines", "ml"):
         project = work / ("consumer-" + extra)
         project.mkdir()
         environment = project / ".venv"
@@ -63,10 +63,28 @@ assert not any(n in sys.modules for n in ('pandas','polars','duckdb','numpy','py
 extra=sys.argv[1]
 for engine in ('pandas','polars','duckdb'):
     assert (importlib.util.find_spec(engine) is not None)==(extra in (engine,'engines'))
-assert importlib.util.find_spec('sklearn') is None
+assert (importlib.util.find_spec('sklearn') is not None) == (extra == 'ml')
 print('Clean installed profile:',extra,'outside checkout; light import verified')
 """
         run([str(python), "-I", "-c", check, extra, str(ROOT)], cwd=project, env=profile_env)
+        if extra == "ml":
+            example = project / "detectors_local.py"
+            shutil.copyfile(ROOT / "examples" / "detectors_local.py", example)
+            bundle = project / "detectors.json"
+            run(
+                [str(python), "-I", str(example), "--bundle", str(bundle)],
+                cwd=project,
+                env=profile_env,
+            )
+            base_python = (
+                work / "runtime" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+            )
+            run(
+                [str(base_python), "-I", str(example), "--bundle", str(bundle), "--restore-only"],
+                cwd=project,
+                env=profile_env,
+            )
+            continue
         comparison_example = project / "compare_local.py"
         shutil.copyfile(ROOT / "examples" / "compare_local.py", comparison_example)
         run([str(python), "-I", str(comparison_example)], cwd=project, env=profile_env)
@@ -314,6 +332,8 @@ print('Installed wheel API roundtrips all five fixtures exactly')
             "examples/profiles/nulls_types.json",
             "examples/profiles_from_run.py",
             "examples/preprocess_profiles.py",
+            "examples/detectors_local.py",
+            "schemas/detector-bundle-1.0.schema.json",
         ):
             if not (source / path).is_file():
                 raise RuntimeError("sdist is missing " + path)

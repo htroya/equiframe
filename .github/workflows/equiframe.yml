@@ -1,4 +1,4 @@
-name: EquiFrame contracts, execution and comparison
+name: EquiFrame library and benchmark
 
 on:
   push:
@@ -59,11 +59,11 @@ jobs:
         run: uv run --locked --all-extras mypy
       - name: Check generated schemas and fixtures
         run: uv run --locked --all-extras python tools/generate_assets.py --check
-      - name: Test contracts, complete comparison and three real native engines
+      - name: Test contracts, native engines, detectors and hybrid decisions
         run: uv run --locked --all-extras pytest -q
       - name: Build wheel and sdist with locked backend
         run: uv run --locked --all-extras python -m build --no-isolation
-      - name: Verify base, each extra and wheel examples outside checkout
+      - name: Verify base, ML, engines and wheel examples outside checkout
         run: uv run --locked --all-extras python tools/verify_distribution.py
       - name: Install locked benchmark environment
         working-directory: packages/equiframe-benchmark
@@ -80,7 +80,7 @@ jobs:
       - name: Check benchmark schemas
         working-directory: packages/equiframe-benchmark
         run: uv run --locked --all-extras python tools/generate_assets.py --check
-      - name: Test oracle independence, provenance, partitions and native pilot
+      - name: Test oracle, calibration lineage, grouped splits and native pilot
         working-directory: packages/equiframe-benchmark
         run: uv run --locked --all-extras pytest -q
       - name: Build benchmark wheel and sdist

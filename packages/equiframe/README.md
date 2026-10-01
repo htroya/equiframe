@@ -1,9 +1,9 @@
-# EquiFrame 0.5.0 — contratos, ejecución, reglas y perfiles
+# EquiFrame 0.7.0 — contratos y detectores calibrados
 
 Contratos estrictos, comparación completa y ejecución local con Pandas, Polars y DuckDB.
 Se requiere Python 3.12; los motores se instalan mediante extras. La configuración
 CI cubre Windows x64, Ubuntu x64/ARM64 y macOS Intel/Apple Silicon.
-La [evidencia de revisión](../../docs/STEP_05_REVIEW.md)
+La [evidencia de revisión](../../docs/STEP_07_REVIEW.md)
 registra los controles completados. No se requiere una VM ni un DW para usar el
 núcleo. Licencia y publicación externa pendientes; no hay paquete del equipo en PyPI.
 
@@ -15,9 +15,9 @@ la experiencia pública objetivo, pendiente del paso 10; podría resolver un
 paquete ajeno. Use el wheel del equipo o este checkout:
 
 ```bash
-python -m pip install ./dist/equiframe-0.5.0-py3-none-any.whl
-python -m pip install "./dist/equiframe-0.5.0-py3-none-any.whl[duckdb]"
-# Alternativas: [arrow], [pandas], [polars] o [engines].
+python -m pip install ./dist/equiframe-0.7.0-py3-none-any.whl
+python -m pip install "./dist/equiframe-0.7.0-py3-none-any.whl[duckdb]"
+# Alternativas: [arrow], [pandas], [polars], [engines] o [ml].
 # Desde el checkout del equipo:
 python -m pip install ".[engines]"
 ```
@@ -333,7 +333,7 @@ actualizar `tzdata` exige revisar políticas y repetir las pruebas.
 Reglas/precondiciones: seis formas cerradas (`schema`, `key`, `cardinality`,
 `join`, `order`, `aggregate`), con referencias verificadas, revisión, severidad,
 obligatoriedad y aplicabilidad. No se ejecutan ni aceptan callbacks/SQL/expresiones.
-Todavía no hay registro de reglas ejecutables.
+Las reglas ejecutables se registran mediante `RuleRegistry` desde el paso 4.
 Joins y grupos numéricos conservan unidades. `sum`, `min` y `max` conservan
 la unidad de la medida; `min`/`max` también su tipo lógico. Una suma admite
 ampliación explícita dentro de la misma familia numérica, sin reducir el dominio
@@ -480,7 +480,7 @@ python examples/compare_local.py --work-dir comparison-runs
 defecto (índices separados no evaluables). Permisos suplementarios requieren
 justificación: `column_order="ignored"`, `physical_types="lossless"` o
 `index="ignore"`. Son parte de `ComparisonSpec`, documento independiente 1.0;
-no cambian bytes/huellas de Contract 1.0. La versión del paquete es 0.5.0 y la
+no cambian bytes/huellas de Contract 1.0. La versión del paquete es 0.7.0 y la
 revisión del contrato conserva su función propia.
 
 Se verifican datos y restricciones del esquema de salida, incluidas claves antes
@@ -543,7 +543,7 @@ familia. Conserva conteos, denominadores, motivos y evidencia de una sola captur
 Las conversiones fallidas exigen recibos instrumentados; no se infieren de NULL.
 
 `ef.fit_preprocessor` ajusta medianas solo con `NormalTrainingProfiles` y
-`ef.transform_profiles` produce una matriz numérica común para los futuros M/B.
+`ef.transform_profiles` produce una matriz numérica común para M/B.
 Medianas y orden persisten en JSON; los fallos técnicos no se imputan. La selección
 de entrenamiento normal necesita un manifiesto externo: el núcleo no valida O
 ni los grupos de procedencia. No se entrenan detectores en este paso.
@@ -556,3 +556,24 @@ python examples/preprocess_profiles.py --training ruta/profile.json --selection-
 Las cinco especificaciones de `examples/profiles/` corresponden a las capturas
 sintéticas de `rules_catalog.py`. El verificador del wheel ejecuta todas y restaura
 el preprocesador fuera del checkout. [API, fórmulas, estados y límites](../../docs/PROFILES.md).
+
+## Detectores M/B/H desde 0.7.0
+
+Instale `python -m pip install ".[ml]"` para entrenar Isolation Forest.
+`ef.fit_detectors` utiliza las mismas medianas congeladas y la misma matriz para
+M y MAD. `ef.calibrate_detectors` recibe una selección normal distinta y alpha
+explícito; `ef.detect` aplica umbrales sin reajustar. `ef.combine_decisions`
+conserva las alertas y la incompletitud de R/M. El paquete base restaura e
+infiere bundles JSON sin sklearn, NumPy ni motores.
+
+Ejemplo sintético ejecutable:
+
+```bash
+python examples/detectors_local.py --bundle detectors.json
+python examples/detectors_local.py --bundle detectors.json --restore-only
+```
+
+Cada ruta de bundle es nueva; no se sobrescribe. [Guía de detectores](../../docs/DETECTORS.md)
+y [diseño del paso 7](../../docs/STEP_07_DESIGN.md) detallan estados, fórmulas,
+independencia, persistencia y límites. Los ejemplos no acreditan normalidad
+científica ni el control poblacional de falsas alarmas. PyPI sigue pendiente.

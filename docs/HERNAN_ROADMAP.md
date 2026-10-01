@@ -75,6 +75,13 @@ e [informe](STEP_06_REVIEW.md). Piloto de 5 escenarios/35 candidatos/15 perfiles
 
 ## Paso 7. Isolation Forest, MAD, calibración e híbrido
 
+**Estado:** ingeniería implementada en núcleo y benchmark 0.7.0. [Diseño y
+reorientación](STEP_07_DESIGN.md), [API y límites](DETECTORS.md) e
+[informe de verificación](STEP_07_REVIEW.md). Ajuste/calibración/inferencia
+separados, selección normal de calibración y auditoría de grupos. El piloto
+del paso 6 sigue sin soporte científico; no se declara entrenado un modelo
+experimental. Licencia y publicación pública siguen en el paso 10.
+
 **Objetivo:** implementar M, B y H con estados estadísticos y técnicos correctos.
 
 **Trabajo:** ajuste normal por familia, soporte/variación, bundles compatibles, score M con signo definido, MAD y casos MAD=0, cuantiles sin interpolación, alpha explícito y tabla completa H. Persistencia segura y versionada; no entrenar/calibrar con prueba.

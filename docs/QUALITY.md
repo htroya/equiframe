@@ -123,3 +123,18 @@ comprueba imports ligeros y rutas instaladas, ejecuta las pruebas/piloto contra
 el wheel y reconstruye el mismo wheel desde sdist. Identidades de tests son
 ficticias; sus decisiones nunca cuentan como revisiones de la tesis.
 Resultados ejecutados y límites: [informe del paso 6](STEP_06_REVIEW.md).
+
+## 11. Controles del paso 7
+
+Scores de árboles exportados contrastados contra sklearn con varias submuestras
+y filas repetidas; MAD contrastado contra valores manuales. Propiedades del rango
+racional exacto, empates, indicadores, MAD cero/infinito, falta de soporte,
+calibración insuficiente, versiones/familias incompatibles y H en nueve estados.
+Persistencia exacta, integridad, árboles inválidos, JSON duplicado y ML ausente.
+El benchmark prueba selección de calibración contra artefactos nativos, rechazo
+de pendientes/prueba, fuga de grupos/capturas y cantidades de soporte.
+
+El verificador de distribución añade `ml`: entrena en entorno con ese extra,
+restaura y puntúa desde la instalación base sin sklearn/NumPy. Conserva ejemplos
+de cada motor, tipado externo y wheel reconstruido desde sdist. GitHub ejecuta
+ambos paquetes en cinco plataformas. [Resultados efectivos](STEP_07_REVIEW.md).

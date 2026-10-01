@@ -1,6 +1,6 @@
 # Arquitectura de EquiFrame
 
-Versión de diseño: 0.6, 2026-10-01. Estado: pasos 1 a 6 implementados en su alcance técnico; revisión científica y componentes posteriores pendientes. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md). La [arquitectura del paso 6](STEP_06_DESIGN.md) analiza la reorientación y sus límites.
+Versión de diseño: 0.7, 2026-10-01. Estado: pasos 1 a 7 implementados en su alcance técnico; revisión científica y componentes posteriores pendientes. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md). La [arquitectura del paso 7](STEP_07_DESIGN.md) analiza la reorientación y sus límites.
 
 ## 1. Propósito y alcance
 
@@ -24,7 +24,7 @@ Los nombres de distribución son internos hasta comprobar disponibilidad y acord
 
 Base propuesta: Python 3.12. El paso 1 verifica Windows x64 y Linux x64; ARM64 se valida antes de declarar soporte para la VM A1. `pyproject.toml`, estructura `src/`, marcadores `py.typed`, wheel/sdist y versiones semánticas. Durante 0.x los cambios incompatibles requieren changelog y migración explícita.
 
-Dependencias del paso 1: Pydantic 2 para formatos estrictos, `tzdata` como base IANA exclusiva en Windows/Ubuntu y Typer para CLI. Versiones de ejecución, desarrollo y backend resueltas y fijadas con hashes en `packages/equiframe/uv.lock`. Paso 2 añade extras funcionales `arrow`, `pandas`, `polars`, `duckdb` y `engines`; cada motor requiere PyArrow. ML no tiene extra anticipado. Cada perfil de instalación se verifica desde wheel fuera del checkout. Pandas/Polars/DuckDB/scikit-learn/NumPy/PyArrow no se importan al hacer `import equiframe`.
+Dependencias del paso 1: Pydantic 2 para formatos estrictos, `tzdata` como base IANA exclusiva en Windows/Ubuntu y Typer para CLI. Versiones de ejecución, desarrollo y backend resueltas y fijadas con hashes en `packages/equiframe/uv.lock`. Paso 2 añade extras funcionales `arrow`, `pandas`, `polars`, `duckdb` y `engines`; cada motor requiere PyArrow. El paso 7 añade el extra funcional `ml` para el ajuste de Isolation Forest. Cada perfil de instalación se verifica desde wheel fuera del checkout. Pandas/Polars/DuckDB/scikit-learn/NumPy/PyArrow no se importan al hacer `import equiframe`.
 
 El almacenamiento tabular Arrow no reemplaza la semántica del contrato. La extracción conserva tipo físico, tipo lógico, máscara de ausencia y NaN antes de cualquier conversión. Un adaptador que no pueda preservar una distinción exigida debe informar incompatibilidad; no adivinarla.
 
@@ -68,7 +68,7 @@ No existe flecha desde O, etiquetas o mutaciones hacia los perfiles o detectores
 | `compare` | Igualdad de esquema lógico, valores, filas, multiplicidad y orden cuando aplique | Diferencias completas/localizables; independiente de R/M/B |
 | `rules` | Reglas R evaluables sobre entrada y salida de una ejecución | Sin consultar otra implementación ni la etiqueta O |
 | `profiles` | Variables por familia con denominadores, aplicabilidad y motivos | Sin IDs, motor, mutación, etiqueta o partición como features |
-| `models` | Preprocesamiento ajustado, Isolation Forest, MAD y calibración | Entrenamiento, calibración e inferencia separados |
+| `preprocessing`, `detectors`, `detector_types` | Preprocesamiento ajustado, Isolation Forest, MAD y calibración | Entrenamiento, calibración e inferencia separados |
 | `decision` | Tabla de verdad de H y disponibilidad de componentes | Una regla que alerta no queda anulada por M |
 | `execution` | Orquestación, materialización forzada, límites y captura de fallos | Corridas aisladas y reproducibles; no administrar la VM |
 | `evidence` | Manifiestos, eventos, hashes, reportes JSON/HTML y reducción acotada | No sobrescribir corridas ni ejecutar contenido del reporte |
@@ -77,7 +77,7 @@ No existe flecha desde O, etiquetas o mutaciones hacia los perfiles o detectores
 `equiframe_benchmark` implementa catálogo/revisiones en `models`, `oracle`,
 `splits`, `selection`, `training_types`, `io`, `fixtures`, `mutations` y un
 piloto ejecutable. Evaluación de métricas/costos y CLI integrada siguen pendientes.
-O no se importa desde las reglas o los futuros detectores. Las revisiones reales
+O no se importa desde las reglas o los detectores. Las revisiones reales
 no se sustituyen por las identidades ficticias de las pruebas.
 
 ## 5. Flujo de una ejecución
@@ -225,3 +225,14 @@ Publica `profile.json`; perfiles y bundles tienen formato propio 1.0 y lectura
 estricta. Los recibos suplementarios registran intentos de conversión de la misma
 captura. Límites contables y cancelación son cooperativos; no hay spill para el
 perfilado en esta versión. [Fórmulas y límites](PROFILES.md).
+
+## 15. Detectores implementados en 0.7.0
+
+`DetectorFit` conserva preprocesamiento compartido, configuración, versiones,
+soporte, bosque declarativo y parámetros MAD. `DetectorBundle` incorpora
+calibración normal independiente con n/alpha/k/umbral y huellas. La inferencia
+no carga objetos ejecutables ni requiere ML. `decision.combine_decisions`
+implementa OR de tres estados y disponibilidad. `equiframe_benchmark` incorpora
+selección normal de calibración y auditoría de grupos sin transmitir etiquetas
+a features. [Diseño](STEP_07_DESIGN.md), [semántica y uso](DETECTORS.md).
+El ensamble operacional completo y su manifiesto permanecen en el paso 8.
