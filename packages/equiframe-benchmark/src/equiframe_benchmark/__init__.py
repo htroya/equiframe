@@ -1,5 +1,11 @@
 """Experimental boundary: no detector imports or labels in the EquiFrame core."""
 
+from equiframe_benchmark.calibration_types import (
+    CalibrationManifest,
+    CalibrationSelection,
+    DetectorSelectionAudit,
+    audit_detector_selections,
+)
 from equiframe_benchmark.io import load_document, save_document
 from equiframe_benchmark.models import (
     Assignment,
@@ -15,15 +21,18 @@ from equiframe_benchmark.models import (
     digest,
 )
 from equiframe_benchmark.oracle import evaluate_oracle, review_packet
-from equiframe_benchmark.selection import select_normal_training
+from equiframe_benchmark.selection import select_normal_calibration, select_normal_training
 from equiframe_benchmark.splits import dependency_groups, make_splits, split_counts, validate_splits
 from equiframe_benchmark.training_types import TrainingManifest, TrainingRecord, TrainingSelection
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 __all__ = [
     "Assignment",
+    "CalibrationManifest",
+    "CalibrationSelection",
     "Candidate",
     "Catalog",
+    "DetectorSelectionAudit",
     "InputBinding",
     "OracleResult",
     "Review",
@@ -34,6 +43,7 @@ __all__ = [
     "TrainingManifest",
     "TrainingRecord",
     "TrainingSelection",
+    "audit_detector_selections",
     "dependency_groups",
     "digest",
     "evaluate_oracle",
@@ -41,6 +51,7 @@ __all__ = [
     "make_splits",
     "review_packet",
     "save_document",
+    "select_normal_calibration",
     "select_normal_training",
     "split_counts",
     "validate_splits",

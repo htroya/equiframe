@@ -1,0 +1,62 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "calibration_groups": {
+      "title": "Calibration Groups",
+      "type": "integer"
+    },
+    "calibration_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Calibration Sha256",
+      "type": "string"
+    },
+    "min_calibration_groups": {
+      "title": "Min Calibration Groups",
+      "type": "integer"
+    },
+    "min_training_groups": {
+      "title": "Min Training Groups",
+      "type": "integer"
+    },
+    "rationale": {
+      "minLength": 1,
+      "title": "Rationale",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "eligible",
+        "not_estimable"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "training_groups": {
+      "title": "Training Groups",
+      "type": "integer"
+    },
+    "training_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Training Sha256",
+      "type": "string"
+    }
+  },
+  "required": [
+    "training_sha256",
+    "calibration_sha256",
+    "training_groups",
+    "calibration_groups",
+    "min_training_groups",
+    "min_calibration_groups",
+    "rationale",
+    "state"
+  ],
+  "title": "DetectorSelectionAudit",
+  "type": "object"
+}

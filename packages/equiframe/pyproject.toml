@@ -4,14 +4,20 @@ build-backend = "hatchling.build"
 
 [project]
 name = "equiframe"
-version = "0.5.0"
-description = "Semantic contracts, native execution, comparison, rules and reproducible profiles"
+version = "0.7.0"
+description = "Semantic ETL contracts, native execution, rules and calibrated anomaly detectors"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 authors = [{ name = "Hernán Troya" }]
+classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3.12", "Typing :: Typed"]
 dependencies = ["pydantic>=2.12,<3", "typer>=0.20,<1", "tzdata>=2025.2"]
 
+[project.urls]
+Repository = "https://github.com/htroya/equiframe"
+Documentation = "https://github.com/htroya/equiframe/blob/main/packages/equiframe/README.md"
+
 [project.optional-dependencies]
+ml = ["scikit-learn>=1.7,<1.10", "numpy>=2,<3"]
 arrow = ["pyarrow>=20,<26"]
 pandas = ["pandas>=2.2,<4", "pyarrow>=20,<26"]
 polars = ["polars>=1.30,<2", "pyarrow>=20,<26"]
@@ -52,7 +58,7 @@ strict = true
 files = ["src", "tools"]
 
 [[tool.mypy.overrides]]
-module = ["pyarrow", "pyarrow.*"]
+module = ["pyarrow", "pyarrow.*", "sklearn", "sklearn.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

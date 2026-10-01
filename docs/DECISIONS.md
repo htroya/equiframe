@@ -157,3 +157,30 @@ del equipo. A59 es un algoritmo versionado de piloto, no una aprobación del
 reparto final. A61 reduce el alcance observado a lo comprobado y obliga a ampliar
 grupos antes del experimento. No cambian objetivos, hipótesis ni DOCX. Cambios
 metodológicos finales y apertura de prueba se registrarán en una versión nueva.
+
+## Paso 7 — ingeniería y condiciones experimentales, 2026-10-01
+
+Fuente: mismo SHA-256 del DOCX; §1.3, §3.4.3, §3.6–3.7. Núcleo/benchmark 0.7.0.
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A63 | Separar ajuste, score, calibración e inferencia por familia | Impide reajuste accidental en prueba; reutiliza una matriz/preprocesador para M/B y registra sus huellas |
+| A64 | Alpha decimal obligatorio y rango exacto con fracciones | Cumple el cuantil sin interpolación de §3.6, evitando redondeos binarios en `ceil`; 5% sigue sin aprobación experimental |
+| A65 | Bosque declarativo JSON y evaluador versionado | Evita cargar objetos ejecutables; inferencia en paquete base, pruebas contra score_samples. No se supone el mismo rendimiento que sklearn; medir costo en 10 |
+| A66 | Soporte de filas y auditoría de grupos explícitos | El piloto 5/4/15 y sus 35 revisiones pendientes no acredita entrenamiento. Mínimos técnicos no equivalen a potencia estadística ni garantía de FPR |
+| A67 | Selección normal de calibración comparte validación de procedencia de entrenamiento | Rechaza prueba, pendientes y capturas ajenas; auditoría exige mismo catálogo/split y grupos disjuntos. Normalidad/grupos permanecen fuera del vector |
+| A68 | MAD cero conserva infinito etiquetado y H conserva alerta parcial | Cumple §3.6/§3.4.3; umbral infinito es no estimable, igualdad no alerta y B nunca interviene en H |
+| A69 | Extra ML y distribuciones 0.7.0; publicar código en Git | Biblioteca consumible sin VM; wheel/sdist y pip por nombre verificados. Licencia/control de nombre y publicación PyPI siguen pendientes del paso 10 |
+
+A63/A65/A67/A69 precisan ingeniería. A64/A68 implementan fórmulas del borrador.
+A66 conserva una condición metodológica pendiente: ampliar y revisar grupos,
+justificar alpha y registrar el FreezeManifest antes de la evaluación final.
+La conversión float32 de M se declara; pérdida de variación o rango no se
+ocultan mediante normalización. El DOCX, R y los contratos previos no se cambian.
+
+A70 (verificación de distribución): el generador heredado de conjuntos de
+dependencias agotó la comprobación de velocidad de Hypothesis en un consumidor
+limpio (3 entradas válidas en 1,04 s), sin contraejemplo de partición. Se cambia
+a máscaras de bits 1–127: conserva los 127 subconjuntos no vacíos de siete
+dependencias y las propiedades de fuga/orden, eliminando rechazo por duplicados.
+No se suprimen health checks ni se modifica el algoritmo de particiones.

@@ -54,7 +54,12 @@ def test_property_group_split_no_leakage_and_order_invariance(make_case):
     base = make_case()[0]
 
     @given(
-        st.lists(st.sets(st.integers(0, 6), min_size=1), min_size=1, max_size=15),
+        # Every nonempty subset of seven dependencies, without duplicate-draw rejection.
+        st.lists(
+            st.integers(1, 127).map(lambda mask: {bit for bit in range(7) if mask & (1 << bit)}),
+            min_size=1,
+            max_size=15,
+        ),
         st.integers(0, 10000),
     )
     def check(dependencies, seed):

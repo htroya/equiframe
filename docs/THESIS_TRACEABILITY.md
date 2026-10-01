@@ -198,3 +198,29 @@ P02/P04 se verifican con imports y consumo externo de distribuciones; P06 mantie
 como aceptación pública final `pip install equiframe` desde PyPI. La prueba
 local con pip y wheels no acredita publicación en ese índice. A55–A62 registran
 motivos, versión y consecuencias. Resultados efectivos: [informe](STEP_06_REVIEW.md).
+
+## Paso 7 — núcleo y benchmark 0.7.0, 2026-10-01
+
+Se releen el objetivo general, los cinco párrafos de objetivos específicos en
+§1.3, la tabla H de §3.4.3 y las fórmulas/condiciones de §3.6–3.7. El DOCX conserva
+el hash declarado y no se modifica. [Diseño y reorientación](STEP_07_DESIGN.md).
+
+T12 implementa H con nueve combinaciones y alerta parcial; T16 implementa
+Isolation Forest, MAD, score con signo definido, alpha explícito, rango exacto,
+igualdad estricta y no estimable. T15 reutiliza las medianas e indicadores de
+ajuste para ambos métodos. T17 incorpora selección normal de calibración y
+auditoría de grupos disjuntos. T18 conserva versiones/hashes/configuración,
+pero el FreezeManifest experimental completo permanece pendiente.
+
+El aporte principal es OE3 y la infraestructura de OE4; mantiene OE1 por
+familia y respeta la responsabilidad compartida de OE2. El quinto objetivo de
+documentación/reproducción se apoya en persistencia, dependencias bloqueadas y
+consumidores externos. P02/P04 se verifican con import ligero, extra `ml` y
+restauración/inferencia del bundle en instalación base. P06 sigue sin publicación
+pública PyPI; no se atribuye esa distribución al texto de la tesis.
+
+Las pruebas sintéticas de software y sus modelos temporales no cuentan como
+perfiles normales científicos, escenarios revisados, ni resultados de H1–H3.
+El piloto anterior conserva cero etiquetas confirmadas y carece de soporte
+por familia para ajuste/calibración. A63–A69 registran decisiones y consecuencias;
+[verificación efectiva](STEP_07_REVIEW.md).

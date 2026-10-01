@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "equiframe-benchmark"
-version = "0.6.0"
+version = "0.7.0"
 description = "Independent oracle reviews and provenance-aware benchmark partitions for EquiFrame"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 authors = [{ name = "Hernán Troya" }]
 classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3.12", "Typing :: Typed"]
-dependencies = ["equiframe[arrow]==0.5.0"]
+dependencies = ["equiframe[arrow]==0.7.0"]
 
 [project.urls]
 Repository = "https://github.com/htroya/equiframe"
@@ -20,7 +20,7 @@ Documentation = "https://github.com/htroya/equiframe/blob/main/docs/STEP_06_DESI
 equiframe-benchmark-pilot = "equiframe_benchmark.pilot:main"
 
 [project.optional-dependencies]
-engines = ["equiframe[engines]==0.5.0"]
+engines = ["equiframe[engines]==0.7.0"]
 
 [tool.uv.sources]
 equiframe = { path = "../equiframe" }

@@ -5,8 +5,11 @@ import json
 from pathlib import Path
 
 from equiframe_benchmark import (
+    CalibrationManifest,
+    CalibrationSelection,
     Candidate,
     Catalog,
+    DetectorSelectionAudit,
     OracleResult,
     Review,
     ReviewAssignment,
@@ -19,6 +22,9 @@ from equiframe_benchmark import (
 
 ROOT = Path(__file__).resolve().parents[1]
 MODELS = (
+    CalibrationManifest,
+    CalibrationSelection,
+    DetectorSelectionAudit,
     Candidate,
     Catalog,
     OracleResult,

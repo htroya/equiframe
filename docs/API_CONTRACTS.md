@@ -274,12 +274,12 @@ agregación, presupuestos y catálogo en [Reglas R](RULES.md).
 | `NormalTrainingProfiles` | Frontera de selección normal de entrenamiento con manifiesto externo |
 | `fit_preprocessor(training, *, spec, empty_policy)` | Medianas y retiro de variables ajustados una sola vez |
 | `PreprocessorBundle`, `FeatureFit` | Orden, medianas, soporte, huellas y estados ready/not_estimable |
-| `transform_profiles(bundle, profiles) -> FeatureMatrix` | Matriz finita común para los futuros M/B; errores no se imputan |
+| `transform_profiles(bundle, profiles) -> FeatureMatrix` | Matriz finita común para M/B; errores no se imputan |
 | `profile_spec_fingerprint`, `read_profile`, `read_preprocessor`, `write_preprocessor` | Identidad y persistencia JSON estricta, sin sobrescritura |
 
 Los formatos nuevos conservan Contract/ExecutionResult/Comparison/Rules 1.0.
 `ProfileOptions` fija presupuestos cooperativos. Detalles y limitaciones:
-[Perfiles](PROFILES.md). Detectores y CLI integrada siguen en los pasos 7–8;
+[Perfiles](PROFILES.md). Detectores disponibles desde 0.7.0; la CLI integrada sigue en 8;
 los scripts de ejemplo ya son ejecutables.
 
 ## 12. Benchmark disponible en 0.6.0
@@ -307,3 +307,22 @@ artefactos exige publicar referencias/paquetes nuevos, con nuevas huellas;
 no se promete portabilidad de rutas absolutas ni firmas autenticadas.
 Uso y límites: [paquete](../packages/equiframe-benchmark/README.md) y
 [diseño](STEP_06_DESIGN.md).
+
+## 13. Detectores y calibración disponibles en 0.7.0
+
+| API/modelo | Comportamiento |
+|---|---|
+| `IsolationForestConfig`, `DetectorSupport` | Semilla, árboles/submuestra, mínimos técnicos y justificación |
+| `fit_detectors(training, *, spec, config, support, empty_policy)` | Ajusta medianas, IF y MAD con una matriz común; retorna `DetectorFit` |
+| `score_detectors(fit, profiles)` | Scores de ambos métodos, número de filas y hashes; no reajusta ni decide |
+| `NormalCalibrationProfiles` | Selección normal distinta de entrenamiento; perfiles sin etiquetas |
+| `calibrate_detectors(fit, calibration, *, alpha)` | Bundle con alpha decimal explícito, n, rango y cuantil sin interpolar |
+| `detect(bundle, profiles)` | Scores, umbrales, decisiones y motivos; errores de contrato se elevan |
+| `ComponentDecision`, `combine_decisions(r, m)`, `HybridDecision` | OR de tres estados, R completo/parcial y M; no incorpora B |
+| `detector_fingerprint`, `write_detector_bundle`, `read_detector_bundle` | JSON declarativo 1.0, validación/huellas, escritura exclusiva, límite 64 MiB |
+| `select_normal_calibration` (benchmark) | O normal confirmado y procedencia completa en partición calibration |
+| `audit_detector_selections` (benchmark) | Igual catálogo/split/features, grupos disjuntos y mínimos explícitos |
+
+Se añaden seis esquemas del núcleo y tres del benchmark. Contratos, ejecuciones,
+R y perfiles previos conservan su formato. Los estados no estimables no se
+convierten en no alerta. Detalles y límites: [detectores](DETECTORS.md).

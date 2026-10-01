@@ -22,13 +22,15 @@ EquiFrame conserva los datos, tipos y diagnósticos necesarios para revisar el r
 - Benchmark separado con esperados independientes, revisión ciega, grupos
   transitivos, particiones auditables y selección normal para entrenamiento.
 - Perfiles de cinco familias con denominadores y recibos de conversión;
-  preprocesamiento con medianas congeladas y matriz común para los futuros M/B.
+  preprocesamiento con medianas congeladas y matriz común para M/B.
+- Isolation Forest y MAD por familia, calibración normal externa con alpha explícito,
+  restauración JSON sin pickle e híbrido H que conserva componentes no evaluables.
 
-**Versiones: núcleo 0.5.0; benchmark 0.6.0 (paso 6).** Una ejecución `completed` confirma que la
+**Versiones: núcleo y benchmark 0.7.0 (paso 7).** Una ejecución `completed` confirma que la
 transformación terminó y se materializó. La [comparación semántica](docs/COMPARISON.md)
 evalúa salidas materializadas. [R](docs/RULES.md) evalúa reglas seleccionadas del
 contrato sobre una captura. El benchmark técnico conserva revisiones pendientes;
-los detectores y la evaluación científica siguen en la
+la evaluación científica sigue en la
 [hoja de ruta](docs/HERNAN_ROADMAP.md).
 
 ## Instalación
@@ -42,7 +44,7 @@ cd equiframe/packages/equiframe
 python -m pip install ".[duckdb]"
 ```
 
-Extras disponibles: `arrow`, `pandas`, `polars`, `duckdb` y `engines`.
+Extras disponibles: `arrow`, `pandas`, `polars`, `duckdb`, `engines` y `ml`.
 La instalación base incluye contratos, CLI y metadatos; los motores son opcionales
 y no se cargan al importar el paquete.
 
@@ -94,6 +96,8 @@ describe los límites y las entregas necesarias; la conexión real sigue pendien
 | [Comparación](docs/COMPARISON.md) | API, autorizaciones, evidencia y presupuestos |
 | [Reglas R](docs/RULES.md) | Semántica, cobertura, catálogo y límites |
 | [Perfiles y preprocesamiento](docs/PROFILES.md) | Fórmulas, soporte, recibos y medianas congeladas |
+| [Detectores y calibración](docs/DETECTORS.md) | Uso de M/B/H, persistencia y estados no estimables |
+| [Diseño del paso 7](docs/STEP_07_DESIGN.md) | Reorientación después de 1–6 y relación con los objetivos de tesis |
 | [Arquitectura](docs/ARCHITECTURE.md) | Componentes, dependencias y flujo de ejecución |
 | [Diseño del paso 6](docs/STEP_06_DESIGN.md) | Reorientación después de 1–5, objetivos de tesis y arquitectura experimental |
 | [Uso del benchmark](packages/equiframe-benchmark/README.md) | Piloto, revisión, particiones, selección y distribución |

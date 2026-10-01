@@ -1,9 +1,11 @@
 """Check reviewed normal training, complete execution lineage and group membership."""
 
 from collections.abc import Mapping
+from typing import Literal
 
 import equiframe as ef
 
+from equiframe_benchmark.calibration_types import CalibrationManifest, CalibrationSelection
 from equiframe_benchmark.models import (
     Candidate,
     Catalog,
@@ -17,7 +19,7 @@ from equiframe_benchmark.splits import validate_splits
 from equiframe_benchmark.training_types import TrainingManifest, TrainingRecord, TrainingSelection
 
 
-def select_normal_training(
+def _select_normal(
     catalog: Catalog,
     splits: SplitManifest,
     *,
@@ -25,11 +27,12 @@ def select_normal_training(
     oracles: Mapping[str, OracleResult],
     profiles: Mapping[str, ef.ProfileResult],
     executions: Mapping[str, ef.ExecutionResult],
-) -> TrainingSelection:
+    partition: Literal["training", "calibration"],
+) -> tuple[tuple[TrainingRecord, ...], tuple[ef.ProfileVector, ...]]:
     """Mappings use candidate IDs, allowing multiple native runs per scenario.
 
     Records must come from trusted producers; hashes do not authenticate people.
-    Pending, divergent, calibration/test, unrelated or duplicated evidence is rejected.
+    Pending, divergent, other partitions, unrelated or duplicated evidence is rejected.
     """
     validate_splits(catalog, splits)
     if not profiles or not (set(profiles) == set(candidates) == set(oracles) == set(executions)):
@@ -44,8 +47,8 @@ def select_normal_training(
         profile = ef.ProfileResult.model_validate(profiles[key])
         execution = ef.ExecutionResult.model_validate(executions[key])
         scenario = scenarios.get(candidate.scenario_sha256)
-        if scenario is None or assignments[scenario.scenario_id].partition != "training":
-            raise ValueError("only training scenarios may enter normal fit")
+        if scenario is None or assignments[scenario.scenario_id].partition != partition:
+            raise ValueError("only " + partition + " scenarios may enter this normal selection")
         if key != candidate.candidate_id:
             raise ValueError("selection keys must be candidate IDs")
         if oracle.status != "confirmed" or oracle.label != "normal" or oracle.assignment is None:
@@ -111,9 +114,31 @@ def select_normal_training(
             )
         )
     if len({v.spec_sha256 for v in vectors}) != 1:
-        raise ValueError("fit requires a single family and feature definition")
+        raise ValueError("normal selection requires a single family and feature definition")
+    return tuple(records), tuple(vectors)
+
+
+def select_normal_training(
+    catalog: Catalog,
+    splits: SplitManifest,
+    *,
+    candidates: Mapping[str, Candidate],
+    oracles: Mapping[str, OracleResult],
+    profiles: Mapping[str, ef.ProfileResult],
+    executions: Mapping[str, ef.ExecutionResult],
+) -> TrainingSelection:
+    """Select reviewed normal training only; all maps use the same candidate IDs."""
+    records, vectors = _select_normal(
+        catalog,
+        splits,
+        candidates=candidates,
+        oracles=oracles,
+        profiles=profiles,
+        executions=executions,
+        partition="training",
+    )
     manifest = TrainingManifest(
-        catalog_sha256=digest(catalog), splits_sha256=digest(splits), records=tuple(records)
+        catalog_sha256=digest(catalog), splits_sha256=digest(splits), records=records
     )
     training = ef.NormalTrainingProfiles(
         purpose="normal_training",
@@ -121,3 +146,31 @@ def select_normal_training(
         profiles=tuple(vectors),
     )
     return TrainingSelection(manifest=manifest, training=training)
+
+
+def select_normal_calibration(
+    catalog: Catalog,
+    splits: SplitManifest,
+    *,
+    candidates: Mapping[str, Candidate],
+    oracles: Mapping[str, OracleResult],
+    profiles: Mapping[str, ef.ProfileResult],
+    executions: Mapping[str, ef.ExecutionResult],
+) -> CalibrationSelection:
+    """Verify reviewed normal calibration with the same lineage checks as training."""
+    records, vectors = _select_normal(
+        catalog,
+        splits,
+        candidates=candidates,
+        oracles=oracles,
+        profiles=profiles,
+        executions=executions,
+        partition="calibration",
+    )
+    manifest = CalibrationManifest(
+        catalog_sha256=digest(catalog), splits_sha256=digest(splits), records=records
+    )
+    calibration = ef.NormalCalibrationProfiles(
+        purpose="normal_calibration", selection_manifest_sha256=digest(manifest), profiles=vectors
+    )
+    return CalibrationSelection(manifest=manifest, calibration=calibration)

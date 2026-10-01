@@ -1,8 +1,8 @@
 # EquiFrame Benchmark
 
-Distribución experimental `equiframe-benchmark 0.6.0`, Python 3.12. Catálogo,
+Distribución experimental `equiframe-benchmark 0.7.0`, Python 3.12. Catálogo,
 revisión independiente, oráculo, grupos transitivos, particiones y selección
-de entrenamiento para `equiframe 0.5.0`. El núcleo no importa este paquete.
+de entrenamiento para `equiframe 0.7.0`. El núcleo no importa este paquete.
 
 ## Instalar y ejecutar
 
@@ -20,7 +20,7 @@ No está publicado en PyPI. Con los dos wheels construidos y dependencias
 disponibles se puede instalar por nombre:
 
 ```bash
-python -m pip install --find-links packages/equiframe/dist --find-links packages/equiframe-benchmark/dist equiframe==0.5.0 equiframe-benchmark==0.6.0
+python -m pip install --find-links packages/equiframe/dist --find-links packages/equiframe-benchmark/dist equiframe==0.7.0 equiframe-benchmark==0.7.0
 ```
 
 El piloto genera 5 escenarios, 35 candidatos, 15 perfiles y 4 grupos. Las
@@ -94,11 +94,51 @@ uv run --locked --all-extras python -m build --no-isolation
 uv run --locked --all-extras python tools/verify_distribution.py
 ```
 
-La última comprobación requiere el wheel de `equiframe 0.5.0` construido en
+La última comprobación requiere el wheel de `equiframe 0.7.0` construido en
 `../equiframe/dist`. Instala ambos paquetes por nombre con pip fuera del checkout,
 comprueba imports ligeros, ejecuta la suite y piloto instalados, y reconstruye
 el wheel desde sdist. CI ejecuta ambos paquetes en las cinco plataformas existentes.
 
 Arquitectura, límites y decisiones: `docs/STEP_06_DESIGN.md` en el repositorio.
-No hay IF/MAD/H, métricas finales, integración SERCOP ni aprobaciones científicas
-en esta distribución. La licencia y publicación pública permanecen pendientes.
+IF/MAD/H están en el núcleo 0.7.0. No hay métricas finales, integración SERCOP
+ni aprobaciones científicas en esta distribución. La licencia y publicación pública permanecen pendientes.
+
+## Selección normal de calibración y soporte por grupos
+
+`select_normal_calibration` recibe los mismos argumentos nombrados que
+`select_normal_training`, pero exige la partición de calibración. Conserva
+las comprobaciones de O normal confirmado, captura exacta, artefactos íntegros
+y una sola familia. Entrega `CalibrationSelection.calibration` al núcleo.
+
+Antes de ajustar, audite ambas selecciones:
+
+```python
+audit = eb.audit_detector_selections(
+    training_selection,
+    calibration_selection,
+    min_training_groups=3,
+    min_calibration_groups=2,
+    rationale="Mínimos del ejemplo; deben justificarse antes de congelar",
+)
+if audit.state != "eligible":
+    raise ValueError("Grupos insuficientes: ampliar el piloto antes de ajustar")
+fit = ef.fit_detectors(
+    training_selection.training,
+    spec=training_selection.training.profiles[0].spec,
+    config=ef.IsolationForestConfig(random_state=7),
+    support=ef.DetectorSupport(
+        min_training_rows=20,
+        min_calibration_rows=10,
+        rationale="Mínimos técnicos del ejemplo, sin garantía inferencial",
+    ),
+)
+bundle = ef.calibrate_detectors(fit, calibration_selection.calibration, alpha="0.05")
+```
+
+La auditoría exige igual catálogo/split, features compatibles y ausencia de
+escenarios, grupos, ejecuciones o perfiles compartidos. Devuelve cantidades de
+grupos y `eligible`/`not_estimable`; el llamador debe conservarla y respetarla.
+La biblioteca general no puede autenticar declaraciones de normalidad o grupos.
+Ningún umbral de ejemplo es aprobación del protocolo científico. El piloto
+original conserva sus 35 revisiones pendientes; no se usa para producir un
+modelo científico ni se amplía con revisiones automáticas.
