@@ -1,6 +1,6 @@
 # API Python y contratos de intercambio
 
-Versión implementada: `equiframe 0.5.0`, formatos independientes `1.0`, pasos 1 a 5. El [README del
+Versión implementada: `equiframe 0.8.0`, formatos independientes `1.0`, pasos 1 a 8. El [README del
 paquete](../packages/equiframe/README.md) contiene instalación, comandos y un
 ejemplo Python ejecutable. Los componentes siguientes siguen en la hoja de ruta.
 
@@ -15,7 +15,7 @@ ejemplo Python ejecutable. Los componentes siguientes siguen en la hoja de ruta.
 | `contract_fingerprint(contract) -> str` | SHA-256 hexadecimal de esos bytes; no equivalencia tabular |
 | `contract_json_schema() -> dict[str, object]` | JSON Schema generado desde `Contract` |
 
-La API explícita está en `equiframe.__all__`; `__version__` es `0.5.0`.
+La API explícita está en `equiframe.__all__`; `__version__` es `0.8.0`.
 Los constructores usan Pydantic estricto/inmutable, rechazan extras y conservan
 colecciones como tuplas. La validación de JSON permite arrays sin introducir
 coerciones numéricas con pérdida. No se interpreta código en documentos.
@@ -98,9 +98,9 @@ Los estados son alias `Literal` públicos; ejecución y comparación tienen APIs
 - `JobState`: `queued`, `running`, `succeeded`, `failed`, `cancelled`.
 
 Un fallo o componente no estimable nunca se define como ausencia de alerta.
-La composición H = R OR M sigue pendiente del paso 7. R ya agrega las reglas
+La composición H = R OR M está implementada desde el paso 7. R agrega las reglas
 según la [tabla del paso 4](RULES.md#estados-cobertura-y-prioridad). La tabla
-prevista para H se conserva para implementación:
+de H conserva las nueve combinaciones:
 
 | R | M | H | Evaluación completa |
 |---|---|---|---|
@@ -154,9 +154,9 @@ escapan claves no imprimibles. Errores temporales mantienen causa específica
 en `allowed_values`. Los textos de errores directos omiten las entradas;
 la API de Pydantic `.errors()` y las causas pueden conservarlas.
 
-Otros comandos (`run`, `compare`, `report`, entrenamiento/evaluación) y errores
-de ejecución/recursos/modelos se definen en sus pasos. No hay subcomandos vacíos.
-Los códigos operacionales futuros mantienen distinción entre alerta/diferencia
+Los comandos `run`, `compare`, `report`, `evidence verify` y `reduce` están
+implementados desde el paso 8; entrenamiento/evaluación conservan APIs separadas.
+Los códigos operacionales mantienen distinción entre alerta/diferencia
 (1), entrada inválida (2) y fallo/no evaluable (3), con evidencia independiente.
 
 
@@ -326,3 +326,20 @@ Uso y límites: [paquete](../packages/equiframe-benchmark/README.md) y
 Se añaden seis esquemas del núcleo y tres del benchmark. Contratos, ejecuciones,
 R y perfiles previos conservan su formato. Los estados no estimables no se
 convierten en no alerta. Detalles y límites: [detectores](DETECTORS.md).
+
+## 14. Orquestación y evidencia en 0.8.0
+
+| API/modelo | Comportamiento |
+|---|---|
+| `PipelineSpec`, `PipelineRequest`, `PipelineInput` | Configuración estricta y bindings verificables; sin código en JSON |
+| `run_pipeline(spec, *, source, registry, ...)` | Captura única, R/perfil/M/B/H y comparación opcional |
+| `PipelineResult`, `StageRecord` | Procedencia cruzada, estados, completitud de lo solicitado y `exit_code` |
+| `EvidenceEvent`, `EvidenceFile` | Secuencias/hash previo y archivos relativos con SHA-256/tamaño |
+| `read_pipeline`, `verify_events`, `inspect_evidence` | Verificación local e identificación de interrupciones |
+| `pipeline_summary`, `render_report`, `write_report` | Resumen seleccionado y reportes JSON/HTML exclusivos con escape |
+| `ReductionOptions`, `ReductionObservation`, `ReducedTable`, `ReductionResult` | Presupuestos, precondiciones/firma, posiciones y estados de reducción |
+| `reduce_case`, `read_reduction` | Reducción por filas entre tablas y lectura de evidencia verificada |
+
+Siete esquemas nuevos 1.0. `DetectorVersions` acepta 0.7.0/0.8.0 sin cambiar el
+algoritmo IF/MAD. El núcleo no importa benchmark ni acepta O como entrada del
+runner. [Uso y códigos CLI](ORCHESTRATION.md), [diseño y límites](STEP_08_DESIGN.md).

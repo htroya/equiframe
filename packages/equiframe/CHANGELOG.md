@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.8.0 — 2026-10-01
+
+- Paso 8: API `run_pipeline`, configuración/resultados estrictos, R/perfil/M/B/H
+  y comparación opcional sobre una captura nativa; sin entrenamiento implícito.
+- Eventos encadenados SHA-256, manifiestos exclusivos, inspección de interrupciones
+  y verificación de archivos, procedencia y consistencia de reportes JSON/HTML.
+- CLI run/compare/report/evidence/reduce y CLI separada del benchmark; códigos
+  0/1/2/3 que conservan la prioridad de fallos y componentes no evaluables.
+- Reducción determinista por filas entre tablas, firma de fallo y precondiciones
+  verificadas por predicado confiable, presupuestos y confirmaciones explícitos.
+  Minimalidad local únicamente; nunca se afirma mínimo global.
+- Siete esquemas nuevos 1.0. DetectorVersions acepta también 0.8.0 y conserva
+  bundles 0.7.0 explícitos sin cambiar el algoritmo declarativo.
+- Ejemplo instalado, pruebas nativas y distribución reproducible; PyPI, integración
+  OCI/DW y cierre científico permanecen pendientes según el plan vigente.
+
 ## 0.7.0 — 2026-10-01
 
 - Paso 7: Isolation Forest y MAD por familia sobre el mismo preprocesamiento,

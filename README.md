@@ -26,12 +26,18 @@ EquiFrame conserva los datos, tipos y diagnósticos necesarios para revisar el r
 - Isolation Forest y MAD por familia, calibración normal externa con alpha explícito,
   restauración JSON sin pickle e híbrido H que conserva componentes no evaluables.
 
-**Versiones: núcleo y benchmark 0.7.0 (paso 7).** Una ejecución `completed` confirma que la
+**Versiones: núcleo y benchmark 0.8.0 (paso 8).** Una ejecución `completed` confirma que la
 transformación terminó y se materializó. La [comparación semántica](docs/COMPARISON.md)
 evalúa salidas materializadas. [R](docs/RULES.md) evalúa reglas seleccionadas del
 contrato sobre una captura. El benchmark técnico conserva revisiones pendientes;
 la evaluación científica sigue en la
 [hoja de ruta](docs/HERNAN_ROADMAP.md).
+
+`ef.run_pipeline` integra ejecución/R/perfil/M/B/H y comparación opcional, con
+eventos append-only, manifiesto verificable y reportes JSON/HTML. Incluye CLI
+operacional, comandos del benchmark y reducción de casos que conserva
+precondiciones/fallo bajo presupuesto. [Uso](docs/ORCHESTRATION.md),
+[diseño](docs/STEP_08_DESIGN.md) y [verificación](docs/STEP_08_REVIEW.md).
 
 ## Instalación
 

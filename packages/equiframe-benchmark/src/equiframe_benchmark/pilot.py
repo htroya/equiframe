@@ -135,21 +135,31 @@ def run_pilot(directory: Path) -> dict[str, object]:
         expected = expected_table(case)
         outputs: list[tuple[str, ef.ArtifactRef, Literal["control", "mutation"], str]] = []
         for engine in ("pandas", "polars", "duckdb"):
-            run = ef.execute(
-                ef.ExecutionPlan(contract=case.contract, engine=engine, transformation_id=family),
+            pipeline = ef.run_pipeline(
+                ef.PipelineSpec(
+                    execution=ef.ExecutionPlan(
+                        contract=case.contract, engine=engine, transformation_id=family
+                    ),
+                    profile=profile_spec(family),
+                    rule_options=rule_options,
+                ),
                 source=ef.LocalDataSource({item.name: item.artifact for item in scenario.inputs}),
                 registry=registered,
+                rule_registry=rule_registry,
                 work_dir=root,
             )
+            run = pipeline.execution
+            if run is None:
+                raise RuntimeError("native pilot execution unavailable; inspect pipeline evidence")
             if run.state != "completed" or run.output is None:
                 raise RuntimeError(f"native pilot failed: {family}/{engine}: {run.problem}")
-            rules = ef.evaluate_rules(
-                run, registry=rule_registry, options=rule_options, work_dir=root
-            )
+            rules = pipeline.rules
+            if rules is None:
+                raise RuntimeError("pilot rules unavailable")
             if rules.rule_set_sha256 != scenario.rules_sha256:
                 raise RuntimeError("rule revision changed after catalog publication")
-            profile = ef.profile_execution(run, spec=profile_spec(family), work_dir=root)
-            if not profile.complete:
+            profile = pipeline.profile
+            if profile is None or not profile.complete:
                 raise RuntimeError("pilot profile incomplete")
             profile_count += 1
             outputs.append((engine, run.output.data, "control", "synthetic.v1"))

@@ -25,7 +25,7 @@ from equiframe_benchmark.selection import select_normal_calibration, select_norm
 from equiframe_benchmark.splits import dependency_groups, make_splits, split_counts, validate_splits
 from equiframe_benchmark.training_types import TrainingManifest, TrainingRecord, TrainingSelection
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 __all__ = [
     "Assignment",
     "CalibrationManifest",

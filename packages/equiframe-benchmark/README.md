@@ -1,8 +1,12 @@
 # EquiFrame Benchmark
 
-Distribución experimental `equiframe-benchmark 0.7.0`, Python 3.12. Catálogo,
+Distribución experimental `equiframe-benchmark 0.8.0`, Python 3.12. Catálogo,
 revisión independiente, oráculo, grupos transitivos, particiones y selección
-de entrenamiento para `equiframe 0.7.0`. El núcleo no importa este paquete.
+de entrenamiento para `equiframe 0.8.0`. El núcleo no importa este paquete.
+
+El paso 8 incorpora `equiframe-benchmark validate`, `split` y `pilot`, y usa
+la orquestación operacional en las quince ejecuciones nativas del piloto.
+[Comandos y límites](../../docs/ORCHESTRATION.md#benchmark-separado).
 
 ## Instalar y ejecutar
 
@@ -20,7 +24,7 @@ No está publicado en PyPI. Con los dos wheels construidos y dependencias
 disponibles se puede instalar por nombre:
 
 ```bash
-python -m pip install --find-links packages/equiframe/dist --find-links packages/equiframe-benchmark/dist equiframe==0.7.0 equiframe-benchmark==0.7.0
+python -m pip install --find-links packages/equiframe/dist --find-links packages/equiframe-benchmark/dist equiframe==0.8.0 equiframe-benchmark==0.8.0
 ```
 
 El piloto genera 5 escenarios, 35 candidatos, 15 perfiles y 4 grupos. Las

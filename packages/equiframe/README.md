@@ -1,9 +1,9 @@
-# EquiFrame 0.7.0 — contratos y detectores calibrados
+# EquiFrame 0.8.0 — orquestación y evidencia verificable
 
 Contratos estrictos, comparación completa y ejecución local con Pandas, Polars y DuckDB.
 Se requiere Python 3.12; los motores se instalan mediante extras. La configuración
 CI cubre Windows x64, Ubuntu x64/ARM64 y macOS Intel/Apple Silicon.
-La [evidencia de revisión](../../docs/STEP_07_REVIEW.md)
+La [evidencia de revisión](../../docs/STEP_08_REVIEW.md)
 registra los controles completados. No se requiere una VM ni un DW para usar el
 núcleo. Licencia y publicación externa pendientes; no hay paquete del equipo en PyPI.
 
@@ -15,8 +15,8 @@ la experiencia pública objetivo, posterior al paso 10 y a una nueva ronda de re
 paquete ajeno. Use el wheel del equipo o este checkout:
 
 ```bash
-python -m pip install ./dist/equiframe-0.7.0-py3-none-any.whl
-python -m pip install "./dist/equiframe-0.7.0-py3-none-any.whl[duckdb]"
+python -m pip install ./dist/equiframe-0.8.0-py3-none-any.whl
+python -m pip install "./dist/equiframe-0.8.0-py3-none-any.whl[duckdb]"
 # Alternativas: [arrow], [pandas], [polars], [engines] o [ml].
 # Desde el checkout del equipo:
 python -m pip install ".[engines]"

@@ -224,3 +224,20 @@ perfiles normales científicos, escenarios revisados, ni resultados de H1–H3.
 El piloto anterior conserva cero etiquetas confirmadas y carece de soporte
 por familia para ajuste/calibración. A63–A69 registran decisiones y consecuencias;
 [verificación efectiva](STEP_07_REVIEW.md).
+
+## Paso 8 — núcleo y benchmark 0.8.0, 2026-10-01
+
+La integración de R/perfil/M/B/H utiliza los formatos y fórmulas existentes;
+el oráculo permanece en benchmark y no alimenta la inferencia. El runner aporta
+trazabilidad de captura, versiones, etapas, evidencia y reportes a OE3/OE4/OE5.
+El reductor facilita diagnóstico técnico con un fallo preservado; no genera
+etiquetas científicas ni transforma candidatos reducidos en nuevos escenarios
+revisados automáticamente.
+
+A72–A78 precisan ingeniería, estados y límites. No hay modificación metodológica
+ni del documento de tesis. Los datos, modelos y autores de tests son sintéticos;
+no aportan revisión humana, resultados SERCOP, FPR ni confirmación H1–H3. El piloto
+conserva 5 escenarios/4 grupos/15 perfiles y 35 revisiones pendientes. P06 continúa
+pendiente de publicación pública en la etapa indicada por Hernán. La instalación
+temporal de wheels solo verifica ingeniería. [Diseño](STEP_08_DESIGN.md),
+[uso](ORCHESTRATION.md) y [verificación](STEP_08_REVIEW.md).
