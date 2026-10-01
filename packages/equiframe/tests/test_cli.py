@@ -1,6 +1,7 @@
 import json
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -88,4 +89,7 @@ print(equiframe.__version__)
     result = subprocess.run(
         [sys.executable, "-c", code], check=True, text=True, capture_output=True
     )
-    assert result.stdout.strip() == "0.4.0"
+    expected = tomllib.loads((PACKAGE / "pyproject.toml").read_text(encoding="utf-8"))["project"][
+        "version"
+    ]
+    assert result.stdout.strip() == expected

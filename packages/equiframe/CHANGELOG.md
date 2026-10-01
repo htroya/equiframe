@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.0 — 2026-10-01
+
+- Perfiles de una captura para las cinco familias y diez métricas de la Tabla 13.
+- Conteos y denominadores explícitos; NULL/NaN/vacío/cero, no aplicabilidad y
+  fallos técnicos separados. Recibos para conversiones instrumentadas.
+- Preprocesamiento normal de entrenamiento: medianas congeladas, indicadores,
+  retiro documentado, incompatibilidades de versión/orden y matriz común M/B.
+- Persistencia JSON sin sobrescritura; esquemas, cinco ejemplos y verificación
+  del wheel fuera del checkout. M/B/H y el benchmark siguen pendientes.
+
 ## 0.4.0 — 2026-09-30
 
 - Paso 4: `ef.evaluate_rules` verifica entradas y salida capturadas de una sola

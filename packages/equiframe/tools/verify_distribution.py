@@ -108,6 +108,50 @@ assert ef.read_table(ref).to_pylist()==[{'id':'001'},{'id':'001'}]
                 cwd=project,
                 env=profile_env,
             )
+            profile_example = project / "profiles_from_run.py"
+            shutil.copyfile(ROOT / "examples" / "profiles_from_run.py", profile_example)
+            shutil.copytree(ROOT / "examples" / "profiles", project / "profiles")
+            for family in ("nulls_types", "joins", "duplicates_order", "aggregations", "dates"):
+                capture = next((project / "rule-runs").glob(family + "_*/run.json"))
+                run(
+                    [
+                        str(python),
+                        "-I",
+                        str(profile_example),
+                        str(capture),
+                        str(project / "profiles" / (family + ".json")),
+                        "--work-dir",
+                        str(project / ("profiles-" + family)),
+                    ],
+                    cwd=project,
+                    env=profile_env,
+                )
+            fitted_example = project / "preprocess_profiles.py"
+            shutil.copyfile(ROOT / "examples" / "preprocess_profiles.py", fitted_example)
+            training_profile = next((project / "profiles-nulls_types").glob("*/profile.json"))
+            selection = project / "synthetic-selection.json"
+            selection.write_text(
+                '{"purpose":"normal_training","status":"synthetic API demonstration",'
+                '"source":"rules_catalog.py/nulls_types"}',
+                encoding="utf-8",
+            )
+            run(
+                [
+                    str(python),
+                    "-I",
+                    str(fitted_example),
+                    "--training",
+                    str(training_profile),
+                    "--selection-manifest",
+                    str(selection),
+                    "--score",
+                    str(training_profile),
+                    "--output",
+                    str(project / "preprocessor.json"),
+                ],
+                cwd=project,
+                env=profile_env,
+            )
         else:
             example = project / "execute_native.py"
             shutil.copyfile(ROOT / "examples" / "execute_native.py", example)
@@ -188,6 +232,8 @@ print('Installed wheel imports from clean site-packages without engines/ML/dev t
 assert equiframe.ComparisonOptions().batch_rows > 0
 assert callable(equiframe.compare) and callable(equiframe.iter_differences)
 assert callable(equiframe.evaluate_rules) and callable(equiframe.iter_rule_findings)
+assert callable(equiframe.profile_execution) and callable(equiframe.fit_preprocessor)
+assert callable(equiframe.transform_profiles) and callable(equiframe.read_preprocessor)
 """
         run([str(python), "-I", "-c", check, package_version], cwd=work, env=env)
         api_check = """
@@ -263,6 +309,11 @@ print('Installed wheel API roundtrips all five fixtures exactly')
             "examples/rules_from_run.py",
             "schemas/contract-1.0.schema.json",
             "schemas/rule-evaluation-1.0.schema.json",
+            "schemas/profile-result-1.0.schema.json",
+            "schemas/preprocessor-bundle-1.0.schema.json",
+            "examples/profiles/nulls_types.json",
+            "examples/profiles_from_run.py",
+            "examples/preprocess_profiles.py",
         ):
             if not (source / path).is_file():
                 raise RuntimeError("sdist is missing " + path)
@@ -331,7 +382,13 @@ assert Path(equiframe.__file__).resolve().is_relative_to(Path(sys.prefix).resolv
             "def compare(a: ef.ArtifactRef, b: ef.ExecutionResult, "
             "contract: ef.Contract) -> ef.ComparisonResult:\n"
             "    options = ef.ComparisonOptions(batch_rows=2)\n"
-            "    return ef.compare(a, b, contract=contract, options=options)\n",
+            "    return ef.compare(a, b, contract=contract, options=options)\n"
+            "def profile(run: ef.ExecutionResult, spec: ef.ProfileSpec) -> ef.ProfileResult:\n"
+            "    return ef.profile_execution(run, spec=spec)\n"
+            "def matrix(training: ef.NormalTrainingProfiles, spec: ef.ProfileSpec, "
+            "profiles: tuple[ef.ProfileVector, ...]) -> ef.FeatureMatrix:\n"
+            "    bundle = ef.fit_preprocessor(training, spec=spec)\n"
+            "    return ef.transform_profiles(bundle, profiles)\n",
             encoding="utf-8",
         )
         run(

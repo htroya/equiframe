@@ -47,3 +47,18 @@ ni casos del benchmark revisado. Para una ejecución real, lea su `run.json` com
 los artefactos referenciados sin importar los motores.
 `rules_from_run.py ruta/al/run.json` es el consumidor mínimo de esa captura;
 no necesita instalar Pandas, Polars ni DuckDB.
+
+## Perfiles del paso 5
+
+`profiles_from_run.py` recibe `run.json` y un `ProfileSpec` JSON. Las cinco
+especificaciones en `profiles/` usan las capturas sintéticas de `rules_catalog.py`.
+Requiere solo Arrow; publica un perfil con conteos, denominadores y estados.
+
+`preprocess_profiles.py` recibe selección normal de entrenamiento, su manifiesto,
+perfiles a transformar y una ruta nueva para el bundle. Guarda y restaura medianas
+congeladas y muestra la matriz común para los futuros M/B. Seleccionar correctamente
+entrenamiento normal sigue siendo responsabilidad del consumidor/benchmark.
+
+`execute_native.py` también perfila sus ejecuciones con los tres motores y verifica
+la igualdad de los vectores calculados independientemente. Ningún profiler recibe
+otra salida. Todo esto es demostración de ingeniería, no entrenamiento científico.

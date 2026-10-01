@@ -282,6 +282,7 @@ def main() -> None:
     args = parser.parse_args()
     registered = registry()
     results: dict[str, list[ef.ExecutionResult]] = {}
+    profiles: dict[str, list[ef.ProfileVector]] = {}
     for engine in args.engine or ("pandas", "polars", "duckdb"):
         for case in cases():
             result = ef.execute(
@@ -296,6 +297,34 @@ def main() -> None:
             )
             assert result.state == "completed", result.problem
             assert result.output is not None
+            features = [ef.ProfileFeature(name="rows", metric="log_filas", table="result")]
+            family = case.contract.family
+            if family in ("joins", "duplicates_order", "aggregations"):
+                features.append(
+                    ef.ProfileFeature(
+                        name="row_ratio",
+                        metric="razon_salida_entrada",
+                        table="result",
+                        denominator_table=case.contract.inputs[0].name,
+                    )
+                )
+            if family in ("nulls_types", "joins", "aggregations"):
+                for column_spec in case.contract.output.schema_spec.columns:
+                    features.append(
+                        ef.ProfileFeature(
+                            name="nulls_" + column_spec.name,
+                            metric="tasa_nulos",
+                            table="result",
+                            columns=(column_spec.name,),
+                        )
+                    )
+            profile = ef.profile_execution(
+                result,
+                spec=ef.ProfileSpec(family=family, features=tuple(features)),
+                work_dir=args.work_dir,
+            )
+            assert profile.complete, profile
+            profiles.setdefault(family, []).append(profile.vector)
             assert_expected(ef.read_table(result.output.data).to_pylist(), case.expected)
             comparison = ef.compare(
                 result,
@@ -320,6 +349,9 @@ def main() -> None:
                 )
                 assert comparison.state == "equivalent", comparison
                 print(left.plan.engine, right.plan.engine, comparison.state)
+    for family, vectors in profiles.items():
+        assert all(vector == vectors[0] for vector in vectors)
+        print(family, "same independent profile across", len(vectors), "native engine(s)")
 
 
 if __name__ == "__main__":

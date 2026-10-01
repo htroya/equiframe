@@ -94,6 +94,31 @@ from equiframe.execution_types import (
 )
 from equiframe.local import LocalArtifactStore
 from equiframe.ports import ArtifactStore, DataSource, EngineAdapter
+from equiframe.preprocessing import (
+    fit_preprocessor,
+    read_preprocessor,
+    transform_profiles,
+    write_preprocessor,
+)
+from equiframe.profile_types import (
+    ConversionReceipt,
+    FeatureFit,
+    FeatureMatrix,
+    FeatureObservation,
+    FeatureState,
+    FeatureSupport,
+    NormalTrainingProfiles,
+    PreprocessorBundle,
+    ProfileFeature,
+    ProfileMetadata,
+    ProfileMetric,
+    ProfileOptions,
+    ProfileResult,
+    ProfileSpec,
+    ProfileVector,
+    profile_spec_fingerprint,
+)
+from equiframe.profiles import profile_execution, read_profile
 from equiframe.registry import (
     DuckDBTransformation,
     PandasTransformation,
@@ -165,7 +190,7 @@ from equiframe.values import (
     TimeZone,
 )
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 __all__ = [
     "CANONICALIZATION",
@@ -202,6 +227,7 @@ __all__ = [
     "ContractIOError",
     "ContractParseError",
     "ContractValidationError",
+    "ConversionReceipt",
     "DataSource",
     "DatePolicy",
     "DateType",
@@ -223,6 +249,11 @@ __all__ = [
     "ExecutionState",
     "ExecutionTimeout",
     "Family",
+    "FeatureFit",
+    "FeatureMatrix",
+    "FeatureObservation",
+    "FeatureState",
+    "FeatureSupport",
     "FitState",
     "FloatType",
     "FloatValue",
@@ -246,6 +277,7 @@ __all__ = [
     "NaNPolicy",
     "NaNValue",
     "NativeEngineError",
+    "NormalTrainingProfiles",
     "NullPolicy",
     "NullValue",
     "NumericPolicy",
@@ -261,6 +293,14 @@ __all__ = [
     "PolarsInput",
     "PolarsTransformation",
     "PreconditionSpec",
+    "PreprocessorBundle",
+    "ProfileFeature",
+    "ProfileMetadata",
+    "ProfileMetric",
+    "ProfileOptions",
+    "ProfileResult",
+    "ProfileSpec",
+    "ProfileVector",
     "ResourceLimitError",
     "RuleContext",
     "RuleCoverage",
@@ -306,13 +346,20 @@ __all__ = [
     "default_rule_registry",
     "evaluate_rules",
     "execute",
+    "fit_preprocessor",
     "iter_differences",
     "iter_rule_findings",
+    "profile_execution",
+    "profile_spec_fingerprint",
     "read_comparison",
     "read_contract",
+    "read_preprocessor",
+    "read_profile",
     "read_rule_evaluation",
     "read_table",
     "rule_set_fingerprint",
+    "transform_profiles",
     "validate_contract",
     "write_contract",
+    "write_preprocessor",
 ]

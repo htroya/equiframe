@@ -1,6 +1,7 @@
 # Trazabilidad con la tesis en elaboración
 
-Fuente local: `TFM_EquiFrame_ACTUAL.docx`, revisada el 2026-09-28.
+Fuente local: `TFM_EquiFrame_ACTUAL.docx`, revisada inicialmente el 2026-09-28
+y contrastada de nuevo para el paso 5 el 2026-10-01; conserva el mismo hash.
 
 SHA-256 del archivo revisado:
 
@@ -28,7 +29,7 @@ El archivo original está en la carpeta padre del proyecto local. No se modifica
 | T12 | 3.4.3 | H = R OR M con disponibilidad explícita | Decisiones, 7 | Nueve combinaciones y estado completo/parcial |
 | T13 | 3.5 | Grano adjudicación, puente sin monto, monedas separadas | Jhair; contrato/integración 9 | Unicidad, integridad y reconciliación |
 | T14 | 3.5 | Preparación antes de publicación, idempotencia | Jhair/José; integración 9 | Carga repetida y fallo sin cambiar versión vigente |
-| T15 | 3.6 | Features por familia, imputación solo en ajuste | Perfiles, 5 | Fórmulas, orden, medianas e indicadores |
+| T15 | 3.6 | Features por familia, imputación solo en ajuste | Perfiles, 5 | Diez fórmulas y preprocesador 0.5.0; pruebas sintéticas y consumidor wheel. Selección científica pendiente |
 | T16 | 3.6 | IF y MAD con calibración externa | Modelos, 7 | Scores, umbrales, igualdad estricta y no estimable |
 | T17 | 3.7 | Dependencias transitivas dentro de una partición | Benchmark, 6 | Componentes conexos y ausencia de fuga |
 | T18 | 3.7, 3.9 | Piloto y congelación; prueba no selecciona parámetros | Benchmark, 6/7/10 | FreezeManifest y auditoría de cambios |
@@ -38,6 +39,12 @@ El archivo original está en la carpeta padre del proyecto local. No se modifica
 | T22 | 1.4, 3.5 | Ejecución local, sin plataforma distribuida | Arquitectura | Núcleo local y VM como apoyo colaborativo |
 
 ## Decisiones todavía abiertas en la tesis
+
+El paso 5 implementa T10/T15 con las decisiones A48–A54. Los recibos de
+conversión son un formato de ingeniería suplementario; no un requisito ya
+escrito en el borrador. La declaración `normal_training` y el hash del manifiesto
+no sustituyen revisión O ni validación de splits. Los casos sintéticos verifican
+fórmulas/API; no se cuentan como los 60 escenarios o 300 perfiles propuestos.
 
 | Decisión | Qué debe obtenerse antes de cerrarla | Tratamiento en el software |
 |---|---|---|

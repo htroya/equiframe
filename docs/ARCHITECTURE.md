@@ -1,6 +1,6 @@
 # Arquitectura de EquiFrame
 
-Versión de diseño: 0.4, 2026-09-30. Estado: pasos 1 a 4 implementados; componentes posteriores siguen siendo especificación. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md).
+Versión de diseño: 0.5, 2026-10-01. Estado: pasos 1 a 5 implementados; componentes posteriores siguen siendo especificación. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md).
 
 ## 1. Propósito y alcance
 
@@ -104,7 +104,7 @@ Una limitación de memoria o tiempo produce comparación `not_evaluable`, no equ
 
 ## 7. Persistencia y trazabilidad
 
-Paso 2 produce `run.json`, entradas capturadas y salida Arrow con referencias, tamaños y SHA-256 en un directorio propio. Paso 3 añade `comparison.json`, diferencias JSONL y snapshots en carpetas independientes. Paso 4 añade `rules.json` y hallazgos JSONL en otra carpeta propia. `environment.json`, `events.jsonl`, `profile.json`, `decisions.json` y `report.html` pertenecen a pasos posteriores. El benchmark agregará manifiestos de splits, revisiones, métricas y costos. Cada formato tiene `schema_version`.
+Paso 2 produce `run.json`, entradas capturadas y salida Arrow con referencias, tamaños y SHA-256 en un directorio propio. Paso 3 añade `comparison.json`, diferencias JSONL y snapshots en carpetas independientes. Paso 4 añade `rules.json` y hallazgos JSONL en otra carpeta propia. Paso 5 añade `profile.json` y bundles JSON de preprocesamiento. `environment.json`, `events.jsonl`, `decisions.json` y `report.html` pertenecen a pasos posteriores. El benchmark agregará manifiestos de splits, revisiones, métricas y costos. Cada formato tiene `schema_version`.
 
 Artefactos grandes: Arrow/Parquet con esquema y hashes; JSON para metadatos y valores especiales etiquetados. Un hash de archivo verifica bytes; un digest lógico versionado puede resumir contenido canónico, pero no reemplaza la prueba exacta. El manifiesto final contiene hashes de sus artefactos y el estado de completitud.
 
@@ -203,4 +203,21 @@ Los estados incompletos conservan evidencia parcial y nunca equivalencia.
 La [especificación de comparación](COMPARISON.md) define políticas suplementarias
 versionadas, mapeos físicos/lógicos, alcance, algoritmos y presupuestos. Contratos
 1.0 y sus huellas no cambian. Índices separados requieren decisión expresa.
-No se implementan R, perfiles, detectores, benchmark, CLI operacional ni oráculo O.
+El comparador no implementa R, perfiles, detectores, benchmark, CLI operacional ni oráculo O.
+
+## 14. Perfiles y preprocesamiento en 0.5.0
+
+`profile_execution` usa exclusivamente tablas verificadas de una captura y una
+`ProfileSpec` de fórmulas cerradas. Metadatos y `ProfileVector` están separados.
+No importa reglas ni invoca la comparación; utiliza las primitivas de valores
+exactos y tiempo ya disponibles. No modifica las tablas ni imputa sus ausencias.
+
+`fit_preprocessor` acepta perfiles seleccionados como entrenamiento normal;
+`transform_profiles` aplica el bundle inmutable, sin reajustarlo. Produce un único
+`FeatureMatrix` para M/B del paso 7. La selección científica y sus grupos son
+responsabilidad del benchmark, no del núcleo. No se infiere normalidad a partir de R.
+
+Publica `profile.json`; perfiles y bundles tienen formato propio 1.0 y lectura
+estricta. Los recibos suplementarios registran intentos de conversión de la misma
+captura. Límites contables y cancelación son cooperativos; no hay spill para el
+perfilado en esta versión. [Fórmulas y límites](PROFILES.md).

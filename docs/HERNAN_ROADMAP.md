@@ -47,6 +47,12 @@ congelamiento experimental final permanecen en sus pasos previstos.
 
 ## Paso 5. Perfiles por familia y preprocesamiento
 
+**Estado:** implementación de ingeniería 0.5.0. Diez fórmulas, especificaciones
+versionadas, recibos de conversión, soporte y preprocesamiento persistente.
+[Semántica](PROFILES.md) e [informe de entrega](STEP_05_REVIEW.md). La selección
+científica de columnas y entrenamiento normal debe validarse en los pasos 6/7;
+no se presenta el preprocesador como un detector entrenado.
+
 **Objetivo:** producir features reproducibles con denominadores y soporte explícitos.
 
 **Trabajo:** implementar fórmulas de sección 3.6 por columna/familia, indicadores de no aplicabilidad, metadatos separados, orden fijo y preprocesador ajustado solo con entrenamiento normal. Comprobar ausencia de fuga e incompatibilidades de feature version.
