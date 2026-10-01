@@ -61,6 +61,12 @@ no se presenta el preprocesador como un detector entrenado.
 
 ## Paso 6. Oráculo, catálogo y particiones independientes
 
+**Estado:** implementación técnica `equiframe-benchmark 0.6.0`, con oráculo,
+paquetes ciegos, validación de revisores, procedencia, splits y selección normal.
+[Diseño y reorientación](STEP_06_DESIGN.md), [uso](../packages/equiframe-benchmark/README.md)
+e [informe](STEP_06_REVIEW.md). Piloto de 5 escenarios/35 candidatos/15 perfiles,
+4 grupos y 35 revisiones pendientes. El cierre científico permanece abierto.
+
 **Objetivo:** disponer de un benchmark trazable antes de ajustar detectores.
 
 **Trabajo:** crear distribución `equiframe-benchmark`; catálogo de cinco familias, resultados esperados independientes, mutaciones candidatas, controles correctos, registro de revisión ciega y estados pendientes. Construir grupos por dependencias transitivas, splits por grupos y validación de fuga. Meta 60 escenarios/300 perfiles sujeta a evidencia; desarrollar equivalentes por motor necesarios.

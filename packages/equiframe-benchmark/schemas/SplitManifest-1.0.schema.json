@@ -1,0 +1,101 @@
+{
+  "$defs": {
+    "Assignment": {
+      "additionalProperties": false,
+      "properties": {
+        "group_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Group Id",
+          "type": "string"
+        },
+        "partition": {
+          "enum": [
+            "training",
+            "calibration",
+            "test"
+          ],
+          "title": "Partition",
+          "type": "string"
+        },
+        "scenario_id": {
+          "minLength": 1,
+          "title": "Scenario Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scenario_id",
+        "group_id",
+        "partition"
+      ],
+      "title": "Assignment",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "algorithm": {
+      "const": "sha256-components-balanced-1.0",
+      "default": "sha256-components-balanced-1.0",
+      "title": "Algorithm",
+      "type": "string"
+    },
+    "assignments": {
+      "items": {
+        "$ref": "#/$defs/Assignment"
+      },
+      "title": "Assignments",
+      "type": "array"
+    },
+    "catalog_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Catalog Sha256",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "seed": {
+      "minimum": 0,
+      "title": "Seed",
+      "type": "integer"
+    },
+    "weights": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        }
+      ],
+      "title": "Weights",
+      "type": "array"
+    }
+  },
+  "required": [
+    "catalog_sha256",
+    "seed",
+    "weights",
+    "assignments"
+  ],
+  "title": "SplitManifest",
+  "type": "object"
+}

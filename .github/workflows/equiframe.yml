@@ -18,7 +18,7 @@ jobs:
   quality:
     name: Python 3.12 / ${{ matrix.os }} / ${{ matrix.architecture }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 25
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
@@ -64,4 +64,28 @@ jobs:
       - name: Build wheel and sdist with locked backend
         run: uv run --locked --all-extras python -m build --no-isolation
       - name: Verify base, each extra and wheel examples outside checkout
+        run: uv run --locked --all-extras python tools/verify_distribution.py
+      - name: Install locked benchmark environment
+        working-directory: packages/equiframe-benchmark
+        run: uv sync --locked --all-extras --python 3.12
+      - name: Check benchmark style
+        working-directory: packages/equiframe-benchmark
+        run: uv run --locked --all-extras ruff check .
+      - name: Check benchmark formatting
+        working-directory: packages/equiframe-benchmark
+        run: uv run --locked --all-extras ruff format --check .
+      - name: Check benchmark typing
+        working-directory: packages/equiframe-benchmark
+        run: uv run --locked --all-extras mypy
+      - name: Check benchmark schemas
+        working-directory: packages/equiframe-benchmark
+        run: uv run --locked --all-extras python tools/generate_assets.py --check
+      - name: Test oracle independence, provenance, partitions and native pilot
+        working-directory: packages/equiframe-benchmark
+        run: uv run --locked --all-extras pytest -q
+      - name: Build benchmark wheel and sdist
+        working-directory: packages/equiframe-benchmark
+        run: uv run --locked --all-extras python -m build --no-isolation
+      - name: Verify pip installation and benchmark consumer outside checkout
+        working-directory: packages/equiframe-benchmark
         run: uv run --locked --all-extras python tools/verify_distribution.py

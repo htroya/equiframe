@@ -279,5 +279,31 @@ agregación, presupuestos y catálogo en [Reglas R](RULES.md).
 
 Los formatos nuevos conservan Contract/ExecutionResult/Comparison/Rules 1.0.
 `ProfileOptions` fija presupuestos cooperativos. Detalles y limitaciones:
-[Perfiles](PROFILES.md). Detectores, oráculo, benchmark y CLI integrada siguen
-en los pasos 6–8; los scripts de ejemplo ya son ejecutables.
+[Perfiles](PROFILES.md). Detectores y CLI integrada siguen en los pasos 7–8;
+los scripts de ejemplo ya son ejecutables.
+
+## 12. Benchmark disponible en 0.6.0
+
+Distribución/import separados: `equiframe-benchmark` / `equiframe_benchmark`.
+No modifica los formatos ni la API operacional de `equiframe 0.5.0`.
+
+| API/modelo | Comportamiento |
+|---|---|
+| `InputBinding`, `Scenario`, `Catalog`, `Candidate` | Entradas, esperado, contrato/política, autores, dependencias, versiones y huellas |
+| `review_packet(scenario, candidate, *, directory)` | Copia verificada a carpeta con token aleatorio y nombres neutros; persiste paquete |
+| `ReviewAssignment`, `Review` | Dos revisores/árbitro distintos, fechas UTC, razón, hash y declaración de ceguera |
+| `evaluate_oracle(..., packet, assignment, reviews, resolution, work_dir)` | Comparación independiente y control de revisión; conserva `ComparisonResult` completo |
+| `OracleResult` | Pending/disagreement/confirmed/not_evaluable; solo confirmed lleva etiqueta normal/divergent |
+| `dependency_groups(catalog)` | Componentes transitivos de dependencias declaradas y artefactos compartidos |
+| `make_splits(catalog, *, seed, weights)`, `validate_splits`, `split_counts` | Particiones deterministas por grupos completos; cobertura y cantidades por familia |
+| `select_normal_training(..., candidates, oracles, profiles, executions)` | Mapas por candidato; verifica normalidad revisada, entrenamiento y procedencia exacta |
+| `TrainingSelection`, `TrainingManifest`, `TrainingRecord` | Manifiesto completo enlazado por hash; `.training` cruza al preprocesador del núcleo |
+| `save_document`, `load_document`, `digest` | JSON canónico estricto, sin sobrescritura y con revalidación al leer/escribir |
+
+Diez esquemas JSON públicos 1.0 se generan y comprueban en CI. `ReviewPacket`
+no incluye metadatos del candidato; `OracleResult` permanece con el coordinador
+y sí conserva decisión, comparación y revisiones. Las URI son locales: mover
+artefactos exige publicar referencias/paquetes nuevos, con nuevas huellas;
+no se promete portabilidad de rutas absolutas ni firmas autenticadas.
+Uso y límites: [paquete](../packages/equiframe-benchmark/README.md) y
+[diseño](STEP_06_DESIGN.md).
