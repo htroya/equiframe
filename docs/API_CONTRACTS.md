@@ -164,7 +164,8 @@ Los códigos operacionales mantienen distinción entre alerta/diferencia
 
 Reutilización general, instalación pip local y alias `ef` son requisitos de producto
 nuevos; conservan el objetivo científico pero no se atribuyen al texto del borrador.
-Publicación PyPI pendiente del paso 10. Ejemplo íntegro y ejecutable, instalación y
+Publicación PyPI prevista en el paso 19, después de la evaluación y revisión de
+los pasos 10–18. Ejemplo íntegro y ejecutable, instalación y
 matriz de tipos: [README](../packages/equiframe/README.md).
 
 | Tipo/servicio | Contrato implementado |
@@ -279,7 +280,7 @@ agregación, presupuestos y catálogo en [Reglas R](RULES.md).
 
 Los formatos nuevos conservan Contract/ExecutionResult/Comparison/Rules 1.0.
 `ProfileOptions` fija presupuestos cooperativos. Detalles y limitaciones:
-[Perfiles](PROFILES.md). Detectores disponibles desde 0.7.0; la CLI integrada sigue en 8;
+[Perfiles](PROFILES.md). Detectores disponibles desde 0.7.0; la CLI integrada está disponible desde 0.8.0;
 los scripts de ejemplo ya son ejecutables.
 
 ## 12. Benchmark disponible en 0.6.0

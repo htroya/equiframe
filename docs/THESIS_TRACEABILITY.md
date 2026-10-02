@@ -1,5 +1,10 @@
 # Trazabilidad con la tesis en elaboración
 
+Revisión del paso 8 contrastada directamente el 2026-10-02 contra el mismo DOCX.
+La corrección de ingeniería 0.8.1 fortalece T09/T11 mediante vínculos entre
+capturas, inventarios e intentos de reducción; no modifica el diseño experimental.
+Véase [segunda revisión del paso 8](STEP_08_SECOND_REVIEW.md).
+
 Fuente local: `TFM_EquiFrame_ACTUAL.docx`, revisada inicialmente el 2026-09-28
 y contrastada de nuevo para el paso 5 el 2026-10-01; conserva el mismo hash.
 

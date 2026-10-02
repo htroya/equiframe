@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,9 +22,13 @@ def main() -> None:
     uv = shutil.which("uv")
     if uv is None:
         raise SystemExit("uv must be on PATH")
-    wheel = ROOT / "dist" / "equiframe_benchmark-0.8.0-py3-none-any.whl"
-    core_wheel = CORE / "dist" / "equiframe-0.8.0-py3-none-any.whl"
-    sdist = ROOT / "dist" / "equiframe_benchmark-0.8.0.tar.gz"
+    package_version = tomllib.loads((ROOT / "pyproject.toml").read_text("utf-8"))["project"][
+        "version"
+    ]
+    core_version = tomllib.loads((CORE / "pyproject.toml").read_text("utf-8"))["project"]["version"]
+    wheel = ROOT / "dist" / f"equiframe_benchmark-{package_version}-py3-none-any.whl"
+    core_wheel = CORE / "dist" / f"equiframe-{core_version}-py3-none-any.whl"
+    sdist = ROOT / "dist" / f"equiframe_benchmark-{package_version}.tar.gz"
     for artifact in (wheel, core_wheel, sdist):
         if not artifact.is_file():
             raise SystemExit("build both distributions first: " + artifact.name)
@@ -62,8 +67,8 @@ def main() -> None:
                 str(CORE / "dist"),
                 "--find-links",
                 str(ROOT / "dist"),
-                "equiframe==0.8.0",
-                "equiframe-benchmark==0.8.0",
+                f"equiframe=={core_version}",
+                f"equiframe-benchmark=={package_version}",
             ],
             work,
             env,
@@ -80,9 +85,14 @@ assert not any(n in sys.modules for n in ('pyarrow','pandas','polars','duckdb','
 for module in (ef, eb):
     assert Path(module.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
 assert not Path.cwd().is_relative_to(Path(sys.argv[1]))
-assert importlib.metadata.version('equiframe-benchmark') == '0.8.0'
+assert importlib.metadata.version('equiframe-benchmark') == sys.argv[2]
+assert importlib.metadata.version('equiframe') == sys.argv[3]
 """
-        run([str(python), "-I", "-c", check, str(ROOT.parents[1])], work, env)
+        run(
+            [str(python), "-I", "-c", check, str(ROOT.parents[1]), package_version, core_version],
+            work,
+            env,
+        )
         shutil.copytree(
             ROOT / "tests", work / "tests", ignore=shutil.ignore_patterns("__pycache__")
         )

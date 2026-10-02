@@ -240,4 +240,5 @@ no carga objetos ejecutables ni requiere ML. `decision.combine_decisions`
 implementa OR de tres estados y disponibilidad. `equiframe_benchmark` incorpora
 selección normal de calibración y auditoría de grupos sin transmitir etiquetas
 a features. [Diseño](STEP_07_DESIGN.md), [semántica y uso](DETECTORS.md).
-El ensamble operacional completo y su manifiesto permanecen en el paso 8.
+El ensamble operacional completo y su manifiesto están implementados desde el
+paso 8; véase [orquestación](ORCHESTRATION.md).
