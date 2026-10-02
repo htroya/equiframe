@@ -344,3 +344,20 @@ convierten en no alerta. Detalles y límites: [detectores](DETECTORS.md).
 Siete esquemas nuevos 1.0. `DetectorVersions` acepta 0.7.0/0.8.0 sin cambiar el
 algoritmo IF/MAD. El núcleo no importa benchmark ni acepta O como entrada del
 runner. [Uso y códigos CLI](ORCHESTRATION.md), [diseño y límites](STEP_08_DESIGN.md).
+
+## 15. Consumidor e integración experimental en 0.9.0
+
+Disponible mediante `import equiframe_benchmark as eb`; requiere núcleo 0.8.1.
+
+| API/modelo | Comportamiento |
+|---|---|
+| `SnapshotColumn`, `SnapshotTable`, `SnapshotManifest` | Recibo publicado e inmutable con tipos, revisión, filas y artefactos |
+| `SnapshotClient`, `SnapshotDataSource` | Cliente explícito, fijación del recibo y selección de tablas con comprobaciones |
+| `snapshot_fingerprint` | Identidad canónica del manifiesto completo |
+| `IntegrationSpec`, `IntegrationResult` | Tres planes nativos compatibles, snapshot, decisiones y evidencia |
+| `run_integration`, `read_integration` | Ejecución única por motor y verificación local de referencias/manifiestos |
+| `AwardReconciliationSpec`, `AwardReconciliationResult`, `reconcile_awards` | Grano, importes exactos, monedas y puente configurables; ausencias explícitas |
+
+Cinco esquemas nuevos 1.0. Los resultados no confirman etiquetas científicas.
+El contrato del cliente no implementa transporte, autenticación, DDL ni operación
+del servicio. [Diseño](STEP_09_DESIGN.md), [uso CLI](../packages/equiframe-benchmark/README.md).

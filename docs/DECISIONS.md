@@ -226,3 +226,19 @@ El DOCX conserva el SHA-256 registrado. Estas correcciones sostienen T09/T11 y
 no cambian alpha, features, hipótesis, etiquetas, particiones ni criterios de O.
 La [segunda revisión](STEP_08_SECOND_REVIEW.md) distingue los controles técnicos
 del cierre científico y de la publicación pública prevista en el paso 19.
+
+## Paso 9 — consumidor y conformidad local, 2026-10-02
+
+Hernán confirmó que no están disponibles cliente/snapshot/DDL y autorizó el
+desarrollo de EquiFrame en paralelo. Las dependencias externas permanecen abiertas.
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A82 | Recibo completo fijado una vez y selección explícita de tablas | Consumir un subconjunto no cambia la versión del DW. El consumidor verifica bytes/tipos; el cliente controla transporte/autenticación/timeouts. El esquema de integración necesita adaptación acordada cuando llegue el cliente real |
+| A83 | Tres planes compatibles y esperado capturado una sola vez | Mantiene ejecuciones nativas y comparación pareada sobre la misma entrada; impide que un esperado mutable cambie entre motores. Una comparación completa no confirma O |
+| A84 | Reconciliación declarativa, decimal exacto y total no evaluable ante importe ausente | No redefine el DW ni normaliza diferencias. La suma entera evita redondeo por contexto Decimal, conserva monedas y muestra importes ausentes; puente con varios proveedores no multiplica la medida |
+| A85 | Benchmark 0.9.0 sobre núcleo 0.8.1, integración real pendiente | Aporta código consumidor/CLI y conformidad instalada. No administra el servicio, crea el DW ni certifica OCI. PyPI permanece en 19 |
+
+Precisan ingeniería de T03/T09/T13–T14. No modifican cohorte, alpha, fórmulas,
+etiquetas, grupos ni criterios de revisión. Diseño y controles:
+[paso 9](STEP_09_DESIGN.md), [verificación](STEP_09_REVIEW.md).

@@ -153,3 +153,18 @@ La distribución comprueba import base sin motores/ML, ejemplo del runner/reduct
 instalado fuera del checkout y reconstrucción idéntica desde sdist. El benchmark
 prueba CLI validate/split/pilot y el mismo piloto nativo, conservando sus revisiones
 pendientes. [Resultados ejecutados](STEP_08_REVIEW.md).
+
+## 13. Controles del paso 9
+
+Snapshots fijados, manifiestos completos con selección parcial, transporte fallido,
+hashes/tamaños/tipos/filas incompatibles, cancelación y límites cooperativos.
+Las tres corridas nativas preservan sus entradas y comparaciones independientes;
+el esperado queda capturado una vez. El lector comprueba el inventario y la
+coherencia de los resultados hijos sin reconectar al servicio. La conciliación
+verifica importes decimales exactos, NULL, duplicados, monedas y puentes sin
+deduplicación ni conversión monetaria implícita.
+
+La distribución instala el ejemplo de integración fuera del checkout y verifica
+las suites contra el wheel reconstruido desde sdist. Fixtures e identidades de
+prueba no son datos SERCOP ni revisiones académicas. El cierre real depende de
+entregables externos identificados en el [informe](STEP_09_REVIEW.md).

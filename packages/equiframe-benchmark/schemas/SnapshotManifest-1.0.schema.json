@@ -1,0 +1,427 @@
+{
+  "$defs": {
+    "ArtifactRef": {
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "enum": [
+            "json",
+            "jsonl",
+            "arrow",
+            "parquet"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "media_type": {
+          "minLength": 1,
+          "title": "Media Type",
+          "type": "string"
+        },
+        "schema_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SchemaRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        },
+        "uri": {
+          "minLength": 1,
+          "title": "Uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "uri",
+        "sha256",
+        "format",
+        "media_type",
+        "size_bytes"
+      ],
+      "title": "ArtifactRef",
+      "type": "object"
+    },
+    "BooleanType": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "boolean",
+          "default": "boolean",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "title": "BooleanType",
+      "type": "object"
+    },
+    "DateType": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "date",
+          "default": "date",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "title": "DateType",
+      "type": "object"
+    },
+    "DecimalType": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "decimal",
+          "default": "decimal",
+          "title": "Kind",
+          "type": "string"
+        },
+        "precision": {
+          "maximum": 76,
+          "minimum": 1,
+          "title": "Precision",
+          "type": "integer"
+        },
+        "scale": {
+          "minimum": 0,
+          "title": "Scale",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "precision",
+        "scale"
+      ],
+      "title": "DecimalType",
+      "type": "object"
+    },
+    "FloatType": {
+      "additionalProperties": false,
+      "properties": {
+        "bits": {
+          "enum": [
+            32,
+            64
+          ],
+          "title": "Bits",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "float",
+          "default": "float",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bits"
+      ],
+      "title": "FloatType",
+      "type": "object"
+    },
+    "IntegerType": {
+      "additionalProperties": false,
+      "properties": {
+        "bits": {
+          "enum": [
+            8,
+            16,
+            32,
+            64
+          ],
+          "title": "Bits",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "integer",
+          "default": "integer",
+          "title": "Kind",
+          "type": "string"
+        },
+        "signed": {
+          "title": "Signed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "bits",
+        "signed"
+      ],
+      "title": "IntegerType",
+      "type": "object"
+    },
+    "SchemaRef": {
+      "additionalProperties": false,
+      "properties": {
+        "revision": {
+          "exclusiveMinimum": 0,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "schema_id": {
+          "minLength": 1,
+          "title": "Schema Id",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_id",
+        "revision",
+        "sha256"
+      ],
+      "title": "SchemaRef",
+      "type": "object"
+    },
+    "SnapshotColumn": {
+      "additionalProperties": false,
+      "description": "Exact observed Arrow type plus independently declared logical expectation.",
+      "properties": {
+        "logical_type": {
+          "discriminator": {
+            "mapping": {
+              "boolean": "#/$defs/BooleanType",
+              "date": "#/$defs/DateType",
+              "decimal": "#/$defs/DecimalType",
+              "float": "#/$defs/FloatType",
+              "integer": "#/$defs/IntegerType",
+              "string": "#/$defs/StringType",
+              "timestamp": "#/$defs/TimestampType"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/BooleanType"
+            },
+            {
+              "$ref": "#/$defs/IntegerType"
+            },
+            {
+              "$ref": "#/$defs/StringType"
+            },
+            {
+              "$ref": "#/$defs/DecimalType"
+            },
+            {
+              "$ref": "#/$defs/FloatType"
+            },
+            {
+              "$ref": "#/$defs/DateType"
+            },
+            {
+              "$ref": "#/$defs/TimestampType"
+            }
+          ],
+          "title": "Logical Type"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "nullable": {
+          "title": "Nullable",
+          "type": "boolean"
+        },
+        "physical_type": {
+          "minLength": 1,
+          "title": "Physical Type",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "physical_type",
+        "logical_type",
+        "nullable"
+      ],
+      "title": "SnapshotColumn",
+      "type": "object"
+    },
+    "SnapshotTable": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "columns": {
+          "items": {
+            "$ref": "#/$defs/SnapshotColumn"
+          },
+          "minItems": 1,
+          "title": "Columns",
+          "type": "array"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "row_count": {
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "artifact",
+        "row_count",
+        "columns"
+      ],
+      "title": "SnapshotTable",
+      "type": "object"
+    },
+    "StringType": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "string",
+          "default": "string",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "title": "StringType",
+      "type": "object"
+    },
+    "TimestampType": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "timestamp",
+          "default": "timestamp",
+          "title": "Kind",
+          "type": "string"
+        },
+        "timezone": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Timezone"
+        },
+        "unit": {
+          "enum": [
+            "s",
+            "ms",
+            "us",
+            "ns"
+          ],
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "unit",
+        "timezone"
+      ],
+      "title": "TimestampType",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "domain_schema_revision": {
+      "minLength": 1,
+      "title": "Domain Schema Revision",
+      "type": "string"
+    },
+    "extraction_revision": {
+      "minLength": 1,
+      "title": "Extraction Revision",
+      "type": "string"
+    },
+    "immutable": {
+      "const": true,
+      "default": true,
+      "title": "Immutable",
+      "type": "boolean"
+    },
+    "provenance": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Provenance",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "state": {
+      "const": "published",
+      "default": "published",
+      "title": "State",
+      "type": "string"
+    },
+    "tables": {
+      "items": {
+        "$ref": "#/$defs/SnapshotTable"
+      },
+      "minItems": 1,
+      "title": "Tables",
+      "type": "array"
+    }
+  },
+  "required": [
+    "snapshot_id",
+    "domain_schema_revision",
+    "extraction_revision",
+    "provenance",
+    "tables"
+  ],
+  "title": "SnapshotManifest",
+  "type": "object"
+}

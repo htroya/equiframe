@@ -1,4 +1,4 @@
-"""Install both distributions with pip outside the checkout, then run the native pilot."""
+"""Verify both installed distributions, native pilot and the integration example."""
 
 import hashlib
 import os
@@ -35,7 +35,7 @@ def main() -> None:
     env = dict(os.environ)
     env.pop("PYTHONPATH", None)
     env.pop("VIRTUAL_ENV", None)
-    with tempfile.TemporaryDirectory(prefix="equiframe-step6-") as temporary:
+    with tempfile.TemporaryDirectory(prefix="equiframe-benchmark-check-") as temporary:
         work = Path(temporary).resolve()
         environment = work / ".venv"
         env["UV_PROJECT_ENVIRONMENT"] = str(environment)
@@ -116,6 +116,13 @@ assert importlib.metadata.version('equiframe') == sys.argv[3]
             work,
             env,
         )
+        example = work / "integration_local.py"
+        shutil.copy2(ROOT / "examples" / "integration_local.py", example)
+        run(
+            [str(python), "-I", str(example), "--output", str(work / "integration-example")],
+            work,
+            env,
+        )
         extracted = work / "sdist"
         with tarfile.open(sdist) as archive:
             archive.extractall(extracted, filter="data")
@@ -128,7 +135,8 @@ assert importlib.metadata.version('equiframe') == sys.argv[3]
         ):
             raise RuntimeError("sdist did not reproduce the same wheel bytes")
         print(
-            "pip installation, installed tests, native pilot and identical sdist rebuild verified"
+            "pip installation, installed tests, native pilot, integration example "
+            "and identical sdist rebuild verified"
         )
 
 
