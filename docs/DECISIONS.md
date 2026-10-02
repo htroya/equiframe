@@ -213,3 +213,16 @@ permanecen versionados; no hubo publicación en PyPI ni despliegue de servicios.
 Son decisiones de ingeniería. No modifican hipótesis, objetivos, DOCX, criterios
 humanos del oráculo o decisiones experimentales pendientes. A71 y el calendario
 de veinte pasos siguen vigentes. Uso: [orquestación](ORCHESTRATION.md).
+
+## Revisión del paso 8 — ingeniería, 2026-10-02
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A79 | Verificar cierre del inventario y vínculo de cada captura propia | Un manifiesto no puede omitir su tabla y seguir declarando evidencia íntegra. Las fuentes externas conservan procedencia; sus capturas privadas deben permanecer en la corrida |
+| A80 | Releer posiciones, confirmaciones y observaciones de reducción sin ejecutar el predicado | Vincula el resultado final con los intentos conservados y con las filas originales; una etiqueta `one_minimal` necesita evidencia de las supresiones individuales restantes. Mantiene formatos 1.0 y límites de autenticidad local |
+| A81 | Versión correctiva 0.8.1 y errores de integridad CLI con código 3 | Conserva bundles anteriores y las dependencias fijadas. Corrupción de evidencia es un fallo operativo, distinto de una solicitud inválida |
+
+El DOCX conserva el SHA-256 registrado. Estas correcciones sostienen T09/T11 y
+no cambian alpha, features, hipótesis, etiquetas, particiones ni criterios de O.
+La [segunda revisión](STEP_08_SECOND_REVIEW.md) distingue los controles técnicos
+del cierre científico y de la publicación pública prevista en el paso 19.

@@ -11,15 +11,18 @@ from pydantic import Field, model_validator
 
 from equiframe._base import FrozenModel, Identifier, NonNegativeInt, PositiveInt, Text
 from equiframe.evidence import (
+    MAX_DOCUMENT_BYTES,
     EventJournal,
+    EvidenceEvent,
     inventory,
     load_json,
+    parse_json,
     publish_json,
     verify_events,
     verify_files,
 )
 from equiframe.execution import CancellationToken
-from equiframe.local import LocalArtifactStore
+from equiframe.local import LocalArtifactStore, local_path
 from equiframe.pipeline_types import EvidenceFile
 from equiframe.tables import ArrowInput
 from equiframe.types import ArtifactRef
@@ -272,14 +275,23 @@ def reduce_case(
 
 
 def read_reduction(path: Path) -> ReductionResult:
+    """Verify recorded decisions and row provenance without invoking the predicate."""
     path = path / "reduction.json" if path.is_dir() else path
     result = load_json(ReductionResult, path)
-    verify_files(path.parent, result.evidence)
+    directory = path.parent
+    verify_files(directory, result.evidence)
     from equiframe.errors import ArtifactIntegrityError
 
-    events = verify_events(path.parent / "events.jsonl", operation_id=result.reduction_id)
+    listed = {item.path: item for item in result.evidence}
+    if not {"events.jsonl", "options.json"} <= listed.keys() or not result.tables:
+        raise ArtifactIntegrityError("reduction is missing required evidence")
+    if load_json(ReductionOptions, directory / "options.json") != result.options:
+        raise ArtifactIntegrityError("reduction options contradict the recorded configuration")
+    events = verify_events(directory / "events.jsonl", operation_id=result.reduction_id)
     if (
-        not events
+        len(events) < 2
+        or (events[0].stage, events[0].state, events[0].code)
+        != ("reduction", "started", "reduction_started")
         or events[-1].stage != "reduction"
         or events[-1].state != "finished"
         or events[-1].code != result.status
@@ -289,4 +301,203 @@ def read_reduction(path: Path) -> ReductionResult:
         != result.accepted_candidates
     ):
         raise ArtifactIntegrityError("reduction journal contradicts final result")
+    _verify_reduction_tables(result, directory, listed)
+    _verify_reduction_attempts(result, directory, listed, events)
     return result
+
+
+def _verify_reduction_tables(
+    result: ReductionResult, directory: Path, listed: Mapping[str, EvidenceFile]
+) -> None:
+    import hashlib
+
+    import pyarrow as pa
+
+    from equiframe.errors import ArtifactIntegrityError
+
+    root = directory.resolve()
+    total_rows = 0
+    for table in result.tables:
+        paths: dict[str, Path] = {}
+        for kind, ref in (("original", table.original), ("reduced", table.reduced)):
+            named = listed.get(f"{table.name}.{kind}.arrow")
+            artifact = local_path(ref).resolve()
+            if not artifact.is_relative_to(root):
+                raise ArtifactIntegrityError("reduction artifact escapes its operation directory")
+            item = listed.get(artifact.relative_to(root).as_posix())
+            if (
+                named is None
+                or item is None
+                or ref.format != "arrow"
+                or ref.media_type != "application/vnd.apache.arrow.file"
+                or ref.schema_ref is not None
+                or (ref.sha256, ref.size_bytes) != (item.sha256, item.size_bytes)
+                or (ref.sha256, ref.size_bytes) != (named.sha256, named.size_bytes)
+            ):
+                raise ArtifactIntegrityError("reduction artifact contradicts its captured table")
+            paths[kind] = artifact
+        with paths["original"].open("rb") as stream, pa.ipc.open_file(stream) as reader:
+            original = reader.read_all()
+        original.validate(full=True)
+        total_rows += original.num_rows
+        if original.num_rows != table.original_rows or total_rows > result.options.max_input_rows:
+            raise ArtifactIntegrityError("original table row count contradicts the reduction")
+        expected = original.take(pa.array(table.retained_positions, type=pa.int64()))
+        sink = pa.BufferOutputStream()
+        with pa.ipc.new_file(sink, expected.schema) as writer:
+            writer.write_table(expected)
+        if hashlib.sha256(sink.getvalue()).hexdigest() != table.reduced.sha256:
+            raise ArtifactIntegrityError(
+                "reduced table does not preserve its recorded row positions"
+            )
+
+
+def _verify_reduction_attempts(
+    result: ReductionResult,
+    directory: Path,
+    listed: Mapping[str, EvidenceFile],
+    events: tuple[EvidenceEvent, ...],
+) -> None:
+    from pydantic import TypeAdapter
+
+    from equiframe.errors import ArtifactIntegrityError
+
+    names = tuple(table.name for table in result.tables)
+    original_rows = {table.name: table.original_rows for table in result.tables}
+    current = tuple((name, index) for name in names for index in range(original_rows[name]))
+    initial = current
+    pending: tuple[tuple[str, int], ...] | None = None
+    matches = evaluation = accepted = baseline_matches = 0
+    rejected: set[tuple[tuple[str, int], ...]] = set()
+    required_attempts: set[str] = set()
+    last_outcome = ""
+    index = 1
+    while index < len(events) - 1:
+        event = events[index]
+        if (event.stage, event.state, event.code) == ("reduction", "accepted", "failure_preserved"):
+            if pending is None or matches != result.options.confirmations:
+                raise ArtifactIntegrityError("accepted reduction lacks matching confirmations")
+            current = pending
+            accepted += 1
+            pending = None
+            matches = 0
+            rejected.clear()
+            index += 1
+            continue
+        if (event.stage, event.state, event.code) != ("predicate", "started", "predicate_started"):
+            raise ArtifactIntegrityError("unexpected reduction journal transition")
+        evaluation += 1
+        attempt = f"attempt-{evaluation:06d}/"
+        selection_file = attempt + "selection.json"
+        required_attempts.add(selection_file)
+        if selection_file not in listed:
+            raise ArtifactIntegrityError("predicate selection is missing from the inventory")
+        with (directory / selection_file).open("rb") as stream:
+            data = stream.read(MAX_DOCUMENT_BYTES + 1)
+        if len(data) > MAX_DOCUMENT_BYTES:
+            raise ArtifactIntegrityError("predicate selection exceeds the verification budget")
+        selection = parse_json(data)
+        if not isinstance(selection, dict) or set(selection) != {"positions"}:
+            raise ArtifactIntegrityError("invalid predicate selection")
+        positions = selection["positions"]
+        if not isinstance(positions, dict) or set(positions) != set(names):
+            raise ArtifactIntegrityError("predicate selection has different input tables")
+        candidate_items: list[tuple[str, int]] = []
+        for name in names:
+            indexes = positions[name]
+            if not isinstance(indexes, list):
+                raise ArtifactIntegrityError("invalid predicate row positions")
+            validated = tuple(
+                TypeAdapter(NonNegativeInt).validate_python(i, strict=True) for i in indexes
+            )
+            if tuple(sorted(set(validated))) != validated or any(
+                i >= original_rows[name] for i in validated
+            ):
+                raise ArtifactIntegrityError("invalid predicate row positions")
+            candidate_items.extend((name, i) for i in validated)
+        candidate = tuple(candidate_items)
+        baseline = evaluation <= result.options.confirmations
+        if not result.baseline_verified or baseline:
+            if candidate != initial:
+                raise ArtifactIntegrityError("baseline observations belong to different rows")
+        elif not set(candidate) < set(current) or (pending is not None and candidate != pending):
+            raise ArtifactIntegrityError(
+                "predicate candidate is not a deletion of the current case"
+            )
+        index += 1
+        if index >= len(events) - 1:
+            raise ArtifactIntegrityError("predicate attempt has no recorded outcome")
+        outcome = events[index]
+        if (outcome.stage, outcome.state, outcome.code) == (
+            "predicate",
+            "failed",
+            "predicate_failed",
+        ):
+            error_file = attempt + "error.json"
+            required_attempts.add(error_file)
+            if error_file not in listed or parse_json((directory / error_file).read_bytes()) != {
+                "code": "predicate_failed"
+            }:
+                raise ArtifactIntegrityError(
+                    "predicate failure evidence is missing or inconsistent"
+                )
+            if result.status != "evaluation_failed" or index != len(events) - 2:
+                raise ArtifactIntegrityError("predicate failure contradicts the final status")
+            last_outcome = "predicate_failed"
+            index += 1
+            continue
+        observation_file = attempt + "observation.json"
+        required_attempts.add(observation_file)
+        if observation_file not in listed:
+            raise ArtifactIntegrityError("predicate observation is missing from the inventory")
+        observation = load_json(ReductionObservation, directory / observation_file)
+        matched = observation.preconditions == "satisfied" and (
+            observation.failure_signature == result.failure_signature
+        )
+        code = "matched" if matched else "not_preserved"
+        if (outcome.stage, outcome.state, outcome.code) != ("predicate", "finished", code):
+            raise ArtifactIntegrityError("predicate observation contradicts its journal outcome")
+        if result.baseline_verified and baseline:
+            if not matched:
+                raise ArtifactIntegrityError(
+                    "verified baseline does not reproduce the target failure"
+                )
+            baseline_matches += 1
+        elif matched:
+            pending = candidate
+            matches += 1
+            if matches > result.options.confirmations:
+                raise ArtifactIntegrityError("predicate confirmations exceed the configured count")
+        else:
+            rejected.add(candidate)
+            pending = None
+            matches = 0
+        last_outcome = code
+        index += 1
+    if (
+        evaluation != result.evaluations
+        or accepted != result.accepted_candidates
+        or (result.baseline_verified and baseline_matches != result.options.confirmations)
+        or {item for item in listed if item.startswith("attempt-")} != required_attempts
+        or current
+        != tuple((table.name, i) for table in result.tables for i in table.retained_positions)
+    ):
+        raise ArtifactIntegrityError("reduction attempts contradict the final result")
+    if result.status == "invalid_baseline" and (
+        result.baseline_verified or last_outcome != "not_preserved"
+    ):
+        raise ArtifactIntegrityError("invalid baseline status contradicts its observations")
+    if result.status == "evaluation_failed" and last_outcome != "predicate_failed":
+        raise ArtifactIntegrityError("evaluation failure lacks a failed predicate attempt")
+    if result.status in ("reduced", "unchanged"):
+        if (
+            not result.baseline_verified
+            or pending is not None
+            or ((result.status == "reduced") != bool(accepted))
+        ):
+            raise ArtifactIntegrityError("successful reduction status contradicts its search")
+        if result.minimality == "one_minimal" and any(
+            current[:offset] + current[offset + 1 :] not in rejected
+            for offset in range(len(current))
+        ):
+            raise ArtifactIntegrityError("one-minimal claim lacks the individual deletion checks")

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "equiframe"
-version = "0.8.0"
+version = "0.8.1"
 description = "Semantic ETL orchestration, calibrated detectors, verifiable evidence and reduction"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"

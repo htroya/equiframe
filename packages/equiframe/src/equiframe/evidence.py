@@ -11,9 +11,10 @@ from pydantic import BaseModel
 
 from equiframe._base import FrozenModel, Identifier, NonNegativeInt, Text
 from equiframe.errors import ArtifactIntegrityError, ResourceLimitError
+from equiframe.local import local_path
 from equiframe.pipeline_types import EvidenceFile, PipelineResult
 from equiframe.profiles import _write_document
-from equiframe.types import Sha256
+from equiframe.types import ArtifactRef, Sha256
 
 MAX_DOCUMENT_BYTES = 64 * 1024 * 1024
 
@@ -150,8 +151,59 @@ def inventory(directory: Path) -> tuple[EvidenceFile, ...]:
 def verify_files(directory: Path, files: tuple[EvidenceFile, ...]) -> None:
     for item in files:
         path = directory / item.path
-        if describe_file(path, directory) != item:
+        try:
+            observed = describe_file(path, directory)
+        except OSError as error:
+            raise ArtifactIntegrityError("evidence file is missing or unreadable") from error
+        if observed != item:
             raise ArtifactIntegrityError("evidence SHA-256 or size mismatch")
+
+
+def _verify_pipeline_artifacts(directory: Path, result: PipelineResult) -> None:
+    """Bind captured artifact references to the verified operation inventory.
+
+    Comparison sources keep the original table/execution as provenance, which
+    may belong to another operation. Their captured ``data`` snapshots, rather
+    than those external original references, are the evidence owned here.
+    """
+    root = directory.resolve()
+    listed = {item.path: item for item in result.evidence}
+    references: list[ArtifactRef] = []
+    if result.execution:
+        for table in (
+            *result.execution.inputs,
+            *((result.execution.output,) if result.execution.output else ()),
+        ):
+            references.append(table.data)
+            if table.index:
+                references.append(table.index)
+    if result.rules:
+        references.extend(
+            check.findings
+            for check in (*result.rules.preconditions, *result.rules.rules)
+            if check.findings is not None
+        )
+    if result.profile:
+        references.extend(result.profile.metadata.artifacts)
+    if result.comparison:
+        references.append(result.comparison.differences)
+        references.extend(
+            source.data
+            for source in (result.comparison.left, result.comparison.right)
+            if source is not None
+        )
+    for reference in references:
+        try:
+            artifact = local_path(reference).resolve()
+        except Exception as error:
+            raise ArtifactIntegrityError("captured evidence requires a local artifact") from error
+        if not artifact.is_relative_to(root):
+            raise ArtifactIntegrityError("captured artifact escapes its operation directory")
+        item = listed.get(artifact.relative_to(root).as_posix())
+        if item is None:
+            raise ArtifactIntegrityError("captured artifact is missing from the evidence inventory")
+        if (reference.sha256, reference.size_bytes) != (item.sha256, item.size_bytes):
+            raise ArtifactIntegrityError("captured artifact reference contradicts its inventory")
 
 
 def read_pipeline(path: Path, *, verify: bool = True) -> PipelineResult:
@@ -161,6 +213,14 @@ def read_pipeline(path: Path, *, verify: bool = True) -> PipelineResult:
     if verify:
         directory = path.parent
         verify_files(directory, result.evidence)
+        actual = {
+            item.relative_to(directory).as_posix()
+            for item in directory.rglob("*")
+            if item.is_file() and item != path
+        }
+        if actual != {item.path for item in result.evidence}:
+            raise ArtifactIntegrityError("operation files contradict the final evidence inventory")
+        _verify_pipeline_artifacts(directory, result)
         required = {
             "events.jsonl",
             "pipeline.json",

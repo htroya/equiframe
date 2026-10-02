@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.8.1 — 2026-10-02
+
+- Revisión del paso 8 frente al TFM: conserva objetivos, fórmulas, separación de
+  detectores/oráculo y pendientes científicos; corrige referencias de estado.
+- Verificación de evidencia vinculada a las capturas y referencias inventariadas;
+  rechaza artefactos omitidos y reducciones inconsistentes con sus observaciones
+  y posiciones originales.
+- CLI de evidencia/reportes distingue corrupción de una petición inválida.
+- Formatos 1.0 y bundles explícitos 0.7.0/0.8.0 conservados; la versión emisora
+  admite 0.8.1. Distribución privada; publicación pública sigue en el paso 19.
+
 ## 0.8.0 — 2026-10-01
 
 - Paso 8: API `run_pipeline`, configuración/resultados estrictos, R/perfil/M/B/H

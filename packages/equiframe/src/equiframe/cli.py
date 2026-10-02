@@ -58,8 +58,8 @@ def _trusted_callable(reference: str) -> Callable[..., object]:
     return cast(Callable[..., object], target)
 
 
-def _failure(error: Exception) -> None:
-    invalid = isinstance(error, (ValueError, ContractValidationError))
+def _failure(error: Exception, *, input_validation: bool = True) -> None:
+    invalid = input_validation and isinstance(error, (ValueError, ContractValidationError))
     typer.echo("invalid_input" if invalid else "operation_failed", err=True)
     raise typer.Exit(code=2 if invalid else 3) from None
 
@@ -134,7 +134,7 @@ def report_command(manifest: Path, output: Path = typer.Option(...)) -> None:
         result = read_pipeline(manifest)
         write_report(result, output)
     except Exception as error:
-        _failure(error)
+        _failure(error, input_validation=False)
         return
     typer.echo(json.dumps({"pipeline_id": result.pipeline_id, "report_created": True}))
 
@@ -145,7 +145,7 @@ def verify_command(directory: Path) -> None:
     try:
         summary = inspect_evidence(directory)
     except Exception as error:
-        _failure(error)
+        _failure(error, input_validation=False)
         return
     typer.echo(json.dumps(summary, sort_keys=True))
     raise typer.Exit(code=0 if summary["finalized"] else 3)

@@ -1,4 +1,4 @@
-# EquiFrame 0.8.0 — orquestación y evidencia verificable
+# EquiFrame 0.8.1 — orquestación y evidencia verificable
 
 Contratos estrictos, comparación completa y ejecución local con Pandas, Polars y DuckDB.
 Se requiere Python 3.12; los motores se instalan mediante extras. La configuración
@@ -15,8 +15,8 @@ la experiencia pública objetivo, posterior al paso 10 y a una nueva ronda de re
 paquete ajeno. Use el wheel del equipo o este checkout:
 
 ```bash
-python -m pip install ./dist/equiframe-0.8.0-py3-none-any.whl
-python -m pip install "./dist/equiframe-0.8.0-py3-none-any.whl[duckdb]"
+python -m pip install ./dist/equiframe-0.8.1-py3-none-any.whl
+python -m pip install "./dist/equiframe-0.8.1-py3-none-any.whl[duckdb]"
 # Alternativas: [arrow], [pandas], [polars], [engines] o [ml].
 # Desde el checkout del equipo:
 python -m pip install ".[engines]"

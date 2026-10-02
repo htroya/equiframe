@@ -151,6 +151,17 @@ class PipelineResult(FrozenModel):
             not self.execution
             or self.profile.vector.spec != self.spec.profile
             or self.profile.metadata.execution_id != self.execution.execution_id
+            or self.profile.metadata.run_id != self.execution.run_id
+            or self.profile.metadata.contract_sha256 != self.execution.contract_sha256
+            or self.profile.metadata.artifacts
+            != tuple(
+                reference
+                for table in (
+                    *self.execution.inputs,
+                    *((self.execution.output,) if self.execution.output else ()),
+                )
+                for reference in (table.data, *((table.index,) if table.index else ()))
+            )
             or self.profile.metadata.execution_sha256
             != profile_digest(self.execution.model_dump(mode="json"))
             or self.profile.options != self.spec.profile_options
