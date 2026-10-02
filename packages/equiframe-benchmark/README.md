@@ -1,12 +1,16 @@
 # EquiFrame Benchmark
 
-Distribución experimental `equiframe-benchmark 0.8.1`, Python 3.12. Catálogo,
+Distribución experimental `equiframe-benchmark 0.9.0`, Python 3.12. Catálogo,
 revisión independiente, oráculo, grupos transitivos, particiones y selección
 de entrenamiento para `equiframe 0.8.1`. El núcleo no importa este paquete.
 
 El paso 8 incorpora `equiframe-benchmark validate`, `split` y `pilot`, y usa
 la orquestación operacional en las quince ejecuciones nativas del piloto.
 [Comandos y límites](../../docs/ORCHESTRATION.md#benchmark-separado).
+
+El paso 9 añade snapshots verificados, `run_integration`/`read_integration`,
+conciliación exacta de adjudicaciones y CLI `integrate`/`verify-integration`.
+La conexión al cliente/DW reales permanece pendiente. [Diseño y límites](../../docs/STEP_09_DESIGN.md).
 
 ## Instalar y ejecutar
 
@@ -24,7 +28,7 @@ No está publicado en PyPI. Con los dos wheels construidos y dependencias
 disponibles se puede instalar por nombre:
 
 ```bash
-python -m pip install --find-links packages/equiframe/dist --find-links packages/equiframe-benchmark/dist equiframe==0.8.1 equiframe-benchmark==0.8.1
+python -m pip install --find-links packages/equiframe/dist --find-links packages/equiframe-benchmark/dist equiframe==0.8.1 equiframe-benchmark==0.9.0
 ```
 
 El piloto genera 5 escenarios, 35 candidatos, 15 perfiles y 4 grupos. Las
@@ -98,7 +102,7 @@ uv run --locked --all-extras python -m build --no-isolation
 uv run --locked --all-extras python tools/verify_distribution.py
 ```
 
-La última comprobación requiere el wheel de `equiframe 0.7.0` construido en
+La última comprobación requiere el wheel de `equiframe 0.8.1` construido en
 `../equiframe/dist`. Instala ambos paquetes por nombre con pip fuera del checkout,
 comprueba imports ligeros, ejecuta la suite y piloto instalados, y reconstruye
 el wheel desde sdist. CI ejecuta ambos paquetes en las cinco plataformas existentes.
@@ -146,3 +150,29 @@ La biblioteca general no puede autenticar declaraciones de normalidad o grupos.
 Ningún umbral de ejemplo es aprobación del protocolo científico. El piloto
 original conserva sus 35 revisiones pendientes; no se usa para producir un
 modelo científico ni se amplía con revisiones automáticas.
+
+## Integración del paso 9
+
+`SnapshotDataSource` recibe un ID de publicación y un cliente confiable inyectado.
+`run_integration` ejecuta las tres implementaciones registradas, verifica sus
+entradas y compara las tres parejas. Un esperado opcional se fija antes de las
+corridas; conservar un `ExecutionResult` conserva también sus precondiciones.
+
+```bash
+equiframe-benchmark integrate integration.json --snapshot-id snapshot-2026-01 \
+  --client mi_cliente:create_client --registry mis_etl:create_registry \
+  --output integration-runs --expected expected.arrow
+equiframe-benchmark verify-integration integration-runs/integration_ID
+```
+
+Los factories se importan y ejecutan por solicitud explícita: deben ser código
+confiable. El JSON no define callbacks ni contiene credenciales. Los códigos
+0/1/2/3 siguen la completitud y alertas del resultado; verificar correctamente
+un expediente incompleto devuelve 0 y conserva `complete=false` en el resumen.
+
+El ejemplo `examples/integration_local.py` usa datos sintéticos, tres motores
+reales y decimales por moneda. Comprueba resultados esperados e inventarios;
+conserva una alerta parcial de Pandas por su precisión decimal nativa. La
+comparación lossless no desactiva esa regla de contrato. `reconcile_awards`
+comprueba grano e importes exactos con columnas configuradas y no genera O.
+Cliente productivo, snapshots SERCOP, DDL/mapeos y aceptación OCI siguen pendientes.

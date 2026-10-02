@@ -5,16 +5,21 @@ import json
 from pathlib import Path
 
 from equiframe_benchmark import (
+    AwardReconciliationResult,
+    AwardReconciliationSpec,
     CalibrationManifest,
     CalibrationSelection,
     Candidate,
     Catalog,
     DetectorSelectionAudit,
+    IntegrationResult,
+    IntegrationSpec,
     OracleResult,
     Review,
     ReviewAssignment,
     ReviewPacket,
     Scenario,
+    SnapshotManifest,
     SplitManifest,
     TrainingManifest,
     TrainingSelection,
@@ -22,6 +27,11 @@ from equiframe_benchmark import (
 
 ROOT = Path(__file__).resolve().parents[1]
 MODELS = (
+    AwardReconciliationResult,
+    AwardReconciliationSpec,
+    IntegrationResult,
+    IntegrationSpec,
+    SnapshotManifest,
     CalibrationManifest,
     CalibrationSelection,
     DetectorSelectionAudit,

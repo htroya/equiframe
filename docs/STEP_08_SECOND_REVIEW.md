@@ -137,7 +137,7 @@ del paso 9 ni el cambio previo de la hoja de ruta.
 | Suite completa del núcleo y benchmark | Núcleo instalado: 717 aprobadas en 252,67 s; benchmark instalado: 88 en 76,59 s |
 | Build de wheel/sdist e inventario/hashes | Ambas distribuciones 0.8.1 construidas; wheels reconstruidos idénticos desde sdist |
 | Distribución instalada fuera del checkout y ejemplos externos | Base/extras/API/CLI/ejemplos y consumidor mypy núcleo aprobados; piloto benchmark: 5 escenarios/35 candidatos/15 perfiles/4 grupos, cero confirmados |
-| CI remota vinculada al commit publicado | Pendiente de completar |
+| CI remota vinculada al commit publicado | Commit `6231ef8`: diez jobs aprobados en push/PR, Windows x64, Linux x64/ARM64 y macOS Intel/Apple Silicon; PR #18 integrado |
 
 El entorno local de referencia es Windows x64 con Python 3.12. Deben registrarse
 la versión concreta de Python, dependencias bloqueadas, comandos y tiempos
@@ -154,3 +154,8 @@ Los verificadores terminaron todos sus controles y registraron su mensaje final
 de verificación. La redirección de stderr nativo en PowerShell devolvió estado 1
 en el envoltorio, aunque no hubo traceback ni fallo de un subprocess comprobado;
 ese estado del envoltorio no se presenta como código 0 del proceso.
+
+CI contrastada: [push](https://github.com/htroya/equiframe/actions/runs/37035598082)
+y [PR](https://github.com/htroya/equiframe/actions/runs/37035605371), sobre
+`6231ef8`. El [PR #18](https://github.com/htroya/equiframe/pull/18) entrega la
+corrección integrada. Estas pruebas siguen sin acreditar OCI/DW ni publicación PyPI.

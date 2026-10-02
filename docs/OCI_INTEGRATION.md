@@ -5,7 +5,7 @@
 El DW, el archivo DuckDB real y la biblioteca o programa que abre sus conexiones
 residirán en una VM de OCI. Este documento fija la integración prevista; no
 representa un despliegue, un servicio remoto ya disponible ni una conexión probada.
-El núcleo EquiFrame 0.4.0 sigue siendo local e independiente de OCI y del esquema de dominio.
+El núcleo EquiFrame 0.8.1 sigue siendo local e independiente de OCI y del esquema de dominio.
 
 El adaptador DuckDB del núcleo abre una conexión propia `:memory:` para ejecutar
 transformaciones sobre entradas registradas. No abre el archivo del DW ni acepta
@@ -66,8 +66,9 @@ Para integrar ambos con EquiFrame se acuerda un recibo versionado que incluya:
 - Procedencia y revisión del código de extracción; política de orden si resulta relevante.
 - Estados de publicación/trabajo, errores, cancelación y presupuestos efectivos.
 
-`SnapshotManifest` es una especificación futura; no existe todavía un modelo de ese
-nombre en la API del núcleo. Un proveedor implementa el puerto actual:
+El paso 9 implementa `SnapshotManifest` y `SnapshotDataSource` en
+`equiframe_benchmark`, con un cliente inyectado y recibos comprobados. El transporte
+y el cliente de producción siguen pendientes. El núcleo conserva este puerto:
 
 ```python
 @property
@@ -80,6 +81,10 @@ La implementación debe resolver el snapshot antes de cargar tablas y registrar 
 identidad en la evidencia. Debe preservar tipos/máscaras y verificar hashes antes
 de devolver datos. Los controles de EquiFrame son por tabla y tras materializar;
 el servicio debe imponer además límites agregados de RAM, trabajos y disco.
+
+El [diseño del consumidor](STEP_09_DESIGN.md) explica la selección de tablas,
+los checkpoints cooperativos y la conciliación configurable. Sus pruebas locales
+no acreditan concurrencia, accesos ni publicación del servicio de OCI.
 
 ## Acceso y validación pendientes
 

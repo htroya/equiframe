@@ -5,6 +5,12 @@ La corrección de ingeniería 0.8.1 fortalece T09/T11 mediante vínculos entre
 capturas, inventarios e intentos de reducción; no modifica el diseño experimental.
 Véase [segunda revisión del paso 8](STEP_08_SECOND_REVIEW.md).
 
+El paso 9 aporta código consumidor y conformidad local para T03/T09/T13–T14,
+en `equiframe-benchmark 0.9.0` sobre núcleo 0.8.1. Cliente, snapshot y DDL
+no están disponibles según confirmó Hernán; las verificaciones reales de T04,
+T13–T14 y coordinación del servicio continúan pendientes. El código no amplía
+el corpus ni confirma O. [Informe](STEP_09_REVIEW.md).
+
 Fuente local: `TFM_EquiFrame_ACTUAL.docx`, revisada inicialmente el 2026-09-28
 y contrastada de nuevo para el paso 5 el 2026-10-01; conserva el mismo hash.
 

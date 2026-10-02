@@ -1,6 +1,6 @@
 # Arquitectura de EquiFrame
 
-Versión de diseño: 0.8, 2026-10-01. Estado: pasos 1 a 8 implementados en su alcance técnico; revisión científica y componentes posteriores pendientes. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md). La [arquitectura del paso 8](STEP_08_DESIGN.md) describe orquestación, evidencia, reducción y límites.
+Versión de diseño: 0.9, 2026-10-02. Estado: pasos 1 a 9 implementados en su alcance técnico; aceptación del servicio real y evaluación científica pendientes. Núcleo 0.8.1 y paquete experimental 0.9.0. Fuente: borrador de tesis identificado en [trazabilidad](THESIS_TRACEABILITY.md). La [arquitectura del paso 8](STEP_08_DESIGN.md) describe orquestación, evidencia, reducción y límites. El [paso 9](STEP_09_DESIGN.md) añade consumo de snapshots, integración de tres motores y conciliación configurable fuera del núcleo.
 
 ## 1. Propósito y alcance
 

@@ -1,6 +1,9 @@
 """Benchmark commands keep experimental labels outside the operational library."""
 
+import importlib
 import json
+import re
+from collections.abc import Callable
 from pathlib import Path
 from uuid import uuid4
 
@@ -13,8 +16,8 @@ from equiframe_benchmark.splits import dependency_groups, make_splits, split_cou
 app = typer.Typer(no_args_is_help=True, add_completion=False, pretty_exceptions_enable=False)
 
 
-def _failure(error: Exception) -> None:
-    invalid = isinstance(error, ValueError)
+def _failure(error: Exception, *, input_validation: bool = True) -> None:
+    invalid = input_validation and isinstance(error, ValueError)
     typer.echo("invalid_input" if invalid else "operation_failed", err=True)
     raise typer.Exit(code=2 if invalid else 3) from None
 
@@ -74,6 +77,104 @@ def pilot_command(output: Path = typer.Option(Path("equiframe-benchmark-runs")))
         _failure(error)
         return
     typer.echo(json.dumps({"pilot_id": directory.name, **summary}, sort_keys=True))
+
+
+def _factory(reference: str) -> Callable[[], object]:
+    from typing import cast
+
+    if not re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*:[A-Za-z_]\w*", reference):
+        raise ValueError("explicit module:factory reference is required")
+    module, name = reference.split(":")
+    factory = getattr(importlib.import_module(module), name)
+    if not callable(factory):
+        raise ValueError("registered factory must be callable")
+    return cast(Callable[[], object], factory)
+
+
+@app.command("integrate")
+def integrate_command(
+    spec: Path,
+    snapshot_id: str = typer.Option(...),
+    client: str = typer.Option(...),
+    registry: str = typer.Option(...),
+    output: Path = typer.Option(Path("equiframe-integration")),
+    expected: Path | None = typer.Option(None),
+    bundle: Path | None = typer.Option(None),
+) -> None:
+    """Consume a pinned snapshot through explicitly supplied trusted client/code."""
+    from typing import cast
+
+    import equiframe as ef
+    from equiframe.evidence import load_json
+
+    from equiframe_benchmark.integration import IntegrationSpec, run_integration
+    from equiframe_benchmark.snapshot import SnapshotClient, SnapshotDataSource
+
+    try:
+        configuration = load_json(IntegrationSpec, spec)
+        detector = load_json(ef.DetectorBundle, bundle) if bundle else None
+        registered = _factory(registry)()
+        if not isinstance(registered, ef.TransformationRegistry):
+            raise ValueError("registry factory must return a TransformationRegistry")
+        transport = _factory(client)()
+        if not all(
+            callable(getattr(transport, name, None))
+            for name in ("get_snapshot", "download_artifact")
+        ):
+            raise ValueError("client factory must expose the snapshot client protocol")
+        source = SnapshotDataSource(
+            snapshot_id,
+            client=cast(SnapshotClient, transport),
+            expected_domain_schema_revision=configuration.domain_schema_revision,
+            table_names=tuple(
+                table.name for table in configuration.pipelines[0].execution.contract.inputs
+            ),
+        )
+        result = run_integration(
+            configuration,
+            source=source,
+            registry=registered,
+            detector_bundle=detector,
+            expected=expected,
+            work_dir=output,
+        )
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(
+        json.dumps(
+            {
+                "integration_id": result.integration_id,
+                "complete": result.complete,
+                "inputs_verified": result.inputs_verified,
+                "scientific_equivalence_confirmed": False,
+            },
+            sort_keys=True,
+        )
+    )
+    raise typer.Exit(code=result.exit_code)
+
+
+@app.command("verify-integration")
+def verify_integration_command(directory: Path) -> None:
+    """Verify the existing receipt and evidence without contacting the service."""
+    from equiframe_benchmark.integration import read_integration
+
+    try:
+        result = read_integration(directory)
+    except Exception as error:
+        _failure(error, input_validation=False)
+        return
+    typer.echo(
+        json.dumps(
+            {
+                "integration_id": result.integration_id,
+                "evidence_verified": True,
+                "complete": result.complete,
+            },
+            sort_keys=True,
+        )
+    )
 
 
 def main() -> None:

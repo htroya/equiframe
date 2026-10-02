@@ -1,7 +1,7 @@
 import hashlib
 
 import pytest
-from hypothesis import given
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 import equiframe_benchmark as eb
@@ -53,6 +53,9 @@ def test_transitive_group_and_exact_artifact_dependencies(make_case):
 def test_property_group_split_no_leakage_and_order_invariance(make_case):
     base = make_case()[0]
 
+    # Generation is bounded to 15 masks of seven bits. Host scheduling under
+    # load must not turn a correctness property into a speed test.
+    @settings(deadline=None, suppress_health_check=[HealthCheck.too_slow])
     @given(
         # Every nonempty subset of seven dependencies, without duplicate-draw rejection.
         st.lists(
