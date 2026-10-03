@@ -7,7 +7,7 @@ from test_migration_backends import column, contract
 from test_workflow import reference
 
 from equiframe.contracts import IntegerType
-from equiframe.destinations import ParquetDestination
+from equiframe.destinations import LoadReceipt, ParquetDestination
 from equiframe.errors import ArtifactIntegrityError
 from equiframe.local import local_path
 from equiframe.verify import verify
@@ -118,3 +118,59 @@ def test_pointer_write_failure_is_recoverable_without_losing_prior(tmp_path, mon
     )
     assert destination.current() == recovered
     assert len(list((destination.root / "versions").iterdir())) == 2
+
+
+def test_case_colliding_table_names_are_rejected_before_destination_creation(tmp_path):
+    ref, report = approved(tmp_path)
+    destination = ParquetDestination(tmp_path / "published")
+    with pytest.raises(ValueError, match="case-insensitive"):
+        destination.publish(
+            {"Table": ref, "table": ref},
+            run_id="collision",
+            verifications={"Table": report, "table": report},
+        )
+    assert not destination.root.exists()
+
+
+def test_case_colliding_replace_preserves_prior_bytes_without_staging(tmp_path, monkeypatch):
+    ref, report = approved(tmp_path)
+    other = reference(pa.table({"n": [9, 2]}), tmp_path / "other.arrow")
+    other_report = verify(
+        {"candidate": other}, contract=report.contract, expected=other, work_dir=tmp_path
+    )
+    destination = ParquetDestination(tmp_path / "published")
+    previous = destination.publish({"old": ref}, run_id="old", verifications={"old": report})
+    pointer_bytes = (destination.root / "current.json").read_bytes()
+
+    def unexpected_write(*args, **kwargs):
+        pytest.fail("case collision must be rejected before any Parquet write")
+
+    monkeypatch.setattr(pq, "write_table", unexpected_write)
+    with pytest.raises(ValueError, match="case-insensitive"):
+        destination.publish(
+            {"Table": ref, "table": other},
+            run_id="new",
+            policy="replace",
+            verifications={"Table": report, "table": other_report},
+        )
+    assert (destination.root / "current.json").read_bytes() == pointer_bytes
+    assert destination.current() == previous
+    assert not (destination.root / "versions" / "new").exists()
+    assert not (destination.root / ".publication.lock").exists()
+    assert not list((destination.root / ".staging").iterdir())
+
+
+def test_receipt_rejects_case_colliding_physical_table_paths(tmp_path):
+    ref, report = approved(tmp_path)
+    receipt = ParquetDestination(tmp_path / "published").publish(
+        {"table": ref}, run_id="one", verifications={"table": report}
+    )
+    original = receipt.tables[0]
+    aliased = original.model_copy(
+        update={
+            "name": "TABLE",
+            "parquet": original.parquet.model_copy(update={"path": "TABLE.parquet"}),
+        }
+    )
+    with pytest.raises(ValueError, match="case-insensitive"):
+        LoadReceipt.model_validate(receipt.model_copy(update={"tables": (original, aliased)}))

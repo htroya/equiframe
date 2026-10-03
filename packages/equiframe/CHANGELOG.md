@@ -9,6 +9,8 @@
   gate de Verify, versiones, visibilidad local atómica e idempotencia.
 - JSON vacío rechazado sin salida; desbordamiento timestamp rechazado o puesto
   en cuarentena antes de materializar Arrow, conservando límites int64 exactos.
+- Carga Parquet rechaza colisiones de nombres sin distinguir mayúsculas antes
+  de escribir; recibos y versiones conservan una identidad física inequívoca.
 - IR nativo ampliado con aritmética acotada, coalesce, condiciones, concatenación,
   deduplicación explícita y semi/anti join. Capacidades/rechazos trazables por prueba.
 - Bundles cerrados para Verify/migración/workflow, lectura relocalizada sin ETL,

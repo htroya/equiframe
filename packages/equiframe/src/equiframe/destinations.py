@@ -46,6 +46,10 @@ class LoadReceipt(FrozenModel):
     def coherent(self) -> Self:
         if not self.tables or len({t.name for t in self.tables}) != len(self.tables):
             raise ValueError("publication table names must be nonempty and unique")
+        if len({table.name.casefold() for table in self.tables}) != len(self.tables):
+            raise ValueError(
+                "publication table names must be unique on case-insensitive filesystems"
+            )
         if any(t.parquet.path != t.name + ".parquet" for t in self.tables):
             raise ValueError("publication Parquet paths must correspond to table names")
         identity = hashlib.sha256(
@@ -134,12 +138,17 @@ class ParquetDestination:
         run_id = TypeAdapter(Identifier).validate_python(run_id, strict=True)
         if not tables or set(tables) != set(verifications):
             raise ValueError("every published table requires exactly one verification gate")
+        for name in tables:
+            TypeAdapter(Identifier).validate_python(name, strict=True)
+        if len({name.casefold() for name in tables}) != len(tables):
+            raise ValueError(
+                "publication table names must be unique on case-insensitive filesystems"
+            )
         if policy not in ("create", "replace"):
             raise ValueError("publication policy must be create or replace")
         checked: dict[str, ArtifactRef] = {}
         reports: dict[str, VerificationResult] = {}
         for name, ref in tables.items():
-            TypeAdapter(Identifier).validate_python(name, strict=True)
             ref = ArtifactRef.model_validate(ref)
             if ref.format not in ("arrow", "parquet"):
                 raise ValueError("published sources require Arrow or Parquet")
