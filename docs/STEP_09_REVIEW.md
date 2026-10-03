@@ -54,9 +54,13 @@ SHA-256 de las distribuciones verificadas:
 | Wheel 0.9.0 | `7dd0e6839a73ffe95678d86921a9e9492630ce1d6d906f909e01b1a6a372164f` |
 | Sdist 0.9.0 | `d474b4b8c9c9e9f510b69dea48684bedae8a241b2af67edcde615a03e223864d` |
 
-La matriz remota de cinco plataformas deberá vincularse al commit entregado;
-la verificación local no se presenta como aprobación de OCI ni como resultado
-de runners que todavía no terminaron.
+El commit `ff0c49f01ccbf0d02c30211adb672b064b6a5b68` superó los diez jobs
+de las dos matrices remotas: Windows x64, Linux x64/ARM64 y macOS x64/ARM64.
+Ejecuciones [push](https://github.com/htroya/equiframe/actions/runs/37041480082)
+y [PR](https://github.com/htroya/equiframe/actions/runs/37041546174).
+El [PR #19](https://github.com/htroya/equiframe/pull/19) se integró el
+2026-10-02; merge `1fbcc7e16c7cc858eb86be1ba0acef85f4763b41`.
+Esta conformidad técnica no acredita aceptación de OCI ni resultados SERCOP.
 
 ## Pendientes para la aceptación real
 

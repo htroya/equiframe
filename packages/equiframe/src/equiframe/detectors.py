@@ -10,6 +10,7 @@ from typing import Literal
 
 from equiframe.detector_types import (
     ComponentDecision,
+    ComponentDetectionResult,
     DetectionResult,
     DetectorBundle,
     DetectorCalibration,
@@ -214,33 +215,35 @@ def _mad_score(model: DetectorModel, row: tuple[float, ...]) -> ScoreValue:
     return maximum
 
 
-def score_detectors(fit: DetectorFit, profiles: tuple[ProfileVector, ...]) -> DetectorScoreResult:
-    """Frozen inference. Incompatible/failed profiles raise, never become no-alert."""
-    fit = DetectorFit.model_validate(fit)
+def _inference_matrix(
+    fit: DetectorFit, profiles: tuple[ProfileVector, ...]
+) -> FeatureMatrix | None:
     profiles = tuple(_compatible(p, fit.preprocessor.spec) for p in profiles)
-    matrix = (
+    return (
         transform_profiles(fit.preprocessor, profiles)
         if fit.preprocessor.state == "ready"
         else None
     )
-    results: list[DetectorScores] = []
-    for model in (fit.m, fit.b):
-        if model.state == "not_estimable":
-            results.append(DetectorScores(state="not_estimable", reason=model.reason))
-            continue
-        assert matrix is not None
-        scorer = _forest_score if model.method == "isolation_forest" else _mad_score
-        results.append(
-            DetectorScores(
-                state="scored", values=tuple(scorer(model, row) for row in matrix.values)
-            )
-        )
+
+
+def _score_model(model: DetectorModel, matrix: FeatureMatrix | None) -> DetectorScores:
+    if model.state == "not_estimable":
+        return DetectorScores(state="not_estimable", reason=model.reason)
+    assert matrix is not None
+    scorer = _forest_score if model.method == "isolation_forest" else _mad_score
+    return DetectorScores(state="scored", values=tuple(scorer(model, row) for row in matrix.values))
+
+
+def score_detectors(fit: DetectorFit, profiles: tuple[ProfileVector, ...]) -> DetectorScoreResult:
+    """Frozen inference. Incompatible/failed profiles raise, never become no-alert."""
+    fit = DetectorFit.model_validate(fit)
+    matrix = _inference_matrix(fit, profiles)
     return DetectorScoreResult(
         fit_sha256=detector_fingerprint(fit),
         matrix_sha256=profile_digest(matrix.model_dump(mode="json")) if matrix else None,
         rows=len(profiles),
-        m=results[0],
-        b=results[1],
+        m=_score_model(fit.m, matrix),
+        b=_score_model(fit.b, matrix),
     )
 
 
@@ -285,41 +288,77 @@ def calibrate_detectors(
     )
 
 
-def detect(bundle: DetectorBundle, profiles: tuple[ProfileVector, ...]) -> DetectionResult:
-    bundle = DetectorBundle.model_validate(bundle)
-    scores = score_detectors(bundle.fit, profiles)
-    decisions = []
-    for calibrated, scored in ((bundle.m, scores.m), (bundle.b, scores.b)):
-        rows = []
-        for index in range(scores.rows):
-            score = scored.values[index] if scored.state == "scored" else None
-            if calibrated.state != "ready":
-                rows.append(
-                    DetectorDecision(
-                        result=ComponentDecision(
-                            decision="not_evaluable", complete=False, reason=calibrated.reason
-                        ),
-                        score=score,
-                        threshold=None,
-                    )
-                )
-                continue
-            assert isinstance(calibrated.threshold, float) and score is not None
+def _decisions(
+    calibrated: DetectorCalibration, scored: DetectorScores, count: int
+) -> tuple[DetectorDecision, ...]:
+    rows = []
+    for index in range(count):
+        score = scored.values[index] if scored.state == "scored" else None
+        if calibrated.state != "ready":
             rows.append(
                 DetectorDecision(
                     result=ComponentDecision(
-                        decision=(
-                            "alert" if numeric_score(score) > calibrated.threshold else "no_alert"
-                        ),
-                        complete=True,
+                        decision="not_evaluable", complete=False, reason=calibrated.reason
                     ),
                     score=score,
-                    threshold=calibrated.threshold,
+                    threshold=None,
                 )
             )
-        decisions.append(tuple(rows))
+            continue
+        assert isinstance(calibrated.threshold, float) and score is not None
+        rows.append(
+            DetectorDecision(
+                result=ComponentDecision(
+                    decision="alert" if numeric_score(score) > calibrated.threshold else "no_alert",
+                    complete=True,
+                ),
+                score=score,
+                threshold=calibrated.threshold,
+            )
+        )
+    return tuple(rows)
+
+
+def detect(bundle: DetectorBundle, profiles: tuple[ProfileVector, ...]) -> DetectionResult:
+    bundle = DetectorBundle.model_validate(bundle)
+    scores = score_detectors(bundle.fit, profiles)
     return DetectionResult(
-        bundle_sha256=detector_fingerprint(bundle), scores=scores, m=decisions[0], b=decisions[1]
+        bundle_sha256=detector_fingerprint(bundle),
+        scores=scores,
+        m=_decisions(bundle.m, scores.m, scores.rows),
+        b=_decisions(bundle.b, scores.b, scores.rows),
+    )
+
+
+def detect_component(
+    bundle: DetectorBundle,
+    profiles: tuple[ProfileVector, ...],
+    *,
+    method: Literal["isolation_forest", "mad"],
+) -> ComponentDetectionResult:
+    """Score and decide one frozen detector, without evaluating the other method.
+
+    The shared preprocessor and strict decision threshold are identical to
+    ``detect``. Invalid or technically failed profiles raise; missing model or
+    calibration support produces explicit not-evaluable decisions.
+    """
+    if method not in ("isolation_forest", "mad"):
+        raise ValueError("method must be isolation_forest or mad")
+    bundle = DetectorBundle.model_validate(bundle)
+    matrix = _inference_matrix(bundle.fit, profiles)
+    model, calibrated = (
+        (bundle.fit.m, bundle.m) if method == "isolation_forest" else (bundle.fit.b, bundle.b)
+    )
+    scores = _score_model(model, matrix)
+    return ComponentDetectionResult(
+        method=method,
+        bundle_sha256=detector_fingerprint(bundle),
+        fit_sha256=detector_fingerprint(bundle.fit),
+        profiles_sha256=profile_digest([p.model_dump(mode="json") for p in profiles]),
+        matrix_sha256=profile_digest(matrix.model_dump(mode="json")) if matrix else None,
+        rows=len(profiles),
+        scores=scores,
+        decisions=_decisions(calibrated, scores, len(profiles)),
     )
 
 

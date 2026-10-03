@@ -1,8 +1,8 @@
 # API Python y contratos de intercambio
 
-Versión implementada: `equiframe 0.8.0`, formatos independientes `1.0`, pasos 1 a 8. El [README del
+Versiones implementadas: `equiframe 0.9.0` y `equiframe-benchmark 0.10.0`, formatos independientes `1.0`, pasos 1 a 10 técnicos. El [README del
 paquete](../packages/equiframe/README.md) contiene instalación, comandos y un
-ejemplo Python ejecutable. Los componentes siguientes siguen en la hoja de ruta.
+ejemplo Python ejecutable. La aceptación del servicio real y la evaluación científica conservan sus requisitos externos.
 
 ## 1. API disponible
 
@@ -15,7 +15,7 @@ ejemplo Python ejecutable. Los componentes siguientes siguen en la hoja de ruta.
 | `contract_fingerprint(contract) -> str` | SHA-256 hexadecimal de esos bytes; no equivalencia tabular |
 | `contract_json_schema() -> dict[str, object]` | JSON Schema generado desde `Contract` |
 
-La API explícita está en `equiframe.__all__`; `__version__` es `0.8.0`.
+La API explícita está en `equiframe.__all__`; `__version__` es `0.9.0`.
 Los constructores usan Pydantic estricto/inmutable, rechazan extras y conservan
 colecciones como tuplas. La validación de JSON permite arrays sin introducir
 coerciones numéricas con pérdida. No se interpreta código en documentos.
@@ -126,10 +126,10 @@ metadato; la etiqueta depende de O, nunca del origen de la variante.
 `DataSource` y `EngineAdapter` tienen tipos completos e implementaciones desde el
 paso 2. `RuleRegistry` y `RuleContext` funcionan desde el paso 4. Los perfiles y
 bundles de preprocesamiento funcionan desde el paso 5 (sección 11), sin etiquetas,
-mutaciones ni otra salida de motor. `Detector`, `SnapshotManifest`, reportes
-completos, oráculo y freeze siguen en la [hoja de ruta](HERNAN_ROADMAP.md).
-No están expuestos como APIs vacías. La integración compartida se acuerda por PR
-con José/Jhair.
+mutaciones ni otra salida de motor. Los detectores, reportes, validación independiente
+de equivalencia, snapshots y freeze tienen APIs implementadas en las secciones
+12–16. El cliente autenticado, DW y operación del servicio siguen bajo los
+responsables y requisitos de [integración](TEAM_INTEGRATION.md).
 
 ## 6. CLI funcional y errores
 
@@ -319,6 +319,7 @@ Uso y límites: [paquete](../packages/equiframe-benchmark/README.md) y
 | `NormalCalibrationProfiles` | Selección normal distinta de entrenamiento; perfiles sin etiquetas |
 | `calibrate_detectors(fit, calibration, *, alpha)` | Bundle con alpha decimal explícito, n, rango y cuantil sin interpolar |
 | `detect(bundle, profiles)` | Scores, umbrales, decisiones y motivos; errores de contrato se elevan |
+| `detect_component(bundle, profiles, *, method) -> ComponentDetectionResult` | Desde 0.9.0: puntúa y decide únicamente `"isolation_forest"` o `"mad"`; hashes de bundle, fit, perfiles y matriz, scores y decisiones |
 | `ComponentDecision`, `combine_decisions(r, m)`, `HybridDecision` | OR de tres estados, R completo/parcial y M; no incorpora B |
 | `detector_fingerprint`, `write_detector_bundle`, `read_detector_bundle` | JSON declarativo 1.0, validación/huellas, escritura exclusiva, límite 64 MiB |
 | `select_normal_calibration` (benchmark) | O normal confirmado y procedencia completa en partición calibration |
@@ -327,6 +328,9 @@ Uso y límites: [paquete](../packages/equiframe-benchmark/README.md) y
 Se añaden seis esquemas del núcleo y tres del benchmark. Contratos, ejecuciones,
 R y perfiles previos conservan su formato. Los estados no estimables no se
 convierten en no alerta. Detalles y límites: [detectores](DETECTORS.md).
+`detect_component` conserva el preprocesamiento, calibración y decisiones de
+`detect`, sin ajustar ni calcular el otro detector. Su propiedad `complete` exige
+decisiones completas; soporte ausente produce motivos no evaluables.
 
 ## 14. Orquestación y evidencia en 0.8.0
 
@@ -341,13 +345,14 @@ convierten en no alerta. Detalles y límites: [detectores](DETECTORS.md).
 | `ReductionOptions`, `ReductionObservation`, `ReducedTable`, `ReductionResult` | Presupuestos, precondiciones/firma, posiciones y estados de reducción |
 | `reduce_case`, `read_reduction` | Reducción por filas entre tablas y lectura de evidencia verificada |
 
-Siete esquemas nuevos 1.0. `DetectorVersions` acepta 0.7.0/0.8.0 sin cambiar el
+Siete esquemas nuevos 1.0. `DetectorVersions` acepta 0.7.0/0.8.0/0.8.1/0.9.0 sin cambiar el
 algoritmo IF/MAD. El núcleo no importa benchmark ni acepta O como entrada del
 runner. [Uso y códigos CLI](ORCHESTRATION.md), [diseño y límites](STEP_08_DESIGN.md).
 
 ## 15. Consumidor e integración experimental en 0.9.0
 
-Disponible mediante `import equiframe_benchmark as eb`; requiere núcleo 0.8.1.
+La implementación original del paso 9 requiere núcleo 0.8.1; la distribución
+actual `equiframe-benchmark 0.10.0` requiere núcleo 0.9.0.
 
 | API/modelo | Comportamiento |
 |---|---|
@@ -361,3 +366,58 @@ Disponible mediante `import equiframe_benchmark as eb`; requiere núcleo 0.8.1.
 Cinco esquemas nuevos 1.0. Los resultados no confirman etiquetas científicas.
 El contrato del cliente no implementa transporte, autenticación, DDL ni operación
 del servicio. [Diseño](STEP_09_DESIGN.md), [uso CLI](../packages/equiframe-benchmark/README.md).
+
+## 16. Congelación, evaluación y reproducción en 0.10.0
+
+Las APIs siguientes se exportan desde `equiframe_benchmark.__all__`. Sus documentos
+estrictos usan formato `1.0`; el núcleo conserva sus formatos y no recibe etiquetas O.
+El [protocolo y alcance](STEP_10_EVALUATION.md) contiene las fórmulas y controles completos.
+
+| API/modelo | Contrato implementado |
+|---|---|
+| `FreezeDefinition`, `TestCaseDefinition`, `FrozenFamilyModel`, `FrozenInput`, `SelectionEvidence`, `EnvironmentPin`, `ExperimentalDecision` | Catálogo/splits, casos, modelos y selecciones declaradas, archivos/entorno, decisiones y protocolos fijados antes de test |
+| `audit_freeze(definition, *, rule_registry=None, work_dir=None) -> FreezeAudit` | Verifica fuentes físicas, procedencia, soporte y bloqueos; no ejecuta ETL ni ajusta IF |
+| `create_freeze(definition, *, rule_registry=None, work_dir=None) -> FreezeManifest` | Emite el sello cuando pasa el gate correspondiente; su persistencia usa `save_document` |
+| `read_freeze(path, *, expected_sha256=None, rule_registry=None, work_dir=None, max_bytes=64*1024**2)` | Reaudita fuentes y sello, con SHA de archivo opcional y límite de lectura |
+| `run_study(manifest, *, registry, rule_registry=None, work_dir=None, cancellation=None) -> StudyResult` | Consume un sello existente y ejecuta cada caso nativo una vez, con su bundle congelado y sin fit |
+| `StudyCaseResult`, `StudyResult`, `read_study(directory, *, rule_registry=None, max_bytes=64*1024**2)` | Conservan casos fallidos, auditorías antes/después, pipelines, evaluación, tablas e inventario; lectura sin ETL, con recomparación física cuando un replay autoriza O confirmado |
+| `BootstrapPlan`, `EvaluationConfig`, `EvaluationRecord`, `EvaluationReport` | Configuración, decisiones originales, cobertura y métricas con motivos explícitos para valores indefinidos |
+| `evaluate_records(records, config)`, `evaluation_protocol_sha256(config)` | Cálculo puro desde una tupla de registros; soporte principal común R/M/B/H y protocolo identificable sin circularidad |
+| `table_payloads(report)`, `write_tables(report, directory) -> TableExport`, `read_tables(directory, *, report)` | Seis CSV deterministas y recibo; lectura contrasta cada byte con su regeneración |
+| `CostProtocol`, `CostSpec`, `ProfileMCostResult`, `ResourceSample`, `ResourceMeasurement`, `CostComparisonResult` | Capturas fijadas, protocolo, resultados originales y mediciones completas/parciales/ausentes |
+| `measure_costs(spec, *, profile_m, comparison, work_dir=None, cancellation=None, probe_factory=None)` | Dos callbacks síncronos confiables `(Path, CancellationToken)`; un par de warmup y cinco pares alternados, primer orden fijado por semilla |
+| `read_costs(path)`, `write_cost_table(directory, *, output)` | Verifican evidencia/capturas y exportan las doce observaciones crudas, incluidos fallos y warmup |
+| `make_reproduction_record(*, configuration, splits, labels, decisions, tables)`, `compare_reproductions(recorded, repeated)` | Contenido JSON canónico completo; `ReproductionRecord` y `ComparisonReceipt` con estado `reproduced` o `different` |
+| `create_bundle(files, *, directory, bundle_id, record_path=None, artifacts=None, expected_files=None, limits=None)` | Copias verificadas e inventario cerrado; `ReproductionBundle` publicado al final bajo `BundleLimits` |
+| `read_bundle(directory, *, expected_sha256=None, limits=None)`, `bundle_artifact(bundle, directory, original, *, limits=None)` | Verifican archivos y permiten resolver una URI portátil conservando identidad, hash, tamaño y formato originales |
+| `reproduce_bundle(directory, *, regenerator, expected_sha256=None, limits=None)` | Regenerador confiable explícito de registros capturados; ningún callback se importa desde JSON |
+| `bundle_study(directory, *, output)`, `regenerate_study_record(record)`, `reproduce_study_bundle(directory, *, expected_sha256=None)` | Bundle portátil del estudio, verificación de capturas y regeneración de métricas/seis CSV, sin reejecutar ETL |
+| `inspect_distribution(package_directory, wheel_path=None, *, name_check=None) -> DistributionReadiness`, `NameCheck` | Inventario local de fuente/lock/wheel y observación externa del nombre; no construye, instala, consulta PyPI ni publica |
+
+`FreezeAudit.technical_ready` y `.scientific_ready` son garantías distintas:
+`pilot` conserva bloqueos científicos; `final` exige resolverlos. `StudyResult`
+separa `.complete`, `.scientific` y `.exit_code`; un caso sin ejecución válida conserva
+cuatro componentes no evaluables, y una etapa posterior fallida conserva R disponible.
+O confirmado requiere mismos inputs/implementación y salida fresca equivalente a la
+revisada. `evaluate_records` calcula sobre registros entregados; la comprobación de
+fuentes y del freeze corresponde a las APIs de estudio, no al cálculo puro.
+
+Los costes incluyen perfilado/inferencia M y comparación operacional sobre salidas
+ya materializadas, con su I/O y evidencia internos; excluyen lectura DW/ETL/captura
+inicial. RSS muestreado es máximo absoluto observado y límite inferior del pico,
+no incremento atribuible a la operación. Fallos conservan resultados y ausencias,
+sin ceros ficticios; el extra `resources` aporta psutil y los controles declarados
+no son cuotas duras. Las repeticiones no aumentan la muestra de detección.
+
+La CLI `run-study` usa 0 para evaluación técnica completa sin alerta/diferencia,
+1 para alerta/diferencia completa y 3 para parcial/no evaluable; `costs` usa 0/3
+según completitud. Entradas inválidas o freeze bloqueado usan 2. Los verificadores
+usan 0 al validar la evidencia, aunque el resultado almacenado sea parcial, y 3
+si falla la verificación. Reproducción distinta usa 1. Véase el
+[README del benchmark](../packages/equiframe-benchmark/README.md) para comandos.
+
+La reproducción compara configuración, splits, etiquetas, decisiones y tablas
+declaradas; preserva costes crudos sin exigir tiempos/CPU/RSS idénticos. No acredita
+una repetición humana independiente ni autentica revisores. `DistributionReadiness`
+mantiene `build_install_verified=False` y `publication_ready=False`: el inventario
+no acredita instalación, control del nombre, licencia resuelta o publicación PyPI.

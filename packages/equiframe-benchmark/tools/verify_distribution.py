@@ -96,6 +96,16 @@ assert importlib.metadata.version('equiframe') == sys.argv[3]
         shutil.copytree(
             ROOT / "tests", work / "tests", ignore=shutil.ignore_patterns("__pycache__")
         )
+        sources = work / "declared-source-packages"
+        for project in (CORE, ROOT):
+            target = sources / project.name
+            target.mkdir(parents=True)
+            for name in ("pyproject.toml", "uv.lock", "README.md"):
+                shutil.copy2(project / name, target / name)
+            shutil.copytree(
+                project / "src", target / "src", ignore=shutil.ignore_patterns("__pycache__")
+            )
+        env["EQUIFRAME_TEST_SOURCE_PACKAGES"] = str(sources)
         run(
             [
                 str(python),
@@ -123,6 +133,13 @@ assert importlib.metadata.version('equiframe') == sys.argv[3]
             work,
             env,
         )
+        evaluation = work / "evaluation_local.py"
+        shutil.copy2(ROOT / "examples" / "evaluation_local.py", evaluation)
+        run(
+            [str(python), "-I", str(evaluation), "--output", str(work / "evaluation-example")],
+            work,
+            env,
+        )
         extracted = work / "sdist"
         with tarfile.open(sdist) as archive:
             archive.extractall(extracted, filter="data")
@@ -135,7 +152,7 @@ assert importlib.metadata.version('equiframe') == sys.argv[3]
         ):
             raise RuntimeError("sdist did not reproduce the same wheel bytes")
         print(
-            "pip installation, installed tests, native pilot, integration example "
+            "pip installation, installed tests, native pilot, integration/evaluation examples "
             "and identical sdist rebuild verified"
         )
 

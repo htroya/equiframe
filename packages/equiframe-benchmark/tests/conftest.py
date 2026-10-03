@@ -1,5 +1,6 @@
 """All people and review decisions here are TEST FIXTURES, never scientific approvals."""
 
+import os
 from pathlib import Path
 
 import equiframe as ef
@@ -8,6 +9,18 @@ import pytest
 import equiframe_benchmark as eb
 from equiframe_benchmark.fixtures import COMPARISON_POLICY, cases, expected_table, registry
 from equiframe_benchmark.pilot import profile_spec, write_table
+
+
+@pytest.fixture(scope="session")
+def source_packages():
+    """Explicit read-only source inventory, separate from installed imports."""
+    configured = os.environ.get("EQUIFRAME_TEST_SOURCE_PACKAGES")
+    root = Path(configured) if configured else Path(__file__).resolve().parents[2]
+    if not all(
+        (root / name / "pyproject.toml").is_file() for name in ("equiframe", "equiframe-benchmark")
+    ):
+        pytest.skip("source inventory requires both declared source distributions")
+    return root
 
 
 @pytest.fixture

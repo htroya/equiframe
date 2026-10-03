@@ -65,6 +65,7 @@ from equiframe.contracts import (
 from equiframe.decision import combine_decisions
 from equiframe.detector_types import (
     ComponentDecision,
+    ComponentDetectionResult,
     DetectionResult,
     DetectorBundle,
     DetectorCalibration,
@@ -83,6 +84,7 @@ from equiframe.detector_types import (
 from equiframe.detectors import (
     calibrate_detectors,
     detect,
+    detect_component,
     fit_detectors,
     read_detector_bundle,
     score_detectors,
@@ -235,7 +237,7 @@ from equiframe.values import (
     TimeZone,
 )
 
-__version__ = "0.8.1"
+__version__ = "0.9.0"
 
 __all__ = [
     "CANONICALIZATION",
@@ -269,6 +271,7 @@ __all__ = [
     "ComparisonState",
     "ComparisonValue",
     "ComponentDecision",
+    "ComponentDetectionResult",
     "Contract",
     "ContractIOError",
     "ContractParseError",
@@ -417,6 +420,7 @@ __all__ = [
     "contract_json_schema",
     "default_rule_registry",
     "detect",
+    "detect_component",
     "detector_fingerprint",
     "evaluate_rules",
     "execute",
