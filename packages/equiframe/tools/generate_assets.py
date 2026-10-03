@@ -43,6 +43,10 @@ from equiframe import (
     JoinCheck,
     KeyCheck,
     KeySpec,
+    MigrationOptions,
+    MigrationRequest,
+    MigrationResult,
+    MigrationSpec,
     NaNPolicy,
     NaNValue,
     NormalCalibrationProfiles,
@@ -63,6 +67,7 @@ from equiframe import (
     ReductionObservation,
     ReductionOptions,
     ReductionResult,
+    RelationalPlan,
     RuleDefinition,
     RuleEvaluation,
     RuleFinding,
@@ -518,6 +523,11 @@ def main() -> None:
         ("reduction-options", ReductionOptions),
         ("reduction-observation", ReductionObservation),
         ("reduction-result", ReductionResult),
+        ("relational-plan", RelationalPlan),
+        ("migration-options", MigrationOptions),
+        ("migration-spec", MigrationSpec),
+        ("migration-request", MigrationRequest),
+        ("migration-result", MigrationResult),
     ):
         assets[ROOT / "schemas" / (name + "-1.0.schema.json")] = render_schema(
             model.model_json_schema()

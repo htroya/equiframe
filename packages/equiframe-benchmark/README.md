@@ -1,8 +1,8 @@
 # EquiFrame Benchmark
 
-Distribución experimental `equiframe-benchmark 0.10.0`, Python 3.12. Catálogo,
+Distribución experimental `equiframe-benchmark 0.10.1`, Python 3.12. Catálogo,
 EquiFrame Verify (validación independiente de equivalencia), grupos transitivos,
-particiones y evaluación para `equiframe 0.9.0`. El núcleo no importa este paquete.
+particiones y evaluación para `equiframe 0.10.0`. El núcleo no importa este paquete.
 
 El paso 8 incorpora `equiframe-benchmark validate`, `split` y `pilot`, y usa
 la orquestación operacional en las quince ejecuciones nativas del piloto.
@@ -28,7 +28,7 @@ No está publicado en PyPI. Con los dos wheels construidos y dependencias
 disponibles se puede instalar por nombre:
 
 ```bash
-python -m pip install --find-links packages/equiframe/dist --find-links packages/equiframe-benchmark/dist equiframe==0.9.0 equiframe-benchmark==0.10.0
+python -m pip install --find-links packages/equiframe/dist --find-links packages/equiframe-benchmark/dist equiframe==0.10.0 equiframe-benchmark==0.10.1
 ```
 
 El piloto genera 5 escenarios, 35 candidatos, 15 perfiles y 4 grupos. Las
@@ -102,7 +102,7 @@ uv run --locked --all-extras python -m build --no-isolation
 uv run --locked --all-extras python tools/verify_distribution.py
 ```
 
-La última comprobación requiere el wheel de `equiframe 0.9.0` construido en
+La última comprobación requiere el wheel de `equiframe 0.10.0` construido en
 `../equiframe/dist`. Instala ambos paquetes por nombre con pip fuera del checkout,
 comprueba imports ligeros, ejecuta la suite y piloto instalados, y reconstruye
 el wheel desde sdist. La matriz de cinco plataformas está disponible solo mediante

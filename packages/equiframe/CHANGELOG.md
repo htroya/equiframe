@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.10.0 — 2026-10-03
+
+- EquiFrame Migrate: IR relacional estricto, compiladores nativos Pandas/Polars/
+  DuckDB y registro explícito extensible; seis direcciones entre los tres motores.
+- `migrate`, `check_migration`, `read_migration` y `migration_summary`; captura
+  única aislada, comprobación de ambos motores antes de ETL, esperado separado,
+  perfiles/detectores congelados y presupuestos cooperativos de extremo a extremo.
+- Diferencias observadas y comprobación contra esperado se conservan separadas.
+  R es requerida por defecto; `require_rules=False` permite exigir solo los
+  componentes declarados sin convertir estados ausentes de R/H en «sin alerta».
+- CLI migration validate/run/verify, reportes, journal e inventario cerrado;
+  lectura verifica archivos, referencias y metadatos físicos sin ejecutar ETL.
+  Manifiesto publicado al final; operaciones interrumpidas permanecen visibles.
+- Cinco JSON Schema nuevos 1.0. `DetectorVersions` añade el emisor 0.10.0 y
+  conserva productores anteriores; sus esquemas reciben la ampliación compatible
+  de enum/default. No cambia el algoritmo de inferencia ni entrena durante migración.
+- Ejemplo con Decimal, monedas, grupos nulos y esperado literal independiente.
+  Timestamps/operaciones float declaradas fuera del IR inicial; plugins confiables,
+  límites de buffers tras materialización y evidencia local sin portabilidad automática.
+
 ## 0.9.0 — 2026-10-03
 
 - API aditiva `detect_component` y resultado `ComponentDetectionResult` para

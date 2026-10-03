@@ -11,8 +11,16 @@ import typer
 from equiframe.comparison import compare
 from equiframe.comparison_types import ComparisonSpec
 from equiframe.detectors import read_detector_bundle
-from equiframe.errors import ContractIOError, ContractValidationError
+from equiframe.errors import CapabilityError, ContractIOError, ContractValidationError
 from equiframe.evidence import inspect_evidence, load_json, read_pipeline
+from equiframe.migration import (
+    MigrationRequest,
+    MigrationSpec,
+    check_migration,
+    migrate,
+    migration_summary,
+    read_migration,
+)
 from equiframe.pipeline import run_pipeline
 from equiframe.pipeline_types import PipelineRequest
 from equiframe.reduction import ReductionObservation, ReductionOptions, reduce_case
@@ -26,6 +34,68 @@ contract_app = typer.Typer(no_args_is_help=True)
 app.add_typer(contract_app, name="contract", help="Validate semantic contract metadata.")
 evidence_app = typer.Typer(no_args_is_help=True)
 app.add_typer(evidence_app, name="evidence", help="Verify final or interrupted evidence.")
+migration_app = typer.Typer(no_args_is_help=True)
+app.add_typer(migration_app, name="migration", help="Compile, migrate and compare native ETL.")
+
+
+@migration_app.command("validate")
+def migration_validate(spec: Path) -> None:
+    """Validate IR/contract support for both engines without executing or loading inputs."""
+    try:
+        document = load_json(MigrationSpec, spec)
+        checks = check_migration(document)
+    except CapabilityError:
+        typer.echo("unsupported_capability", err=True)
+        raise typer.Exit(code=2) from None
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(
+        json.dumps(
+            {
+                "compilation_only": True,
+                "checks": [c.model_dump(mode="json") for c in checks],
+            },
+            sort_keys=True,
+        )
+    )
+    raise typer.Exit(code=0 if all(c.supported for c in checks) else 2)
+
+
+@migration_app.command("run")
+def migration_run(
+    request: Path,
+    output: Path = typer.Option(Path("equiframe-runs")),
+    bundle: Path | None = typer.Option(None),
+) -> None:
+    """Execute two native plans over fixed inputs; optional independent verification."""
+    try:
+        document = load_json(MigrationRequest, request)
+        result = migrate(
+            document.spec,
+            source=LocalDataSource({i.name: i.artifact for i in document.inputs}),
+            expected=document.expected,
+            work_dir=output,
+            detector_bundle=read_detector_bundle(bundle) if bundle else None,
+        )
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(json.dumps(migration_summary(result), sort_keys=True))
+    raise typer.Exit(code=result.exit_code)
+
+
+@migration_app.command("verify")
+def migration_verify(directory: Path) -> None:
+    """Verify bundle integrity without ETL; exit 0 does not certify correctness."""
+    try:
+        result = read_migration(directory)
+    except Exception as error:
+        _failure(error, input_validation=False)
+        return
+    typer.echo(
+        json.dumps({**migration_summary(result), "integrity_verified": True}, sort_keys=True)
+    )
 
 
 @contract_app.command("validate")

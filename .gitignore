@@ -12,6 +12,7 @@ build/
 dist/
 .pytest_cache/
 .pytest-tmp/
+.pytest-*/
 .mypy_cache/
 .ruff_cache/
 .hypothesis/

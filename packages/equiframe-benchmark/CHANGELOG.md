@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.10.1 — 2026-10-03
+
+- Compatibilidad y dependencia fijada en `equiframe 0.10.0`, que añade el
+  migrador nativo. No cambia los protocolos, etiquetas ni algoritmos del estudio.
+- Lock y metadatos sincronizados; evaluación científica, revisión humana,
+  integración real y publicación PyPI conservan sus requisitos pendientes.
+- Los esquemas que incorporan `DetectorVersions` reciben el emisor 0.10.0 y
+  su nuevo default, conservando productores previos y formatos 1.0.
+
 ## 0.10.0 — 2026-10-03
 
 - Congelación de protocolos y ejecución de estudios con decisiones, esperados y

@@ -122,7 +122,7 @@ class DetectorModel(FrozenModel):
 
 
 class DetectorVersions(FrozenModel):
-    equiframe: Literal["0.7.0", "0.8.0", "0.8.1", "0.9.0"] = "0.9.0"
+    equiframe: Literal["0.7.0", "0.8.0", "0.8.1", "0.9.0", "0.10.0"] = "0.10.0"
     python: Text
     sklearn: Text | None = None
     numpy: Text | None = None
