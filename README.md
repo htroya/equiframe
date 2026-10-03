@@ -26,7 +26,7 @@ EquiFrame conserva los datos, tipos y diagnósticos necesarios para revisar el r
 - Isolation Forest y MAD por familia, calibración normal externa con alpha explícito,
   restauración JSON sin pickle e híbrido H que conserva componentes no evaluables.
 
-**Versiones: núcleo 0.9.0 y benchmark 0.10.0 (paso 10 técnico).** Una ejecución `completed` confirma que la
+**Versiones: núcleo 0.10.0 y benchmark 0.10.1 (paso 10 técnico y migrador).** Una ejecución `completed` confirma que la
 transformación terminó y se materializó. La [comparación semántica](docs/COMPARISON.md)
 evalúa salidas materializadas. [R](docs/RULES.md) evalúa reglas seleccionadas del
 contrato sobre una captura. El benchmark técnico conserva revisiones pendientes;
@@ -45,6 +45,16 @@ La [conformidad del paso 9](docs/STEP_09_REVIEW.md) usa datos sintéticos; el cl
 snapshot, DDL y entorno reales de José/Jhair continúan pendientes.
 
 ## Instalación
+
+[EquiFrame Migrate](docs/MIGRATION.md) declara un plan relacional, ejecuta sus
+implementaciones nativas en origen/destino y compara sus resultados, con un
+esperado independiente opcional. Admite las seis direcciones entre Pandas,
+Polars y DuckDB; documenta capacidades, presupuestos y evidencia verificable.
+La tesis mantiene tres familias principales y las tres parejas, con nueve
+estratos; las cinco familias genéricas de perfiles son capacidades del producto.
+
+La [revisión del tutor](docs/THESIS_TUTOR_REVIEW_20261003.md) registra los cambios
+del Word y los requisitos empíricos aún pendientes. El paso 11 no se ha iniciado.
 
 **Objetivo futuro:** publicar EquiFrame en PyPI para que cualquier persona pueda
 usar `pip install equiframe`. Se abordará después de completar el paso 10 y

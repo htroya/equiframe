@@ -313,3 +313,29 @@ conserva 5 escenarios/4 grupos/15 perfiles y 35 revisiones pendientes. P06 conti
 pendiente de publicación pública en la etapa indicada por Hernán. La instalación
 temporal de wheels solo verifica ingeniería. [Diseño](STEP_08_DESIGN.md),
 [uso](ORCHESTRATION.md) y [verificación](STEP_08_REVIEW.md).
+
+## Alcance vigente del documento tras las observaciones del tutor
+
+El [contraste de las 13 recomendaciones](THESIS_TUTOR_REVIEW_20261003.md)
+corresponde al Word entregado con hash
+`4e2f571ceb16d98b16f1d74e5f66803e0268baa607f9ee589adf6e29d11854c8`.
+Hernán mantiene las tres parejas principales y tres familias; A100 sustituye
+la reducción a una pareja de A96. A101 corrige A98: el mínimo mayor que 10.000
+corresponde a los registros del conjunto efectivo de ajuste, no a adjudicaciones
+fuente ni sumas de matrices. Se informan N por modelo/familia, ejecuciones únicas
+y grupos independientes. Las reutilizaciones entre parejas no aumentan N.
+
+El Word contiene capítulos 1–3 y referencias, 132 páginas, 15 figuras, 17 tablas
+y 97 destinos paginados. Los controles editoriales están cerrados; corpus SERCOP
+real, soporte de aprendizaje, revisión doble, designación del tutor y aceptación
+institucional permanecen pendientes. Los pasos 9/10 técnicos no acreditan esos
+requisitos. El [migrador integrado](MIGRATION.md), cuyo [plan previo](MIGRATION_DESIGN.md)
+se documentó antes de programar, es una extensión de
+ingeniería autorizada antes del paso 11; no cambia R/M/B/H ni incorpora esperados
+o etiquetas a las variables de los detectores.
+
+El núcleo 0.10.0 implementa las seis direcciones entre los tres motores y
+conserva comparación observada/esperado, requisitos de componentes y evidencia.
+El benchmark 0.10.1 fija esa dependencia sin cambiar algoritmos ni protocolos.
+[Validación y límites](MIGRATION_REVIEW.md). Sus pruebas sintéticas verifican
+ingeniería; no constituyen registros reales de aprendizaje ni revisión humana.

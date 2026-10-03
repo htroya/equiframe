@@ -105,7 +105,7 @@ from equiframe_benchmark.study_bundle import (
 from equiframe_benchmark.tables import TableExport, read_tables, table_payloads, write_tables
 from equiframe_benchmark.training_types import TrainingManifest, TrainingRecord, TrainingSelection
 
-__version__ = "0.10.0"
+__version__ = "0.10.1"
 __all__ = [
     "Assignment",
     "AwardReconciliationResult",

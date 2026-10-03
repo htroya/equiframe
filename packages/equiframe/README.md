@@ -1,4 +1,4 @@
-# EquiFrame 0.9.0 — orquestación y evidencia verificable
+# EquiFrame 0.10.0 — migración nativa y evidencia verificable
 
 Contratos estrictos, comparación completa y ejecución local con Pandas, Polars y DuckDB.
 Se requiere Python 3.12; los motores se instalan mediante extras. La configuración
@@ -15,8 +15,8 @@ la experiencia pública objetivo, posterior al paso 10 y a una nueva ronda de re
 paquete ajeno. Use el wheel del equipo o este checkout:
 
 ```bash
-python -m pip install ./dist/equiframe-0.9.0-py3-none-any.whl
-python -m pip install "./dist/equiframe-0.9.0-py3-none-any.whl[duckdb]"
+python -m pip install ./dist/equiframe-0.10.0-py3-none-any.whl
+python -m pip install "./dist/equiframe-0.10.0-py3-none-any.whl[duckdb]"
 # Alternativas: [arrow], [pandas], [polars], [engines] o [ml].
 # Desde el checkout del equipo:
 python -m pip install ".[engines]"
@@ -232,7 +232,7 @@ python examples/execute_native.py --engine polars --work-dir my-runs
 ```
 
 Los esperados pequeños son explícitos e independientes de las salidas. Los ejemplos
-no son el benchmark de 60 escenarios ni aprobación científica del oráculo.
+no son el benchmark de 60 escenarios ni aprobación científica de EquiFrame Verify.
 
 ## Instalación reproducible
 
@@ -577,3 +577,22 @@ Cada ruta de bundle es nueva; no se sobrescribe. [Guía de detectores](../../doc
 y [diseño del paso 7](../../docs/STEP_07_DESIGN.md) detallan estados, fórmulas,
 independencia, persistencia y límites. Los ejemplos no acreditan normalidad
 científica ni el control poblacional de falsas alarmas. PyPI sigue pendiente.
+
+## Migración nativa desde 0.10.0
+
+`ef.migrate` ejecuta un plan relacional declarado en origen y destino, compara
+salidas y permite verificarlas contra un esperado capturado por separado.
+`ef.check_migration` comprueba metadatos sin ETL; `ef.read_migration` valida
+la evidencia sin reejecutar motores. La [guía de EquiFrame Migrate](../../docs/MIGRATION.md)
+describe IR, API/CLI, componentes requeridos, extensiones y límites reales.
+
+Con el extra `engines`, el ejemplo sintético comprueba las seis direcciones:
+
+```bash
+python examples/migrate_native.py --output migration-runs
+```
+
+`require_rules=True` conserva R como requisito; `False` permite exigir solo
+los componentes solicitados y mantiene los estados originales de R/H.
+Equivalencia entre motores no acredita corrección independiente. No se entrena
+durante la migración ni se traduce código Python/SQL arbitrario.

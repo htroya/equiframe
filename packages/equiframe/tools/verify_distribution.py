@@ -177,6 +177,20 @@ assert ef.read_table(ref).to_pylist()==[{'id':'001'},{'id':'001'}]
             if extra != "engines":
                 command += ["--engine", extra]
             run(command, cwd=project, env=profile_env)
+            if extra == "engines":
+                migrated_example = project / "migrate_native.py"
+                shutil.copyfile(ROOT / "examples" / "migrate_native.py", migrated_example)
+                run(
+                    [
+                        str(python),
+                        "-I",
+                        str(migrated_example),
+                        "--output",
+                        str(project / "migration-runs"),
+                    ],
+                    cwd=project,
+                    env=profile_env,
+                )
             if extra == "duckdb":
                 pipeline_example = project / "pipeline_local.py"
                 shutil.copyfile(ROOT / "examples" / "pipeline_local.py", pipeline_example)
@@ -270,6 +284,8 @@ assert callable(equiframe.profile_execution) and callable(equiframe.fit_preproce
 assert callable(equiframe.transform_profiles) and callable(equiframe.read_preprocessor)
 assert callable(equiframe.run_pipeline) and callable(equiframe.read_pipeline)
 assert callable(equiframe.reduce_case) and callable(equiframe.inspect_evidence)
+assert callable(equiframe.migrate) and callable(equiframe.read_migration)
+assert callable(equiframe.check_migration) and callable(equiframe.native_compiler_registry)
 """
         run([str(python), "-I", "-c", check, package_version], cwd=work, env=env)
         api_check = """
@@ -429,7 +445,11 @@ assert Path(equiframe.__file__).resolve().is_relative_to(Path(sys.prefix).resolv
             "def matrix(training: ef.NormalTrainingProfiles, spec: ef.ProfileSpec, "
             "profiles: tuple[ef.ProfileVector, ...]) -> ef.FeatureMatrix:\n"
             "    bundle = ef.fit_preprocessor(training, spec=spec)\n"
-            "    return ef.transform_profiles(bundle, profiles)\n",
+            "    return ef.transform_profiles(bundle, profiles)\n"
+            "def migration(spec: ef.MigrationSpec, source: ef.DataSource) -> ef.MigrationResult:\n"
+            "    return ef.migrate(spec, source=source)\n"
+            "def migration_read(path: Path) -> ef.MigrationResult:\n"
+            "    return ef.read_migration(path)\n",
             encoding="utf-8",
         )
         run(

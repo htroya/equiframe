@@ -296,3 +296,34 @@ PR 20 y la publicación PyPI continúa fuera de esta entrega.
 Documento final SHA-256:
 `ff638dff604fbe30179fa463b5e3c9440028f23fec0f114c55d4eac8f63246a2`.
 [Cambios, fuentes, comprobación y límites](THESIS_FINAL_REVIEW_20261003.md).
+
+## Corrección conforme a instrucciones de Hernán — 2026-10-03 UTC
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A100 | Las tres parejas Pandas–Polars, Pandas–DuckDB y Polars–DuckDB son principales; tres familias y nueve estratos | Instrucción expresa del usuario. Sustituye A96; catálogo y partición global comparten identidades reales, sin sumar reutilizaciones ni mezclar scores incompatibles |
+| A101 | El umbral superior a 10.000 corresponde a los registros reales de la matriz efectiva de aprendizaje | Corrige A98 conforme al texto literal del tutor. Adjudicaciones fuente y cantidad de perfiles/grupos son unidades distintas. Informar N por modelo/familia no atribuye al PDF un mínimo literal por familia; requisito empírico pendiente |
+| A102 | Word final de 132 páginas, solo 1–3, 15 figuras, 17 tablas, 61 referencias y 97 destinos | Actualiza A99. Gate estructural, contraste de 13 recomendaciones y revisión visual completa; respaldo de la versión anterior y fuentes intactas. Tutor, datos, ajuste y revisiones independientes no se dan por cumplidos |
+
+La [revisión actual](THESIS_TUTOR_REVIEW_20261003.md) sustituye el alcance y la
+interpretación del mínimo del informe anterior, conservado como historia. El
+Word nuevo tiene SHA-256
+`4e2f571ceb16d98b16f1d74e5f66803e0268baa607f9ee589adf6e29d11854c8`.
+
+Antes del paso 11 se registra el [plan del migrador](MIGRATION_DESIGN.md), solicitado
+por Hernán. Su implementación no adelanta el cierre científico ni PyPI.
+
+## Migración integrada anterior al paso 11 — 2026-10-03 UTC
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A103 | EquiFrame Migrate pertenece al núcleo 0.10.0; benchmark 0.10.1 fija esa dependencia | Una biblioteca genérica puede declarar ETL, compilarla nativamente y comparar sus resultados sin el DW. IR cerrado y registro explícito permiten extensiones confiables, sin cargar código desde JSON |
+| A104 | Captura única aislada para ambos motores y esperado opcional fijado antes de ETL | Comparar salidas no prueba corrección independiente; verificar contra un esperado aportado tampoco autentica su revisión humana. El esperado permanece fuera de perfiles y detectores |
+| A105 | R requerida por defecto, alternativa explícita `require_rules=False` | Permite exigir migración/comparación sin ocultar los estados originales de R/H; ejecución y componentes solicitados deben finalizar y las alertas disponibles conservan su efecto |
+| A106 | Manifiesto final, inventario cerrado y validación física sin reejecución | Conserva fallos y evidencia parcial; hashes, URI locales, metadatos, eventos y conteos deben concordar. Las URI del migrador no constituyen un bundle portátil ni una firma de autoría |
+| A107 | Capacidades iniciales acotadas y presupuestos cooperativos | Rechazo explícito de pérdidas/overflow/índice no representable; límites de captura tras materialización y cota Polars conservadora. Registrar motores no acredita una traducción universal |
+
+[Guía](MIGRATION.md), [plan previo](MIGRATION_DESIGN.md) y
+[comprobaciones y límites](MIGRATION_REVIEW.md). Las ampliaciones compatibles
+de `DetectorVersions` mantienen formatos 1.0 y productores previos; no modifican
+los algoritmos ni el protocolo científico. No se inicia el paso 11 ni PyPI.
