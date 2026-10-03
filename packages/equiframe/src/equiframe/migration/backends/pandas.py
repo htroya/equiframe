@@ -22,11 +22,16 @@ from equiframe.registry import PandasTransformation
 from ..ports import CompiledPlan, compiler_check, require_supported
 from ..types import (
     Aggregate,
+    Arithmetic,
     Boolean,
     Cast,
+    Coalesce,
     Column,
     Compare,
     CompilationCheck,
+    Concatenate,
+    Conditional,
+    Deduplicate,
     EquiJoin,
     Expression,
     Filter,
@@ -90,6 +95,24 @@ def _expression(expression: Expression, frame: pd.DataFrame, columns: Any) -> pd
             ),
             index=frame.index,
         )
+    if isinstance(expression, Arithmetic):
+        left = _expression(expression.left, frame, columns).astype(object)
+        right = _expression(expression.right, frame, columns).astype(object)
+        operation = {"add": "add", "subtract": "sub", "multiply": "mul"}[expression.operation]
+        with localcontext() as context:
+            context.prec = 100
+            return cast("pd.Series[Any]", getattr(left, operation)(right))
+    if isinstance(expression, Coalesce):
+        result = _expression(expression.arguments[0], frame, columns)
+        for item in expression.arguments[1:]:
+            replacement = _expression(item, frame, columns)
+            result = result.where(result.notna(), replacement)
+        return result
+    if isinstance(expression, Conditional):
+        predicate = _expression(expression.predicate, frame, columns).fillna(False)
+        left = _expression(expression.then, frame, columns)
+        right = _expression(expression.otherwise, frame, columns)
+        return left.where(predicate, right)
     if isinstance(expression, Compare):
         left = _expression(expression.left, frame, columns)
         right = _expression(expression.right, frame, columns)
@@ -251,6 +274,20 @@ class PandasCompiler:
                 elif isinstance(node, EquiJoin):
                     left = frames[node.left]
                     right = frames[node.right]
+                    if node.how in ("semi", "anti"):
+                        keys_left = [key.left for key in node.keys]
+                        keys_right = [key.right for key in node.keys]
+                        keys = right[keys_right].drop_duplicates()
+                        if node.null_keys == "never":
+                            keys = keys.loc[keys.notna().all(axis=1)]
+                        keys = keys.rename(columns=dict(zip(keys_right, keys_left, strict=True)))
+                        matches = left[keys_left].merge(
+                            keys, how="left", on=keys_left, indicator=True, sort=False
+                        )
+                        mask = matches["_merge"].eq("both").to_numpy()
+                        frame = left.loc[mask if node.how == "semi" else ~mask].copy()
+                        frames[node.node_id] = _coerce(frame, validated, node.node_id)
+                        continue
                     if node.null_keys == "never":
                         right = right.loc[
                             right[[key.right for key in node.keys]].notna().all(axis=1)
@@ -264,13 +301,17 @@ class PandasCompiler:
                     )
                     frame = left.merge(
                         right,
-                        how=node.how,
+                        how="inner" if node.how == "inner" else "left",
                         left_on=[key.left for key in node.keys],
                         right_on=[node.right_prefix + key.right for key in node.keys],
                         sort=False,
                     )
                 elif isinstance(node, Aggregate):
                     frame = _aggregate(frames[node.source], node, validated)
+                elif isinstance(node, Concatenate):
+                    frame = pd.concat([frames[ref] for ref in node.sources], ignore_index=True)
+                elif isinstance(node, Deduplicate):
+                    frame = frames[node.source].drop_duplicates(subset=list(node.keys)).copy()
                 else:
                     frame = frames[node.source].copy(deep=True)
                     if (

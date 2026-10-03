@@ -32,10 +32,15 @@ from equiframe.values import (
 
 from .types import (
     Aggregate,
+    Arithmetic,
     Boolean,
     Cast,
+    Coalesce,
     Column,
     Compare,
+    Concatenate,
+    Conditional,
+    Deduplicate,
     EquiJoin,
     Expression,
     Filter,
@@ -151,6 +156,74 @@ def expression_type(
         return _column(expression.name, columns)
     if isinstance(expression, LiteralExpression):
         return _literal(expression)
+    if isinstance(expression, Arithmetic):
+        left = expression_type(expression.left, columns, depth=depth + 1)
+        right = expression_type(expression.right, columns, depth=depth + 1)
+        dtype = expression.logical_type
+        if left.logical_type != right.logical_type:
+            raise CapabilityError("arithmetic requires identical operand types")
+        operand = left.logical_type
+        if left.unit != right.unit or expression.unit != left.unit:
+            raise CapabilityError("arithmetic requires explicit matching units")
+        if isinstance(operand, IntegerType) and isinstance(dtype, IntegerType):
+            if not operand.signed:
+                raise CapabilityError("arithmetic currently requires signed integers")
+            if expression.operation == "multiply" and operand.bits > 32:
+                raise CapabilityError(
+                    "exact common integer multiplication requires <=32 bit operands"
+                )
+        elif isinstance(operand, DecimalType) and isinstance(dtype, DecimalType):
+            if (
+                expression.operation == "multiply"
+                or operand.precision > 37
+                or dtype.scale != operand.scale
+                or dtype.precision < operand.precision + 1
+            ):
+                raise CapabilityError(
+                    "decimal add/subtract requires same scale and one guard digit"
+                )
+        else:
+            raise CapabilityError(
+                "arithmetic supports signed integer or exact decimal add/subtract"
+            )
+        return IRColumn(
+            name="arithmetic",
+            logical_type=dtype,
+            nullable=left.nullable or right.nullable,
+            unit=expression.unit,
+        )
+    if isinstance(expression, Coalesce):
+        if any(contains_arithmetic(item) for item in expression.arguments):
+            raise CapabilityError(
+                "fallible arithmetic inside coalesce requires a preceding checkpoint"
+            )
+        types = tuple(
+            expression_type(item, columns, depth=depth + 1) for item in expression.arguments
+        )
+        first = types[0]
+        if any(c.logical_type != first.logical_type or c.unit != first.unit for c in types):
+            raise ValueError("coalesce requires identical types and units")
+        return first.model_copy(
+            update={"name": "coalesce", "nullable": all(c.nullable for c in types)}
+        )
+    if isinstance(expression, Conditional):
+        if any(
+            contains_arithmetic(item)
+            for item in (expression.predicate, expression.then, expression.otherwise)
+        ):
+            raise CapabilityError(
+                "fallible arithmetic inside conditional requires a preceding checkpoint"
+            )
+        predicate = expression_type(expression.predicate, columns, depth=depth + 1)
+        left = expression_type(expression.then, columns, depth=depth + 1)
+        right = expression_type(expression.otherwise, columns, depth=depth + 1)
+        if not isinstance(predicate.logical_type, BooleanType):
+            raise ValueError("conditional predicate requires boolean")
+        if left.logical_type != right.logical_type or left.unit != right.unit:
+            raise ValueError("conditional branches require identical types and units")
+        return left.model_copy(
+            update={"name": "conditional", "nullable": left.nullable or right.nullable}
+        )
     if isinstance(expression, Compare):
         left = expression_type(expression.left, columns, depth=depth + 1)
         right = expression_type(expression.right, columns, depth=depth + 1)
@@ -162,6 +235,10 @@ def expression_type(
             name="predicate", logical_type=BooleanType(), nullable=left.nullable or right.nullable
         )
     if isinstance(expression, (Boolean, Not)):
+        if contains_arithmetic(expression):
+            raise CapabilityError(
+                "fallible arithmetic inside boolean logic requires a preceding checkpoint"
+            )
         arguments = (
             expression.arguments if isinstance(expression, Boolean) else (expression.argument,)
         )
@@ -179,11 +256,30 @@ def expression_type(
     return IRColumn(name="predicate", logical_type=BooleanType(), nullable=False)
 
 
+def contains_arithmetic(expression: Expression) -> bool:
+    if isinstance(expression, Arithmetic):
+        return True
+    if isinstance(expression, (Column, LiteralExpression)):
+        return False
+    if isinstance(expression, Compare):
+        return contains_arithmetic(expression.left) or contains_arithmetic(expression.right)
+    if isinstance(expression, (Boolean, Coalesce)):
+        return any(contains_arithmetic(item) for item in expression.arguments)
+    if isinstance(expression, Conditional):
+        return any(
+            contains_arithmetic(item)
+            for item in (expression.predicate, expression.then, expression.otherwise)
+        )
+    return contains_arithmetic(expression.argument)
+
+
 def references(node: Node) -> tuple[str, ...]:
     if isinstance(node, Scan):
         return ()
     if isinstance(node, EquiJoin):
         return node.left, node.right
+    if isinstance(node, Concatenate):
+        return node.sources
     return (node.source,)
 
 
@@ -257,6 +353,10 @@ def validate_ir(plan: RelationalPlan, contract: Contract) -> ValidatedIR:
                 for c in schemas[node.source]
             )
         elif isinstance(node, EquiJoin):
+            if node.how in ("right", "full"):
+                raise CapabilityError(
+                    "right/full joins remain explicitly unsupported by the common IR"
+                )
             _unique(tuple(k.left for k in node.keys))
             _unique(tuple(k.right for k in node.keys))
             for key in node.keys:
@@ -268,15 +368,32 @@ def validate_ir(plan: RelationalPlan, contract: Contract) -> ValidatedIR:
                     raise ValueError("join keys must have identical types and units")
                 if isinstance(left.logical_type, FloatType):
                     raise CapabilityError("float join keys are not supported")
-            columns = schemas[node.left] + tuple(
-                c.model_copy(
-                    update={
-                        "name": node.right_prefix + c.name,
-                        "nullable": c.nullable or node.how == "left",
-                    }
+            columns = schemas[node.left] + (
+                ()
+                if node.how in ("semi", "anti")
+                else tuple(
+                    c.model_copy(
+                        update={
+                            "name": node.right_prefix + c.name,
+                            "nullable": c.nullable or node.how == "left",
+                        }
+                    )
+                    for c in schemas[node.right]
                 )
-                for c in schemas[node.right]
             )
+        elif isinstance(node, Concatenate):
+            columns = schemas[node.sources[0]]
+            if any(schemas[ref] != columns for ref in node.sources[1:]):
+                raise ValueError(
+                    "concatenate requires identical ordered schemas/types/units/nullability"
+                )
+        elif isinstance(node, Deduplicate):
+            columns = schemas[node.source]
+            _unique(node.keys)
+            if set(node.keys) != {c.name for c in columns}:
+                raise CapabilityError("deduplicate identical requires every column as key")
+            if any(isinstance(c.logical_type, FloatType) for c in columns):
+                raise CapabilityError("float deduplicate keys remain unsupported")
         elif isinstance(node, Aggregate):
             _unique(node.group_by)
             groups = tuple(_column(name, schemas[node.source]) for name in node.group_by)

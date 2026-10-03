@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.11.0 — 2026-10-03
+
+- Puente tipado `OracleVerificationBridge`/`oracle_verification_bridge` para
+  conservar identidades, hashes, procedencia y revisión al usar Verify del núcleo.
+  Compatibilidad de `oracle`, `OracleResult` y `evaluate_oracle` mantenida.
+- Dependencia/extras exactos `equiframe==0.11.0`, locks/esquemas compatibles,
+  Twine reproducible y verificador de consumidor limpio ampliado.
+- No altera R/M/B/H, etiquetas, entrenamiento, protocolo científico ni autentica
+  personas por nombres JSON. No publica en PyPI/TestPyPI.
+
+
 ## 0.10.1 — 2026-10-03
 
 - Compatibilidad y dependencia fijada en `equiframe 0.10.0`, que añade el

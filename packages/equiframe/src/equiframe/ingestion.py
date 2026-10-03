@@ -1,0 +1,554 @@
+"""Explicit scalar ingestion; proposals never become approved contracts implicitly."""
+
+from __future__ import annotations
+
+import csv
+import hashlib
+import io
+import json
+import math
+import re
+import time
+from dataclasses import dataclass
+from datetime import date
+from decimal import Decimal, localcontext
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Literal, Self
+from uuid import uuid4
+
+from pydantic import Field, model_validator
+
+from equiframe._base import FrozenModel, NonNegativeInt, Text
+from equiframe.contracts import (
+    BooleanType,
+    ColumnSpec,
+    DateType,
+    DecimalType,
+    FloatType,
+    IntegerType,
+    StringType,
+    TimestampPolicy,
+)
+from equiframe.errors import InvalidExecutionInput, ResourceLimitError
+from equiframe.evidence import publish_json
+from equiframe.local import LocalArtifactStore
+from equiframe.migration.validation import decimal_limit, integer_bounds
+from equiframe.tables import LoadedTable, check_arrow, read_table, require_dependency
+from equiframe.types import ArtifactRef, Sha256
+from equiframe.values import TimestampValue
+
+if TYPE_CHECKING:
+    from equiframe.execution import RunContext
+
+
+class FieldMapping(FrozenModel):
+    column: ColumnSpec
+    path: tuple[Text, ...]
+    scope: Literal["record", "root", "ancestor"] = "record"
+    ancestor_levels: int = Field(default=1, ge=1)
+    null_tokens: tuple[str, ...] = ()
+    missing: Literal["reject", "null"] = "reject"
+    decimal_separator: Literal[".", ","] = "."
+    thousands_separator: Literal[",", ".", " "] | None = None
+    date_format: Text | None = None
+    true_tokens: tuple[str, ...] = ("true",)
+    false_tokens: tuple[str, ...] = ("false",)
+
+    @model_validator(mode="after")
+    def coherent(self) -> Self:
+        if not self.path or "*" in self.path:
+            raise ValueError(
+                "field paths are explicit nonempty object paths without array expansion"
+            )
+        if self.thousands_separator == self.decimal_separator:
+            raise ValueError("decimal and thousands separators must differ")
+        if set(self.true_tokens) & set(self.false_tokens):
+            raise ValueError("boolean token sets must be disjoint")
+        if (self.missing == "null" or self.null_tokens) and not self.column.nullable:
+            raise ValueError("absence conversions require nullable columns")
+        return self
+
+
+class IngestionSpec(FrozenModel):
+    schema_version: Literal["1.0"] = "1.0"
+    format: Literal["csv", "json", "jsonl"]
+    fields: tuple[FieldMapping, ...]
+    encoding: Text = "utf-8"
+    delimiter: str = ","
+    header: bool = True
+    fieldnames: tuple[Text, ...] = ()
+    records_path: tuple[Text, ...] = ()
+    extra_fields: Literal["reject", "ignore"] = "reject"
+    invalid_records: Literal["reject", "quarantine"] = "reject"
+    max_source_bytes: int = Field(default=256 * 1024 * 1024, gt=0)
+    max_records: int = Field(default=1_000_000, ge=0)
+
+    @model_validator(mode="after")
+    def coherent(self) -> Self:
+        names = tuple(field.column.name for field in self.fields)
+        if not names or len(names) != len(set(names)):
+            raise ValueError("ingestion fields must have unique nonempty output names")
+        if len(self.delimiter) != 1:
+            raise ValueError("CSV delimiter must be one character")
+        if self.format == "csv":
+            if self.records_path or any(
+                f.scope != "record" or len(f.path) != 1 for f in self.fields
+            ):
+                raise ValueError("CSV requires direct record fields and no records_path")
+            if not self.header and not self.fieldnames:
+                raise ValueError("CSV without a header requires explicit fieldnames")
+        return self
+
+
+class SourceReceipt(FrozenModel):
+    uri: Text
+    preserved_uri: Text
+    sha256: Sha256
+    size_bytes: NonNegativeInt
+
+
+class ConversionReceipt(FrozenModel):
+    record: NonNegativeInt
+    path: Text
+    column: Text
+    original_kind: Text
+    original_text: str
+    converted_text: str
+    operation: Text
+
+
+class QuarantinedRecord(FrozenModel):
+    record: NonNegativeInt
+    path: Text
+    original_text: str
+    code: Text
+
+
+class IngestionResult(FrozenModel):
+    schema_version: Literal["1.0"] = "1.0"
+    ingestion_id: Text
+    spec: IngestionSpec
+    source: SourceReceipt
+    state: Literal["completed", "rejected", "quarantined"]
+    inspected_records: NonNegativeInt
+    accepted_records: NonNegativeInt
+    quarantined: tuple[QuarantinedRecord, ...]
+    conversions: tuple[ConversionReceipt, ...]
+    output: ArtifactRef | None
+    elapsed_seconds: float = Field(ge=0)
+    extractor_version: Literal["equiframe-ingestion-1.0"] = "equiframe-ingestion-1.0"
+
+    @model_validator(mode="after")
+    def coherent(self) -> Self:
+        if self.inspected_records != self.accepted_records + len(self.quarantined):
+            raise ValueError("ingestion coverage counts differ")
+        if (self.state == "rejected") != (self.output is None):
+            raise ValueError("rejected ingestion cannot publish a partial accepted table")
+        if self.state == "completed" and self.quarantined:
+            raise ValueError("quarantine cannot be labelled complete ingestion")
+        return self
+
+
+_MISSING = object()
+
+
+def _text(value: object) -> str:
+    if value is _MISSING:
+        return "<missing>"
+    return json.dumps(value, ensure_ascii=False, default=str, separators=(",", ":"))
+
+
+def _path(value: object, parts: tuple[str, ...]) -> object:
+    for part in parts:
+        if not isinstance(value, dict) or part not in value:
+            return _MISSING
+        value = value[part]
+    return value
+
+
+def _records(
+    value: object, parts: tuple[str, ...], ancestors: tuple[object, ...] = (), location: str = "$"
+) -> list[tuple[object, tuple[object, ...], str]]:
+    if not parts:
+        if isinstance(value, list):
+            raise ValueError("array grain requires an explicit '*' in records_path")
+        return [(value, ancestors, location)]
+    part, remaining = parts[0], parts[1:]
+    if part == "*":
+        if not isinstance(value, list):
+            raise ValueError("records_path '*' requires an array")
+        result = []
+        for index, child in enumerate(value):
+            result.extend(_records(child, remaining, (*ancestors, value), f"{location}[{index}]"))
+        return result
+    child = _path(value, (part,))
+    if child is _MISSING:
+        raise ValueError("records_path field is absent")
+    return _records(child, remaining, (*ancestors, value), location + "." + part)
+
+
+def _arrow_type(field: FieldMapping) -> Any:
+    import pyarrow as pa
+
+    dtype = field.column.logical_type
+    if isinstance(dtype, IntegerType):
+        return getattr(pa, ("int" if dtype.signed else "uint") + str(dtype.bits))()
+    if isinstance(dtype, DecimalType):
+        return (pa.decimal128 if dtype.precision <= 38 else pa.decimal256)(
+            dtype.precision, dtype.scale
+        )
+    if isinstance(dtype, StringType):
+        return pa.string()
+    if isinstance(dtype, BooleanType):
+        return pa.bool_()
+    if isinstance(dtype, FloatType):
+        return pa.float32() if dtype.bits == 32 else pa.float64()
+    if isinstance(dtype, DateType):
+        return pa.date32()
+    return pa.timestamp(dtype.unit, tz=dtype.timezone)
+
+
+def _convert(value: object, field: FieldMapping) -> object:
+    column, dtype = field.column, field.column.logical_type
+    if value is _MISSING:
+        if field.missing != "null":
+            raise ValueError("missing_field")
+        value = None
+    if isinstance(value, str) and value in field.null_tokens:
+        value = None
+    if value is None:
+        if not column.nullable:
+            raise ValueError("forbidden_null")
+        return None
+    if isinstance(dtype, StringType):
+        if not isinstance(value, str):
+            raise ValueError("string_required_identifiers_are_not_coerced")
+        if any(0xD800 <= ord(char) <= 0xDFFF for char in value):
+            raise ValueError("invalid_unicode")
+        return value
+    if isinstance(dtype, BooleanType):
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str) and value in field.true_tokens:
+            return True
+        if isinstance(value, str) and value in field.false_tokens:
+            return False
+        raise ValueError("invalid_boolean")
+    if isinstance(dtype, IntegerType):
+        if isinstance(value, bool) or not isinstance(value, (int, str)):
+            raise ValueError("integer_required")
+        if isinstance(value, str) and re.fullmatch(r"[+-]?[0-9]+", value) is None:
+            raise ValueError("invalid_integer")
+        integer_number = int(value)
+        lower, upper = integer_bounds(dtype)
+        if not lower <= integer_number <= upper:
+            raise ValueError("integer_overflow")
+        return integer_number
+    if isinstance(dtype, DecimalType):
+        if isinstance(value, bool) or not isinstance(value, (str, int, Decimal)):
+            raise ValueError("exact_decimal_required")
+        if isinstance(value, Decimal):
+            # JSON numeric exponents must not expand to an unbounded plain string
+            # before precision/range validation (e.g. a tiny 1e-999999999 token).
+            with localcontext() as context:
+                context.prec = 100
+                if (
+                    not value.is_finite()
+                    or value.copy_abs() > decimal_limit(dtype)
+                    or (value.is_zero() and value.is_signed())
+                ):
+                    raise ValueError("decimal_overflow_or_precision_loss")
+                exact = value.quantize(Decimal(10) ** -dtype.scale)
+                if exact != value:
+                    raise ValueError("decimal_overflow_or_precision_loss")
+                return exact
+        text = str(value)
+        separator = re.escape(field.decimal_separator)
+        integer = r"[0-9]+"
+        if field.thousands_separator:
+            group = re.escape(field.thousands_separator)
+            integer = rf"(?:[0-9]+|[0-9]{{1,3}}(?:{group}[0-9]{{3}})+)"
+        if re.fullmatch(rf"[+-]?{integer}(?:{separator}[0-9]+)?", text) is None:
+            raise ValueError("invalid_decimal")
+        if field.thousands_separator:
+            text = text.replace(field.thousands_separator, "")
+        text = text.replace(field.decimal_separator, ".")
+        with localcontext() as context:
+            context.prec = 100
+            decimal_number = Decimal(text)
+            if (
+                decimal_number.copy_abs() > decimal_limit(dtype)
+                or decimal_number != decimal_number.quantize(Decimal(10) ** -dtype.scale)
+                or (decimal_number.is_zero() and decimal_number.is_signed())
+            ):
+                raise ValueError("decimal_overflow_or_precision_loss")
+            return decimal_number.quantize(Decimal(10) ** -dtype.scale)
+    if isinstance(dtype, FloatType):
+        if isinstance(value, bool) or not isinstance(value, (int, str, float, Decimal)):
+            raise ValueError("float_required")
+        float_number = float(value)
+        if not math.isfinite(float_number):
+            raise ValueError("nonfinite_float_requires_explicit_external_input")
+        if dtype.bits == 32:
+            import struct
+
+            if struct.unpack("f", struct.pack("f", float_number))[0] != float_number:
+                raise ValueError("float32_precision_loss")
+        return float_number
+    if not isinstance(value, str):
+        raise ValueError("temporal_text_required")
+    if isinstance(dtype, DateType):
+        if field.date_format:
+            from datetime import datetime
+
+            return datetime.strptime(value, field.date_format).date()
+        if re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value) is None:
+            raise ValueError("ISO_date_required")
+        return date.fromisoformat(value)
+    stamp = TimestampValue(value=value, zone=dtype.timezone)
+    if (dtype.timezone is None) != (not stamp.has_offset):
+        raise ValueError("timestamp_zone_or_offset_mismatch")
+    divisor = {"s": 10**9, "ms": 10**6, "us": 10**3, "ns": 1}[dtype.unit]
+    epoch = TimestampValue(
+        value="1970-01-01T00:00:00Z" if stamp.has_offset else "1970-01-01T00:00:00"
+    )
+    ticks = stamp.nanoseconds(instant=stamp.has_offset) - epoch.nanoseconds(
+        instant=stamp.has_offset
+    )
+    if ticks % divisor:
+        raise ValueError("timestamp_precision_loss")
+    policy = column.temporal_policy
+    if isinstance(policy, TimestampPolicy):
+        policy._bound(stamp, "ingestion")
+    return ticks // divisor
+
+
+def _json(text: str) -> object:
+    def pairs(items: list[tuple[str, object]]) -> dict[str, object]:
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError("duplicate_json_field")
+            result[key] = value
+        return result
+
+    def invalid(value: str) -> object:
+        raise ValueError("nonfinite_json_number")
+
+    return json.loads(text, parse_float=Decimal, object_pairs_hook=pairs, parse_constant=invalid)
+
+
+def ingest_file(
+    path: Path, *, spec: IngestionSpec, work_dir: Path, context: RunContext | None = None
+) -> IngestionResult:
+    """Preserve bytes, then parse to declared types. A rejected file has no output."""
+    require_dependency("pyarrow", "arrow")
+    import pyarrow as pa
+
+    spec = IngestionSpec.model_validate(spec)
+    start = time.perf_counter()
+    directory = work_dir.resolve() / ("ingestion_" + uuid4().hex)
+    directory.mkdir(parents=True, exist_ok=False)
+    source_path = path.resolve()
+    digest, size = hashlib.sha256(), 0
+    preserved = directory / "source.original"
+    with source_path.open("rb") as source_reader, preserved.open("xb") as source_writer:
+        while block := source_reader.read(1024 * 1024):
+            if context:
+                context.check()
+            size += len(block)
+            if size > spec.max_source_bytes:
+                raise ResourceLimitError("source exceeds ingestion byte budget before parsing")
+            digest.update(block)
+            source_writer.write(block)
+    receipt = SourceReceipt(
+        uri=source_path.as_uri(),
+        preserved_uri=preserved.as_uri(),
+        sha256=digest.hexdigest(),
+        size_bytes=size,
+    )
+    publish_json(receipt, directory / "source.json")
+    values: dict[str, list[object]] = {f.column.name: [] for f in spec.fields}
+    conversions: list[ConversionReceipt] = []
+    quarantine: list[QuarantinedRecord] = []
+    count = 0
+
+    def accept(raw: object, root: object, ancestors: tuple[object, ...], location: str) -> bool:
+        nonlocal count
+        if context:
+            context.check()
+        if count >= spec.max_records:
+            raise ResourceLimitError("expanded records exceed ingestion record budget")
+        index = count
+        count += 1
+        converted = {}
+        pending = []
+        try:
+            if not isinstance(raw, dict):
+                raise ValueError("record_object_required")
+            if spec.extra_fields == "reject":
+                permitted = {f.path[0] for f in spec.fields if f.scope == "record"}
+                if set(raw) - permitted:
+                    raise ValueError("new_or_extra_field")
+            for field in spec.fields:
+                scope = raw if field.scope == "record" else root
+                if field.scope == "ancestor":
+                    if len(ancestors) < field.ancestor_levels:
+                        raise ValueError("ancestor_scope_unavailable")
+                    scope = ancestors[-field.ancestor_levels]
+                original = _path(scope, field.path)
+                converted[field.column.name] = _convert(original, field)
+                pending.append(
+                    ConversionReceipt(
+                        record=index,
+                        path=location,
+                        column=field.column.name,
+                        original_kind="missing"
+                        if original is _MISSING
+                        else type(original).__name__,
+                        original_text=_text(original),
+                        converted_text=_text(converted[field.column.name]),
+                        operation="declared_scalar_parse",
+                    )
+                )
+        except (ValueError, TypeError, OverflowError) as error:
+            quarantine.append(
+                QuarantinedRecord(
+                    record=index, path=location, original_text=_text(raw), code=str(error)
+                )
+            )
+            return spec.invalid_records == "quarantine"
+        conversions.extend(pending)
+        for name, value in converted.items():
+            values[name].append(value)
+        return True
+
+    rejected = False
+    try:
+        text = preserved.read_text(encoding=spec.encoding)
+        if spec.format == "csv":
+            reader = csv.DictReader(
+                io.StringIO(text, newline=""),
+                delimiter=spec.delimiter,
+                fieldnames=None if spec.header else list(spec.fieldnames),
+                strict=True,
+            )
+            names = reader.fieldnames or []
+            if len(names) != len(set(names)) or any(not name for name in names):
+                raise ValueError("invalid_or_duplicate_csv_header")
+            required = {field.path[0] for field in spec.fields if field.missing == "reject"}
+            if required - set(names):
+                raise ValueError("missing_csv_header_field")
+            permitted = {field.path[0] for field in spec.fields}
+            if spec.extra_fields == "reject" and set(names) - permitted:
+                raise ValueError("new_or_extra_csv_header_field")
+            for csv_record in reader:
+                if None in csv_record:
+                    csv_record = {**csv_record, "<surplus_fields>": csv_record[None]}
+                else:
+                    csv_record = {
+                        name: value for name, value in csv_record.items() if value is not None
+                    }
+                if not accept(csv_record, csv_record, (), f"$[{count}]"):
+                    rejected = True
+                    break
+        else:
+            documents = text.splitlines() if spec.format == "jsonl" else [text]
+            for line_number, document in enumerate(documents, 1):
+                if not document.strip():
+                    if spec.format == "jsonl" and not accept(None, None, (), f"line:{line_number}"):
+                        rejected = True
+                        break
+                    continue
+                try:
+                    root = _json(document)
+                    records = _records(root, spec.records_path)
+                except ValueError as error:
+                    if count >= spec.max_records:
+                        raise ResourceLimitError(
+                            "records exceed ingestion record budget"
+                        ) from error
+                    quarantine.append(
+                        QuarantinedRecord(
+                            record=count,
+                            path=f"line:{line_number}",
+                            original_text=document,
+                            code=str(error),
+                        )
+                    )
+                    count += 1
+                    if spec.invalid_records == "reject":
+                        rejected = True
+                        break
+                    continue
+                for raw, ancestors, location in records:
+                    if not accept(raw, root, ancestors, f"line:{line_number}" + location):
+                        rejected = True
+                        break
+                if rejected:
+                    break
+    except (UnicodeError, csv.Error, ValueError) as error:
+        quarantine.append(
+            QuarantinedRecord(
+                record=count,
+                path="$",
+                original_text="",
+                code=type(error).__name__ + ":" + str(error),
+            )
+        )
+        count += 1
+        rejected = True
+    output = None
+    accepted = len(next(iter(values.values())))
+    if not rejected:
+        table = pa.Table.from_arrays(
+            [
+                pa.array(values[f.column.name], type=_arrow_type(f), from_pandas=False)
+                for f in spec.fields
+            ],
+            names=list(values),
+        )
+        check_arrow(table)
+        if context:
+            context.check_table(table, output=False)
+        target = directory / "accepted.arrow"
+        with pa.OSFile(str(target), "wb") as sink, pa.ipc.new_file(sink, table.schema) as writer:
+            writer.write_table(table)
+        output = LocalArtifactStore(directory / "artifacts").put(
+            target, media_type="application/vnd.apache.arrow.file"
+        )
+    result = IngestionResult(
+        ingestion_id=directory.name,
+        spec=spec,
+        source=receipt,
+        state="rejected" if rejected else ("quarantined" if quarantine else "completed"),
+        inspected_records=count,
+        accepted_records=accepted,
+        quarantined=tuple(quarantine),
+        conversions=tuple(conversions),
+        output=output,
+        elapsed_seconds=time.perf_counter() - start,
+    )
+    publish_json(result, directory / "ingestion.json")
+    return result
+
+
+@dataclass(frozen=True)
+class FileInput:
+    path: Path
+    spec: IngestionSpec
+
+    def load(self, context: RunContext) -> LoadedTable:
+        result = ingest_file(self.path, spec=self.spec, work_dir=context.directory, context=context)
+        if result.state != "completed" or result.output is None:
+            raise InvalidExecutionInput(
+                "ingestion rejected/quarantined records; inspect ingestion receipt"
+            )
+        return LoadedTable(
+            read_table(result.output),
+            origin=result.output,
+            notes=(
+                "Source original SHA-256=" + result.source.sha256,
+                "Explicit ingestion specification and conversion receipts retained.",
+            ),
+        )

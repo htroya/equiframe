@@ -54,11 +54,43 @@ class IsNaN(FrozenModel):
     argument: Expression
 
 
+class Arithmetic(FrozenModel):
+    kind: Literal["arithmetic"] = "arithmetic"
+    operation: Literal["add", "subtract", "multiply"]
+    left: Expression
+    right: Expression
+    logical_type: LogicalType
+    unit: Text
+    overflow: Literal["reject"] = "reject"
+
+
+class Coalesce(FrozenModel):
+    kind: Literal["coalesce"] = "coalesce"
+    arguments: Annotated[tuple[Expression, ...], Field(min_length=2, max_length=32)]
+
+
+class Conditional(FrozenModel):
+    kind: Literal["conditional"] = "conditional"
+    predicate: Expression
+    then: Expression
+    otherwise: Expression
+    unknown: Literal["otherwise"] = "otherwise"
+
+
 Expression = Annotated[
-    Column | LiteralExpression | Compare | Boolean | Not | IsNull | IsNaN,
+    Column
+    | LiteralExpression
+    | Compare
+    | Boolean
+    | Not
+    | IsNull
+    | IsNaN
+    | Arithmetic
+    | Coalesce
+    | Conditional,
     Field(discriminator="kind"),
 ]
-for _model in (Compare, Boolean, Not, IsNull, IsNaN):
+for _model in (Compare, Boolean, Not, IsNull, IsNaN, Arithmetic, Coalesce, Conditional):
     _model.model_rebuild()
 
 
@@ -111,7 +143,7 @@ class EquiJoin(FrozenModel):
     left: Identifier
     right: Identifier
     keys: Annotated[tuple[JoinKey, ...], Field(min_length=1, max_length=32)]
-    how: Literal["inner", "left"]
+    how: Literal["inner", "left", "right", "full", "semi", "anti"]
     null_keys: Literal["equal", "never"]
     right_prefix: Text = "right."
 
@@ -154,8 +186,25 @@ class Sort(FrozenModel):
     ties: Literal["unspecified", "identical_rows", "reject"]
 
 
+class Concatenate(FrozenModel):
+    kind: Literal["concatenate"] = "concatenate"
+    node_id: Identifier
+    sources: Annotated[tuple[Identifier, ...], Field(min_length=2, max_length=32)]
+    schema_policy: Literal["identical"] = "identical"
+
+
+class Deduplicate(FrozenModel):
+    kind: Literal["deduplicate"] = "deduplicate"
+    node_id: Identifier
+    source: Identifier
+    keys: Annotated[tuple[Text, ...], Field(min_length=1, max_length=256)]
+    keep: Literal["identical"] = "identical"
+    nulls: Literal["equal"] = "equal"
+
+
 Node = Annotated[
-    Scan | Project | Filter | Cast | EquiJoin | Aggregate | Sort, Field(discriminator="kind")
+    Scan | Project | Filter | Cast | EquiJoin | Aggregate | Sort | Concatenate | Deduplicate,
+    Field(discriminator="kind"),
 ]
 
 

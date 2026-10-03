@@ -1,8 +1,14 @@
 # EquiFrame Benchmark
 
-Distribución experimental `equiframe-benchmark 0.10.1`, Python 3.12. Catálogo,
+El README forma parte de los metadatos del wheel/sdist. Los enlaces al monorepo
+pueden requerir acceso al repositorio privado. Los ejemplos, tests, herramientas
+y JSON Schema completos se incluyen en el **sdist**; el wheel contiene la API,
+CLI y recursos runtime. Hasta resolver licencia y acceso público, use artefactos
+identificados del equipo y `--no-index --find-links` para evitar paquetes ajenos.
+
+Distribución experimental `equiframe-benchmark 0.11.0`, Python 3.12. Catálogo,
 EquiFrame Verify (validación independiente de equivalencia), grupos transitivos,
-particiones y evaluación para `equiframe 0.10.0`. El núcleo no importa este paquete.
+particiones y evaluación para `equiframe 0.11.0`. El núcleo no importa este paquete.
 
 El paso 8 incorpora `equiframe-benchmark validate`, `split` y `pilot`, y usa
 la orquestación operacional en las quince ejecuciones nativas del piloto.
@@ -28,7 +34,7 @@ No está publicado en PyPI. Con los dos wheels construidos y dependencias
 disponibles se puede instalar por nombre:
 
 ```bash
-python -m pip install --find-links packages/equiframe/dist --find-links packages/equiframe-benchmark/dist equiframe==0.10.0 equiframe-benchmark==0.10.1
+python -m pip install packages/equiframe/dist/equiframe-0.11.0-py3-none-any.whl packages/equiframe-benchmark/dist/equiframe_benchmark-0.11.0-py3-none-any.whl
 ```
 
 El piloto genera 5 escenarios, 35 candidatos, 15 perfiles y 4 grupos. Las
@@ -102,14 +108,14 @@ uv run --locked --all-extras python -m build --no-isolation
 uv run --locked --all-extras python tools/verify_distribution.py
 ```
 
-La última comprobación requiere el wheel de `equiframe 0.10.0` construido en
+La última comprobación requiere el wheel de `equiframe 0.11.0` construido en
 `../equiframe/dist`. Instala ambos paquetes por nombre con pip fuera del checkout,
 comprueba imports ligeros, ejecuta la suite y piloto instalados, y reconstruye
 el wheel desde sdist. La matriz de cinco plataformas está disponible solo mediante
 despacho manual autorizado; permanece desactivada por la cuota de Actions.
 
 Arquitectura, límites y decisiones: `docs/STEP_06_DESIGN.md` en el repositorio.
-IF/MAD/H están en el núcleo 0.7.0. No hay métricas finales, integración SERCOP
+IF/MAD/H están disponibles desde el núcleo 0.7.0. No hay métricas científicas finales, integración productiva SERCOP/DW
 ni aprobaciones científicas en esta distribución. La licencia y publicación pública permanecen pendientes.
 
 ## Selección normal de calibración y soporte por grupos
@@ -176,7 +182,9 @@ reales y decimales por moneda. Comprueba resultados esperados e inventarios;
 conserva una alerta parcial de Pandas por su precisión decimal nativa. La
 comparación lossless no desactiva esa regla de contrato. `reconcile_awards`
 comprueba grano e importes exactos con columnas configuradas y no genera O.
-Cliente productivo, snapshots SERCOP, DDL/mapeos y aceptación OCI siguen pendientes.
+Cliente productivo, snapshots representativos del DW, DDL/mapeos y aceptación OCI
+siguen pendientes. El consumidor público acotado actual está en
+[caso SERCOP](https://github.com/htroya/equiframe/blob/main/docs/SERCOP_EXAMPLE.md).
 
 ## Evaluación y reproducción del paso 10
 
@@ -228,3 +236,16 @@ El paso 10 inventaría licencia, nombre, metadatos, dependencias y tipado; no re
 un nombre ni publica en PyPI. Ver [diseño](../../docs/STEP_10_DESIGN.md),
 [evaluación](../../docs/STEP_10_EVALUATION.md) e
 [inventario de distribución](../../docs/STEP_10_DISTRIBUTION.md).
+
+## Puente de Verify 0.11.0
+
+`OracleVerificationBridge` y `oracle_verification_bridge` vinculan los tipos
+históricos `Scenario`, `Candidate`, `OracleResult` con `VerificationBinding`,
+procedencia del esperado y revisiones del núcleo. `evaluate_oracle` conserva su
+API. El plan y la dependencia del esperado se suministran explícitamente; no se
+infieren revisores reales ni se autentican nombres JSON. El núcleo puede usar
+Verify sin instalar este paquete.
+
+Se fijó `equiframe==0.11.0`; extras y locks reflejan esa pareja. Twine se incorpora
+al entorno de desarrollo. La CI es manual y la matriz remota del candidato no fue
+ejecutada. [Candidato, controles y pendientes](https://github.com/htroya/equiframe/blob/main/docs/RELEASE_CANDIDATE.md).

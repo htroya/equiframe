@@ -1,6 +1,22 @@
 # Changelog
 
-## Unreleased
+## 0.11.0 — 2026-10-03
+
+- Verify reutilizable para artefactos, ejecuciones y migraciones; dimensiones
+  separadas y puente opcional de O, sin cambiar los algoritmos R/M/B/H.
+- CSV/JSON/JSONL con esquema explícito, copias originales, conversiones exactas,
+  rutas/grano y cuarentena; workflow de checkpoints y destino Parquet con staging,
+  gate de Verify, versiones, visibilidad local atómica e idempotencia.
+- IR nativo ampliado con aritmética acotada, coalesce, condiciones, concatenación,
+  deduplicación explícita y semi/anti join. Capacidades/rechazos trazables por prueba.
+- Bundles cerrados para Verify/migración/workflow, lectura relocalizada sin ETL,
+  protección de rutas y comprobación de decisiones/refencias a evidencia.
+- API/CLI, once esquemas nuevos, productores previos de detectores preservados,
+  ejemplos genéricos y OCDS sintético/consumidor real sin descarga implícita.
+- Twine reproducible, verificadores de wheel/sdist ampliados, manifiesto de
+  candidato y automatización separada de publicación. Python 3.12 sin ampliar
+  plataformas; licencia, publicación e integración DW/OCI pendientes.
+
 
 - Informes de migración distinguen la comparación con el esperado aportado de
   EquiFrame Verify (O), cuya independencia/revisión humana no establece el runner.

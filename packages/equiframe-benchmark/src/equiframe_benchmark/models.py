@@ -6,6 +6,11 @@ from datetime import datetime
 from typing import Annotated, Literal, Self
 
 from equiframe import ArtifactRef, ComparisonResult, ComparisonSpec, Family
+from equiframe.verify_types import (
+    ExpectedProvenance,
+    IndependentReviewEvidence,
+    VerificationBinding,
+)
 from pydantic import (
     AfterValidator,
     BaseModel,
@@ -278,6 +283,26 @@ class OracleResult(Document):
                 )
         if self.status != expected_status:
             raise ValueError("oracle status contradicts evidence and reviews")
+        return self
+
+
+class OracleVerificationBridge(Document):
+    """Explicit content binding for reusable Verify; no human authentication."""
+
+    oracle_sha256: Digest
+    binding: VerificationBinding
+    provenance: ExpectedProvenance
+    review: IndependentReviewEvidence | None
+
+    @model_validator(mode="after")
+    def consistent(self) -> Self:
+        if self.provenance.expected_sha256 != self.binding.expected_sha256:
+            raise ValueError("bridge expected identity mismatch")
+        if self.review and (
+            self.review.binding != self.binding
+            or self.review.source_document_sha256 != self.oracle_sha256
+        ):
+            raise ValueError("bridge review identity mismatch")
         return self
 
 

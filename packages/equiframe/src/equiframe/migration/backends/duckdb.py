@@ -29,12 +29,17 @@ from equiframe.values import (
 from ..ports import CompiledPlan, compiler_check, require_supported
 from ..types import (
     Aggregate,
+    Arithmetic,
     Boolean,
     Cast,
+    Coalesce,
     Column,
     Compare,
     CompilationCheck,
     CompilationDiagnostic,
+    Concatenate,
+    Conditional,
+    Deduplicate,
     EquiJoin,
     Expression,
     Filter,
@@ -48,7 +53,13 @@ from ..types import (
     Scan,
     Sort,
 )
-from ..validation import ValidatedIR, compilation_identity, expression_type, references
+from ..validation import (
+    ValidatedIR,
+    compilation_identity,
+    contains_arithmetic,
+    expression_type,
+    references,
+)
 
 
 def quote(name: str) -> str:
@@ -104,6 +115,30 @@ def _expression(expression: Expression, columns: tuple[IRColumn, ...]) -> str:
         return quote(expression.name)
     if isinstance(expression, LiteralExpression):
         return _literal(expression)
+    if isinstance(expression, Arithmetic):
+        left = _expression(expression.left, columns)
+        right = _expression(expression.right, columns)
+        operand = expression_type(expression.left, columns).logical_type
+        intermediate = (
+            "HUGEINT" if isinstance(operand, IntegerType) else _dtype(expression.logical_type)
+        )
+        operator = {"add": "+", "subtract": "-", "multiply": "*"}[expression.operation]
+        return (
+            f"CAST((CAST({left} AS {intermediate}) {operator} "
+            f"CAST({right} AS {intermediate})) AS {_dtype(expression.logical_type)})"
+        )
+    if isinstance(expression, Coalesce):
+        return (
+            "coalesce("
+            + ", ".join(_expression(item, columns) for item in expression.arguments)
+            + ")"
+        )
+    if isinstance(expression, Conditional):
+        return (
+            f"CASE WHEN {_expression(expression.predicate, columns)} "
+            f"THEN {_expression(expression.then, columns)} "
+            f"ELSE {_expression(expression.otherwise, columns)} END"
+        )
     if isinstance(expression, Compare):
         left, right = _expression(expression.left, columns), _expression(expression.right, columns)
         operator = {"eq": "=", "ne": "<>", "lt": "<", "le": "<=", "gt": ">", "ge": ">="}[
@@ -210,6 +245,10 @@ class DuckDBCompiler:
                 if not (
                     isinstance(node, Aggregate)
                     or (isinstance(node, Sort) and node.ties == "reject")
+                    or (
+                        isinstance(node, Project)
+                        and any(contains_arithmetic(item.expression) for item in node.columns)
+                    )
                 ):
                     continue
                 # SQL optimizers may prune a checked aggregate column, even in
@@ -277,10 +316,14 @@ class DuckDBCompiler:
                     "l." + quote(c.name) + " AS " + quote(c.name)
                     for c in validated.schema(node.left)
                 ]
-                join_columns += [
-                    "r." + quote(c.name) + " AS " + quote(node.right_prefix + c.name)
-                    for c in validated.schema(node.right)
-                ]
+                join_columns += (
+                    []
+                    if node.how in ("semi", "anti")
+                    else [
+                        "r." + quote(c.name) + " AS " + quote(node.right_prefix + c.name)
+                        for c in validated.schema(node.right)
+                    ]
+                )
                 operator = "IS NOT DISTINCT FROM" if node.null_keys == "equal" else "="
                 predicate = " AND ".join(
                     f"l.{quote(key.left)} {operator} r.{quote(key.right)}" for key in node.keys
@@ -316,6 +359,10 @@ class DuckDBCompiler:
                     )
                 if node.group_by:
                     body += " GROUP BY " + ", ".join(quote(name) for name in node.group_by)
+            elif isinstance(node, Concatenate):
+                body = " UNION ALL ".join(f"SELECT * FROM {names[ref]}" for ref in node.sources)
+            elif isinstance(node, Deduplicate):
+                body = f"SELECT DISTINCT * FROM {names[node.source]}"
             else:
                 body = f"SELECT {_projection(validated, node.node_id)} FROM {names[node.source]}"
                 if node.ties == "reject":

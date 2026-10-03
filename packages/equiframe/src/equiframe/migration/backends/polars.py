@@ -22,11 +22,16 @@ from equiframe.registry import PolarsTransformation
 from ..ports import CompiledPlan, compiler_check, require_supported
 from ..types import (
     Aggregate,
+    Arithmetic,
     Boolean,
     Cast,
+    Coalesce,
     Column,
     Compare,
     CompilationCheck,
+    Concatenate,
+    Conditional,
+    Deduplicate,
     EquiJoin,
     Expression,
     Filter,
@@ -79,6 +84,25 @@ def _expression(expression: Expression, columns: Any) -> pl.Expr:
     if isinstance(expression, LiteralExpression):
         scalar = literal_scalar(expression)
         return pl.lit(scalar, dtype=_dtype(expression.logical_type))
+    if isinstance(expression, Arithmetic):
+        operand = expression_type(expression.left, columns).logical_type
+        scale = operand.scale if isinstance(operand, DecimalType) else 0
+        left = _expression(expression.left, columns).cast(pl.Decimal(38, scale), strict=True)
+        right = _expression(expression.right, columns).cast(pl.Decimal(38, scale), strict=True)
+        result = {
+            "add": lambda: left + right,
+            "subtract": lambda: left - right,
+            "multiply": lambda: left * right,
+        }[expression.operation]()
+        return result.cast(_dtype(expression.logical_type), strict=True)
+    if isinstance(expression, Coalesce):
+        return pl.coalesce([_expression(item, columns) for item in expression.arguments])
+    if isinstance(expression, Conditional):
+        return (
+            pl.when(_expression(expression.predicate, columns))
+            .then(_expression(expression.then, columns))
+            .otherwise(_expression(expression.otherwise, columns))
+        )
     if isinstance(expression, Compare):
         left, right = _expression(expression.left, columns), _expression(expression.right, columns)
         operation = {"eq": "eq", "ne": "ne", "lt": "lt", "le": "le", "gt": "gt", "ge": "ge"}[
@@ -247,6 +271,10 @@ class PolarsCompiler:
                     )
                 elif isinstance(node, Aggregate):
                     frame = _aggregate(frames[node.source], node, validated)
+                elif isinstance(node, Concatenate):
+                    frame = pl.concat([frames[ref] for ref in node.sources], how="vertical")
+                elif isinstance(node, Deduplicate):
+                    frame = frames[node.source].unique(subset=list(node.keys), maintain_order=True)
                 else:
                     frame = frames[node.source]
                     if (

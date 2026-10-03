@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "equiframe"
-version = "0.10.0"
-description = "Native ETL migration, semantic comparison, calibrated detectors and verifiable evidence"
+version = "0.11.0"
+description = "Operational verification, native ETL migration and portable semantic evidence"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 authors = [{ name = "Hernán Troya" }]
@@ -37,6 +37,7 @@ dev = [
   "pytest>=8.4,<10",
   "ruff>=0.14,<1",
   "pandas-stubs>=2.2,<4",
+  "twine>=6.2,<7",
 ]
 
 [tool.hatch.build.targets.wheel]

@@ -65,6 +65,184 @@
       "title": "Aggregate",
       "type": "object"
     },
+    "Arithmetic": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "arithmetic",
+          "default": "arithmetic",
+          "title": "Kind",
+          "type": "string"
+        },
+        "left": {
+          "discriminator": {
+            "mapping": {
+              "arithmetic": "#/$defs/Arithmetic",
+              "boolean": "#/$defs/Boolean",
+              "coalesce": "#/$defs/Coalesce",
+              "column": "#/$defs/Column",
+              "compare": "#/$defs/Compare",
+              "conditional": "#/$defs/Conditional",
+              "is_nan": "#/$defs/IsNaN",
+              "is_null": "#/$defs/IsNull",
+              "literal": "#/$defs/LiteralExpression",
+              "not": "#/$defs/Not"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Column"
+            },
+            {
+              "$ref": "#/$defs/LiteralExpression"
+            },
+            {
+              "$ref": "#/$defs/Compare"
+            },
+            {
+              "$ref": "#/$defs/Boolean"
+            },
+            {
+              "$ref": "#/$defs/Not"
+            },
+            {
+              "$ref": "#/$defs/IsNull"
+            },
+            {
+              "$ref": "#/$defs/IsNaN"
+            },
+            {
+              "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/Coalesce"
+            },
+            {
+              "$ref": "#/$defs/Conditional"
+            }
+          ],
+          "title": "Left"
+        },
+        "logical_type": {
+          "discriminator": {
+            "mapping": {
+              "boolean": "#/$defs/BooleanType",
+              "date": "#/$defs/DateType",
+              "decimal": "#/$defs/DecimalType",
+              "float": "#/$defs/FloatType",
+              "integer": "#/$defs/IntegerType",
+              "string": "#/$defs/StringType",
+              "timestamp": "#/$defs/TimestampType"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/BooleanType"
+            },
+            {
+              "$ref": "#/$defs/IntegerType"
+            },
+            {
+              "$ref": "#/$defs/StringType"
+            },
+            {
+              "$ref": "#/$defs/DecimalType"
+            },
+            {
+              "$ref": "#/$defs/FloatType"
+            },
+            {
+              "$ref": "#/$defs/DateType"
+            },
+            {
+              "$ref": "#/$defs/TimestampType"
+            }
+          ],
+          "title": "Logical Type"
+        },
+        "operation": {
+          "enum": [
+            "add",
+            "subtract",
+            "multiply"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "overflow": {
+          "const": "reject",
+          "default": "reject",
+          "title": "Overflow",
+          "type": "string"
+        },
+        "right": {
+          "discriminator": {
+            "mapping": {
+              "arithmetic": "#/$defs/Arithmetic",
+              "boolean": "#/$defs/Boolean",
+              "coalesce": "#/$defs/Coalesce",
+              "column": "#/$defs/Column",
+              "compare": "#/$defs/Compare",
+              "conditional": "#/$defs/Conditional",
+              "is_nan": "#/$defs/IsNaN",
+              "is_null": "#/$defs/IsNull",
+              "literal": "#/$defs/LiteralExpression",
+              "not": "#/$defs/Not"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Column"
+            },
+            {
+              "$ref": "#/$defs/LiteralExpression"
+            },
+            {
+              "$ref": "#/$defs/Compare"
+            },
+            {
+              "$ref": "#/$defs/Boolean"
+            },
+            {
+              "$ref": "#/$defs/Not"
+            },
+            {
+              "$ref": "#/$defs/IsNull"
+            },
+            {
+              "$ref": "#/$defs/IsNaN"
+            },
+            {
+              "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/Coalesce"
+            },
+            {
+              "$ref": "#/$defs/Conditional"
+            }
+          ],
+          "title": "Right"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "operation",
+        "left",
+        "right",
+        "logical_type",
+        "unit"
+      ],
+      "title": "Arithmetic",
+      "type": "object"
+    },
     "Boolean": {
       "additionalProperties": false,
       "properties": {
@@ -72,9 +250,12 @@
           "items": {
             "discriminator": {
               "mapping": {
+                "arithmetic": "#/$defs/Arithmetic",
                 "boolean": "#/$defs/Boolean",
+                "coalesce": "#/$defs/Coalesce",
                 "column": "#/$defs/Column",
                 "compare": "#/$defs/Compare",
+                "conditional": "#/$defs/Conditional",
                 "is_nan": "#/$defs/IsNaN",
                 "is_null": "#/$defs/IsNull",
                 "literal": "#/$defs/LiteralExpression",
@@ -103,6 +284,15 @@
               },
               {
                 "$ref": "#/$defs/IsNaN"
+              },
+              {
+                "$ref": "#/$defs/Arithmetic"
+              },
+              {
+                "$ref": "#/$defs/Coalesce"
+              },
+              {
+                "$ref": "#/$defs/Conditional"
               }
             ]
           },
@@ -263,6 +453,77 @@
       "title": "CastColumn",
       "type": "object"
     },
+    "Coalesce": {
+      "additionalProperties": false,
+      "properties": {
+        "arguments": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "arithmetic": "#/$defs/Arithmetic",
+                "boolean": "#/$defs/Boolean",
+                "coalesce": "#/$defs/Coalesce",
+                "column": "#/$defs/Column",
+                "compare": "#/$defs/Compare",
+                "conditional": "#/$defs/Conditional",
+                "is_nan": "#/$defs/IsNaN",
+                "is_null": "#/$defs/IsNull",
+                "literal": "#/$defs/LiteralExpression",
+                "not": "#/$defs/Not"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Column"
+              },
+              {
+                "$ref": "#/$defs/LiteralExpression"
+              },
+              {
+                "$ref": "#/$defs/Compare"
+              },
+              {
+                "$ref": "#/$defs/Boolean"
+              },
+              {
+                "$ref": "#/$defs/Not"
+              },
+              {
+                "$ref": "#/$defs/IsNull"
+              },
+              {
+                "$ref": "#/$defs/IsNaN"
+              },
+              {
+                "$ref": "#/$defs/Arithmetic"
+              },
+              {
+                "$ref": "#/$defs/Coalesce"
+              },
+              {
+                "$ref": "#/$defs/Conditional"
+              }
+            ]
+          },
+          "maxItems": 32,
+          "minItems": 2,
+          "title": "Arguments",
+          "type": "array"
+        },
+        "kind": {
+          "const": "coalesce",
+          "default": "coalesce",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "arguments"
+      ],
+      "title": "Coalesce",
+      "type": "object"
+    },
     "Column": {
       "additionalProperties": false,
       "properties": {
@@ -296,9 +557,12 @@
         "left": {
           "discriminator": {
             "mapping": {
+              "arithmetic": "#/$defs/Arithmetic",
               "boolean": "#/$defs/Boolean",
+              "coalesce": "#/$defs/Coalesce",
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
+              "conditional": "#/$defs/Conditional",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
@@ -327,6 +591,15 @@
             },
             {
               "$ref": "#/$defs/IsNaN"
+            },
+            {
+              "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/Coalesce"
+            },
+            {
+              "$ref": "#/$defs/Conditional"
             }
           ],
           "title": "Left"
@@ -352,9 +625,12 @@
         "right": {
           "discriminator": {
             "mapping": {
+              "arithmetic": "#/$defs/Arithmetic",
               "boolean": "#/$defs/Boolean",
+              "coalesce": "#/$defs/Coalesce",
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
+              "conditional": "#/$defs/Conditional",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
@@ -383,6 +659,15 @@
             },
             {
               "$ref": "#/$defs/IsNaN"
+            },
+            {
+              "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/Coalesce"
+            },
+            {
+              "$ref": "#/$defs/Conditional"
             }
           ],
           "title": "Right"
@@ -394,6 +679,218 @@
         "right"
       ],
       "title": "Compare",
+      "type": "object"
+    },
+    "Concatenate": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "concatenate",
+          "default": "concatenate",
+          "title": "Kind",
+          "type": "string"
+        },
+        "node_id": {
+          "minLength": 1,
+          "title": "Node Id",
+          "type": "string"
+        },
+        "schema_policy": {
+          "const": "identical",
+          "default": "identical",
+          "title": "Schema Policy",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 32,
+          "minItems": 2,
+          "title": "Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "node_id",
+        "sources"
+      ],
+      "title": "Concatenate",
+      "type": "object"
+    },
+    "Conditional": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "conditional",
+          "default": "conditional",
+          "title": "Kind",
+          "type": "string"
+        },
+        "otherwise": {
+          "discriminator": {
+            "mapping": {
+              "arithmetic": "#/$defs/Arithmetic",
+              "boolean": "#/$defs/Boolean",
+              "coalesce": "#/$defs/Coalesce",
+              "column": "#/$defs/Column",
+              "compare": "#/$defs/Compare",
+              "conditional": "#/$defs/Conditional",
+              "is_nan": "#/$defs/IsNaN",
+              "is_null": "#/$defs/IsNull",
+              "literal": "#/$defs/LiteralExpression",
+              "not": "#/$defs/Not"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Column"
+            },
+            {
+              "$ref": "#/$defs/LiteralExpression"
+            },
+            {
+              "$ref": "#/$defs/Compare"
+            },
+            {
+              "$ref": "#/$defs/Boolean"
+            },
+            {
+              "$ref": "#/$defs/Not"
+            },
+            {
+              "$ref": "#/$defs/IsNull"
+            },
+            {
+              "$ref": "#/$defs/IsNaN"
+            },
+            {
+              "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/Coalesce"
+            },
+            {
+              "$ref": "#/$defs/Conditional"
+            }
+          ],
+          "title": "Otherwise"
+        },
+        "predicate": {
+          "discriminator": {
+            "mapping": {
+              "arithmetic": "#/$defs/Arithmetic",
+              "boolean": "#/$defs/Boolean",
+              "coalesce": "#/$defs/Coalesce",
+              "column": "#/$defs/Column",
+              "compare": "#/$defs/Compare",
+              "conditional": "#/$defs/Conditional",
+              "is_nan": "#/$defs/IsNaN",
+              "is_null": "#/$defs/IsNull",
+              "literal": "#/$defs/LiteralExpression",
+              "not": "#/$defs/Not"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Column"
+            },
+            {
+              "$ref": "#/$defs/LiteralExpression"
+            },
+            {
+              "$ref": "#/$defs/Compare"
+            },
+            {
+              "$ref": "#/$defs/Boolean"
+            },
+            {
+              "$ref": "#/$defs/Not"
+            },
+            {
+              "$ref": "#/$defs/IsNull"
+            },
+            {
+              "$ref": "#/$defs/IsNaN"
+            },
+            {
+              "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/Coalesce"
+            },
+            {
+              "$ref": "#/$defs/Conditional"
+            }
+          ],
+          "title": "Predicate"
+        },
+        "then": {
+          "discriminator": {
+            "mapping": {
+              "arithmetic": "#/$defs/Arithmetic",
+              "boolean": "#/$defs/Boolean",
+              "coalesce": "#/$defs/Coalesce",
+              "column": "#/$defs/Column",
+              "compare": "#/$defs/Compare",
+              "conditional": "#/$defs/Conditional",
+              "is_nan": "#/$defs/IsNaN",
+              "is_null": "#/$defs/IsNull",
+              "literal": "#/$defs/LiteralExpression",
+              "not": "#/$defs/Not"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Column"
+            },
+            {
+              "$ref": "#/$defs/LiteralExpression"
+            },
+            {
+              "$ref": "#/$defs/Compare"
+            },
+            {
+              "$ref": "#/$defs/Boolean"
+            },
+            {
+              "$ref": "#/$defs/Not"
+            },
+            {
+              "$ref": "#/$defs/IsNull"
+            },
+            {
+              "$ref": "#/$defs/IsNaN"
+            },
+            {
+              "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/Coalesce"
+            },
+            {
+              "$ref": "#/$defs/Conditional"
+            }
+          ],
+          "title": "Then"
+        },
+        "unknown": {
+          "const": "otherwise",
+          "default": "otherwise",
+          "title": "Unknown",
+          "type": "string"
+        }
+      },
+      "required": [
+        "predicate",
+        "then",
+        "otherwise"
+      ],
+      "title": "Conditional",
       "type": "object"
     },
     "DateType": {
@@ -479,13 +976,67 @@
       "title": "DecimalValue",
       "type": "object"
     },
+    "Deduplicate": {
+      "additionalProperties": false,
+      "properties": {
+        "keep": {
+          "const": "identical",
+          "default": "identical",
+          "title": "Keep",
+          "type": "string"
+        },
+        "keys": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 256,
+          "minItems": 1,
+          "title": "Keys",
+          "type": "array"
+        },
+        "kind": {
+          "const": "deduplicate",
+          "default": "deduplicate",
+          "title": "Kind",
+          "type": "string"
+        },
+        "node_id": {
+          "minLength": 1,
+          "title": "Node Id",
+          "type": "string"
+        },
+        "nulls": {
+          "const": "equal",
+          "default": "equal",
+          "title": "Nulls",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "node_id",
+        "source",
+        "keys"
+      ],
+      "title": "Deduplicate",
+      "type": "object"
+    },
     "EquiJoin": {
       "additionalProperties": false,
       "properties": {
         "how": {
           "enum": [
             "inner",
-            "left"
+            "left",
+            "right",
+            "full",
+            "semi",
+            "anti"
           ],
           "title": "How",
           "type": "string"
@@ -563,9 +1114,12 @@
         "predicate": {
           "discriminator": {
             "mapping": {
+              "arithmetic": "#/$defs/Arithmetic",
               "boolean": "#/$defs/Boolean",
+              "coalesce": "#/$defs/Coalesce",
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
+              "conditional": "#/$defs/Conditional",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
@@ -594,6 +1148,15 @@
             },
             {
               "$ref": "#/$defs/IsNaN"
+            },
+            {
+              "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/Coalesce"
+            },
+            {
+              "$ref": "#/$defs/Conditional"
             }
           ],
           "title": "Predicate"
@@ -737,9 +1300,12 @@
         "argument": {
           "discriminator": {
             "mapping": {
+              "arithmetic": "#/$defs/Arithmetic",
               "boolean": "#/$defs/Boolean",
+              "coalesce": "#/$defs/Coalesce",
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
+              "conditional": "#/$defs/Conditional",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
@@ -768,6 +1334,15 @@
             },
             {
               "$ref": "#/$defs/IsNaN"
+            },
+            {
+              "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/Coalesce"
+            },
+            {
+              "$ref": "#/$defs/Conditional"
             }
           ],
           "title": "Argument"
@@ -791,9 +1366,12 @@
         "argument": {
           "discriminator": {
             "mapping": {
+              "arithmetic": "#/$defs/Arithmetic",
               "boolean": "#/$defs/Boolean",
+              "coalesce": "#/$defs/Coalesce",
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
+              "conditional": "#/$defs/Conditional",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
@@ -822,6 +1400,15 @@
             },
             {
               "$ref": "#/$defs/IsNaN"
+            },
+            {
+              "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/Coalesce"
+            },
+            {
+              "$ref": "#/$defs/Conditional"
             }
           ],
           "title": "Argument"
@@ -1089,9 +1676,12 @@
         "expression": {
           "discriminator": {
             "mapping": {
+              "arithmetic": "#/$defs/Arithmetic",
               "boolean": "#/$defs/Boolean",
+              "coalesce": "#/$defs/Coalesce",
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
+              "conditional": "#/$defs/Conditional",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
@@ -1120,6 +1710,15 @@
             },
             {
               "$ref": "#/$defs/IsNaN"
+            },
+            {
+              "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/Coalesce"
+            },
+            {
+              "$ref": "#/$defs/Conditional"
             }
           ],
           "title": "Expression"
@@ -1143,9 +1742,12 @@
         "argument": {
           "discriminator": {
             "mapping": {
+              "arithmetic": "#/$defs/Arithmetic",
               "boolean": "#/$defs/Boolean",
+              "coalesce": "#/$defs/Coalesce",
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
+              "conditional": "#/$defs/Conditional",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
@@ -1174,6 +1776,15 @@
             },
             {
               "$ref": "#/$defs/IsNaN"
+            },
+            {
+              "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/Coalesce"
+            },
+            {
+              "$ref": "#/$defs/Conditional"
             }
           ],
           "title": "Argument"
@@ -1462,6 +2073,8 @@
           "mapping": {
             "aggregate": "#/$defs/Aggregate",
             "cast": "#/$defs/Cast",
+            "concatenate": "#/$defs/Concatenate",
+            "deduplicate": "#/$defs/Deduplicate",
             "filter": "#/$defs/Filter",
             "join": "#/$defs/EquiJoin",
             "project": "#/$defs/Project",
@@ -1491,6 +2104,12 @@
           },
           {
             "$ref": "#/$defs/Sort"
+          },
+          {
+            "$ref": "#/$defs/Concatenate"
+          },
+          {
+            "$ref": "#/$defs/Deduplicate"
           }
         ]
       },

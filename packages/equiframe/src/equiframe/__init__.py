@@ -1,6 +1,14 @@
 """Typed contracts and local native execution; import does not load engines/ML."""
 
 from equiframe.adapters import DuckDBAdapter, PandasAdapter, PolarsAdapter
+from equiframe.bundle import (
+    BundleReference,
+    EvidenceBundle,
+    export_bundle,
+    import_bundle,
+    inspect_bundle,
+    read_bundle,
+)
 from equiframe.comparison import (
     ComparisonInput,
     compare,
@@ -63,6 +71,7 @@ from equiframe.contracts import (
     Tolerance,
 )
 from equiframe.decision import combine_decisions
+from equiframe.destinations import Destination, LoadReceipt, ParquetDestination, PublishedTable
 from equiframe.detector_types import (
     ComponentDecision,
     ComponentDetectionResult,
@@ -121,6 +130,18 @@ from equiframe.execution_types import (
     TableArtifact,
     VersionInfo,
 )
+from equiframe.ingestion import (
+    ConversionReceipt as IngestionConversionReceipt,
+)
+from equiframe.ingestion import (
+    FieldMapping,
+    FileInput,
+    IngestionResult,
+    IngestionSpec,
+    QuarantinedRecord,
+    SourceReceipt,
+    ingest_file,
+)
 from equiframe.local import LocalArtifactStore
 from equiframe.migration import (
     Aggregate,
@@ -166,6 +187,7 @@ from equiframe.migration import (
     render_migration_report,
     validate_ir,
 )
+from equiframe.migration.types import Arithmetic, Coalesce, Concatenate, Conditional, Deduplicate
 from equiframe.pipeline import run_pipeline
 from equiframe.pipeline_types import (
     EvidenceFile,
@@ -280,8 +302,38 @@ from equiframe.values import (
     TimeUnit,
     TimeZone,
 )
+from equiframe.verification_request import VerificationRequest
+from equiframe.verify import (
+    VerificationInput,
+    read_verification,
+    verification_summary,
+    verify,
+    verify_migration,
+)
+from equiframe.verify_types import (
+    ExpectedProvenance,
+    IndependentReviewEvidence,
+    VerificationBinding,
+    VerificationCheck,
+    VerificationCoverage,
+    VerificationResult,
+    VerificationReview,
+    VerificationState,
+)
+from equiframe.workflow import (
+    InputBinding as WorkflowInputBinding,
+)
+from equiframe.workflow import (
+    WorkflowCheckpoint,
+    WorkflowResult,
+    WorkflowSpec,
+    WorkflowStage,
+    read_workflow,
+    run_workflow,
+)
+from equiframe.workflow_request import WorkflowExpected, WorkflowRequest
 
-__version__ = "0.10.0"
+__version__ = "0.11.0"
 
 __all__ = [
     "CANONICALIZATION",
@@ -289,6 +341,7 @@ __all__ = [
     "Aggregate",
     "AggregateCheck",
     "AppliedPolicy",
+    "Arithmetic",
     "ArrowInput",
     "ArtifactIOError",
     "ArtifactInput",
@@ -298,6 +351,7 @@ __all__ = [
     "Boolean",
     "BooleanType",
     "BooleanValue",
+    "BundleReference",
     "CancellationToken",
     "CapabilityError",
     "CardinalityCheck",
@@ -305,6 +359,7 @@ __all__ = [
     "CastColumn",
     "CheckResult",
     "CheckState",
+    "Coalesce",
     "Column",
     "ColumnKeyScope",
     "ColumnSpec",
@@ -327,6 +382,8 @@ __all__ = [
     "CompilerRegistry",
     "ComponentDecision",
     "ComponentDetectionResult",
+    "Concatenate",
+    "Conditional",
     "Contract",
     "ContractIOError",
     "ContractParseError",
@@ -339,6 +396,8 @@ __all__ = [
     "DecimalType",
     "DecimalValue",
     "DecisionState",
+    "Deduplicate",
+    "Destination",
     "DetectionResult",
     "DetectorBundle",
     "DetectorCalibration",
@@ -355,6 +414,7 @@ __all__ = [
     "EngineCapabilities",
     "EquiFrameError",
     "EquiJoin",
+    "EvidenceBundle",
     "EvidenceEvent",
     "EvidenceFile",
     "ExactDecimal",
@@ -365,12 +425,15 @@ __all__ = [
     "ExecutionResult",
     "ExecutionState",
     "ExecutionTimeout",
+    "ExpectedProvenance",
     "Family",
     "FeatureFit",
     "FeatureMatrix",
     "FeatureObservation",
     "FeatureState",
     "FeatureSupport",
+    "FieldMapping",
+    "FileInput",
     "Filter",
     "FitState",
     "FloatType",
@@ -379,7 +442,11 @@ __all__ = [
     "HybridDecision",
     "IRColumn",
     "IgnoredOrder",
+    "IndependentReviewEvidence",
     "InfinityValue",
+    "IngestionConversionReceipt",
+    "IngestionResult",
+    "IngestionSpec",
     "IntegerType",
     "IntegerValue",
     "InvalidExecutionInput",
@@ -393,6 +460,7 @@ __all__ = [
     "KeyScope",
     "KeySpec",
     "LiteralExpression",
+    "LoadReceipt",
     "LoadedTable",
     "LocalArtifactStore",
     "LocalDataSource",
@@ -423,6 +491,7 @@ __all__ = [
     "PandasInput",
     "PandasTransformation",
     "Parameter",
+    "ParquetDestination",
     "PhysicalColumn",
     "PipelineInput",
     "PipelineRequest",
@@ -442,6 +511,8 @@ __all__ = [
     "ProfileSpec",
     "ProfileVector",
     "Project",
+    "PublishedTable",
+    "QuarantinedRecord",
     "ReducedTable",
     "ReductionObservation",
     "ReductionOptions",
@@ -468,6 +539,7 @@ __all__ = [
     "Sort",
     "SortKey",
     "SortSpec",
+    "SourceReceipt",
     "StageRecord",
     "StageTiming",
     "StringType",
@@ -487,7 +559,22 @@ __all__ = [
     "TransformationRegistry",
     "ValidatedIR",
     "ValidationIssue",
+    "VerificationBinding",
+    "VerificationCheck",
+    "VerificationCoverage",
+    "VerificationInput",
+    "VerificationRequest",
+    "VerificationResult",
+    "VerificationReview",
+    "VerificationState",
     "VersionInfo",
+    "WorkflowCheckpoint",
+    "WorkflowExpected",
+    "WorkflowInputBinding",
+    "WorkflowRequest",
+    "WorkflowResult",
+    "WorkflowSpec",
+    "WorkflowStage",
     "__version__",
     "calibrate_detectors",
     "canonical_contract_bytes",
@@ -503,8 +590,12 @@ __all__ = [
     "detector_fingerprint",
     "evaluate_rules",
     "execute",
+    "export_bundle",
     "fit_detectors",
     "fit_preprocessor",
+    "import_bundle",
+    "ingest_file",
+    "inspect_bundle",
     "inspect_evidence",
     "ir_fingerprint",
     "iter_differences",
@@ -515,6 +606,7 @@ __all__ = [
     "pipeline_summary",
     "profile_execution",
     "profile_spec_fingerprint",
+    "read_bundle",
     "read_comparison",
     "read_contract",
     "read_detector_bundle",
@@ -525,16 +617,22 @@ __all__ = [
     "read_reduction",
     "read_rule_evaluation",
     "read_table",
+    "read_verification",
+    "read_workflow",
     "reduce_case",
     "render_migration_report",
     "render_report",
     "rule_set_fingerprint",
     "run_pipeline",
+    "run_workflow",
     "score_detectors",
     "transform_profiles",
     "validate_contract",
     "validate_ir",
+    "verification_summary",
+    "verify",
     "verify_events",
+    "verify_migration",
     "write_contract",
     "write_detector_bundle",
     "write_preprocessor",
