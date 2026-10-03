@@ -7,6 +7,8 @@
 - CSV/JSON/JSONL con esquema explícito, copias originales, conversiones exactas,
   rutas/grano y cuarentena; workflow de checkpoints y destino Parquet con staging,
   gate de Verify, versiones, visibilidad local atómica e idempotencia.
+- JSON vacío rechazado sin salida; desbordamiento timestamp rechazado o puesto
+  en cuarentena antes de materializar Arrow, conservando límites int64 exactos.
 - IR nativo ampliado con aritmética acotada, coalesce, condiciones, concatenación,
   deduplicación explícita y semi/anti join. Capacidades/rechazos trazables por prueba.
 - Bundles cerrados para Verify/migración/workflow, lectura relocalizada sin ETL,
