@@ -212,3 +212,80 @@ def test_json_numeric_exponents_are_bounded_before_plain_string_expansion(tmp_pa
     )
     assert len(result.quarantined) == 2
     assert read_table(result.output).to_pylist() == [{"id": "exact", "money": Decimal("2000.00")}]
+
+
+@pytest.mark.parametrize("content", ["", " \n\t"])
+def test_empty_json_document_is_rejected_without_publishing_a_table(tmp_path, content):
+    path = tmp_path / "empty.json"
+    path.write_text(content, encoding="utf-8")
+    result = ingest_file(
+        path, spec=IngestionSpec(format="json", fields=fields()), work_dir=tmp_path
+    )
+    assert result.state == "rejected"
+    assert result.output is None
+    assert result.accepted_records == 0
+    assert result.inspected_records == 1
+    assert result.quarantined[0].code == "ValueError:empty_json_document"
+
+
+@pytest.mark.parametrize("format,content,records_path", [("json", "[]", ("*",)), ("jsonl", "", ())])
+def test_explicit_empty_collection_and_empty_jsonl_stream_remain_valid(
+    tmp_path, format, content, records_path
+):
+    path = tmp_path / ("empty." + format)
+    path.write_text(content, encoding="utf-8")
+    result = ingest_file(
+        path,
+        spec=IngestionSpec(format=format, fields=fields(), records_path=records_path),
+        work_dir=tmp_path,
+    )
+    assert result.state == "completed"
+    assert result.inspected_records == 0
+    assert read_table(result.output).num_rows == 0
+
+
+@pytest.mark.parametrize("invalid_records", ["reject", "quarantine"])
+def test_timestamp_overflow_respects_record_policy_and_preserves_int64_boundaries(
+    tmp_path, invalid_records
+):
+    stamp = column("t", StringType(), nullable=False).model_copy(
+        update={
+            "logical_type": TimestampType(unit="ns", timezone="UTC"),
+            "temporal_policy": TimestampPolicy(
+                granularity="ns",
+                timezone="UTC",
+                naive="reject",
+                comparison="instant",
+                ambiguous="reject",
+                closed="both",
+            ),
+        }
+    )
+    path = tmp_path / "overflow.jsonl"
+    path.write_text(
+        '{"t":"9999-12-31T00:00:00Z"}\n'
+        '{"t":"0001-01-01T00:00:00Z"}\n'
+        '{"t":"1677-09-21T00:12:43.145224192Z"}\n'
+        '{"t":"2262-04-11T23:47:16.854775807Z"}',
+        encoding="utf-8",
+    )
+    result = ingest_file(
+        path,
+        spec=IngestionSpec(
+            format="jsonl",
+            fields=(FieldMapping(column=stamp, path=("t",)),),
+            invalid_records=invalid_records,
+        ),
+        work_dir=tmp_path,
+    )
+    if invalid_records == "reject":
+        assert result.state == "rejected"
+        assert result.output is None
+        assert result.inspected_records == 1
+        assert result.accepted_records == 0
+    else:
+        assert result.state == "quarantined"
+        assert result.inspected_records == 4
+        assert result.accepted_records == 2
+        assert read_table(result.output)["t"].cast("int64").to_pylist() == [-(2**63), 2**63 - 1]
+    assert all(item.code == "timestamp_overflow" for item in result.quarantined)

@@ -317,10 +317,13 @@ def _convert(value: object, field: FieldMapping) -> object:
     )
     if ticks % divisor:
         raise ValueError("timestamp_precision_loss")
+    timestamp_ticks = ticks // divisor
+    if not -(2**63) <= timestamp_ticks < 2**63:
+        raise ValueError("timestamp_overflow")
     policy = column.temporal_policy
     if isinstance(policy, TimestampPolicy):
         policy._bound(stamp, "ingestion")
-    return ticks // divisor
+    return timestamp_ticks
 
 
 def _json(text: str) -> object:
@@ -453,6 +456,8 @@ def ingest_file(
                     rejected = True
                     break
         else:
+            if spec.format == "json" and not text.strip():
+                raise ValueError("empty_json_document")
             documents = text.splitlines() if spec.format == "jsonl" else [text]
             for line_number, document in enumerate(documents, 1):
                 if not document.strip():
