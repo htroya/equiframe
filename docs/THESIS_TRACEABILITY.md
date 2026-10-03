@@ -1,25 +1,36 @@
 # Trazabilidad con la tesis en elaboración
 
-El Word se amplió y guardó el 2026-10-02 después del paso 9 y antes del paso 10.
-La revisión académica desarrolla los capítulos 2/3, conserva independientes
-R/M/B/H y EquiFrame Verify (O), y corrige APA e índices sin añadir resultados
-experimentales. Contiene 125 páginas, 15 figuras, 17 tablas y 61 referencias.
-Las 107 entradas de los tres índices se comprobaron contra la paginación de Word.
-[Alcance y verificación](THESIS_UPDATE_20261002.md).
+La entrega vigente es `tesis_final.docx`, guardada tras el paso 10 técnico el
+2026-10-03 a las 02:41:43 UTC. Incorpora las observaciones del anteproyecto y
+el modelo institucional; por instrucción de Hernán contiene solo capítulos
+1–3 y referencias, sin capítulos 4/5 ni remisiones. Tiene 130 páginas,
+15 figuras, 17 tablas, 61 referencias y 97 destinos de índices comprobados.
+Separa R, M y B; H combina R y M, y EquiFrame Verify (O) conserva la validación
+independiente. Mantiene formato APA y límites entre verificación del software
+y experimento pendiente.
+[Entrega y comprobación](THESIS_FINAL_REVIEW_20261003.md).
 
-SHA-256 del Word actualizado:
+SHA-256 de la tesis vigente:
 
 ```text
-45aaccd3d66da222389b1d153dca5fa23e5eef9cd0ec75c15c3d797ab955cbe1
+ff638dff604fbe30179fa463b5e3c9440028f23fec0f114c55d4eac8f63246a2
 ```
 
-El hash `c96f0ed…` que aparece en las revisiones históricas siguientes identifica
-el borrador previo. Sus capítulos 4/5 pendientes se conservaron íntegros.
-Hernán solicitó después una entrega `tesis_final.docx`, basada en observaciones
-del anteproyecto y el modelo institucional, una vez terminado el paso 10.
-Esa entrega posterior todavía no queda acreditada por este registro.
+El contraste principal se delimita a Pandas–DuckDB y tres familias: ausencias
+y tipos, uniones y agregaciones. La biblioteca conserva Polars y cinco familias
+como cobertura técnica adicional. Los objetivos se reformulan en términos
+académicos y las cuotas de escenarios quedan por fijar. El requisito de más
+de 10.000 adjudicaciones originales sigue pendiente; no equivale a perfiles
+o grupos independientes. Decisiones metodológicas A96/A98 y editoriales A97/A99.
 
-Revisión del paso 8 contrastada directamente el 2026-10-02 contra el mismo DOCX.
+La entrega anterior del 2026-10-02, entre los pasos 9 y 10, permanece intacta:
+SHA-256 `45aaccd3d66da222389b1d153dca5fa23e5eef9cd0ec75c15c3d797ab955cbe1`,
+125 páginas y 107 destinos. En esa versión sí se conservaron los capítulos
+4/5 pendientes. [Registro histórico](THESIS_UPDATE_20261002.md).
+El hash `c96f0ed…` identifica el borrador anterior a ambas ediciones.
+
+Revisión del paso 8 contrastada directamente el 2026-10-02 contra el borrador
+de SHA-256 `c96f0ed…`, anterior a las dos ediciones del Word.
 La corrección de ingeniería 0.8.1 fortalece T09/T11 mediante vínculos entre
 capturas, inventarios e intentos de reducción; no modifica el diseño experimental.
 Véase [segunda revisión del paso 8](STEP_08_SECOND_REVIEW.md).
@@ -63,16 +74,17 @@ c96f0edfcab839b2ccf357527f4a7937c4b1fd3570f491d702b4f01fde44b38d
 ```
 
 El archivo está en la carpeta padre del proyecto local y no se publica en Git.
-La edición autorizada del 2026-10-02 queda registrada en A86; no cierra el estudio
-ni elimina las decisiones experimentales pendientes.
+La edición inicial queda registrada en A86 y la entrega institucional posterior
+en A96–A99. Ninguna cierra el estudio ni sustituye decisiones experimentales
+y revisiones humanas pendientes.
 
 ## Matriz de requisitos
 
-| ID | Sección | Requisito del borrador | Componente / paso de Hernán | Evidencia de aceptación |
+| ID | Sección | Requisito vigente / cobertura técnica | Componente / paso de Hernán | Evidencia de aceptación |
 |---|---|---|---|---|
-| T01 | 1.3, 1.4, 3.3 | Cinco familias de divergencias | Contratos/catálogo, 1/4/6 | Casos y reglas por familia |
-| T02 | 1.4, 3.1 | Pandas-Polars y Pandas-DuckDB principales; tercera pareja adicional | Adaptadores/evaluación, 2/10 | Resultados separados por migración |
-| T03 | 3.2 | Snapshot original, SHA-256, inventario, cobertura/exclusiones | Puertos/manifiestos, 1/2/9; adquisición compartida con Jhair | Hashes y procedencia verificables |
+| T01 | 1.3, 1.4, 3.3 | Tres familias del contraste; cinco disponibles en software | Contratos/catálogo, 1/4/6; A96 | Casos y reglas de las tres familias; adicionales separados |
+| T02 | 1.4, 3.1 | Pandas–DuckDB principal; Polars como comprobación adicional | Adaptadores/evaluación, 2/10; A96 | Un protocolo y resultados del contraste principal; extras separados |
+| T03 | 3.2 | Snapshot original, SHA-256, inventario y más de 10.000 adjudicaciones identificables, cobertura/exclusiones | Puertos/manifiestos, 1/2/9; adquisición compartida con Jhair; A98 | Hashes, unidad `ocid`/`award.id` y recuento real verificables |
 | T04 | 3.2, 3.5 | Compilación OCDS y cohorte temporal validada | Dominio de Jhair; consumo en 9 | Contrato de dominio y perfilado real |
 | T05 | 3.3 | Contratos independientes del motor; normalización permitida | Contratos/normalización, 1/3 | Pruebas de ausencia, precisión, orden y multiplicidad |
 | T06 | 3.3.1 | R fijada antes de mutantes finales | Reglas, 4/6 | Revisión/commit de reglas y catálogo |
@@ -99,7 +111,8 @@ El paso 5 implementa T10/T15 con las decisiones A48–A54. Los recibos de
 conversión son un formato de ingeniería suplementario; no un requisito ya
 escrito en el borrador. La declaración `normal_training` y el hash del manifiesto
 no sustituyen revisión O ni validación de splits. Los casos sintéticos verifican
-fórmulas/API; no se cuentan como los 60 escenarios o 300 perfiles propuestos.
+fórmulas/API; no acreditan corpus científico ni las metas históricas de 60
+escenarios o 300 perfiles, sustituidas por A98.
 
 | Decisión | Qué debe obtenerse antes de cerrarla | Tratamiento en el software |
 |---|---|---|
@@ -111,21 +124,22 @@ fórmulas/API; no se cuentan como los 60 escenarios o 300 perfiles propuestos.
 | Alpha propuesto 5% | Justificación operativa y soporte de grupos | Sin default oculto en evaluación final |
 | Árboles/submuestras IF | Piloto normal | Configuración inicial revisable, bundle registra valor final |
 | Soporte de modelos por familia | Variación y cantidad de grupos de ajuste/calibración | `not_estimable` explícito |
-| 60 escenarios y reparto 30/10/20 | Catálogo, grupos transitivos y revisiones reales | Metas frente a cantidades realizadas; no fragmentar grupos |
+| Cantidades de escenarios/perfiles y reparto por partición | Inventario real, tres familias, grupos transitivos y revisiones | Por fijar en la tesis vigente; 60/300 y 30/10/20 son metas históricas sustituidas por A98; no fragmentar grupos |
 | Intervalos y tolerancia inferencial | Independencia y suficiencia | Descriptivos si no hay soporte; no atribuir garantías |
 | Revisores/arbitraje con tres autores | Asignación y tratamiento de conflictos | Registro ciego y pendientes, sin aprobaciones automáticas |
 
 ## Ajustes planteados al borrador inicial
 
-La edición del 2026-10-02 desarrolla estos límites en los capítulos 2/3.
-La resolución humana de conflictos y los resultados reales siguen pendientes.
+La edición inicial y la adaptación posterior desarrollan estos límites en los
+capítulos 2/3. El nuevo alcance acota las migraciones y familias; la resolución
+humana de conflictos y los resultados reales siguen pendientes.
 
 1. En 1.4 y 3.5 explicar que el núcleo sigue siendo local y la VM apoya colaboración/publicación de snapshots; distinguir transporte compartido de evaluación distribuida.
 2. En 3.4 explicitar API tipada, estados independientes y separación del benchmark respecto de la biblioteca consumible.
 3. En 3.3.4 resolver la independencia del arbitraje cuando el tercer integrante es autor de la variante.
 4. En 3.6/3.7 dejar alpha, modelos por familia y tamaños como propuestas hasta observar soporte real.
 5. En 3.8 establecer que las mediciones comparativas requieren aislamiento de otras cargas de la VM.
-6. En el capítulo 4 informar lo construido y probado, junto con los componentes no estimables o pendientes. No incorporar resultados de ejemplo como observaciones.
+6. En 3.4.2 se informa lo construido y probado, junto con componentes no estimables o pendientes. La entrega solo contiene capítulos 1–3; no incorpora resultados de ejemplo como observaciones científicas.
 
 Las decisiones de empaquetado, Python 3.12, formatos de API y organización del repo son propuestas de ingeniería de esta arquitectura, no afirmaciones de que el borrador ya las exige.
 
