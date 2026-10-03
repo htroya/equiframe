@@ -122,6 +122,20 @@ política declarada. No acredita autoría independiente, revisión humana ni una
 etiqueta O confirmada. Dos salidas iguales pueden compartir el mismo error.
 Sin esperado, la comprobación independiente permanece no solicitada.
 
+Los reportes nuevos nombran esa operación como comparación con el esperado
+aportado. `migration_summary` conserva la clave histórica
+`independent_verification` por compatibilidad y añade `expected_output_comparison`
+con el mismo valor, junto con `comparisons.source_target`, `source_expected` y
+`target_expected`: cada una conserva estado, completitud, ID y conteo de diferencias.
+`equiframe_verify` identifica **EquiFrame Verify (O)** con estado
+`not_established`: el migrador no recoge autoría independiente del esperado ni
+dos revisiones humanas independientes. Ese estado tampoco equivale a una etiqueta
+divergente. EquiFrame Verify establece si una salida cumple el contrato mediante
+un resultado esperado independiente, comparación de contenido y revisión humana;
+la comparación automática C es uno de sus componentes.
+El lector acepta reportes históricos completos o el formato ampliado completo;
+ambos conservan las verificaciones físicas, eventos e inventarios existentes.
+
 Por defecto `require_rules=True` exige la completitud existente del pipeline,
 incluida R. Un contrato sin reglas evaluables conserva su estado no evaluable.
 Para un uso que requiera solo migración y comparación puede declararse

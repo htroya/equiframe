@@ -505,6 +505,14 @@ detectores solicitados, conserva R/H no evaluables o alertas parciales y no camb
 el `complete` ni `exit_code` de los `PipelineResult` hijos. Un conjunto vacío de
 reglas sigue sin acreditar R. El resumen hace visible ese alcance.
 
+El resumen ampliado conserva `independent_verification` como clave histórica y
+añade `expected_output_comparison`, así como el estado/completitud/ID/conteo de
+cada comparación origen–destino, origen–esperado y destino–esperado.
+`equiframe_verify` identifica EquiFrame Verify (O) y conserva `not_established`:
+comparar el esperado aportado no acredita su autoría independiente ni las dos
+revisiones humanas. No se convierte ese estado en una etiqueta ni se incorpora O
+al vector de aprendizaje. Los reportes previos completos siguen siendo legibles.
+
 | Campo/código | Significado |
 |---|---|
 | `state` | `equivalent`, `different`, `not_evaluable`: comparación entre los dos motores |

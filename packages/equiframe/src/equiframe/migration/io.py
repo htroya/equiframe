@@ -6,6 +6,7 @@ from html import escape
 from pathlib import Path
 
 from equiframe.comparison import iter_differences, read_comparison
+from equiframe.comparison_types import ComparisonResult
 from equiframe.errors import ArtifactIntegrityError
 from equiframe.evidence import (
     describe_file,
@@ -22,7 +23,7 @@ from ._physical import physical_size, verify_table_metadata
 from .runner_types import MigrationResult, MigrationSpec
 
 
-def migration_summary(result: MigrationResult) -> dict[str, object]:
+def _legacy_summary(result: MigrationResult) -> dict[str, object]:
     result = MigrationResult.model_validate(result)
     return {
         "schema_version": "1.0",
@@ -49,7 +50,43 @@ def migration_summary(result: MigrationResult) -> dict[str, object]:
     }
 
 
-def render_migration_report(result: MigrationResult) -> str:
+def _comparison_summary(result: ComparisonResult | None, *, requested: bool) -> dict[str, object]:
+    return {
+        "state": result.state if result else "not_evaluable" if requested else "not_requested",
+        "complete": result.complete if result else False,
+        "comparison_id": result.comparison_id if result else None,
+        "difference_records": result.counts.difference_records if result else None,
+    }
+
+
+def migration_summary(result: MigrationResult) -> dict[str, object]:
+    """Keep each comparison visible without attributing human validation to C."""
+    result = MigrationResult.model_validate(result)
+    return {
+        **_legacy_summary(result),
+        "expected_output_comparison": result.verification,
+        "comparisons": {
+            "source_target": _comparison_summary(result.comparison, requested=True),
+            "source_expected": _comparison_summary(
+                result.verification_source, requested=result.expected_requested
+            ),
+            "target_expected": _comparison_summary(
+                result.verification_target, requested=result.expected_requested
+            ),
+        },
+        "equiframe_verify": {
+            "procedure": "EquiFrame Verify",
+            "identifier": "O",
+            "status": "not_established",
+            "reason": (
+                "Migration compares supplied expected content but does not establish "
+                "independent expected authorship or collect two independent human reviews."
+            ),
+        },
+    }
+
+
+def _render_report(result: MigrationResult, *, legacy: bool = False) -> str:
     summary = migration_summary(result)
     rows = "".join(
         "<tr><td>"
@@ -70,16 +107,27 @@ def render_migration_report(result: MigrationResult) -> str:
         + escape(result.spec.target_engine)
         + "</p><p>Observed equivalence: "
         + escape(result.state)
-        + ". Independent verification: "
+        + (". Independent verification: " if legacy else ". Supplied expected comparison: ")
         + escape(result.verification)
         + ". Complete: "
         + str(summary["complete"])
         + ".</p>"
         "<p>Matching native outputs do not establish independent correctness.</p>"
-        "<table><thead><tr><th>Stage</th><th>State</th><th>Code</th></tr></thead><tbody>"
+        + (
+            ""
+            if legacy
+            else "<p>EquiFrame Verify (O): not established. Comparing supplied expected "
+            "content does not establish independent expected authorship or collect "
+            "two independent human reviews.</p>"
+        )
+        + "<table><thead><tr><th>Stage</th><th>State</th><th>Code</th></tr></thead><tbody>"
         + rows
         + "</tbody></table></body></html>"
     )
+
+
+def render_migration_report(result: MigrationResult) -> str:
+    return _render_report(result)
 
 
 def read_migration(path: Path, *, verify: bool = True) -> MigrationResult:
@@ -212,9 +260,13 @@ def read_migration(path: Path, *, verify: bool = True) -> MigrationResult:
             raise ArtifactIntegrityError("migration artifact contradicts its inventory")
         if describe_file(ref_path, directory) != item:
             raise ArtifactIntegrityError("migration artifact changed")
-    if parse_json((directory / "report.json").read_bytes()) != migration_summary(result):
+    stored_summary = parse_json((directory / "report.json").read_bytes())
+    legacy = stored_summary == _legacy_summary(result)
+    if not legacy and stored_summary != migration_summary(result):
         raise ArtifactIntegrityError("migration report contradicts its manifest")
-    if (directory / "report.html").read_bytes() != render_migration_report(result).encode("utf-8"):
+    if (directory / "report.html").read_bytes() != _render_report(result, legacy=legacy).encode(
+        "utf-8"
+    ):
         raise ArtifactIntegrityError("migration HTML contradicts its manifest")
     if result.detection_requested:
         from equiframe.detector_types import DetectorBundle

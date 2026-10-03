@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Informes de migración distinguen la comparación con el esperado aportado de
+  EquiFrame Verify (O), cuya independencia/revisión humana no establece el runner.
+  Resúmenes conservan estados y evidencia de las tres comparaciones por separado,
+  mantienen la clave histórica y permiten leer reportes previos completos.
+- Pruebas integradas de las seis direcciones para NULL/NaN, uniones many-to-many
+  sin coincidencia NULL, claves/multiplicidad y sumas Decimal por moneda con
+  esperados literales. Son verificaciones sintéticas de software.
+
 ## 0.10.0 — 2026-10-03
 
 - EquiFrame Migrate: IR relacional estricto, compiladores nativos Pandas/Polars/

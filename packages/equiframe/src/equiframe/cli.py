@@ -68,7 +68,7 @@ def migration_run(
     output: Path = typer.Option(Path("equiframe-runs")),
     bundle: Path | None = typer.Option(None),
 ) -> None:
-    """Execute two native plans over fixed inputs; optional independent verification."""
+    """Execute two native plans over fixed inputs; optionally compare a supplied expected."""
     try:
         document = load_json(MigrationRequest, request)
         result = migrate(

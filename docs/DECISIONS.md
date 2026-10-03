@@ -327,3 +327,15 @@ por Hernán. Su implementación no adelanta el cierre científico ni PyPI.
 [comprobaciones y límites](MIGRATION_REVIEW.md). Las ampliaciones compatibles
 de `DetectorVersions` mantienen formatos 1.0 y productores previos; no modifican
 los algoritmos ni el protocolo científico. No se inicia el paso 11 ni PyPI.
+
+## Refuerzo autorizado durante la reorientación documental — 2026-10-03
+
+La nueva instrucción del autor autoriza mejorar la biblioteca y subir el cambio
+revisable a Git en paralelo con la entrega de capítulos 1–2. No autoriza PyPI ni
+despliegues. El cambio ajeno presente en `HERNAN_ROADMAP.md` permanece intacto.
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A108 | Distinguir en reportes comparación con esperado de EquiFrame Verify (O) | El HTML anterior decía «Independent verification» sin recoger autoría/revisión humana. Se conserva la clave histórica de API y se añade el estado explícito `not_established`, con cada comparación y su evidencia por separado. El lector acepta formatos históricos completos para preservar expedientes; integridad y corrección siguen siendo diferentes. No modifica etiquetas ni algoritmo R/M/B/H. |
+| A109 | Contrastar las seis direcciones con semántica de las tres familias y esperados literales | Las pruebas invocan ambos adaptadores reales, conservan NULL/NaN, ocurrencias many-to-many y claves, y separan montos Decimal por moneda. Las seis direcciones son capacidad técnica; el protocolo científico sigue declarando origen y destino de cada ensayo y no hereda validez bidireccional de los tests sintéticos. |
+| A110 | Entrega documental actual de capítulos 1–2 y anexos preparatorios | La instrucción actual sustituye el alcance editorial previo de A97/A102 para esta entrega parcial, sin afirmar aceptación del tutor. El requisito superior a 10.000 se refiere a filas reales utilizadas en aprendizaje; interpretación por modelo, corpus, grupos, calibración, etiquetas y revisión humana permanecen pendientes. El plan nuevo distingue soporte H–R del soporte común R/M/B/H y presupone revisión antes de entrenamiento/calibración. |

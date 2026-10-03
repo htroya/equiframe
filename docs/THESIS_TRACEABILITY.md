@@ -339,3 +339,20 @@ conserva comparación observada/esperado, requisitos de componentes y evidencia.
 El benchmark 0.10.1 fija esa dependencia sin cambiar algoritmos ni protocolos.
 [Validación y límites](MIGRATION_REVIEW.md). Sus pruebas sintéticas verifican
 ingeniería; no constituyen registros reales de aprendizaje ni revisión humana.
+
+## Reorientación documental y refuerzo autorizado — 2026-10-03
+
+El encargo actual mantiene tres parejas y tres familias principales, pero entrega
+solo los capítulos 1–2 y anexos preparatorios. Los documentos históricos no son
+instrucciones para sustituir `tesis_final.docx` ni acreditan autorización del tutor
+para retirar definitivamente el futuro desarrollo. A108–A110 registran alcance
+y consecuencias, sin convertir el plan en ejecución científica.
+
+El refuerzo de la biblioteca conserva núcleo 0.10.0/benchmark 0.10.1 como versiones
+de partida; los cambios aún no publicados están en `Unreleased`. Corrige el
+informe de migración para distinguir comparación automática con esperado
+aportado de EquiFrame Verify (O); no crea etiquetas ni revisores. Se conservan
+las tres comparaciones y la lectura íntegra de formatos históricos. Las pruebas
+integradas nuevas cubren las tres familias en seis direcciones con motores
+reales y esperados literales sintéticos. Sus cantidades no aumentan N_fit ni
+prueban hipótesis, integración SERCOP o aceptación institucional.

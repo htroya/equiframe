@@ -140,7 +140,7 @@ def main() -> None:
         assert result.complete and result.exit_code == 0, ef.migration_summary(result)
         assert result.state == "equivalent" and result.verification == "correct"
         assert ef.read_migration(args.output / result.migration_id) == result
-        print(source, "to", target, result.state, "independent:", result.verification)
+        print(source, "to", target, result.state, "supplied expected:", result.verification)
     print("Six actual native migrations verified; synthetic data are not thesis results.")
 
 
