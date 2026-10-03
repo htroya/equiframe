@@ -274,3 +274,25 @@ código la cohorte SERCOP, revisión humana, licencia, soporte científico o H1�
 La tesis previa permanece protegida; el documento institucional posterior recogerá
 la implementación real y las limitaciones. [Diseño](STEP_10_DESIGN.md),
 [métodos](STEP_10_EVALUATION.md), [distribución](STEP_10_DISTRIBUTION.md).
+
+## Adaptación institucional posterior al paso 10 — 2026-10-03 UTC
+
+Fuente: observaciones completas del anteproyecto, modelo institucional y
+petición de Hernán de entregar solo capítulos 1–3. El documento anterior se
+conserva; la versión posterior tiene un hash propio y no altera el código.
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A96 | Acotar el experimento a Pandas–DuckDB y tres familias: ausencias/tipos, uniones y agregaciones | Responder a viabilidad y problema científico de las observaciones. Polars y cinco familias permanecen capacidades técnicas; objetivos, figura 4, figura 5, texto y tablas distinguen ambos alcances. La evaluación real, selección de variables y composición de manifiestos deben corresponder al nuevo protocolo antes del freeze; no se presentan los ejemplos de cinco familias como el experimento acotado |
+| A97 | Entregar solo capítulos 1–3 y referencias, con estructura previa institucional y APA 7 | Instrucción explícita de Hernán prevalece sobre los cinco capítulos y estilos mezclados del modelo. Retirar entradas y remisiones a 4/5; conservar portada, 15 figuras, 17 tablas y 61 referencias. Formularios sin firmas, tutor pendiente y paginación continua; ningún formato acredita aceptación institucional |
+| A98 | Exigir inventario de más de 10.000 adjudicaciones originales y dejar cuotas de escenarios por fijar | Observaciones del anteproyecto, sin corpus disponible. Identificar por `ocid` y `award.id`, registrar versiones y exclusiones; registros, perfiles y grupos independientes son unidades distintas. Las antiguas metas 60/300 y reparto 30/10/20 dejan de ser cuotas de la tesis vigente. No fijar tamaños ni calibración por conveniencia antes de observar soporte real |
+| A99 | Entrega separada por copia exacta tras cierre estructural y visual completo | 130 páginas; 97 destinos; 62 PNG nuevos inspeccionados y 68 reutilizados solo por bytes idénticos a inspecciones previas. Dos controles estructurales y fuentes originales intactas. Respaldo privado duradero; Word/PDF/datos no se suben a Git ni se usan Actions |
+
+A96/A98 son revisiones metodológicas pendientes de revisión académica y
+evidencia real; no confirman hipótesis ni revisiones humanas. A97/A99 registran
+la edición y entrega autorizadas. El paso 10 técnico ya está integrado por
+PR 20 y la publicación PyPI continúa fuera de esta entrega.
+
+Documento final SHA-256:
+`ff638dff604fbe30179fa463b5e3c9440028f23fec0f114c55d4eac8f63246a2`.
+[Cambios, fuentes, comprobación y límites](THESIS_FINAL_REVIEW_20261003.md).
