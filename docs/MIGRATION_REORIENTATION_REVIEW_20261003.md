@@ -39,7 +39,7 @@ NumPy 2.5.3, Pydantic 2.13.5, Typer 0.27.2 y Pytest 9.1.1.
 | Control | Resultado real |
 |---|---|
 | Contratos/comparación/R/perfiles/preprocesamiento/inferencia declarativa/backends nativos | 240 aprobadas; 101,60 s |
-| Benchmark: EquiFrame Verify, particiones, selecciones/calibración, métricas y costos | 150 aprobadas, 1 omitida por enlaces simbólicos Windows; 103,13 s |
+| Benchmark: EquiFrame Verify, particiones, selecciones/calibración, métricas y costos | 150 aprobadas, 1 omitida por psutil ausente; 103,13 s |
 | Runner/evidencia de migración y nueva suite semántica | 82 aprobadas, 1 excluida explícitamente; 218,22 s |
 | CLI e integridad + lectura de informe histórico tras última edición textual | 2 aprobadas; 13,39 s |
 | Ruff check sobre 4 archivos Python afectados | Sin errores |
@@ -61,6 +61,13 @@ ajeno al rango declarado >=1.7,<1.10 y no se utilizó para atribuir ajuste váli
 No se afirma suite completa, consumo desde wheel nuevo, CI de otras plataformas
 ni entrenamiento empírico real. El cambio no altera algoritmos ni esquemas
 tipados, y permanece en `Unreleased`.
+
+La omisión del benchmark se contrastó posteriormente con `pytest -rs` sobre
+`test_optional_default_probe_collects_actual_process_resources`: 1 omitida en
+1,39 s, `could not import 'psutil': No module named 'psutil'` en test_costs.py:532.
+No se verificó el monitor psutil real; los monitores inyectados y sus fallos sí
+se ejercitaron. Las omisiones por symlink corresponden al informe histórico,
+no a esta ronda de pruebas. Se corrige la atribución inicial del registro.
 
 ## Comandos ejecutados
 
