@@ -1,5 +1,24 @@
 # Trazabilidad con la tesis en elaboración
 
+El Word se amplió y guardó el 2026-10-02 después del paso 9 y antes del paso 10.
+La revisión académica desarrolla los capítulos 2/3, conserva independientes
+R/M/B/H y EquiFrame Verify (O), y corrige APA e índices sin añadir resultados
+experimentales. Contiene 125 páginas, 15 figuras, 17 tablas y 61 referencias.
+Las 107 entradas de los tres índices se comprobaron contra la paginación de Word.
+[Alcance y verificación](THESIS_UPDATE_20261002.md).
+
+SHA-256 del Word actualizado:
+
+```text
+45aaccd3d66da222389b1d153dca5fa23e5eef9cd0ec75c15c3d797ab955cbe1
+```
+
+El hash `c96f0ed…` que aparece en las revisiones históricas siguientes identifica
+el borrador previo. Sus capítulos 4/5 pendientes se conservaron íntegros.
+Hernán solicitó después una entrega `tesis_final.docx`, basada en observaciones
+del anteproyecto y el modelo institucional, una vez terminado el paso 10.
+Esa entrega posterior todavía no queda acreditada por este registro.
+
 Revisión del paso 8 contrastada directamente el 2026-10-02 contra el mismo DOCX.
 La corrección de ingeniería 0.8.1 fortalece T09/T11 mediante vínculos entre
 capturas, inventarios e intentos de reducción; no modifica el diseño experimental.
@@ -11,8 +30,31 @@ no están disponibles según confirmó Hernán; las verificaciones reales de T04
 T13–T14 y coordinación del servicio continúan pendientes. El código no amplía
 el corpus ni confirma O. [Informe](STEP_09_REVIEW.md).
 
-Fuente local: `TFM_EquiFrame_ACTUAL.docx`, revisada inicialmente el 2026-09-28
-y contrastada de nuevo para el paso 5 el 2026-10-01; conserva el mismo hash.
+## Paso 10 técnico — 2026-10-03 UTC
+
+Núcleo 0.9.0 añade inferencia aislada para medir M sin MAD. Benchmark 0.10.0
+implementa sello y auditoría de protocolos, ejecución de prueba sin ajuste,
+evaluación sobre intersección R/M/B/H y O confirmado, cobertura y soportes
+propios, AP homogénea, bootstrap por grupos, costes sobre capturas y CSV
+regenerables. Refuerza T09/T11/T15–T18 y OE3/OE4/OE5.
+
+El sello técnico de piloto conserva los bloqueos; el sello final los exige
+resueltos. Reutilizar O necesita reproducir la salida revisada con la misma
+implementación e inputs. Se conservan fallos, etiquetas pendientes, desacuerdos
+y familias no soportadas. Las hipótesis se mantienen: no se generan personas,
+etiquetas ni métricas SERCOP para aparentar su confirmación.
+
+El bundle conserva bytes, capturas, fuentes y configuración original; regenera
+el contenido completo de tablas/decisiones. Esa comprobación de software no
+acredita una ejecución independiente de otro integrante. Corpus, cliente,
+DDL/mapeos, decisiones y revisión de resultados siguen pendientes, al igual
+que la licencia, control del nombre y publicación PyPI del paso 19. Actions
+está desactivado por la cuota; las plataformas de esta versión requieren
+evidencia nueva. [Diseño](STEP_10_DESIGN.md), [evaluación](STEP_10_EVALUATION.md),
+[distribución](STEP_10_DISTRIBUTION.md) y [revisión](STEP_10_REVIEW.md).
+
+Fuente histórica: `TFM_EquiFrame_ACTUAL.docx`, revisada inicialmente el 2026-09-28
+y contrastada de nuevo para el paso 5 el 2026-10-01.
 
 SHA-256 del archivo revisado:
 
@@ -20,7 +62,9 @@ SHA-256 del archivo revisado:
 c96f0edfcab839b2ccf357527f4a7937c4b1fd3570f491d702b4f01fde44b38d
 ```
 
-El archivo original está en la carpeta padre del proyecto local. No se modifica ni se publica como parte de esta preparación. Si cambia su hash se revisan los requisitos afectados y se añade una entrada de decisión; no se supone que el borrador actual está finalizado.
+El archivo está en la carpeta padre del proyecto local y no se publica en Git.
+La edición autorizada del 2026-10-02 queda registrada en A86; no cierra el estudio
+ni elimina las decisiones experimentales pendientes.
 
 ## Matriz de requisitos
 
@@ -71,7 +115,10 @@ fórmulas/API; no se cuentan como los 60 escenarios o 300 perfiles propuestos.
 | Intervalos y tolerancia inferencial | Independencia y suficiencia | Descriptivos si no hay soporte; no atribuir garantías |
 | Revisores/arbitraje con tres autores | Asignación y tratamiento de conflictos | Registro ciego y pendientes, sin aprobaciones automáticas |
 
-## Ajustes sugeridos al texto, sin editarlo todavía
+## Ajustes planteados al borrador inicial
+
+La edición del 2026-10-02 desarrolla estos límites en los capítulos 2/3.
+La resolución humana de conflictos y los resultados reales siguen pendientes.
 
 1. En 1.4 y 3.5 explicar que el núcleo sigue siendo local y la VM apoya colaboración/publicación de snapshots; distinguir transporte compartido de evaluación distribuida.
 2. En 3.4 explicitar API tipada, estados independientes y separación del benchmark respecto de la biblioteca consumible.

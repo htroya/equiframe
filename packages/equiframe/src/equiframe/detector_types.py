@@ -122,7 +122,7 @@ class DetectorModel(FrozenModel):
 
 
 class DetectorVersions(FrozenModel):
-    equiframe: Literal["0.7.0", "0.8.0", "0.8.1"] = "0.8.1"
+    equiframe: Literal["0.7.0", "0.8.0", "0.8.1", "0.9.0"] = "0.9.0"
     python: Text
     sklearn: Text | None = None
     numpy: Text | None = None
@@ -314,6 +314,40 @@ class DetectionResult(FrozenModel):
             if tuple(d.score for d in decisions) != expected:
                 raise ValueError("decisions must preserve the actual scores")
         return self
+
+
+class ComponentDetectionResult(FrozenModel):
+    """Frozen inference for one method; the other detector is not scored."""
+
+    schema_version: Literal["1.0"] = "1.0"
+    method: Literal["isolation_forest", "mad"]
+    bundle_sha256: Sha256
+    fit_sha256: Sha256
+    profiles_sha256: Sha256
+    matrix_sha256: Sha256 | None
+    rows: NonNegativeInt
+    scores: DetectorScores
+    decisions: tuple[DetectorDecision, ...]
+
+    @model_validator(mode="after")
+    def consistent(self) -> Self:
+        if len(self.decisions) != self.rows:
+            raise ValueError("decisions must cover every input profile")
+        if self.scores.state == "scored":
+            if len(self.scores.values) != self.rows or self.matrix_sha256 is None:
+                raise ValueError("scores require every profile and a matrix fingerprint")
+            if self.method == "isolation_forest" and any(
+                s == "+infinity" or not 0 < s <= 1 for s in self.scores.values
+            ):
+                raise ValueError("Isolation Forest scores must be finite in (0, 1]")
+        expected = self.scores.values if self.scores.state == "scored" else (None,) * self.rows
+        if tuple(d.score for d in self.decisions) != expected:
+            raise ValueError("decisions must preserve the actual component scores")
+        return self
+
+    @property
+    def complete(self) -> bool:
+        return all(decision.result.complete for decision in self.decisions)
 
 
 class HybridDecision(FrozenModel):

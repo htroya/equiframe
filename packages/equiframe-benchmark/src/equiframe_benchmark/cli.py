@@ -9,6 +9,8 @@ from uuid import uuid4
 
 import typer
 
+from equiframe_benchmark.commands import register as _register_delivery
+from equiframe_benchmark.commands_step10 import register as _register_step10
 from equiframe_benchmark.io import load_document, save_document
 from equiframe_benchmark.models import Catalog, SplitManifest
 from equiframe_benchmark.splits import dependency_groups, make_splits, split_counts, validate_splits
@@ -175,6 +177,10 @@ def verify_integration_command(directory: Path) -> None:
             sort_keys=True,
         )
     )
+
+
+_register_step10(app)
+_register_delivery(app)
 
 
 def main() -> None:

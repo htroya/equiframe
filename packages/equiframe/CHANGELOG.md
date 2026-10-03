@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.9.0 — 2026-10-03
+
+- API aditiva `detect_component` y resultado `ComponentDetectionResult` para
+  inferir M o MAD con el preprocesador y la calibración congelados, sin puntuar
+  el otro detector. Conserva los scores, umbrales y decisiones de `detect`.
+- Huellas del bundle, ajuste, perfiles y matriz enlazan el resultado aislado a
+  sus entradas. Los modelos/calibraciones no estimables conservan sus motivos
+  y scores ausentes; las mediciones fallidas o incompatibles se rechazan.
+- Paridad de inferencia, restauración declarativa y regresiones de independencia;
+  formatos anteriores y algoritmo conjunto conservados. El benchmark separado
+  incorpora evaluación y costes operacionales del paso 10.
+- `DetectorVersions` admite el emisor 0.9.0 y conserva productores explícitos
+  0.7.0/0.8.0/0.8.1. Sin ajuste implícito, nuevas etiquetas ni publicación PyPI.
+
 ## 0.8.1 — 2026-10-02
 
 - Revisión del paso 8 frente al TFM: conserva objetivos, fórmulas, separación de

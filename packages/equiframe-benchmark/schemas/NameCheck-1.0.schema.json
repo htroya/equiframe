@@ -1,0 +1,83 @@
+{
+  "additionalProperties": false,
+  "description": "Injected observation; an HTTP response is not evidence of ownership.",
+  "properties": {
+    "control_evidence": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Control Evidence"
+    },
+    "controlled": {
+      "default": false,
+      "title": "Controlled",
+      "type": "boolean"
+    },
+    "fetched_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Fetched At"
+    },
+    "http_status": {
+      "anyOf": [
+        {
+          "maximum": 599,
+          "minimum": 100,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Http Status"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "query_url": {
+      "minLength": 1,
+      "title": "Query Url",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "not_found",
+        "exists",
+        "unknown"
+      ],
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "query_url",
+    "fetched_at",
+    "http_status",
+    "status"
+  ],
+  "title": "NameCheck",
+  "type": "object"
+}

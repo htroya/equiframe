@@ -1,8 +1,8 @@
 # EquiFrame Benchmark
 
-Distribución experimental `equiframe-benchmark 0.9.0`, Python 3.12. Catálogo,
-revisión independiente, oráculo, grupos transitivos, particiones y selección
-de entrenamiento para `equiframe 0.8.1`. El núcleo no importa este paquete.
+Distribución experimental `equiframe-benchmark 0.10.0`, Python 3.12. Catálogo,
+EquiFrame Verify (validación independiente de equivalencia), grupos transitivos,
+particiones y evaluación para `equiframe 0.9.0`. El núcleo no importa este paquete.
 
 El paso 8 incorpora `equiframe-benchmark validate`, `split` y `pilot`, y usa
 la orquestación operacional en las quince ejecuciones nativas del piloto.
@@ -28,7 +28,7 @@ No está publicado en PyPI. Con los dos wheels construidos y dependencias
 disponibles se puede instalar por nombre:
 
 ```bash
-python -m pip install --find-links packages/equiframe/dist --find-links packages/equiframe-benchmark/dist equiframe==0.8.1 equiframe-benchmark==0.9.0
+python -m pip install --find-links packages/equiframe/dist --find-links packages/equiframe-benchmark/dist equiframe==0.9.0 equiframe-benchmark==0.10.0
 ```
 
 El piloto genera 5 escenarios, 35 candidatos, 15 perfiles y 4 grupos. Las
@@ -102,10 +102,11 @@ uv run --locked --all-extras python -m build --no-isolation
 uv run --locked --all-extras python tools/verify_distribution.py
 ```
 
-La última comprobación requiere el wheel de `equiframe 0.8.1` construido en
+La última comprobación requiere el wheel de `equiframe 0.9.0` construido en
 `../equiframe/dist`. Instala ambos paquetes por nombre con pip fuera del checkout,
 comprueba imports ligeros, ejecuta la suite y piloto instalados, y reconstruye
-el wheel desde sdist. CI ejecuta ambos paquetes en las cinco plataformas existentes.
+el wheel desde sdist. La matriz de cinco plataformas está disponible solo mediante
+despacho manual autorizado; permanece desactivada por la cuota de Actions.
 
 Arquitectura, límites y decisiones: `docs/STEP_06_DESIGN.md` en el repositorio.
 IF/MAD/H están en el núcleo 0.7.0. No hay métricas finales, integración SERCOP
@@ -176,3 +177,54 @@ conserva una alerta parcial de Pandas por su precisión decimal nativa. La
 comparación lossless no desactiva esa regla de contrato. `reconcile_awards`
 comprueba grano e importes exactos con columnas configuradas y no genera O.
 Cliente productivo, snapshots SERCOP, DDL/mapeos y aceptación OCI siguen pendientes.
+
+## Evaluación y reproducción del paso 10
+
+`FreezeDefinition` fija catálogo, particiones por grupos, casos de prueba, cinco
+familias, selecciones/modelos previos, doce decisiones metodológicas, archivos
+con SHA/tamaño, versiones y protocolos de evaluación/coste. Un sello de piloto
+verifica integridad y conserva los bloqueos científicos. Un sello final exige
+resolverlos; no genera revisiones ni ajusta modelos con prueba.
+
+```bash
+equiframe-benchmark freeze definition.json --output freeze.json
+equiframe-benchmark verify-freeze freeze.json
+equiframe-benchmark run-study freeze.json --registry mis_etl:create_registry --output studies
+equiframe-benchmark verify-study studies/study_ID
+equiframe-benchmark evaluate studies/study_ID --output evaluation.json
+equiframe-benchmark tables studies/study_ID --output regenerated-tables
+equiframe-benchmark bundle-study studies/study_ID --output portable-study
+equiframe-benchmark reproduce-study portable-study --expected-sha256 SHA_DEL_BUNDLE_JSON
+```
+
+La comparación principal exige O confirmado y R/M/B/H completos sobre los mismos
+casos. Se conservan soporte propio, alertas parciales, fallos y exclusiones.
+Precisión, recall, F1 y FPR indefinidos quedan vacíos con un motivo explícito.
+AP requiere dos clases y una misma familia/modelo. El bootstrap remuestrea grupos
+enteros, conserva réplicas indefinidas y requiere una justificación previa de
+independencia. Los seis CSV contienen los denominadores y se regeneran desde
+registros íntegros; editar un CSV y recalcular su hash no altera la evidencia válida.
+
+`costs spec.json --bundle detector.json --output costs-runs` compara perfil+M
+aislado con comparación exhaustiva sobre capturas existentes. Hace un calentamiento
+y cinco repeticiones por método, alterna el orden y registra tiempo, CPU y RSS.
+No incluye ETL inicial ni llama al detector MAD al medir M. Instalar el extra
+`resources` habilita psutil; un monitor fallido conserva medidas ausentes y motivos.
+RSS es máximo absoluto muestreado, no asignación neta ni límite duro de memoria.
+`cost-table costs-runs/cost_ID --output costs.csv` conserva las doce observaciones
+crudas, sus unidades y motivos; no las suma ni las convierte en réplicas independientes.
+
+`run-study` devuelve 1 ante alertas de un estudio completo y 3 si queda incompleto;
+`costs` devuelve 3 si la medición queda incompleta. Los lectores `verify-*` devuelven
+0 al verificar correctamente un expediente incompleto y conservan sus estados.
+
+Los bundles copian bytes originales, capturas y fuentes congeladas sin reescribir
+sus manifiestos. `reproduce-study` verifica el inventario y regenera tablas desde
+decisiones capturadas. La repetición de ETL por un compañero es un criterio externo
+pendiente; este comando no inventa su ejecución ni su aprobación. No hay todavía
+corpus científico cerrado, métricas finales ni resultados para capítulos 4/5.
+
+El paso 10 inventaría licencia, nombre, metadatos, dependencias y tipado; no reserva
+un nombre ni publica en PyPI. Ver [diseño](../../docs/STEP_10_DESIGN.md),
+[evaluación](../../docs/STEP_10_EVALUATION.md) e
+[inventario de distribución](../../docs/STEP_10_DISTRIBUTION.md).

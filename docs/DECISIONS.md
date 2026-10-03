@@ -242,3 +242,35 @@ desarrollo de EquiFrame en paralelo. Las dependencias externas permanecen abiert
 Precisan ingeniería de T03/T09/T13–T14. No modifican cohorte, alpha, fórmulas,
 etiquetas, grupos ni criterios de revisión. Diseño y controles:
 [paso 9](STEP_09_DESIGN.md), [verificación](STEP_09_REVIEW.md).
+
+## Edición académica y nombre del componente, 2026-10-02
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A86 | Ampliar los capítulos 2/3 y aplicar APA 7 e índices paginados después del paso 9 | Solicitud explícita de Hernán. Word guardado y revisado: 125 páginas, 15 figuras, 17 tablas, 61 referencias y 107 destinos. Conserva A4 y la portada del TFM como adaptaciones del formato original; no acredita resultados ni cambia el contenido pendiente de 4/5 |
+| A87 | Nombre de producto EquiFrame Verify para la validación independiente O | Solicitud de un nombre acorde al producto. Cambia presentación, sección e imagen; conserva O, comparación completa, esperado independiente y revisión humana. Los títulos bibliográficos auténticos y los identificadores anteriores de API mantienen su significado |
+| A88 | Actions sin ejecuciones automáticas durante la cuota agotada | Workflow remoto desactivado manualmente antes de subir cambios; YAML conserva solo ejecución manual explícita. La validación local se registra aparte y no se presenta como nueva prueba remota en ARM64/macOS |
+
+La tesis entregada conserva SHA-256 `45aaccd3d66da222389b1d153dca5fa23e5eef9cd0ec75c15c3d797ab955cbe1`.
+[Detalle de fuentes, formato, límites y verificación](THESIS_UPDATE_20261002.md).
+El paso 10 se inicia después de esa entrega. Hernán solicita una nueva revisión
+con el modelo institucional y las observaciones del anteproyecto al terminarlo;
+se guardará aparte como `tesis_final.docx`.
+
+## Paso 10 — implementación técnica, 2026-10-03 UTC
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A89 | Separar sello técnico de piloto y sello científico final | El primero conserva decisiones/revisiones pendientes; el segundo se bloquea ante cualquier requisito no resuelto. Reauditar fuentes, modelos y alcance antes/después evita ejecutar una configuración incompatible o mantener un informe final si cambian fuentes |
+| A90 | Comparación principal sobre O confirmado y R/M/B/H completos | Mantiene denominadores pareados de §3.8. Soporte propio y alertas parciales se publican aparte; F1 se calcula directamente con conteos y valores indefinidos conservan motivos |
+| A91 | AP con empates y scores homogéneos; bootstrap de grupos completos | Evita mezclar escalas entre familias/modelos e independencia ficticia entre variantes. Estima métricas agregadas de ejecuciones, fija ordinales ceil sin interpolación y no publica intervalos cuando existen réplicas indefinidas. Parámetros y soporte requieren justificación previa |
+| A92 | Inferencia de componente aislado y costes sobre capturas previas | Núcleo 0.9.0 añade API sin puntuar MAD al medir M. Un warmup y cinco pares alternados; CPU de proceso con sampler, RSS absoluto muestreado y medidas fallidas explícitas. No atribuye ETL inicial ni cuota dura de memoria a H3 |
+| A93 | Reutilizar O solo tras verificar entrada, implementación y salida revisada | El registro del estudio conserva cada caso, incluso fallido. Una salida nueva diferente no hereda una etiqueta del candidato antiguo. No aprende modelos ni umbrales con test |
+| A94 | Bundle portable de bytes originales y tablas regeneradas | Conserva decimales/monedas y hashes de padres; cambia URI solo con vínculo explícito. La reproducción de tablas desde capturas no acredita una nueva ETL ni aprobación humana. La repetición auténtica por otro integrante sigue pendiente |
+| A95 | Inventario público separado de publicación y matriz | Licencia, control de nombres y nuevas plataformas requieren evidencia externa. El lector no reserva/publica ni confunde 404 con propiedad; build/instalación temporal solo verifican software. Actions permanece desactivado por A88 |
+
+Precisiones de ingeniería de T09/T11/T15–T18 y OE3/OE4/OE5. No se resuelven por
+código la cohorte SERCOP, revisión humana, licencia, soporte científico o H1–H3.
+La tesis previa permanece protegida; el documento institucional posterior recogerá
+la implementación real y las limitaciones. [Diseño](STEP_10_DESIGN.md),
+[métodos](STEP_10_EVALUATION.md), [distribución](STEP_10_DISTRIBUTION.md).

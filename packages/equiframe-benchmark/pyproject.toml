@@ -4,24 +4,26 @@ build-backend = "hatchling.build"
 
 [project]
 name = "equiframe-benchmark"
-version = "0.9.0"
-description = "Independent oracle reviews and provenance-aware benchmark partitions for EquiFrame"
+version = "0.10.0"
+description = "EquiFrame Verify, paired evaluation and reproducible experimental evidence"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 authors = [{ name = "Hernán Troya" }]
 classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3.12", "Typing :: Typed"]
-dependencies = ["equiframe[arrow]==0.8.1"]
+dependencies = ["equiframe[arrow]==0.9.0", "packaging>=26,<27"]
 
 [project.urls]
 Repository = "https://github.com/htroya/equiframe"
-Documentation = "https://github.com/htroya/equiframe/blob/main/docs/STEP_06_DESIGN.md"
+Documentation = "https://github.com/htroya/equiframe/blob/main/docs/STEP_10_DESIGN.md"
 
 [project.scripts]
 equiframe-benchmark-pilot = "equiframe_benchmark.pilot:main"
 equiframe-benchmark = "equiframe_benchmark.cli:main"
 
 [project.optional-dependencies]
-engines = ["equiframe[engines]==0.8.1"]
+engines = ["equiframe[engines]==0.9.0"]
+ml = ["equiframe[ml]==0.9.0"]
+resources = ["psutil==7.2.2"]
 
 [tool.uv.sources]
 equiframe = { path = "../equiframe" }

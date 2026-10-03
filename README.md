@@ -26,7 +26,7 @@ EquiFrame conserva los datos, tipos y diagnósticos necesarios para revisar el r
 - Isolation Forest y MAD por familia, calibración normal externa con alpha explícito,
   restauración JSON sin pickle e híbrido H que conserva componentes no evaluables.
 
-**Versiones: núcleo 0.8.1 y benchmark 0.9.0 (paso 9 técnico).** Una ejecución `completed` confirma que la
+**Versiones: núcleo 0.9.0 y benchmark 0.10.0 (paso 10 técnico).** Una ejecución `completed` confirma que la
 transformación terminó y se materializó. La [comparación semántica](docs/COMPARISON.md)
 evalúa salidas materializadas. [R](docs/RULES.md) evalúa reglas seleccionadas del
 contrato sobre una captura. El benchmark técnico conserva revisiones pendientes;
@@ -126,7 +126,7 @@ describe los límites y las entregas necesarias; la conexión real sigue pendien
 
 ```text
 packages/equiframe/            biblioteca y pruebas
-packages/equiframe-benchmark/  catálogo, oráculo, revisión, particiones y pruebas
+packages/equiframe-benchmark/  EquiFrame Verify, evaluación, reproducción y pruebas
 packages/equiframe-data/       especificación de acceso a datos
 packages/equiframe-sercop/     especificación de integración de dominio
 services/data-gateway/         especificación del servicio de datos

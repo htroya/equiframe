@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.10.0 — 2026-10-03
+
+- Congelación de protocolos y ejecución de estudios con decisiones, esperados y
+  hashes verificados; las revisiones pendientes conservan su estado.
+- Evaluación R/M/B/H sobre la misma intersección completa, soporte propio,
+  alertas parciales, AP por modelos homogéneos y métricas indefinidas explícitas.
+- Remuestreo de grupos completos con justificación de independencia, percentiles
+  discretos y registro de réplicas indefinidas; no sustituye evidencia científica.
+- Protocolos de costos controlados, tablas regenerables y bundles cerrados con
+  comparación del contenido lógico completo y regenerador explícito.
+- Inventario de fuente/wheel y preparación pública sin conexión a PyPI,
+  publicación, reserva del nombre ni selección de licencia. Los metadatos no
+  acreditan por sí solos instalación, plataforma o reproducción por un compañero.
+- Depende del núcleo 0.9.0. La evaluación científica real, integración externa,
+  matriz de plataformas de esta versión y publicación pública tienen requisitos
+  pendientes y evidencia separada; los fixtures no son aprobaciones reales.
+
 ## 0.9.0 — 2026-10-02
 
 - Consumidor de snapshots publicados: recibos estrictos, revisiones, identidad
