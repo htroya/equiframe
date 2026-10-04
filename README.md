@@ -61,7 +61,7 @@ La tesis mantiene tres familias principales y las tres parejas, con nueve
 estratos; las cinco familias genéricas de perfiles son capacidades del producto.
 
 La [revisión del tutor](docs/THESIS_TUTOR_REVIEW_20261003.md) registra los cambios
-del Word histórico y los requisitos empíricos pendientes. La revisión actual y su alcance están en [VERIFY_ETL_REVIEW](docs/VERIFY_ETL_REVIEW_20261003.md); no cierran la evaluación científica.
+del Word histórico y los requisitos empíricos pendientes. La revisión actual y su alcance están en [el informe integral](docs/COMPREHENSIVE_REVIEW_20261003.md); la [revisión 0.11.0](docs/VERIFY_ETL_REVIEW_20261003.md) conserva su evidencia histórica. Ninguna cierra la evaluación científica.
 
 **Objetivo futuro:** publicar EquiFrame en PyPI para que cualquier persona pueda
 usar `pip install equiframe`. El candidato 0.11.1 incorpora construcción,

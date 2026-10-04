@@ -33,7 +33,7 @@ en el Word de José. No se modifican sus carpetas ni se simulan sus entregas.
 | G01 | Ingestión/IR/Pandas/Polars con contexto decimal externo de precisión baja, Emax=9 y traps activos | Dinero exacto válido podía fallar; pérdida de escala podía escapar de cuarentena | Contexto decimal propio para aritmética acotada, sin cambiar contexto/flags del consumidor; `test_review_core_limits.py` |
 | G02 | SUM decimal R con totales exactos grandes, correcto y distinto por un centavo | Reglas convertidas en no evaluables por configuración ajena | Contexto independiente conservando precisión R=1000; ambos resultados mantienen su decisión |
 | G03 | SUM vacío Polars Decimal(20,20) bajo Emin externo reducido | Resultado cero correcto modificaba flag Clamped del consumidor | Construcción exacta de cero mediante tupla Decimal, sin aritmética ambiental |
-| G04 | JSON con arreglo expandido mayor que max_records | La lista completa se creaba antes de comprobar el límite | Presupuesto restante y comprobación cooperativa durante recorrido, antes de convertir registros |
+| G04 | JSON expandido o fallo CSV/Unicode/JSON tras agotar max_records | La lista se creaba antes del límite; el manejador de error podía excederlo al registrar rechazo | Presupuesto durante expansión y antes de añadir cuarentena por fallo del parser; límite exacto válido conservado |
 | G05 | Tokens numéricos JSON con exponente fuera de rango de Decimal | InvalidOperation eludía rechazo/cuarentena | Diagnóstico `json_decimal_outside_supported_range`, con documento original conservado |
 | G06 | Bundle científico con conteos inventados y hashes recalculados coherentemente | Reproducción podía aceptar metadata incompatible con filas reales | Recomparación con opciones congeladas/reference peer; conteos, estrategia y clave deben concordar |
 | G07 | Inventario no vacío de diferencias ligado a O equivalente | Selección normal pública podía admitir evidencia contradictoria | Recuento físico y contraste con ComparisonCounts antes de entrenamiento/calibración |
@@ -77,6 +77,13 @@ Las suites completas y controles finales del candidato se registrarán aquí
 al concluir su ejecución. Las evidencias detalladas quedan fuera de Git en
 `revision_global_equiframe_20261003` del workspace de tesis. Un resultado de
 fuente no se atribuye a una instalación limpia hasta ejecutar su verificador.
+
+La revisión cruzada reprodujo además el exceso de presupuesto al rechazar un
+CSV mal formado. Cinco de siete casos adicionales fallaron antes del arreglo;
+los dos restantes verifican la frontera válida. La ronda posterior aprobó
+53 pruebas de ingestión/regresiones. Los primeros controles completos fueron
+interrumpidos para reiniciarlos sobre los bytes corregidos; sus recibos parciales
+se conservan y no se presentan como suites completas aprobadas.
 
 ## Compatibilidad, impacto y límites
 

@@ -148,7 +148,8 @@ y preparación de la VM Ubuntu/Python 3.12; las garantías del cliente, snapshot
 concurrencia y recuperación son las mismas. Las referencias OCI describen el
 entorno inicialmente previsto y no retiran esas alternativas de la guía Word.
 
-El DW, DuckDB real y su programa/biblioteca de conexión estarán en la VM OCI.
+El DW, DuckDB real y su programa/biblioteca de conexión estarán en la VM elegida
+por José, con OCI como opción inicialmente prevista.
 `packages/equiframe-data` versiona el código de acceso a desplegar allí; un cliente
 ligero externo es opcional si se acuerda un servicio remoto. EquiFrame podrá
 instalarse y ejecutarse dentro de la VM, o consumir snapshots verificados mediante

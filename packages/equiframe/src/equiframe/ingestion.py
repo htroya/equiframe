@@ -528,6 +528,8 @@ def ingest_file(
                 if rejected:
                     break
     except (UnicodeError, csv.Error, ValueError) as error:
+        if count >= spec.max_records:
+            raise ResourceLimitError("records exceed ingestion record budget") from error
         quarantine.append(
             QuarantinedRecord(
                 record=count,

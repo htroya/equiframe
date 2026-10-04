@@ -7,7 +7,7 @@ import pytest
 from rule_helpers import captured
 from test_migration_backends import column, contract, run
 
-from equiframe.contracts import AggregateCheck, DecimalType, RuleSpec
+from equiframe.contracts import AggregateCheck, DecimalType, RuleSpec, StringType
 from equiframe.errors import ExecutionCancelled, ResourceLimitError
 from equiframe.ingestion import FieldMapping, IngestionSpec, ingest_file
 from equiframe.migration.types import (
@@ -24,6 +24,46 @@ from equiframe.migration.types import (
 from equiframe.rules import evaluate_rules
 from equiframe.tables import read_table
 from equiframe.values import DecimalValue
+
+
+@pytest.mark.parametrize("invalid_records", ["reject", "quarantine"])
+@pytest.mark.parametrize("max_records", [1, 2])
+def test_malformed_csv_record_respects_budget_and_keeps_file_failure(
+    tmp_path, invalid_records, max_records
+):
+    path = tmp_path / "malformed.csv"
+    path.write_text('id\n1\n"unterminated\n', encoding="utf-8")
+    spec = IngestionSpec(
+        format="csv",
+        fields=(FieldMapping(column=column("id", StringType()), path=("id",)),),
+        invalid_records=invalid_records,
+        max_records=max_records,
+    )
+    if max_records == 1:
+        with pytest.raises(ResourceLimitError, match="record budget"):
+            ingest_file(path, spec=spec, work_dir=tmp_path)
+        return
+    result = ingest_file(path, spec=spec, work_dir=tmp_path)
+    assert result.state == "rejected" and result.output is None
+    assert result.inspected_records == 2 and result.accepted_records == 1
+    assert len(result.quarantined) == 1
+    assert result.quarantined[0].code == "Error:unexpected end of data"
+
+
+@pytest.mark.parametrize(
+    "format,content", [("csv", b'"unterminated\n'), ("json", b""), ("csv", b"\xff")]
+)
+def test_file_parser_failures_cannot_exceed_zero_record_budget(tmp_path, format, content):
+    path = tmp_path / ("invalid." + format)
+    path.write_bytes(content)
+    spec = IngestionSpec(
+        format=format,
+        fields=(FieldMapping(column=column("id", StringType()), path=("id",)),),
+        invalid_records="quarantine",
+        max_records=0,
+    )
+    with pytest.raises(ResourceLimitError, match="record budget"):
+        ingest_file(path, spec=spec, work_dir=tmp_path)
 
 
 @pytest.mark.parametrize("numeric_token", [True, False])
