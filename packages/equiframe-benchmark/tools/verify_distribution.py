@@ -1,5 +1,6 @@
 """Verify both installed distributions, native pilot and the integration example."""
 
+import argparse
 import hashlib
 import os
 import shutil
@@ -19,7 +20,10 @@ def run(args: list[str], cwd: Path, env: dict[str, str]) -> None:
 
 
 def main() -> None:
-    uv = shutil.which("uv")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--uv", default="uv")
+    args = parser.parse_args()
+    uv = shutil.which(args.uv)
     if uv is None:
         raise SystemExit("uv must be on PATH")
     package_version = tomllib.loads((ROOT / "pyproject.toml").read_text("utf-8"))["project"][
@@ -81,6 +85,9 @@ import equiframe as ef
 assert 'equiframe_benchmark' not in sys.modules
 assert not any(n in sys.modules for n in ('pyarrow','pandas','polars','duckdb','numpy','sklearn'))
 import equiframe_benchmark as eb
+assert callable(eb.oracle_verification_bridge)
+assert callable(eb.evaluate_pairwise)
+assert callable(ef.verify) and callable(ef.read_bundle)
 assert not any(n in sys.modules for n in ('pyarrow','pandas','polars','duckdb','numpy','sklearn'))
 for module in (ef, eb):
     assert Path(module.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
@@ -95,6 +102,9 @@ assert importlib.metadata.version('equiframe') == sys.argv[3]
         )
         shutil.copytree(
             ROOT / "tests", work / "tests", ignore=shutil.ignore_patterns("__pycache__")
+        )
+        shutil.copytree(
+            ROOT / "examples", work / "examples", ignore=shutil.ignore_patterns("__pycache__")
         )
         sources = work / "declared-source-packages"
         for project in (CORE, ROOT):

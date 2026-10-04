@@ -29,9 +29,11 @@ Los cambios de interfaces compartidas se acuerdan con los responsables de ambos
 componentes. La [distribución de componentes](docs/TEAM_INTEGRATION.md) evita
 implementar infraestructura o reglas de dominio dentro del núcleo.
 
-La CI de EquiFrame se activa para ramas de cualquier colaborador y para PR.
-Las pruebas remotas necesitan un entorno autorizado aparte y no forman parte del
-workflow local de contratos y ejecución.
+La CI vigente se inicia manualmente con `workflow_dispatch` y requiere activar
+`run_platform_matrix` de forma explícita. Una subida de rama o un PR no ejecuta
+la matriz. Los recibos de controles locales identifican los bytes comprobados;
+no sustituyen un job remoto ni la revisión de otro integrante. Las pruebas
+del servicio/DW real necesitan el entorno compartido y sus entregas.
 
 ## Documentación y archivos
 

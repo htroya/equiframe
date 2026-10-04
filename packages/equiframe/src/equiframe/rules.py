@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, BinaryIO, Literal
 from uuid import uuid4
 
+from equiframe._decimal import exact_decimal_context
 from equiframe.comparison_types import ComparisonPolicy, ComparisonValue
 from equiframe.contracts import (
     AggregateCheck,
@@ -491,7 +492,7 @@ def _aggregate(definition: RuleDefinition, context: RuleContext) -> None:
                     kind="integer", value=str(sum(int(v.value or "0") for v in members))
                 )
             else:
-                with localcontext() as decimal_context:
+                with localcontext(exact_decimal_context()) as decimal_context:
                     decimal_context.prec = 1000
                     value = sum((Decimal(v.value or "0") for v in members), Decimal())
                 expected = ComparisonValue(kind="decimal", value=str(value))

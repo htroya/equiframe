@@ -1,6 +1,6 @@
 # Trazabilidad con la tesis en elaboración
 
-La entrega vigente es `tesis_final.docx`, guardada tras el paso 10 técnico el
+La entrega histórica tras el paso 10 técnico fue `tesis_final.docx`, guardada el
 2026-10-03 a las 02:41:43 UTC. Incorpora las observaciones del anteproyecto y
 el modelo institucional; por instrucción de Hernán contiene solo capítulos
 1–3 y referencias, sin capítulos 4/5 ni remisiones. Tiene 130 páginas,
@@ -10,13 +10,13 @@ independiente. Mantiene formato APA y límites entre verificación del software
 y experimento pendiente.
 [Entrega y comprobación](THESIS_FINAL_REVIEW_20261003.md).
 
-SHA-256 de la tesis vigente:
+SHA-256 de esa entrega histórica:
 
 ```text
 ff638dff604fbe30179fa463b5e3c9440028f23fec0f114c55d4eac8f63246a2
 ```
 
-El contraste principal se delimita a Pandas–DuckDB y tres familias: ausencias
+En esa entrega histórica, el contraste principal se delimitó a Pandas–DuckDB y tres familias: ausencias
 y tipos, uniones y agregaciones. La biblioteca conserva Polars y cinco familias
 como cobertura técnica adicional. Los objetivos se reformulan en términos
 académicos y las cuotas de escenarios quedan por fijar. El requisito de más
@@ -80,11 +80,17 @@ y revisiones humanas pendientes.
 
 ## Matriz de requisitos
 
+La matriz siguiente describe la entrega vigente de capítulos 1–2 y anexos
+preparatorios, identificada en «Segunda entrega editorial final». Las referencias
+3.x conservan su ubicación histórica como trazabilidad del diseño, sin declarar
+un capítulo 3 entregado en el Word vigente. A100/A101/A110 prevalecen sobre
+A96/A98: tres parejas principales, N efectivo de aprendizaje y soportes pareados.
+
 | ID | Sección | Requisito vigente / cobertura técnica | Componente / paso de Hernán | Evidencia de aceptación |
 |---|---|---|---|---|
 | T01 | 1.3, 1.4, 3.3 | Tres familias del contraste; cinco disponibles en software | Contratos/catálogo, 1/4/6; A96 | Casos y reglas de las tres familias; adicionales separados |
-| T02 | 1.4, 3.1 | Pandas–DuckDB principal; Polars como comprobación adicional | Adaptadores/evaluación, 2/10; A96 | Un protocolo y resultados del contraste principal; extras separados |
-| T03 | 3.2 | Snapshot original, SHA-256, inventario y más de 10.000 adjudicaciones identificables, cobertura/exclusiones | Puertos/manifiestos, 1/2/9; adquisición compartida con Jhair; A98 | Hashes, unidad `ocid`/`award.id` y recuento real verificables |
+| T02 | 1.4; diseño histórico 3.1 | Pandas–Polars, Pandas–DuckDB y Polars–DuckDB principales; tres familias, nueve estratos | Adaptadores/evaluación, 2/10; A100 | Protocolo fijado por pareja, capturas nativas y resultados separados sin contar reutilizaciones como nuevas muestras |
+| T03 | 1.4; diseño histórico 3.2 | Snapshot original, SHA-256 e inventario; más de 10.000 registros reales efectivos de aprendizaje, con soporte/grupos y exclusiones | Puertos/manifiestos, 1/2/9; adquisición compartida con Jhair; A101/A110 | Procedencia y hashes del corpus; N_fit real por modelo/familia, sin sustituirlo por adjudicaciones, filas de calibration/test o cuotas heredadas |
 | T04 | 3.2, 3.5 | Compilación OCDS y cohorte temporal validada | Dominio de Jhair; consumo en 9 | Contrato de dominio y perfilado real |
 | T05 | 3.3 | Contratos independientes del motor; normalización permitida | Contratos/normalización, 1/3 | Pruebas de ausencia, precisión, orden y multiplicidad |
 | T06 | 3.3.1 | R fijada antes de mutantes finales | Reglas, 4/6 | Revisión/commit de reglas y catálogo |
@@ -100,7 +106,7 @@ y revisiones humanas pendientes.
 | T16 | 3.6 | IF y MAD con calibración externa | Modelos, 7 | Scores, umbrales, igualdad estricta y no estimable |
 | T17 | 3.7 | Dependencias transitivas dentro de una partición | Benchmark, 6 | Componentes conexos y ausencia de fuga |
 | T18 | 3.7, 3.9 | Piloto y congelación; prueba no selecciona parámetros | Benchmark, 6/7/10 | FreezeManifest y auditoría de cambios |
-| T19 | 3.8 | Métricas sobre intersección evaluable, cobertura y denominadores | Evaluación, 10 | Conteos y métricas regenerables |
+| T19 | 1.4, A.7; diseño histórico 3.8 | Soporte pareado de los métodos comparados, con O confirmado; intersección común R/M/B/H adicional, cobertura y denominadores | Evaluación, 10; A110 | Conteos y métricas regenerables por soporte; el reporte histórico conserva su intersección común y no se renombra como protocolo principal vigente |
 | T20 | 3.8 | Incertidumbre por grupos y costos desglosados | Evaluación, 10 | Remuestreo trazable y medición controlada |
 | T21 | 3.9 | Reproducción por otro integrante | Entrega, 10 | Registro independiente con contenido y decisiones |
 | T22 | 1.4, 3.5 | Ejecución local, sin plataforma distribuida | Arquitectura | Núcleo local y VM como apoyo colaborativo |
@@ -313,3 +319,143 @@ conserva 5 escenarios/4 grupos/15 perfiles y 35 revisiones pendientes. P06 conti
 pendiente de publicación pública en la etapa indicada por Hernán. La instalación
 temporal de wheels solo verifica ingeniería. [Diseño](STEP_08_DESIGN.md),
 [uso](ORCHESTRATION.md) y [verificación](STEP_08_REVIEW.md).
+
+## Alcance vigente del documento tras las observaciones del tutor
+
+El [contraste de las 13 recomendaciones](THESIS_TUTOR_REVIEW_20261003.md)
+corresponde al Word entregado con hash
+`4e2f571ceb16d98b16f1d74e5f66803e0268baa607f9ee589adf6e29d11854c8`.
+Hernán mantiene las tres parejas principales y tres familias; A100 sustituye
+la reducción a una pareja de A96. A101 corrige A98: el mínimo mayor que 10.000
+corresponde a los registros del conjunto efectivo de ajuste, no a adjudicaciones
+fuente ni sumas de matrices. Se informan N por modelo/familia, ejecuciones únicas
+y grupos independientes. Las reutilizaciones entre parejas no aumentan N.
+
+El Word contiene capítulos 1–3 y referencias, 132 páginas, 15 figuras, 17 tablas
+y 97 destinos paginados. Los controles editoriales están cerrados; corpus SERCOP
+real, soporte de aprendizaje, revisión doble, designación del tutor y aceptación
+institucional permanecen pendientes. Los pasos 9/10 técnicos no acreditan esos
+requisitos. El [migrador integrado](MIGRATION.md), cuyo [plan previo](MIGRATION_DESIGN.md)
+se documentó antes de programar, es una extensión de
+ingeniería autorizada antes del paso 11; no cambia R/M/B/H ni incorpora esperados
+o etiquetas a las variables de los detectores.
+
+El núcleo 0.10.0 implementa las seis direcciones entre los tres motores y
+conserva comparación observada/esperado, requisitos de componentes y evidencia.
+El benchmark 0.10.1 fija esa dependencia sin cambiar algoritmos ni protocolos.
+[Validación y límites](MIGRATION_REVIEW.md). Sus pruebas sintéticas verifican
+ingeniería; no constituyen registros reales de aprendizaje ni revisión humana.
+
+## Reorientación documental y refuerzo autorizado — 2026-10-03
+
+El encargo actual mantiene tres parejas y tres familias principales, pero entrega
+solo los capítulos 1–2 y anexos preparatorios. Los documentos históricos no son
+instrucciones para sustituir `tesis_final.docx` ni acreditan autorización del tutor
+para retirar definitivamente el futuro desarrollo. A108–A110 registran alcance
+y consecuencias, sin convertir el plan en ejecución científica.
+
+El refuerzo de la biblioteca conserva núcleo 0.10.0/benchmark 0.10.1 como versiones
+de partida; los cambios aún no publicados están en `Unreleased`. Corrige el
+informe de migración para distinguir comparación automática con esperado
+aportado de EquiFrame Verify (O); no crea etiquetas ni revisores. Se conservan
+las tres comparaciones y la lectura íntegra de formatos históricos. Las pruebas
+integradas nuevas cubren las tres familias en seis direcciones con motores
+reales y esperados literales sintéticos. Sus cantidades no aumentan N_fit ni
+prueban hipótesis, integración SERCOP o aceptación institucional.
+
+## Primera entrega de formato y candidato 0.11.0 — 2026-10-03
+
+La autoridad de contenido es `tesis_reorientada_capitulos_1_2.docx`; la referencia
+visual exacta es `tesis_final.docx` de la raíz. `tesis_corregda_v1.docx` aplica
+formato sin añadir resultados académicos. La evidencia editorial de esa entrega está
+fuera del repositorio; la descripción inicial de 130 páginas pertenece a otra
+entrega y no fija el número de páginas del documento actual.
+
+La primera entrega quedó en 133 páginas editables, conservando las 20 tablas,
+15 figuras corregidas, 74 referencias y 26 grupos de expresiones de la autoridad
+de contenido. Los originales conservaron sus hashes. Word actualizó realmente
+campos e índices; se renderizaron y revisaron todas las páginas finales a tamaño
+legible. La evidencia estructural/visual está en `word_qa_20261003` del workspace,
+incluido el reemplazo documentado del runtime ausente por Word nativo. Esto
+acredita conservación y revisión de formato, sin afirmar identidad de píxeles
+entre documentos de contenido distinto ni aceptación académica.
+
+La reanudación solicitó una revisión bibliográfica/editorial adicional fuera
+del alcance del código. Este registro conserva la primera entrega como historia;
+no atribuye sus 133 páginas o hashes a la segunda entrega final descrita abajo.
+
+El candidato técnico 0.11.0 añade Verify operacional, workflow, ingestión, carga
+local y bundles. Mantiene el protocolo científico: Pandas–Polars,
+Pandas–DuckDB, Polars–DuckDB × ausencias/tipos, uniones y agregaciones, nueve
+estratos. La [validación SERCOP](SERCOP_EXAMPLE.md) es un subconjunto público
+de dos awards; no satisface el corpus efectivo de aprendizaje, independencia
+humana/doble revisión, ni prueba hipótesis. R/M/B/H y sus entradas se conservan.
+
+Los tests, receipts y wheels son evidencia de ingeniería. El esperado literal
+manual del consumidor se declara con su procedencia, sin autores/revisores
+inventados. DW/OCI, corpus/modelado, aceptación del tutor y publicación externa
+mantienen requisitos propios. A111–A116 registran motivo y consecuencias.
+
+## Segunda entrega editorial final — 2026-10-03
+
+El archivo editable final, fuera de Git, es `tesis_corregda_v1.docx` en la raíz
+del workspace tesis. Su identidad comprobada es:
+
+```text
+365af93cdd4bbf7e665145d0e4597eb1391678f5dcb16ce25423b5802c249ac2
+```
+
+La nueva instrucción editorial autoriza verificar las 74 referencias mediante
+fuentes primarias, corregir su metadata, registrarlas en la lista actual nativa
+de Administrar fuentes de Word y aplicar APA 7 al texto y a la bibliografía.
+El cuerpo queda alineado a la izquierda; la bibliografía APA 7 es manual y
+editable, con DOI/URL verificables, no un campo automático de bibliografía.
+No se crean obras, autores, fechas, revisores o resultados científicos.
+
+La entrega tiene **134 páginas**, **74 fuentes nativas**, **74 referencias**,
+**17 figuras** y **20 tablas**. Añade dos gráficos técnicos de proceso ETL y
+verificación independiente, figuras 14/15 en páginas 81/82; la bibliografía
+comienza ahora en página 83. Las 17 figuras aparecen en el selector nativo
+de referencias cruzadas bajo **Ilustración**, y las 20 tablas bajo **Tabla**.
+Los rótulos visibles conservan «Figura». Los campos y relaciones del documento
+se validaron sin errores; el rótulo de la tabla 2 permanece unido a su tabla.
+
+Se comprobaron las **134 páginas**: 112 imágenes de página de la última revisión
+y 22 idénticas en SHA-256 a páginas ya aprobadas. La entrega es idéntica a la
+revisión congelada. Conserva exactamente los textos de las 20 tablas, los bytes
+y orden relativo de las 15 imágenes originales, los 530 nombres de marcadores
+originales y los 26 textos analíticos identificados en la autoridad de contenido.
+Ambos originales de contenido y formato conservan sus hashes.
+
+Los recibos editoriales están en `word_qa_20261003_revision2/delivery-final.json`,
+`delivery-final.md` y `delivery-structure-final.json` del workspace; la comprobación
+independiente de preservación está en
+`revision_equiframe_20261003/word-preservation-final.json`. Estos artefactos
+locales no se incorporan al repositorio de código. La revisión editorial y los
+controles del candidato 0.11.0 no acreditan aceptación del tutor, corpus efectivo,
+etiquetas/revisiones humanas, entrenamiento científico, DW/OCI ni publicación PyPI.
+
+## Revisión integral del software 0.11.1 — 2026-10-03
+
+La [matriz de preservación](COMPREHENSIVE_REVIEW_SCOPE_20261003.md) fija la última
+tesis y ambas guías por SHA-256; permanecen intactas. No se editan las catorce
+actividades ni las carpetas de José/Jhair. Las aclaraciones del repositorio
+incorporan los proveedores alternativos de VM que constan en el Word de José,
+sin retirar opciones ni añadir entregables obligatorios.
+
+Las decisiones A119–A126 registran correcciones de decimales/presupuestos y
+evidencia, vinculación de controles y el reporte pareado descriptivo. El código
+conserva R/M/B/H/O, tres parejas × tres familias, nueve estratos y N efectivo de
+aprendizaje. La huella de R corregida exige evidencia nueva cuando se use en un
+estudio, sin reescribir freezes previos.
+
+El reporte aditivo expone soporte por contraste conforme al plan vigente, pero
+no reemplaza el protocolo común histórico ni acredita análisis científico
+principal. Esa adopción requiere revisión y congelación antes de la prueba.
+No se entrenan modelos del estudio, inventan etiquetas o recalibran parámetros.
+
+La [revisión final](COMPREHENSIVE_REVIEW_20261003.md) acredita nueve controles por
+distribución y 1041/454 pruebas de fuente repetidas desde instalaciones externas.
+Tres casos de symlinks se omiten por privilegios Windows; no se extrapola a
+otras plataformas ni al corpus/servicio/DW reales. Los pendientes empíricos,
+humanos y de publicación conservan su responsable y aceptación propia.

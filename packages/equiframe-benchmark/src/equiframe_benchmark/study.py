@@ -437,7 +437,7 @@ def _recheck_confirmed_replay(
     try:
         with TemporaryDirectory(prefix="equiframe-study-recheck-") as temporary:
             observed = ef.compare(
-                execution.output.data,
+                execution.output,
                 definition.candidate.output,
                 contract=scenario.comparison.contract,
                 policy=scenario.comparison.policy,

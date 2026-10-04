@@ -297,6 +297,16 @@ def read_pipeline(path: Path, *, verify: bool = True) -> PipelineResult:
 
 def inspect_evidence(directory: Path) -> dict[str, object]:
     """An interrupted operation remains inspectable but can never claim completion."""
+    if (directory / "migration.json").exists():
+        from equiframe.migration import migration_summary, read_migration
+
+        migrated = read_migration(directory)
+        return {
+            **migration_summary(migrated),
+            "finalized": True,
+            "events": migrated.event_count,
+            "files": len(migrated.evidence),
+        }
     if (directory / "reduction.json").exists():
         from equiframe.reduction import read_reduction
 
@@ -321,6 +331,15 @@ def inspect_evidence(directory: Path) -> dict[str, object]:
             "files": len(result.evidence),
         }
     events = verify_events(directory / "events.jsonl", operation_id=directory.name)
+    if directory.name.startswith("migration_"):
+        return {
+            "migration_id": directory.name,
+            "finalized": False,
+            "complete": False,
+            "exit_code": 3,
+            "events": len(events),
+            "last_stage": events[-1].stage if events else None,
+        }
     return {
         "pipeline_id": directory.name,
         "finalized": False,

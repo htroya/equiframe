@@ -1,5 +1,66 @@
 # Changelog
 
+## 0.11.1 — 2026-10-03
+
+- Decimales exactos de ingestión, IR, ejecución nativa y sumas R aislados del
+  contexto decimal del consumidor, conservando sus flags y sin autorizar redondeo.
+- Exponentes JSON fuera de rango siguen rechazo/cuarentena; expansión de registros
+  comprueba presupuesto y cancelación antes de materializar la colección completa.
+- Recibos de calidad vinculados a bytes de fuente, dependencias locales y
+  wheel/sdist; evidencia histórica legible pero insuficiente para un candidato nuevo.
+- Productores 0.11.1 añadidos a DetectorVersions conservando los anteriores y
+  esquemas 1.0. Python 3.12, motores y dependencias bloqueadas sin ampliar soporte.
+
+## 0.11.0 — 2026-10-03
+
+- Verify reutilizable para artefactos, ejecuciones y migraciones; dimensiones
+  separadas y puente opcional de O, sin cambiar los algoritmos R/M/B/H.
+- CSV/JSON/JSONL con esquema explícito, copias originales, conversiones exactas,
+  rutas/grano y cuarentena; workflow de checkpoints y destino Parquet con staging,
+  gate de Verify, versiones, visibilidad local atómica e idempotencia.
+- JSON vacío rechazado sin salida; desbordamiento timestamp rechazado o puesto
+  en cuarentena antes de materializar Arrow, conservando límites int64 exactos.
+- Carga Parquet rechaza colisiones de nombres sin distinguir mayúsculas antes
+  de escribir; recibos y versiones conservan una identidad física inequívoca.
+- IR nativo ampliado con aritmética acotada, coalesce, condiciones, concatenación,
+  deduplicación explícita y semi/anti join. Capacidades/rechazos trazables por prueba.
+- Bundles cerrados para Verify/migración/workflow, lectura relocalizada sin ETL,
+  protección de rutas y comprobación de decisiones/refencias a evidencia.
+- API/CLI, once esquemas nuevos, productores previos de detectores preservados,
+  ejemplos genéricos y OCDS sintético/consumidor real sin descarga implícita.
+- Twine reproducible, verificadores de wheel/sdist ampliados, manifiesto de
+  candidato y automatización separada de publicación. Python 3.12 sin ampliar
+  plataformas; licencia, publicación e integración DW/OCI pendientes.
+
+
+- Informes de migración distinguen la comparación con el esperado aportado de
+  EquiFrame Verify (O), cuya independencia/revisión humana no establece el runner.
+  Resúmenes conservan estados y evidencia de las tres comparaciones por separado,
+  mantienen la clave histórica y permiten leer reportes previos completos.
+- Pruebas integradas de las seis direcciones para NULL/NaN, uniones many-to-many
+  sin coincidencia NULL, claves/multiplicidad y sumas Decimal por moneda con
+  esperados literales. Son verificaciones sintéticas de software.
+
+## 0.10.0 — 2026-10-03
+
+- EquiFrame Migrate: IR relacional estricto, compiladores nativos Pandas/Polars/
+  DuckDB y registro explícito extensible; seis direcciones entre los tres motores.
+- `migrate`, `check_migration`, `read_migration` y `migration_summary`; captura
+  única aislada, comprobación de ambos motores antes de ETL, esperado separado,
+  perfiles/detectores congelados y presupuestos cooperativos de extremo a extremo.
+- Diferencias observadas y comprobación contra esperado se conservan separadas.
+  R es requerida por defecto; `require_rules=False` permite exigir solo los
+  componentes declarados sin convertir estados ausentes de R/H en «sin alerta».
+- CLI migration validate/run/verify, reportes, journal e inventario cerrado;
+  lectura verifica archivos, referencias y metadatos físicos sin ejecutar ETL.
+  Manifiesto publicado al final; operaciones interrumpidas permanecen visibles.
+- Cinco JSON Schema nuevos 1.0. `DetectorVersions` añade el emisor 0.10.0 y
+  conserva productores anteriores; sus esquemas reciben la ampliación compatible
+  de enum/default. No cambia el algoritmo de inferencia ni entrena durante migración.
+- Ejemplo con Decimal, monedas, grupos nulos y esperado literal independiente.
+  Timestamps/operaciones float declaradas fuera del IR inicial; plugins confiables,
+  límites de buffers tras materialización y evidencia local sin portabilidad automática.
+
 ## 0.9.0 — 2026-10-03
 
 - API aditiva `detect_component` y resultado `ComponentDetectionResult` para

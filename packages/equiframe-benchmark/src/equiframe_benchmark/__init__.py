@@ -59,6 +59,7 @@ from equiframe_benchmark.models import (
     Catalog,
     InputBinding,
     OracleResult,
+    OracleVerificationBridge,
     Review,
     ReviewAssignment,
     ReviewPacket,
@@ -66,7 +67,8 @@ from equiframe_benchmark.models import (
     SplitManifest,
     digest,
 )
-from equiframe_benchmark.oracle import evaluate_oracle, review_packet
+from equiframe_benchmark.oracle import evaluate_oracle, oracle_verification_bridge, review_packet
+from equiframe_benchmark.pairwise import PairwiseReport, evaluate_pairwise
 from equiframe_benchmark.reconciliation import (
     AwardReconciliationResult,
     AwardReconciliationSpec,
@@ -105,7 +107,7 @@ from equiframe_benchmark.study_bundle import (
 from equiframe_benchmark.tables import TableExport, read_tables, table_payloads, write_tables
 from equiframe_benchmark.training_types import TrainingManifest, TrainingRecord, TrainingSelection
 
-__version__ = "0.10.0"
+__version__ = "0.11.1"
 __all__ = [
     "Assignment",
     "AwardReconciliationResult",
@@ -140,6 +142,8 @@ __all__ = [
     "IntegrationSpec",
     "NameCheck",
     "OracleResult",
+    "OracleVerificationBridge",
+    "PairwiseReport",
     "ProfileMCostResult",
     "ReconciliationCheck",
     "ReproductionBundle",
@@ -174,6 +178,7 @@ __all__ = [
     "dependency_groups",
     "digest",
     "evaluate_oracle",
+    "evaluate_pairwise",
     "evaluate_records",
     "evaluation_protocol_sha256",
     "inspect_distribution",
@@ -181,6 +186,7 @@ __all__ = [
     "make_reproduction_record",
     "make_splits",
     "measure_costs",
+    "oracle_verification_bridge",
     "read_bundle",
     "read_costs",
     "read_freeze",

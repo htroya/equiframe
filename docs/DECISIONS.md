@@ -296,3 +296,77 @@ PR 20 y la publicación PyPI continúa fuera de esta entrega.
 Documento final SHA-256:
 `ff638dff604fbe30179fa463b5e3c9440028f23fec0f114c55d4eac8f63246a2`.
 [Cambios, fuentes, comprobación y límites](THESIS_FINAL_REVIEW_20261003.md).
+
+## Corrección conforme a instrucciones de Hernán — 2026-10-03 UTC
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A100 | Las tres parejas Pandas–Polars, Pandas–DuckDB y Polars–DuckDB son principales; tres familias y nueve estratos | Instrucción expresa del usuario. Sustituye A96; catálogo y partición global comparten identidades reales, sin sumar reutilizaciones ni mezclar scores incompatibles |
+| A101 | El umbral superior a 10.000 corresponde a los registros reales de la matriz efectiva de aprendizaje | Corrige A98 conforme al texto literal del tutor. Adjudicaciones fuente y cantidad de perfiles/grupos son unidades distintas. Informar N por modelo/familia no atribuye al PDF un mínimo literal por familia; requisito empírico pendiente |
+| A102 | Word final de 132 páginas, solo 1–3, 15 figuras, 17 tablas, 61 referencias y 97 destinos | Actualiza A99. Gate estructural, contraste de 13 recomendaciones y revisión visual completa; respaldo de la versión anterior y fuentes intactas. Tutor, datos, ajuste y revisiones independientes no se dan por cumplidos |
+
+La [revisión actual](THESIS_TUTOR_REVIEW_20261003.md) sustituye el alcance y la
+interpretación del mínimo del informe anterior, conservado como historia. El
+Word nuevo tiene SHA-256
+`4e2f571ceb16d98b16f1d74e5f66803e0268baa607f9ee589adf6e29d11854c8`.
+
+Antes del paso 11 se registra el [plan del migrador](MIGRATION_DESIGN.md), solicitado
+por Hernán. Su implementación no adelanta el cierre científico ni PyPI.
+
+## Migración integrada anterior al paso 11 — 2026-10-03 UTC
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A103 | EquiFrame Migrate pertenece al núcleo 0.10.0; benchmark 0.10.1 fija esa dependencia | Una biblioteca genérica puede declarar ETL, compilarla nativamente y comparar sus resultados sin el DW. IR cerrado y registro explícito permiten extensiones confiables, sin cargar código desde JSON |
+| A104 | Captura única aislada para ambos motores y esperado opcional fijado antes de ETL | Comparar salidas no prueba corrección independiente; verificar contra un esperado aportado tampoco autentica su revisión humana. El esperado permanece fuera de perfiles y detectores |
+| A105 | R requerida por defecto, alternativa explícita `require_rules=False` | Permite exigir migración/comparación sin ocultar los estados originales de R/H; ejecución y componentes solicitados deben finalizar y las alertas disponibles conservan su efecto |
+| A106 | Manifiesto final, inventario cerrado y validación física sin reejecución | Conserva fallos y evidencia parcial; hashes, URI locales, metadatos, eventos y conteos deben concordar. Las URI del migrador no constituyen un bundle portátil ni una firma de autoría |
+| A107 | Capacidades iniciales acotadas y presupuestos cooperativos | Rechazo explícito de pérdidas/overflow/índice no representable; límites de captura tras materialización y cota Polars conservadora. Registrar motores no acredita una traducción universal |
+
+[Guía](MIGRATION.md), [plan previo](MIGRATION_DESIGN.md) y
+[comprobaciones y límites](MIGRATION_REVIEW.md). Las ampliaciones compatibles
+de `DetectorVersions` mantienen formatos 1.0 y productores previos; no modifican
+los algoritmos ni el protocolo científico. No se inicia el paso 11 ni PyPI.
+
+## Refuerzo autorizado durante la reorientación documental — 2026-10-03
+
+La nueva instrucción del autor autoriza mejorar la biblioteca y subir el cambio
+revisable a Git en paralelo con la entrega de capítulos 1–2. No autoriza PyPI ni
+despliegues. El cambio ajeno presente en `HERNAN_ROADMAP.md` permanece intacto.
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A108 | Distinguir en reportes comparación con esperado de EquiFrame Verify (O) | El HTML anterior decía «Independent verification» sin recoger autoría/revisión humana. Se conserva la clave histórica de API y se añade el estado explícito `not_established`, con cada comparación y su evidencia por separado. El lector acepta formatos históricos completos para preservar expedientes; integridad y corrección siguen siendo diferentes. No modifica etiquetas ni algoritmo R/M/B/H. |
+| A109 | Contrastar las seis direcciones con semántica de las tres familias y esperados literales | Las pruebas invocan ambos adaptadores reales, conservan NULL/NaN, ocurrencias many-to-many y claves, y separan montos Decimal por moneda. Las seis direcciones son capacidad técnica; el protocolo científico sigue declarando origen y destino de cada ensayo y no hereda validez bidireccional de los tests sintéticos. |
+| A110 | Entrega documental actual de capítulos 1–2 y anexos preparatorios | La instrucción actual sustituye el alcance editorial previo de A97/A102 para esta entrega parcial, sin afirmar aceptación del tutor. El requisito superior a 10.000 se refiere a filas reales utilizadas en aprendizaje; interpretación por modelo, corpus, grupos, calibración, etiquetas y revisión humana permanecen pendientes. El plan nuevo distingue soporte H–R del soporte común R/M/B/H y presupone revisión antes de entrenamiento/calibración. |
+
+## Verify reutilizable y ETL local — 2026-10-03
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A111 | Verify operacional en core, O opcional y puente benchmark | Artefactos externos sin rehacer ETL; acuerdo, esperado, R e independencia separados. Los nombres declarados no autentican revisores. APIs oracle históricas se preservan. |
+| A112 | Ingestión y grano explícitos, IR nativo acotado y checkpoints | IDs/money/ausencias se conservan o se rechazan con recibos; no inferir esquemas aprobados ni traducir programas arbitrarios. Matriz trazable con rechazos deliberados. |
+| A113 | Carga Parquet local con gate releído, staging, versiones y puntero | Utilidad ETL sin DW/OCI; idempotencia y conservación, atomicidad de visibilidad local sin prometer durabilidad eléctrica/transacción distribuida. Resume rechazado. |
+| A114 | Evidencia portátil sin reescribir formatos históricos | Inventario/hash/tamaño y resolver limitado a capturas; lectura reconstruye vínculos/estados sin ejecutar motores ni callbacks. Hash no equivale a autenticidad. |
+| A115 | Candidato 0.11.0, Python 3.12, CI manual y publicación separada | Twine, builds/instalaciones limpias y manifest; no ampliar plataformas por configuración. Licencia, titularidad, acceso público y publicación son decisiones pendientes. |
+| A116 | Validación SERCOP de subconjunto manual identificado | Tres paquetes/dos awards, grano (ocid,award_id), puentes sin monto y monedas separadas; seis direcciones técnicas. No corpus, O humano, DW ni entrenamiento real. |
+| A117 | JSON vacío inválido y límites timestamp comprobados por registro | La pasada extra reprodujo éxito ficticio de JSON vacío y overflow fuera de cuarentena. Un `[]` declarado o stream JSONL vacío conserva tabla vacía válida; ticks int64 extremos exactos se aceptan y desbordamientos siguen rechazo/cuarentena. Es corrección de ingeniería sin cambio experimental. |
+| A118 | Nombres de publicación inequívocos sin distinguir mayúsculas | Windows podía sobrescribir `Table.parquet` con `table.parquet` y devolver éxito. API/recibo rechazan estas colisiones antes de escribir; la versión previa se conserva. No se normalizan ni fusionan datos y no cambia el protocolo científico. |
+
+Se revisó el cambio preexistente del roadmap y se preservó su planificación
+11–20, conciliando descripciones vigentes con evidencia. No modifica el diseño
+experimental de tres parejas/tres familias/nueve estratos ni transforma filas
+fuente/fixtures/reutilizaciones en registros efectivos de aprendizaje.
+
+## Revisión integral conforme a la última tesis y guía del equipo — 2026-10-03
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A119 | Candidato núcleo/benchmark 0.11.1, con la misma resolución de dependencias | Identifica los fixes y la API descriptiva adicional sin reemplazar artefactos 0.11.0. DetectorVersions conserva productores anteriores; formatos históricos 1.0 no se reescriben. |
+| A120 | Aislar operaciones exactas del contexto decimal del consumidor | Traps, rango de exponentes y flags externos podían cambiar ingestión, IR, ejecución y R. Contexto propio y validación de escala/rango preservan valores y no autorizan pérdida de precisión. R conserva precisión 1000; cambia la huella de su implementación y se regenera el catálogo. Estudios congelados con la huella anterior conservan su revisión; usar R corregida requiere nueva evidencia/congelación. |
+| A121 | Presupuestos y cancelación durante expansión JSON; exponentes inválidos explícitos | La colección expandida podía crecer antes del control max_records. Se aplica presupuesto restante antes de convertir escalares y se conserva rechazo/cuarentena para exponentes fuera de rango. Parseo sigue materializado, acotado por bytes y controles cooperativos. |
+| A122 | Contrastar evidencia física con conteos y clasificación declarada | Reproducción portátil, selección normal y puente Verify rechazan contradicciones de conteos o tipo de candidato. Se usan opciones congeladas y referencia peer, sin modificar etiquetas válidas ni fabricar revisiones. |
+| A123 | Reporte pareado aditivo y descriptivo, separado del protocolo histórico | La tesis vigente distingue soportes por contraste de intersección común. evaluate_pairwise conserva el EvaluationReport y seis CSV, añade seis pares R/M/B/H y scientific=false. Su uso principal requiere protocolo nuevo revisado/congelado antes de la prueba; no se reinterpretan resultados ni cambia bootstrap/AP. |
+| A124 | Vincular controles a fuente y artefactos del candidato | Huellas antes/después y wheels de dependencias locales evitan aprobar bytes nuevos con recibos antiguos; se exige limpieza del cierre de fuentes al emitir manifest. Listas condicionales de uv.sources se rechazan explícitamente por no estar soportadas. Vinculación no autentica ejecutores ni sustituye aprobación de licencia/publicación. |
+| A125 | Preservar las guías y responsabilidades comunicadas, incluida flexibilidad de VM | Tesis y guías se mantienen idénticas en hash. El Word de José permite OCI o alternativas AWS/Azure/Hetzner; se aclara esa flexibilidad sin elegir/desplegar proveedor, construir su gateway o redefinir el DW de Jhair. |
+| A126 | Aplicar max_records también al registrar errores de parser | La revisión cruzada confirmó exceso tras una fila válida seguida de CSV mal formado, y casos con presupuesto cero. Se comprueba límite antes de añadir cuarentena; se preservan errores dentro del presupuesto. Se interrumpen y repiten controles finales para vincular evidencia a la corrección. |

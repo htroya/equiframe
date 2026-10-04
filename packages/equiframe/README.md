@@ -1,9 +1,23 @@
-# EquiFrame 0.9.0 — orquestación y evidencia verificable
+# EquiFrame 0.11.1 — Verify, ETL y migración nativa
+
+La revisión 0.11.1 corrige aislamiento decimal, presupuestos de expansión JSON y
+vinculación de controles a los bytes comprobados. Los acuerdos de integración
+del equipo conservan su alcance; el [informe integral](../../docs/COMPREHENSIVE_REVIEW_20261003.md)
+identifica pruebas finales y pendientes externos.
+
+El README forma parte de los metadatos del wheel/sdist. Los enlaces al monorepo
+pueden requerir acceso al repositorio privado. Los ejemplos, tests, herramientas
+y JSON Schema completos se incluyen en el **sdist**; el wheel contiene la API,
+CLI y recursos runtime. Hasta resolver licencia y acceso público, use artefactos
+identificados del equipo y `--no-index --find-links` para evitar paquetes ajenos.
 
 Contratos estrictos, comparación completa y ejecución local con Pandas, Polars y DuckDB.
 Se requiere Python 3.12; los motores se instalan mediante extras. La configuración
-CI cubre Windows x64, Ubuntu x64/ARM64 y macOS Intel/Apple Silicon.
-La [evidencia de revisión](../../docs/STEP_08_REVIEW.md)
+CI manual ofrece una matriz opcional Windows x64, Ubuntu x64/ARM64 y macOS
+Intel/Apple Silicon. El candidato se verifica localmente en Windows x64; no
+se ejecutó esa matriz remota.
+La [revisión actual](../../docs/VERIFY_ETL_REVIEW_20261003.md) y la
+[evidencia histórica](../../docs/STEP_08_REVIEW.md)
 registra los controles completados. No se requiere una VM ni un DW para usar el
 núcleo. Licencia y publicación externa pendientes; no hay paquete del equipo en PyPI.
 
@@ -15,8 +29,8 @@ la experiencia pública objetivo, posterior al paso 10 y a una nueva ronda de re
 paquete ajeno. Use el wheel del equipo o este checkout:
 
 ```bash
-python -m pip install ./dist/equiframe-0.9.0-py3-none-any.whl
-python -m pip install "./dist/equiframe-0.9.0-py3-none-any.whl[duckdb]"
+python -m pip install ./dist/equiframe-0.11.1-py3-none-any.whl
+python -m pip install "./dist/equiframe-0.11.1-py3-none-any.whl[duckdb]"
 # Alternativas: [arrow], [pandas], [polars], [engines] o [ml].
 # Desde el checkout del equipo:
 python -m pip install ".[engines]"
@@ -232,7 +246,7 @@ python examples/execute_native.py --engine polars --work-dir my-runs
 ```
 
 Los esperados pequeños son explícitos e independientes de las salidas. Los ejemplos
-no son el benchmark de 60 escenarios ni aprobación científica del oráculo.
+no son el benchmark de 60 escenarios ni aprobación científica de EquiFrame Verify.
 
 ## Instalación reproducible
 
@@ -345,7 +359,7 @@ aporta dirección, ausencias y empates. Los literales float32 de comparación
 exacta deben ser representables sin redondeo ni subdesbordamiento.
 
 `ArtifactRef` describe URI, SHA-256, formato, tamaño y esquema opcional. Rechaza
-credenciales, query y fragmentos de URI. La referencia declara metadatos; el almacén local verifica hash y tamaño al copiar. `ArtifactStore`, `DataSource` y `EngineAdapter` tienen tipos completos e implementaciones locales. Snapshots remotos, reglas ejecutables, perfiles y detectores se definen en pasos posteriores.
+credenciales, query y fragmentos de URI. La referencia declara metadatos; el almacén local verifica hash y tamaño al copiar. `ArtifactStore`, `DataSource` y `EngineAdapter` tienen tipos completos e implementaciones locales. Snapshots remotos se inyectan mediante proveedores explícitos; reglas, perfiles y detectores ya tienen API propia. El servicio real del equipo sigue pendiente.
 Se valida sintaxis de puertos, separadores y escapes porcentuales; solo HTTPS
 admite puerto explícito. Se aceptan IPv6 y rutas con espacios codificados.
 
@@ -417,8 +431,8 @@ uv run --locked --all-extras python tools/verify_distribution.py
 ```
 
 El backend y sus dependencias están en el lock; `--no-isolation` usa ese entorno.
-Build produce `dist/equiframe-0.4.0-py3-none-any.whl` y
-`dist/equiframe-0.4.0.tar.gz`. El verificador crea entornos temporales fuera del checkout, instala dependencias runtime del lock y el wheel sin editable,
+Build produce `dist/equiframe-0.11.1-py3-none-any.whl` y
+`dist/equiframe-0.11.1.tar.gz`. El verificador crea entornos temporales fuera del checkout, instala dependencias runtime del lock y el wheel sin editable,
 comprueba `py.typed` e importación sin motores/ML/dev, valida cinco ejemplos por
 CLI y reconstruye desde el sdist comparando todos los bytes del wheel.
 También instala cada extra y la combinación engines sin editable, ejecuta los ejemplos copiados fuera del checkout y comprueba roundtrips de API y errores/códigos de CLI instalada, ejecuta
@@ -433,7 +447,7 @@ uv run --locked --all-extras python tools/generate_assets.py
 ```
 
 Cambiar dependencias exige resolver un nuevo lock y repetir CI. `pip install
-dist/equiframe-0.4.0-py3-none-any.whl` funciona, pero solo el lock reproduce el
+dist/equiframe-0.11.1-py3-none-any.whl` funciona, pero solo el lock reproduce el
 entorno comprobado. Los fixtures no fijan cohorte, escala monetaria real, alpha
 ni tamaño del benchmark. Detectores y perfiles permanecen fuera de esta versión.
 
@@ -480,7 +494,7 @@ python examples/compare_local.py --work-dir comparison-runs
 defecto (índices separados no evaluables). Permisos suplementarios requieren
 justificación: `column_order="ignored"`, `physical_types="lossless"` o
 `index="ignore"`. Son parte de `ComparisonSpec`, documento independiente 1.0;
-no cambian bytes/huellas de Contract 1.0. La versión del paquete es 0.7.0 y la
+no cambian bytes/huellas de Contract 1.0. La versión actual del paquete es 0.11.1 y la
 revisión del contrato conserva su función propia.
 
 Se verifican datos y restricciones del esquema de salida, incluidas claves antes
@@ -506,7 +520,7 @@ comprobar sus bytes. Los detalles normativos están en
 
 El alcance declarado es `output_schema`: no ejecuta reglas/precondiciones R,
 perfiles, M/B/H ni revisión O. Dos motores pueden coincidir en un error. La CLI
-operacional y la evaluación experimental continúan en sus pasos posteriores.
+operacional ya tiene `run_pipeline`; la evaluación científica mantiene sus gates humanos y empíricos.
 El verificador de distribución ejecuta estos ejemplos y la comparación entre
 motores desde wheel instalado fuera del checkout, además del consumidor mypy.
 
@@ -577,3 +591,84 @@ Cada ruta de bundle es nueva; no se sobrescribe. [Guía de detectores](../../doc
 y [diseño del paso 7](../../docs/STEP_07_DESIGN.md) detallan estados, fórmulas,
 independencia, persistencia y límites. Los ejemplos no acreditan normalidad
 científica ni el control poblacional de falsas alarmas. PyPI sigue pendiente.
+
+## Migración nativa desde 0.10.0
+
+`ef.migrate` ejecuta un plan relacional declarado en origen y destino, compara
+salidas y permite verificarlas contra un esperado capturado por separado.
+`ef.check_migration` comprueba metadatos sin ETL; `ef.read_migration` valida
+la evidencia sin reejecutar motores. La [guía de EquiFrame Migrate](../../docs/MIGRATION.md)
+describe IR, API/CLI, componentes requeridos, extensiones y límites reales.
+
+Con el extra `engines`, el ejemplo sintético comprueba las seis direcciones:
+
+```bash
+python examples/migrate_native.py --output migration-runs
+```
+
+`require_rules=True` conserva R como requisito; `False` permite exigir solo
+los componentes solicitados y mantiene los estados originales de R/H.
+Equivalencia entre motores no acredita corrección independiente. No se entrena
+durante la migración ni se traduce código Python/SQL arbitrario.
+
+## Verify y recorrido ETL de 0.11.1
+
+El extra `arrow` permite verificar artefactos externos sin motores. `engines`
+permite el recorrido nativo completo. La instalación base sigue sin cargar
+Arrow, Pandas, Polars, DuckDB, NumPy o sklearn al importar `equiframe`.
+
+Desde un sdist extraído, con el wheel instalado en un entorno externo:
+
+```bash
+python -I examples/verify_generic.py --output verify-example
+python -I examples/retail_etl.py --output retail-example
+python -I examples/sercop_etl.py --snapshot examples/sercop_offline --expected examples/sercop_offline/expected.json --output sercop-example
+```
+
+El primer ejemplo demuestra dos salidas coincidentes pero erróneas frente a un
+esperado literal: acuerdo `passed`, esperado `failed`, carga bloqueada. El segundo
+ingiere CSV de comercio, conserva IDs y dinero exacto, ejecuta dos checkpoints,
+verifica esperados y publica Parquet de forma idempotente. El tercero es una
+fixture **sintética** OCDS sin red; el [caso real fijado](https://github.com/htroya/equiframe/blob/main/docs/SERCOP_EXAMPLE.md)
+usa el mismo consumidor con un snapshot externo, sin descargar implícitamente.
+
+API: `verify`, `verify_migration`, `read_verification`, `verification_summary`,
+`ingest_file`, `FileInput`, `run_workflow`, `read_workflow`, `ParquetDestination`,
+`export_bundle`, `import_bundle`, `read_bundle`, `inspect_bundle`. Se mantienen
+`compare`, `execute`, `run_pipeline` y APIs de migración existentes.
+
+```text
+equiframe verify validate request.json
+equiframe verify run request.json --output evidence
+equiframe verify migration migration_run --output evidence
+equiframe verify inspect verification_run
+equiframe ingestion run ingestion-spec.json source.csv --output evidence
+equiframe workflow validate workflow-request.json
+equiframe workflow run workflow-request.json --output evidence
+equiframe workflow inspect workflow_run
+equiframe bundle export workflow_run portable
+equiframe bundle import portable relocated
+equiframe bundle verify relocated --sha256 SHA256_DEL_MANIFIESTO
+```
+
+Run: 0 aprobación, 1 incumplimiento, 2 configuración inválida, 3 fallo/no evaluable.
+Inspect/verify de expedientes: 0 integridad, 3 corrupción; su 0 conserva y muestra
+fallos semánticos. Ingestión: 0 completa, 1 rechazada/cuarentena, 2 especificación
+inválida, 3 error operativo. JSON de solicitudes contiene datos y referencias,
+nunca código, callbacks o importaciones de plugins.
+
+Verify separa entradas, finalización técnica, integridad, acuerdo, cada salida
+vs esperado, R, cobertura y O. El puente científico opcional está en el benchmark.
+Nombres declarados no autentican revisores; hashes no acreditan verdad. O exige
+independencia y revisiones aplicables; no se deriva del éxito operacional.
+
+El soporte común es explícito: aritmética exacta acotada, coalesce, condiciones,
+concat, deduplicación de filas completas y semi/anti join. Right/full, timestamps
+en IR, división y decimal multiply se rechazan. Timestamps sí tienen importador
+exacto y APIs de comparación existentes. No hay traducción arbitraria de programas,
+resume de workflow, cuotas RSS duras o transacciones distribuidas.
+
+Guías del monorepo: [Verify](https://github.com/htroya/equiframe/blob/main/docs/VERIFY.md),
+[ETL](https://github.com/htroya/equiframe/blob/main/docs/ETL.md),
+[matriz](https://github.com/htroya/equiframe/blob/main/docs/SEMANTIC_SUPPORT.md),
+[preparación de release](https://github.com/htroya/equiframe/blob/main/docs/RELEASE_CANDIDATE.md).

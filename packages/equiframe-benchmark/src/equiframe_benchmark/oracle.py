@@ -12,6 +12,7 @@ from equiframe_benchmark.models import (
     InputBinding,
     Label,
     OracleResult,
+    OracleVerificationBridge,
     Review,
     ReviewAssignment,
     ReviewPacket,
@@ -181,4 +182,83 @@ def evaluate_oracle(
         resolution=resolution,
         mutation_effect=effect,
         reason=reason,
+    )
+
+
+def oracle_verification_bridge(
+    scenario: Scenario,
+    candidate: Candidate,
+    oracle: OracleResult,
+    *,
+    output_name: str,
+    plan_sha256: str,
+    independence_declared: bool = False,
+    derived_from_engines: tuple[str, ...] = (),
+) -> OracleVerificationBridge:
+    """Bind existing scientific evidence to reusable Verify without changing O.
+
+    The caller supplies the frozen plan identity and declares the expected's
+    construction dependency. Existing reviews remain captured declarations;
+    this bridge neither creates decisions nor authenticates people.
+    """
+    from equiframe.serialization import contract_fingerprint
+    from equiframe.verify_types import (
+        ExpectedProvenance,
+        IndependentReviewEvidence,
+        VerificationBinding,
+        VerificationReview,
+    )
+
+    oracle = OracleResult.model_validate(oracle)
+    validate_packet(scenario, candidate, oracle.packet)
+    if oracle.scenario_sha256 != digest(scenario) or oracle.candidate_sha256 != digest(candidate):
+        raise ValueError("oracle belongs to different scenario/candidate identities")
+    if oracle.candidate_kind != candidate.kind:
+        raise ValueError("oracle candidate kind differs")
+    if oracle.assignment:
+        validate_assignment(scenario, candidate, oracle.packet, oracle.assignment)
+    binding = VerificationBinding.model_validate(
+        dict(
+            contract_sha256=contract_fingerprint(scenario.comparison.contract),
+            snapshots=tuple((i.name, i.artifact.sha256) for i in scenario.inputs),
+            plan_sha256=plan_sha256,
+            outputs=((output_name, candidate.output.sha256),),
+            expected_sha256=scenario.expected.sha256,
+        )
+    )
+    provenance = ExpectedProvenance.model_validate(
+        dict(
+            expected_sha256=scenario.expected.sha256,
+            method=scenario.expected_method,
+            authors=scenario.expected_authors,
+            implementation_authors=tuple(dict.fromkeys((*scenario.authors, *candidate.authors))),
+            independence_declared=independence_declared,
+            derived_from_engines=derived_from_engines,
+        )
+    )
+    review = None
+    if oracle.assignment:
+        assignment = oracle.assignment
+        review = IndependentReviewEvidence.model_validate(
+            dict(
+                binding=binding,
+                output=output_name,
+                packet_sha256=oracle.packet_sha256,
+                source_document_sha256=digest(oracle),
+                reviewers=assignment.reviewers,
+                arbitrator=assignment.arbitrator,
+                assigned_at=assignment.assigned_at,
+                reviews=tuple(
+                    VerificationReview.model_validate(r.model_dump(exclude={"schema_version"}))
+                    for r in oracle.reviews
+                ),
+                resolution=VerificationReview.model_validate(
+                    oracle.resolution.model_dump(exclude={"schema_version"})
+                )
+                if oracle.resolution
+                else None,
+            )
+        )
+    return OracleVerificationBridge(
+        oracle_sha256=digest(oracle), binding=binding, provenance=provenance, review=review
     )

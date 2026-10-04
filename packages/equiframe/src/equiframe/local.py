@@ -2,6 +2,9 @@
 
 import hashlib
 import os
+from collections.abc import Iterator, Mapping
+from contextlib import contextmanager
+from contextvars import ContextVar
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 from urllib.request import url2pathname
@@ -12,9 +15,25 @@ from equiframe.errors import ArtifactIntegrityError, ArtifactIOError, Capability
 from equiframe.types import ArtifactRef
 
 _FORMATS = {".json": "json", ".jsonl": "jsonl", ".arrow": "arrow", ".parquet": "parquet"}
+_BUNDLE_PATHS: ContextVar[Mapping[str, Path] | None] = ContextVar("bundle_paths", default=None)
+
+
+@contextmanager
+def _bundle_paths(paths: Mapping[str, Path]) -> Iterator[None]:
+    """Resolve only verified bundle members, restoring scope even after a failure."""
+    token = _BUNDLE_PATHS.set(dict(paths))
+    try:
+        yield
+    finally:
+        _BUNDLE_PATHS.reset(token)
 
 
 def local_path(ref: ArtifactRef) -> Path:
+    mapping = _BUNDLE_PATHS.get()
+    if mapping is not None:
+        if ref.uri not in mapping:
+            raise ArtifactIntegrityError("artifact reference is outside the portable inventory")
+        return mapping[ref.uri]
     parts = urlsplit(ref.uri)
     if parts.scheme != "file" or parts.netloc not in ("", "localhost"):
         raise CapabilityError("only local file URIs are supported; remote access is unavailable")

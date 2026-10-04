@@ -8,11 +8,21 @@ from typing import cast
 
 import typer
 
+from equiframe.bundle import export_bundle, import_bundle, inspect_bundle
 from equiframe.comparison import compare
 from equiframe.comparison_types import ComparisonSpec
 from equiframe.detectors import read_detector_bundle
-from equiframe.errors import ContractIOError, ContractValidationError
+from equiframe.errors import CapabilityError, ContractIOError, ContractValidationError
 from equiframe.evidence import inspect_evidence, load_json, read_pipeline
+from equiframe.ingestion import IngestionSpec, ingest_file
+from equiframe.migration import (
+    MigrationRequest,
+    MigrationSpec,
+    check_migration,
+    migrate,
+    migration_summary,
+    read_migration,
+)
 from equiframe.pipeline import run_pipeline
 from equiframe.pipeline_types import PipelineRequest
 from equiframe.reduction import ReductionObservation, ReductionOptions, reduce_case
@@ -20,12 +30,250 @@ from equiframe.registry import TransformationRegistry
 from equiframe.reporting import pipeline_summary, write_report
 from equiframe.serialization import contract_fingerprint, read_contract
 from equiframe.tables import ArrowInput, LocalDataSource, read_table
+from equiframe.verification_request import VerificationRequest
+from equiframe.verify import read_verification, verification_summary, verify, verify_migration
+from equiframe.workflow import read_workflow, run_workflow
+from equiframe.workflow_request import WorkflowRequest
 
 app = typer.Typer(no_args_is_help=True, add_completion=False, pretty_exceptions_enable=False)
 contract_app = typer.Typer(no_args_is_help=True)
 app.add_typer(contract_app, name="contract", help="Validate semantic contract metadata.")
 evidence_app = typer.Typer(no_args_is_help=True)
 app.add_typer(evidence_app, name="evidence", help="Verify final or interrupted evidence.")
+migration_app = typer.Typer(no_args_is_help=True)
+app.add_typer(migration_app, name="migration", help="Compile, migrate and compare native ETL.")
+verify_app = typer.Typer(no_args_is_help=True)
+app.add_typer(verify_app, name="verify", help="Inspect semantic dimensions without executing ETL.")
+bundle_app = typer.Typer(no_args_is_help=True)
+app.add_typer(bundle_app, name="bundle", help="Export, import and verify portable evidence.")
+ingestion_app = typer.Typer(no_args_is_help=True)
+app.add_typer(ingestion_app, name="ingestion", help="Parse explicit CSV/JSON/JSONL contracts.")
+workflow_app = typer.Typer(no_args_is_help=True)
+app.add_typer(workflow_app, name="workflow", help="Run dependent native ETL checkpoints.")
+
+
+@ingestion_app.command("run")
+def ingestion_run(
+    spec: Path, source: Path, output: Path = typer.Option(Path("equiframe-runs"))
+) -> None:
+    """Preserve and ingest a file. Exit 0 complete, 1 quarantine/rejected, 2 invalid, 3 I/O."""
+    try:
+        result = ingest_file(source, spec=load_json(IngestionSpec, spec), work_dir=output)
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(result.model_dump_json())
+    raise typer.Exit(code=0 if result.state == "completed" else 1)
+
+
+@workflow_app.command("validate")
+def workflow_validate(request: Path) -> None:
+    """Validate bindings and both native compilers without reading inputs. Exit 0/2/3."""
+    try:
+        document = load_json(WorkflowRequest, request)
+        checks = tuple(
+            check for stage in document.spec.stages for check in check_migration(stage.migration)
+        )
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(
+        json.dumps(
+            {"compilation_only": True, "checks": [c.model_dump(mode="json") for c in checks]}
+        )
+    )
+    raise typer.Exit(code=0 if all(c.supported for c in checks) else 2)
+
+
+@workflow_app.command("run")
+def workflow_run(request: Path, output: Path = typer.Option(Path("equiframe-runs"))) -> None:
+    """Execute native migration checkpoints over fixed inputs. Exit 0/1/2/3."""
+    try:
+        document = load_json(WorkflowRequest, request)
+        result = run_workflow(
+            document.spec,
+            source=LocalDataSource({item.name: item.artifact for item in document.inputs}),
+            expected={item.stage_id: item.artifact for item in document.expected},
+            work_dir=output,
+        )
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(result.model_dump_json())
+    raise typer.Exit(code=result.exit_code)
+
+
+@workflow_app.command("inspect")
+def workflow_inspect(directory: Path) -> None:
+    """Verify recorded ETL evidence without execution. Exit 0 intact, 3 corrupt."""
+    try:
+        result = read_workflow(directory)
+    except Exception as error:
+        _failure(error, input_validation=False)
+        return
+    typer.echo(result.model_dump_json())
+
+
+@verify_app.command("validate")
+def verification_validate(request: Path) -> None:
+    """Validate data-only request metadata; does not inspect artifact bytes. Exit 0/2/3."""
+    try:
+        document = load_json(VerificationRequest, request)
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(
+        json.dumps(
+            {"metadata_valid": True, "contract_sha256": contract_fingerprint(document.contract)}
+        )
+    )
+
+
+@verify_app.command("run")
+def verification_run(request: Path, output: Path = typer.Option(Path("equiframe-runs"))) -> None:
+    """Verify one or more existing artifacts. Exit 0 passed, 1 failed, 2 invalid, 3 unavailable."""
+    try:
+        document = load_json(VerificationRequest, request)
+        result = verify(
+            {item.name: item.artifact for item in document.outputs},
+            contract=document.contract,
+            expected=document.expected,
+            provenance=document.provenance,
+            reviews=document.reviews,
+            request_review=document.request_review,
+            require_expected=document.require_expected,
+            require_rules=document.require_rules,
+            snapshots={item.name: item.artifact for item in document.snapshots},
+            plan_sha256=document.plan_sha256,
+            policy=document.policy,
+            options=document.options,
+            work_dir=output,
+        )
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(json.dumps(verification_summary(result), sort_keys=True))
+    raise typer.Exit(code=result.exit_code)
+
+
+@verify_app.command("migration")
+def verification_migration(
+    directory: Path, output: Path = typer.Option(Path("equiframe-runs"))
+) -> None:
+    """Verify outputs of an existing migration. Exit 0/1/2/3; never reruns engines."""
+    try:
+        result = verify_migration(directory, work_dir=output)
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(json.dumps(verification_summary(result), sort_keys=True))
+    raise typer.Exit(code=result.exit_code)
+
+
+@verify_app.command("inspect")
+def verification_inspect(directory: Path) -> None:
+    """Verify evidence integrity and report its semantic states. Exit 0 intact, 3 corrupt."""
+    try:
+        result = read_verification(directory)
+    except Exception as error:
+        _failure(error, input_validation=False)
+        return
+    typer.echo(
+        json.dumps({**verification_summary(result), "integrity_verified": True}, sort_keys=True)
+    )
+
+
+@bundle_app.command("export")
+def bundle_export(source: Path, destination: Path) -> None:
+    """Export a finalized migration, verification or workflow. Exit 0/2/3."""
+    try:
+        result = export_bundle(source, destination)
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(result.model_dump_json())
+
+
+@bundle_app.command("import")
+def bundle_import(source: Path, destination: Path, sha256: str | None = typer.Option(None)) -> None:
+    """Copy a portable bundle and verify it again without ETL. Exit 0/2/3."""
+    try:
+        result = import_bundle(source, destination, expected_sha256=sha256)
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(result.model_dump_json())
+
+
+@bundle_app.command("verify")
+def bundle_verify(directory: Path, sha256: str | None = typer.Option(None)) -> None:
+    """Verify closed inventory and semantic receipts. Exit 0 intact, 3 corrupt."""
+    try:
+        result = inspect_bundle(directory, expected_sha256=sha256)
+    except Exception as error:
+        _failure(error, input_validation=False)
+        return
+    typer.echo(json.dumps(result, sort_keys=True))
+
+
+@migration_app.command("validate")
+def migration_validate(spec: Path) -> None:
+    """Validate IR/contract support for both engines without executing or loading inputs."""
+    try:
+        document = load_json(MigrationSpec, spec)
+        checks = check_migration(document)
+    except CapabilityError:
+        typer.echo("unsupported_capability", err=True)
+        raise typer.Exit(code=2) from None
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(
+        json.dumps(
+            {
+                "compilation_only": True,
+                "checks": [c.model_dump(mode="json") for c in checks],
+            },
+            sort_keys=True,
+        )
+    )
+    raise typer.Exit(code=0 if all(c.supported for c in checks) else 2)
+
+
+@migration_app.command("run")
+def migration_run(
+    request: Path,
+    output: Path = typer.Option(Path("equiframe-runs")),
+    bundle: Path | None = typer.Option(None),
+) -> None:
+    """Execute two native plans over fixed inputs; optionally compare a supplied expected."""
+    try:
+        document = load_json(MigrationRequest, request)
+        result = migrate(
+            document.spec,
+            source=LocalDataSource({i.name: i.artifact for i in document.inputs}),
+            expected=document.expected,
+            work_dir=output,
+            detector_bundle=read_detector_bundle(bundle) if bundle else None,
+        )
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(json.dumps(migration_summary(result), sort_keys=True))
+    raise typer.Exit(code=result.exit_code)
+
+
+@migration_app.command("verify")
+def migration_verify(directory: Path) -> None:
+    """Verify bundle integrity without ETL; exit 0 does not certify correctness."""
+    try:
+        result = read_migration(directory)
+    except Exception as error:
+        _failure(error, input_validation=False)
+        return
+    typer.echo(
+        json.dumps({**migration_summary(result), "integrity_verified": True}, sort_keys=True)
+    )
 
 
 @contract_app.command("validate")

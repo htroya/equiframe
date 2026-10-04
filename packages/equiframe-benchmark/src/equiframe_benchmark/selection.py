@@ -99,7 +99,9 @@ def _select_normal(
         ef.read_table(oracle.packet.expected)
         ef.read_table(oracle.packet.candidate)
         # Verify the comparison evidence file too, not just metadata fingerprints.
-        tuple(ef.iter_differences(oracle.comparison.differences))
+        difference_count = sum(1 for _ in ef.iter_differences(oracle.comparison.differences))
+        if difference_count != oracle.comparison.counts.difference_records:
+            raise ValueError("oracle difference inventory disagrees with recorded counts")
         vectors.append(profile.vector)
         records.append(
             TrainingRecord(

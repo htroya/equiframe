@@ -1,8 +1,15 @@
 # API Python y contratos de intercambio
 
-Versiones implementadas: `equiframe 0.9.0` y `equiframe-benchmark 0.10.0`, formatos independientes `1.0`, pasos 1 a 10 técnicos. El [README del
+Versiones candidatas actuales: `equiframe 0.11.1` y `equiframe-benchmark 0.11.1`, formatos independientes `1.0`, Verify operacional, migrador y ETL local. El [README del
 paquete](../packages/equiframe/README.md) contiene instalación, comandos y un
-ejemplo Python ejecutable. La aceptación del servicio real y la evaluación científica conservan sus requisitos externos.
+ejemplo Python ejecutable. Las secciones por versión conservan la evolución de la API. La aceptación del servicio real, la evaluación científica y la comprobación final de las distribuciones actuales conservan sus controles propios.
+
+El alcance científico principal comprende `nulls_types`, `joins` y `aggregations`
+en las parejas Pandas–Polars, Pandas–DuckDB y Polars–DuckDB: nueve estratos. El
+software conserva además `duplicates_order` y `dates` como capacidades genéricas.
+EquiFrame Verify es el nombre comercial de la validación independiente de
+equivalencia; la notación O y los nombres existentes `oracle`, `OracleResult`,
+`OracleState` y `evaluate_oracle` conservan compatibilidad.
 
 ## 1. API disponible
 
@@ -15,7 +22,7 @@ ejemplo Python ejecutable. La aceptación del servicio real y la evaluación cie
 | `contract_fingerprint(contract) -> str` | SHA-256 hexadecimal de esos bytes; no equivalencia tabular |
 | `contract_json_schema() -> dict[str, object]` | JSON Schema generado desde `Contract` |
 
-La API explícita está en `equiframe.__all__`; `__version__` es `0.9.0`.
+La API explícita está en `equiframe.__all__`; `__version__` es `0.11.1`.
 Los constructores usan Pydantic estricto/inmutable, rechazan extras y conservan
 colecciones como tuplas. La validación de JSON permite arrays sin introducir
 coerciones numéricas con pérdida. No se interpreta código en documentos.
@@ -46,9 +53,10 @@ coerciones numéricas con pérdida. No se interpreta código en documentos.
 La validación comprueba nombres únicos, claves/ámbitos/columnas existentes,
 referencias a tablas/precondiciones, parejas y tipos de joins, medidas/grupos
 agregados, precisión/escala, políticas compatibles, unidades, zonas IANA e
-intervalos coherentes. No procesa tablas, comprueba unicidad real, aplica
-redondeo ni ejecuta las reglas declaradas. Nuevas formas incompatibles exigen
-versión de esquema y migración expresa; no hay migración automática.
+intervalos coherentes. Esta validación de metadatos no procesa tablas ni comprueba
+unicidad real, y tampoco aplica redondeo o ejecuta las reglas declaradas. Nuevas
+formas incompatibles exigen versión de esquema y migración expresa de esos
+formatos; no hay actualización automática de documentos antiguos.
 
 Joins y agrupaciones numéricos requieren unidades iguales. `sum`/`min`/`max`
 conservan la unidad; `sum` admite tipos más amplios de la misma familia sin
@@ -128,7 +136,7 @@ paso 2. `RuleRegistry` y `RuleContext` funcionan desde el paso 4. Los perfiles y
 bundles de preprocesamiento funcionan desde el paso 5 (sección 11), sin etiquetas,
 mutaciones ni otra salida de motor. Los detectores, reportes, validación independiente
 de equivalencia, snapshots y freeze tienen APIs implementadas en las secciones
-12–16. El cliente autenticado, DW y operación del servicio siguen bajo los
+12–16; el migrador del núcleo está en la sección 17. El cliente autenticado, DW y operación del servicio siguen bajo los
 responsables y requisitos de [integración](TEAM_INTEGRATION.md).
 
 ## 6. CLI funcional y errores
@@ -345,14 +353,15 @@ decisiones completas; soporte ausente produce motivos no evaluables.
 | `ReductionOptions`, `ReductionObservation`, `ReducedTable`, `ReductionResult` | Presupuestos, precondiciones/firma, posiciones y estados de reducción |
 | `reduce_case`, `read_reduction` | Reducción por filas entre tablas y lectura de evidencia verificada |
 
-Siete esquemas nuevos 1.0. `DetectorVersions` acepta 0.7.0/0.8.0/0.8.1/0.9.0 sin cambiar el
+Siete esquemas nuevos 1.0 en el paso 8. `DetectorVersions` acepta actualmente 0.7.0/0.8.0/0.8.1/0.9.0/0.10.0/0.11.0/0.11.1 sin cambiar el
 algoritmo IF/MAD. El núcleo no importa benchmark ni acepta O como entrada del
 runner. [Uso y códigos CLI](ORCHESTRATION.md), [diseño y límites](STEP_08_DESIGN.md).
 
 ## 15. Consumidor e integración experimental en 0.9.0
 
 La implementación original del paso 9 requiere núcleo 0.8.1; la distribución
-actual `equiframe-benchmark 0.10.0` requiere núcleo 0.9.0.
+actual `equiframe-benchmark 0.11.0` requiere exactamente núcleo 0.11.0 con el extra
+Arrow. Esa dependencia no acredita la instalación final de los nuevos paquetes.
 
 | API/modelo | Comportamiento |
 |---|---|
@@ -367,7 +376,7 @@ Cinco esquemas nuevos 1.0. Los resultados no confirman etiquetas científicas.
 El contrato del cliente no implementa transporte, autenticación, DDL ni operación
 del servicio. [Diseño](STEP_09_DESIGN.md), [uso CLI](../packages/equiframe-benchmark/README.md).
 
-## 16. Congelación, evaluación y reproducción en 0.10.0
+## 16. Congelación, evaluación y reproducción desde benchmark 0.10.0
 
 Las APIs siguientes se exportan desde `equiframe_benchmark.__all__`. Sus documentos
 estrictos usan formato `1.0`; el núcleo conserva sus formatos y no recibe etiquetas O.
@@ -402,6 +411,25 @@ O confirmado requiere mismos inputs/implementación y salida fresca equivalente 
 revisada. `evaluate_records` calcula sobre registros entregados; la comprobación de
 fuentes y del freeze corresponde a las APIs de estudio, no al cálculo puro.
 
+`run_integration` captura una vez cada motor y compara las tres parejas; un
+`run_study` consume casos de un estudio congelado. Articular tres estudios por
+pareja exige preservar catálogo, grupos, splits e identidad de capturas, sin
+convertir las comparaciones reutilizadas en nuevas muestras independientes. La
+API no proporciona un consolidador científico automático ni una escala común de
+scores entre modelos diferentes. Pandas no actúa como O: el esperado y su revisión
+independiente pertenecen a EquiFrame Verify.
+
+El freeze genérico exige cinco slots de modelos, incluidos los no soportados con
+motivo explícito. El protocolo final declara las cinco familias; las dos fuera
+del alcance principal pueden quedar sin casos/bundle y deben distinguirse de los
+nueve estratos de la tesis. El corpus real, las revisiones humanas, el
+entrenamiento/calibración con soporte real y la reproducción externa siguen
+pendientes. El criterio `N_fit > 10_000` corresponde a registros reales de la matriz
+efectiva de aprendizaje; no se satisface con adjudicaciones fuente, sumas entre
+modelos, capturas reutilizadas o registros de calibration/test. Se informa N por modelo/familia, soporte y grupos,
+sin atribuir al PDF del anteproyecto un mínimo literal por familia. Un sello piloto
+no resuelve esas condiciones científicas.
+
 Los costes incluyen perfilado/inferencia M y comparación operacional sobre salidas
 ya materializadas, con su I/O y evidencia internos; excluyen lectura DW/ETL/captura
 inicial. RSS muestreado es máximo absoluto observado y límite inferior del pico,
@@ -421,3 +449,137 @@ declaradas; preserva costes crudos sin exigir tiempos/CPU/RSS idénticos. No acr
 una repetición humana independiente ni autentica revisores. `DistributionReadiness`
 mantiene `build_install_verified=False` y `publication_ready=False`: el inventario
 no acredita instalación, control del nombre, licencia resuelta o publicación PyPI.
+
+## 17. Migrador declarativo en núcleo 0.10.0
+
+El migrador compila el mismo IR cerrado a transformaciones nativas y ejecuta dos
+motores contra una captura común. Su ámbito es un plan tabular declarativo;
+no traduce Python arbitrario ni acepta SQL libre o imports de plugins desde JSON.
+El [diseño](MIGRATION_DESIGN.md) registra sus decisiones de arquitectura.
+
+| API/modelo | Contrato implementado |
+|---|---|
+| `RelationalPlan`, `Scan`, `Project`, `Filter`, `Cast`, `EquiJoin`, `Aggregate`, `Sort` | IR 1.0, DAG topológico acotado, referencias y tipos cerrados |
+| `Column`, `LiteralExpression`, `Compare`, `Boolean`, `Not`, `IsNull`, `IsNaN`, `NamedExpression`, `Measure` | Expresiones/predicados tipados; valores etiquetados mediante `ScalarValue` |
+| `validate_ir(plan, contract) -> ValidatedIR`, `ir_fingerprint(plan)` | Validación semántica de metadatos y SHA-256 canónico; sin leer datos |
+| `PlanCompiler`, `CompilationCheck`, `CompiledPlan`, `CompilerRegistry`, `native_compiler_registry()` | Compiladores registrados explícitamente; transformación nativa e identidad determinista de IR/contrato/motor |
+| `MigrationSpec` | IR, contrato, motores distintos, `require_rules`, políticas y opciones de ejecución/comparación/R/perfil/migración |
+| `MigrationOptions` | Timeout cooperativo y máximos de captura: por defecto 10 000 000 filas y 512 MiB de buffers |
+| `MigrationRequest` | Spec, entradas locales Arrow/Parquet declaradas exactamente y esperado opcional |
+| `check_migration(spec, *, compilers=None)` | Dos comprobaciones de compilación sin ETL, resolución de entradas ni imports de motores |
+| `migrate(spec, *, source, work_dir=None, expected=None, compilers=None, adapters=None, rule_registry=None, detector_bundle=None, cancellation=None)` | Captura aislada, dos pipelines nativos, comparación entre pares y verificación opcional contra esperado fijado aparte |
+| `MigrationResult`, `MigrationStage`, `migration_summary(result)` | Siete etapas, hijos/evidencia, `state`, `verification`, `complete`, `exit_code` y alcance `rules_required` |
+| `read_migration(path, *, verify=True)` | Lectura local con integridad física y enlaces de evidencia; no ejecuta ETL |
+
+Los compiladores Pandas, Polars y DuckDB cargan sus bibliotecas de motor sólo al
+usarlas. El registro admite extensiones confiables mediante `PlanCompiler` y
+`EngineAdapter`; registrar un compilador no declara soportadas sus capacidades.
+Las identidades compiladas vinculan IR, contrato y semántica versionada del
+compilador. No hay fallback a un resultado calculado por otro motor.
+
+El IR admite joins inner/left con igualdad de claves NULL explícita, grupos NULL
+retenidos/descartados, sumas vacías NULL/cero y orden/empates declarados. Cast
+preserva identidad o amplía enteros/precisión decimal sin cambiar escala. SUM usa
+enteros o Decimal exactos; min/max conservan tipo y las unidades se cotejan.
+El rango común decimal es precisión hasta 38; timestamps, claves de
+join/agrupación/orden float y SUM/min/max float no están soportados en este IR.
+`count_valid` sí admite columnas float. Fechas y
+otras representaciones físicas se comprueban para ambos motores antes de ejecutar
+cualquiera. Polars usa una cota conservadora de SUM que puede rechazar sumas con
+cancelación segura. DuckDB rechaza Aggregate o Sort con rechazo de empates si un
+nodo posterior distinto de Sort pudiera podar errores intermedios; no simula
+semántica eager. Identificadores incompatibles, tipos fuera del rango o pérdidas
+de precisión producen diagnósticos explícitos, sin conversión silenciosa.
+
+Antes de ejecutar, el runner comprueba ambos compiladores, dependencias y
+capacidades; luego resuelve cada tabla una sola vez y comprueba tipos/valores y
+restricciones físicas para los dos motores. Las entradas no se normalizan ni
+modifican. Un índice Pandas significativo se rechaza; descartar RangeIndex exige
+política explícita y justificación. El esperado se copia una vez, no alimenta
+perfiles/detectores y no participa como entrada del ETL. R, perfiles y M/B/H se
+reutilizan sin entrenar; aportar un detector bundle es opcional.
+
+`require_rules=True` es el default y exige la completitud de cada pipeline.
+`require_rules=False` debe declararse explícitamente: exige ETL y los perfiles/
+detectores solicitados, conserva R/H no evaluables o alertas parciales y no cambia
+el `complete` ni `exit_code` de los `PipelineResult` hijos. Un conjunto vacío de
+reglas sigue sin acreditar R. El resumen hace visible ese alcance.
+
+El resumen ampliado conserva `independent_verification` como clave histórica y
+añade `expected_output_comparison`, así como el estado/completitud/ID/conteo de
+cada comparación origen–destino, origen–esperado y destino–esperado.
+`equiframe_verify` identifica EquiFrame Verify (O) y conserva `not_established`:
+comparar el esperado aportado no acredita su autoría independiente ni las dos
+revisiones humanas. No se convierte ese estado en una etiqueta ni se incorpora O
+al vector de aprendizaje. Los reportes previos completos siguen siendo legibles.
+
+| Campo/código | Significado |
+|---|---|
+| `state` | `equivalent`, `different`, `not_evaluable`: comparación entre los dos motores |
+| `verification` | `correct`, `divergent`, `not_evaluable`, `not_requested`: comparación con el esperado declarado |
+| `complete` | Completitud de las etapas exigidas por el alcance, incluida verificación si se pidió |
+| run 0 | Completo sin alerta/diferencia |
+| run 1 | Completo con alerta/diferencia |
+| run 2 | Entrada/capacidad/dependencia inválida en preflight o captura |
+| run 3 | Parcial/no evaluable |
+
+La CLI ofrece `equiframe migration validate SPEC.json`, `migration run
+REQUEST.json --output DIR` y `migration verify DIR`; run admite `--bundle` para
+inferencia con detectores congelados. Validate comprueba metadatos/compilación;
+verify usa 0 si la evidencia local es íntegra, incluso si la corrida almacenada es
+parcial, y 3 si falla esa comprobación.
+
+El lector verifica inventario cerrado, tamaños/SHA antes de decodificar,
+secuencia de eventos, configuración y referencias de hijos, filas/esquema/NULL/
+NaN/índice físicos, captura, snapshots de comparación y diferencias/reportes.
+Integridad no autentica al autor o revisor, ni certifica independencia/corrección
+del esperado. Dos motores equivalentes pueden compartir el mismo error.
+
+Los `ArtifactRef` conservan URI locales absolutas; la evidencia del migrador no
+es un bundle portátil del benchmark. Los presupuestos y la cancelación son
+cooperativos; resolver/materializar entradas puede asignar memoria antes del
+checkpoint. No se promete cuota dura de RSS ni preempción de callbacks. Los
+controles reales de wheel/sdist/instalación y sus límites están registrados en la
+[revisión del migrador](MIGRATION_REVIEW.md), que distingue los controles del
+núcleo y del benchmark. La publicación sigue pendiente.
+
+## APIs aditivas 0.11.0
+
+| API / formato | Contrato y evidencia |
+|---|---|
+| `verify` / `VerificationRequest`, `VerificationResult` | Artefactos/ejecuciones externos; entradas, técnica, integridad, acuerdo, esperado, R, cobertura y O separados |
+| `verify_migration`, `read_verification`, `verification_summary` | Adaptar expediente sin ETL; lector cerrado reconstruye decisiones y vínculos |
+| `ExpectedProvenance`, `IndependentReviewEvidence` | Método/autores/dependencia declarados y revisión ligada a hashes; no autenticación humana |
+| `ingest_file`, `FileInput`, `IngestionSpec`, `IngestionResult` | CSV/JSON/JSONL de esquema explícito, fuente original y recibos; grano/rutas declarados |
+| `run_workflow`, `read_workflow`, `WorkflowRequest`, `WorkflowResult` | Captura única, dependencias/checkpoints, fallo y etapas saltadas; sin resume |
+| `Destination`, `ParquetDestination`, `LoadReceipt` | Publicación local de tablas verificadas, staging, versiones, idempotencia y puntero |
+| `export_bundle`, `import_bundle`, `read_bundle`, `inspect_bundle` | Inventario cerrado, relocalización y lectura sin callbacks de Verify/migración/workflow |
+| `OracleVerificationBridge`, `oracle_verification_bridge` (benchmark) | Puente científico preservando APIs previas; core sin dependencia de benchmark |
+
+Se añaden once JSON Schema públicos y las solicitudes CLI son datos tipados.
+`WorkflowInputBinding` evita confusión con bindings internos de ejecución;
+`IngestionConversionReceipt` evita colisión con recibos históricos de perfiles.
+`Arithmetic`, `Coalesce`, `Conditional`, `Concatenate`, `Deduplicate` y semi/anti
+join amplían el IR común. [Soporte por prueba](SEMANTIC_SUPPORT.md),
+[Verify](VERIFY.md) y [ETL](ETL.md) definen restricciones y códigos de salida.
+
+Los formatos previos de migración no se reescriben: el bundle conserva sus bytes
+y resuelve URI históricas sólo a miembros capturados de hash/tamaño idénticos.
+Un hash confiable externo puede fijar el manifiesto del bundle. Campos nuevos de
+expedientes 0.11.0 no se anuncian como lectores de candidatos intermedios privados.
+
+## Revisión compatible 0.11.1
+
+`equiframe_benchmark.evaluate_pairwise(report) -> PairwiseReport` deriva seis
+soportes descriptivos R/M/B/H desde un EvaluationReport validado. Conserva el
+informe/digest/protocolo original y recalcula sus métricas al leer; incorpora
+un JSON Schema propio 1.0, sin cambiar EvaluationReport ni los seis CSV.
+O debe estar confirmado y ambos métodos completos; alertas parciales y motivos
+de exclusión permanecen visibles. El resultado conserva `scientific=False` y
+no reemplaza una congelación previa. [Semántica y ejemplo](PAIRWISE_EVALUATION.md).
+
+Ingestión y operaciones decimales nativas/R usan contexto propio sin alterar
+el del consumidor; pérdida de escala/rango sigue siendo rechazo. La expansión
+JSON y el registro de errores de parser respetan max_records. No se añaden
+formatos de ejecución, tipos de dominio ni permisos del servicio/DW.
+[Pruebas completas y compatibilidad](COMPREHENSIVE_REVIEW_20261003.md).

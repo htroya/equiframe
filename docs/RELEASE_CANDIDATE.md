@@ -1,0 +1,164 @@
+# Candidatos Python 0.11.1
+
+Dos distribuciones: `equiframe==0.11.1` y `equiframe-benchmark==0.11.1`.
+El benchmark fija exactamente el núcleo en base/extras; `uv` usa una fuente
+local sólo para desarrollo. Los metadatos publicados del wheel contienen la
+dependencia por nombre/version y ninguna obligación de ruta local.
+
+Python declarado **`>=3.12,<3.13`**. Esta entrega verifica Windows x64/Python
+3.12.4; no amplía versiones/plataformas. Hatchling 1.28.0, locks por paquete,
+Twine 6.2.0 resuelto desde `>=6.2,<7` y `py.typed`. El import base no carga Arrow,
+Pandas, Polars, DuckDB, NumPy o sklearn; cada extra se comprueba por separado.
+Los rangos anunciados conservan su metadata, pero la prueba ejecuta versiones
+resueltas del lock, no cada combinación de todo el rango.
+
+## Construcción y controles
+
+Desde cada paquete, con un ejecutable `uv` realmente disponible:
+
+```bash
+uv sync --locked --all-extras --python 3.12
+uv run --locked --all-extras ruff check .
+uv run --locked --all-extras ruff format --check .
+uv run --locked --all-extras mypy
+uv run --locked --all-extras python tools/generate_assets.py --check
+uv run --locked --all-extras pytest -q
+uv run --locked --all-extras python -m build --no-isolation
+uv run --locked --all-extras twine check --strict dist/*.whl dist/*.tar.gz
+uv run --locked --all-extras python tools/verify_distribution.py --uv /ruta/al/uv
+```
+
+El verificador existente se amplía, conserva imports ligeros/consumidor tipado,
+API/CLI, extras, instalación runtime-only fuera del checkout, ejemplos nativos,
+suite enviada contra site-packages y reconstrucción byte a byte de wheel desde
+sdist. Arrow ejecuta el ejemplo Verify; engines ejecuta comercio y OCDS sintético.
+El benchmark comprueba puente, piloto y ejemplos de integración/evaluación, sin
+contarlos como evidencia científica real.
+
+El wheel incluye módulos/resources runtime; el sdist incluye además tests,
+ejemplos, esquemas, herramientas, lock y changelog. Los READMEs del wheel
+explican que enlaces del monorepo privado pueden requerir acceso. La licencia
+y documentación pública requieren decisión antes de distribuir públicamente.
+
+`tools/check_candidate.py`, situado en el paquete núcleo, guarda comandos,
+logs, fechas, duración, directorio de ejecución y exit codes; se detiene al
+fallo. Su opción `--package` permite comprobar el benchmark. El helper
+`tools/release_manifest.py` identifica versión, wheel/sdist, SHA-256/tamaño,
+entorno, herramientas, fuente Git y recibos de ejecución. Desde
+`packages/equiframe`, por ejemplo:
+
+```bash
+uv run --locked --all-extras python tools/release_manifest.py --checks /ruta/checks-core.json --output /ruta/core-manifest.json
+uv run --locked --all-extras python tools/release_manifest.py --package ../equiframe-benchmark --checks /ruta/checks-benchmark.json --output /ruta/benchmark-manifest.json
+```
+
+La fuente debe pertenecer a un repositorio Git real: el helper resuelve
+`HEAD^{commit}` y exige sus **40 caracteres hexadecimales exactos**. Si se pasa
+`--commit`, debe coincidir íntegramente con ese HEAD. `pyproject.toml` debe estar
+versionado y el paquete comprobado debe estar limpio, sin cambios tracked ni
+archivos untracked no ignorados dentro de su propia carpeta. Esta comprobación
+se aplica también a dependencias locales `path` del paquete; las carpetas ajenas
+a ese cierre del monorepo no necesitan estar limpias. Un SHA inventado,
+otra revisión o una copia sin Git no acredita la fuente y se rechaza.
+
+Cada recibo `--checks` debe contener comandos y exit codes válidos, y su `cwd`
+debe ser absoluto y resolver exactamente a la carpeta del paquete comprobado.
+Se pueden aportar varios recibos, conservando sus hashes. Para completar el
+candidato se necesitan resultados exitosos de estas **nueve etapas**:
+`locked_sync`, `ruff_check`, `ruff_format`, `mypy`, `assets`, `pytest`, `build`,
+`twine` y `distribution`. Se reconocen los comandos completos correspondientes:
+sync locked con todos los extras, Ruff sobre el paquete completo, mypy, assets
+con `--check`, suite completa `pytest -q`, build sin aislamiento, Twine estricto
+sobre el wheel y sdist identificados y el verificador de distribución propio.
+Una prueba dirigida, nodo pytest, filtro `-k`/`-m` o colección sin ejecutar
+**no cumple la etapa pytest**, aunque termine con código 0.
+
+`check_completion` registra etapas requeridas, exitosas, ausentes y comandos
+fallidos. Recibos con cwd inválido se rechazan; etapas ausentes o cualquier
+comando fallido añaden bloqueos de publicación al manifiesto generado. No se
+convierte una ejecución parcial en distribución final aprobada. Los dos
+manifiestos locales finales de `09c3dfb` contienen nueve etapas exitosas, cero
+faltantes y cero comandos fallidos, con las suites instaladas aprobadas.
+Los cuatro bloqueos de licencia/nombre/acceso/publicación permanecen.
+[Resultados, hashes y alcance ejecutado](VERIFY_ETL_REVIEW_20261003.md).
+
+La comprobación Git acredita el HEAD y la limpieza del paquete al generar el
+manifiesto. Los recibos suministrados no autentican su ejecución ni la identidad
+del ejecutor (`receipts_authenticated=false`); los hashes identifican los bytes
+actuales de los artefactos, sin autenticar su origen de construcción. El
+manifiesto no es una firma ni concede licencia, titularidad o autorización de
+publicación. Las evidencias y los manifests locales están fuera de Git; los
+artefactos están en `dist` de cada paquete.
+
+Instalación identificada, sin resolver proyectos ajenos en un índice:
+
+```bash
+python -m pip install --no-index --find-links /ruta/wheels equiframe==0.11.1 equiframe-benchmark==0.11.1
+```
+
+Esa carpeta debe contener también las dependencias runtime necesarias; los
+verificadores crean entornos con versiones del lock antes de instalar los wheels.
+
+## Controles vinculados a los bytes actuales
+
+Desde 0.11.1 cada control registra huellas `source_before`/`source_after` de los
+archivos versionados y nuevos no ignorados del paquete y de sus dependencias
+locales declaradas en `tool.uv.sources`. El benchmark incorpora así los bytes
+del núcleo usados por sus pruebas. El driver aborta si cambian durante o entre
+controles; los locks y las versiones runtime se mantienen separados de esta
+huella de fuente. Construcción, Twine e instalación se vinculan además al
+wheel/sdist exactos, y los últimos dos exigen bytes constantes antes y después.
+La instalación del benchmark registra también el wheel exacto del núcleo en
+`dependency_artifacts_before`/`dependency_artifacts`. Un wheel ausente o
+sustituido invalida esa etapa aunque la fuente no cambie. Se soportan fuentes
+locales `path` simples dentro del repositorio; listas condicionales de fuentes
+se rechazan explícitamente para impedir omisiones silenciosas.
+
+`check_completion.source_bound_stages` contiene las etapas vinculadas a los
+bytes actuales. Las etapas sin ese vínculo aparecen en `unbound_stages` y
+bloquean publicación. Los recibos históricos siguen siendo legibles: conservar
+su comando exitoso no acredita validación del candidato nuevo. El driver usa
+una carpeta pytest propia junto al recibo para evitar colisiones entre rondas.
+Esta vinculación detecta evidencia desactualizada; conserva
+`receipts_authenticated=false` y no es una firma ni acredita ejecución externa.
+Use un recibo fuera del árbol de fuente o dentro de `dist/`, ignorado por Git;
+un recibo no ignorado escrito dentro del paquete cambia su propia huella.
+
+La [revisión integral final](COMPREHENSIVE_REVIEW_20261003.md) registra las nueve
+etapas aprobadas de ambos candidatos 0.11.1, las suites instaladas, sus tres
+omisiones Windows y los SHA-256 exactos. La evidencia 0.11.0 de `09c3dfb` citada
+arriba permanece histórica y no es la validación de estos artefactos.
+
+## CI y publicación separadas
+
+`.github/workflows/equiframe.yml` es manual y exige activar la matriz opcional.
+`.github/workflows/release-candidate.yml` construye ambos paquetes y conserva
+artefactos `equiframe-candidate-SHA`; exige `run_build=true`, desactivado por
+defecto. Sus acciones oficiales están fijadas a SHA. No se activó ningún job,
+amplió cuota ni cambió facturación; configuración no acredita ejecución.
+
+`.github/publish-prepared.yml.example` está deliberadamente fuera de `workflows`.
+Prepara un trabajo separado con environment, descarga del run identificado,
+verificación de commit, fuente limpia, nueve controles, inventario exacto de
+ambas distribuciones/hashes y OIDC `id-token: write`, siguiendo
+[Trusted Publishing](https://docs.pypi.org/trusted-publishers/using-a-publisher/).
+No recompila durante publicación y rechaza manifiestos con decisiones pendientes.
+Su activación requiere una tarea expresa posterior y adecuar las decisiones
+del manifiesto; actualmente no puede publicar.
+
+## Decisiones externas pendientes
+
+| Decisión | Resultado observado y siguiente requisito |
+|---|---|
+| Licencia | No hay licencia de distribución asignada; autores deben aprobar términos y archivos/metadata correspondientes |
+| Nombre | GET oficiales de PyPI para ambos nombres devolvieron HTTP 404 el 2026-10-03 20:16:32 UTC; no reserva ni acredita titularidad |
+| Cuenta/Trusted Publisher | No se configuró proyecto/editor en PyPI/TestPyPI ni autorización de environments |
+| Acceso público | Repo privado; decidir documentación accesible y permisos de redistribución sin cambiar visibilidad aquí |
+| Publicación | No autorizada por este encargo; wheels/sdist preparados, no publicados |
+| Aceptación externa | No se inventa ejecución por compañero ni matriz de plataformas remota |
+
+La [guía oficial de empaquetado](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
+y [Twine](https://twine.readthedocs.io/en/stable/) orientan metadatos/construcción.
+`twine check --strict` aprobado valida artefactos; no elimina decisiones de
+licencia, titularidad o publicación. La etiqueta científica O mantiene gates
+humanos separados del release.

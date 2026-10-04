@@ -89,6 +89,13 @@ print('Clean installed profile:',extra,'outside checkout; light import verified'
         shutil.copyfile(ROOT / "examples" / "compare_local.py", comparison_example)
         run([str(python), "-I", str(comparison_example)], cwd=project, env=profile_env)
         if extra == "arrow":
+            verify_example = project / "verify_generic.py"
+            shutil.copyfile(ROOT / "examples" / "verify_generic.py", verify_example)
+            run(
+                [str(python), "-I", str(verify_example), "--output", str(project / "verify-runs")],
+                cwd=project,
+                env=profile_env,
+            )
             arrow_check = r"""
 from pathlib import Path
 import pyarrow as pa
@@ -177,6 +184,49 @@ assert ef.read_table(ref).to_pylist()==[{'id':'001'},{'id':'001'}]
             if extra != "engines":
                 command += ["--engine", extra]
             run(command, cwd=project, env=profile_env)
+            if extra == "engines":
+                for name in ("retail_etl.py", "sercop_etl.py"):
+                    shutil.copyfile(ROOT / "examples" / name, project / name)
+                shutil.copytree(ROOT / "examples" / "sercop_offline", project / "sercop_offline")
+                run(
+                    [
+                        str(python),
+                        "-I",
+                        str(project / "retail_etl.py"),
+                        "--output",
+                        str(project / "retail-etl"),
+                    ],
+                    cwd=project,
+                    env=profile_env,
+                )
+                run(
+                    [
+                        str(python),
+                        "-I",
+                        str(project / "sercop_etl.py"),
+                        "--snapshot",
+                        str(project / "sercop_offline"),
+                        "--expected",
+                        str(project / "sercop_offline/expected.json"),
+                        "--output",
+                        str(project / "sercop-etl"),
+                    ],
+                    cwd=project,
+                    env=profile_env,
+                )
+                migrated_example = project / "migrate_native.py"
+                shutil.copyfile(ROOT / "examples" / "migrate_native.py", migrated_example)
+                run(
+                    [
+                        str(python),
+                        "-I",
+                        str(migrated_example),
+                        "--output",
+                        str(project / "migration-runs"),
+                    ],
+                    cwd=project,
+                    env=profile_env,
+                )
             if extra == "duckdb":
                 pipeline_example = project / "pipeline_local.py"
                 shutil.copyfile(ROOT / "examples" / "pipeline_local.py", pipeline_example)
@@ -270,6 +320,13 @@ assert callable(equiframe.profile_execution) and callable(equiframe.fit_preproce
 assert callable(equiframe.transform_profiles) and callable(equiframe.read_preprocessor)
 assert callable(equiframe.run_pipeline) and callable(equiframe.read_pipeline)
 assert callable(equiframe.reduce_case) and callable(equiframe.inspect_evidence)
+assert callable(equiframe.migrate) and callable(equiframe.read_migration)
+assert callable(equiframe.check_migration) and callable(equiframe.native_compiler_registry)
+assert callable(equiframe.verify) and callable(equiframe.verify_migration)
+assert callable(equiframe.read_verification) and callable(equiframe.export_bundle)
+assert callable(equiframe.read_bundle) and callable(equiframe.import_bundle)
+assert callable(equiframe.ingest_file) and callable(equiframe.run_workflow)
+assert callable(equiframe.read_workflow) and callable(equiframe.ParquetDestination)
 """
         run([str(python), "-I", "-c", check, package_version], cwd=work, env=env)
         api_check = """
@@ -355,6 +412,18 @@ print('Installed wheel API roundtrips all five fixtures exactly')
             "schemas/pipeline-result-1.0.schema.json",
             "schemas/reduction-result-1.0.schema.json",
             "examples/pipeline_local.py",
+            "examples/verify_generic.py",
+            "examples/retail_etl.py",
+            "examples/sercop_etl.py",
+            "examples/sercop_offline/snapshot.json",
+            "schemas/verification-request-1.0.schema.json",
+            "schemas/verification-result-1.0.schema.json",
+            "schemas/evidence-bundle-1.0.schema.json",
+            "schemas/workflow-request-1.0.schema.json",
+            "schemas/workflow-result-1.0.schema.json",
+            "schemas/ingestion-spec-1.0.schema.json",
+            "schemas/load-receipt-1.0.schema.json",
+            "tools/release_manifest.py",
         ):
             if not (source / path).is_file():
                 raise RuntimeError("sdist is missing " + path)
@@ -429,7 +498,26 @@ assert Path(equiframe.__file__).resolve().is_relative_to(Path(sys.prefix).resolv
             "def matrix(training: ef.NormalTrainingProfiles, spec: ef.ProfileSpec, "
             "profiles: tuple[ef.ProfileVector, ...]) -> ef.FeatureMatrix:\n"
             "    bundle = ef.fit_preprocessor(training, spec=spec)\n"
-            "    return ef.transform_profiles(bundle, profiles)\n",
+            "    return ef.transform_profiles(bundle, profiles)\n"
+            "def migration(spec: ef.MigrationSpec, source: ef.DataSource) -> ef.MigrationResult:\n"
+            "    return ef.migrate(spec, source=source)\n"
+            "def migration_read(path: Path) -> ef.MigrationResult:\n"
+            "    return ef.read_migration(path)\n"
+            "def verify_external(ref: ef.ArtifactRef, contract: ef.Contract) "
+            "-> ef.VerificationResult:\n"
+            "    return ef.verify({'external': ref}, contract=contract)\n"
+            "def ingest(path: Path, spec: ef.IngestionSpec, root: Path) "
+            "-> ef.IngestionResult:\n"
+            "    return ef.ingest_file(path, spec=spec, work_dir=root)\n"
+            "def workflow(spec: ef.WorkflowSpec, source: ef.DataSource, root: Path) "
+            "-> ef.WorkflowResult:\n"
+            "    return ef.run_workflow(spec, source=source, work_dir=root)\n"
+            "def load(destination: ef.Destination, ref: ef.ArtifactRef, "
+            "report: ef.VerificationResult) -> ef.LoadReceipt:\n"
+            "    return destination.publish({'table': ref}, run_id='consumer', "
+            "verifications={'table': report})\n"
+            "def bundle(source: Path, destination: Path) -> ef.EvidenceBundle:\n"
+            "    return ef.export_bundle(source, destination)\n",
             encoding="utf-8",
         )
         run(

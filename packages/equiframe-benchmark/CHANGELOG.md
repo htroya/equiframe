@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.11.1 — 2026-10-03
+
+- Reproducción portátil compara conteos/estrategia/clave con las filas capturadas,
+  usando opciones congeladas y referencia peer; lectura local preserva TableArtifact.
+- Selección normal de entrenamiento/calibración comprueba el inventario físico
+  de diferencias; puente Verify exige el tipo de candidato ligado a O.
+- API evaluate_pairwise y PairwiseReport: seis contrastes descriptivos R/M/B/H,
+  soporte confirmado común a cada pareja, denominadores, discordancias y exclusiones.
+  No modifica el freeze, las seis tablas previas ni resultados científicos.
+- Dependencia exacta de equiframe 0.11.1; ejemplo pareado y esquema JSON propios,
+  comprobados también en el consumidor instalado fuera del checkout.
+
+## 0.11.0 — 2026-10-03
+
+- Puente tipado `OracleVerificationBridge`/`oracle_verification_bridge` para
+  conservar identidades, hashes, procedencia y revisión al usar Verify del núcleo.
+  Compatibilidad de `oracle`, `OracleResult` y `evaluate_oracle` mantenida.
+- Dependencia/extras exactos `equiframe==0.11.0`, locks/esquemas compatibles,
+  Twine reproducible y verificador de consumidor limpio ampliado.
+- No altera R/M/B/H, etiquetas, entrenamiento, protocolo científico ni autentica
+  personas por nombres JSON. No publica en PyPI/TestPyPI.
+
+
+## 0.10.1 — 2026-10-03
+
+- Compatibilidad y dependencia fijada en `equiframe 0.10.0`, que añade el
+  migrador nativo. No cambia los protocolos, etiquetas ni algoritmos del estudio.
+- Lock y metadatos sincronizados; evaluación científica, revisión humana,
+  integración real y publicación PyPI conservan sus requisitos pendientes.
+- Los esquemas que incorporan `DetectorVersions` reciben el emisor 0.10.0 y
+  su nuevo default, conservando productores previos y formatos 1.0.
+
 ## 0.10.0 — 2026-10-03
 
 - Congelación de protocolos y ejecución de estudios con decisiones, esperados y

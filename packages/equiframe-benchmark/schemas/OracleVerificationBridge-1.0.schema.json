@@ -1,0 +1,306 @@
+{
+  "$defs": {
+    "ExpectedProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "authors": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Authors",
+          "type": "array"
+        },
+        "derived_from_engines": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Derived From Engines",
+          "type": "array"
+        },
+        "expected_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Expected Sha256",
+          "type": "string"
+        },
+        "implementation_authors": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Implementation Authors",
+          "type": "array"
+        },
+        "independence_declared": {
+          "default": false,
+          "title": "Independence Declared",
+          "type": "boolean"
+        },
+        "method": {
+          "minLength": 1,
+          "title": "Method",
+          "type": "string"
+        }
+      },
+      "required": [
+        "expected_sha256",
+        "method",
+        "authors"
+      ],
+      "title": "ExpectedProvenance",
+      "type": "object"
+    },
+    "IndependentReviewEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "arbitrator": {
+          "minLength": 1,
+          "title": "Arbitrator",
+          "type": "string"
+        },
+        "assigned_at": {
+          "minLength": 1,
+          "title": "Assigned At",
+          "type": "string"
+        },
+        "binding": {
+          "$ref": "#/$defs/VerificationBinding"
+        },
+        "output": {
+          "minLength": 1,
+          "title": "Output",
+          "type": "string"
+        },
+        "packet_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Packet Sha256",
+          "type": "string"
+        },
+        "resolution": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/VerificationReview"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "reviewers": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "minLength": 1,
+              "type": "string"
+            }
+          ],
+          "title": "Reviewers",
+          "type": "array"
+        },
+        "reviews": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/VerificationReview"
+          },
+          "title": "Reviews",
+          "type": "array"
+        },
+        "source_document_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Document Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "binding",
+        "output",
+        "packet_sha256",
+        "source_document_sha256",
+        "reviewers",
+        "arbitrator",
+        "assigned_at"
+      ],
+      "title": "IndependentReviewEvidence",
+      "type": "object"
+    },
+    "VerificationBinding": {
+      "additionalProperties": false,
+      "description": "Content identities; locations and names never authenticate a producer.",
+      "properties": {
+        "contract_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Contract Sha256",
+          "type": "string"
+        },
+        "expected_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Sha256"
+        },
+        "outputs": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "plan_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Plan Sha256"
+        },
+        "snapshots": {
+          "default": [],
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Snapshots",
+          "type": "array"
+        }
+      },
+      "required": [
+        "contract_sha256",
+        "outputs"
+      ],
+      "title": "VerificationBinding",
+      "type": "object"
+    },
+    "VerificationReview": {
+      "additionalProperties": false,
+      "properties": {
+        "blind_attestation": {
+          "const": true,
+          "title": "Blind Attestation",
+          "type": "boolean"
+        },
+        "label": {
+          "enum": [
+            "normal",
+            "divergent",
+            "not_evaluable"
+          ],
+          "title": "Label",
+          "type": "string"
+        },
+        "packet_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Packet Sha256",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "recorded_at": {
+          "minLength": 1,
+          "title": "Recorded At",
+          "type": "string"
+        },
+        "reviewer": {
+          "minLength": 1,
+          "title": "Reviewer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "packet_sha256",
+        "reviewer",
+        "label",
+        "reason",
+        "recorded_at",
+        "blind_attestation"
+      ],
+      "title": "VerificationReview",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Explicit content binding for reusable Verify; no human authentication.",
+  "properties": {
+    "binding": {
+      "$ref": "#/$defs/VerificationBinding"
+    },
+    "oracle_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Oracle Sha256",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/ExpectedProvenance"
+    },
+    "review": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IndependentReviewEvidence"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "oracle_sha256",
+    "binding",
+    "provenance",
+    "review"
+  ],
+  "title": "OracleVerificationBridge",
+  "type": "object"
+}

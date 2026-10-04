@@ -336,6 +336,7 @@ def reproduce_study_bundle(
             case.pipeline is None
             or case.pipeline.execution is None
             or (case.pipeline.execution.output is None)
+            or case.output_replay is None
         ):
             raise ValueError("a confirmed replay requires an actual captured output")
         original = case.pipeline.execution.output
@@ -357,11 +358,22 @@ def reproduce_study_bundle(
                 _portable_artifact(declared.candidate.output, directory, by_source),
                 contract=scenario.comparison.contract,
                 policy=scenario.comparison.policy,
-                reference="expected",
+                options=declared.pipeline.comparison_options,
+                reference="peer",
                 work_dir=Path(temporary),
             )
         if not replay.complete or replay.state != "equivalent":
             raise ValueError("confirmed portable label requires equivalent actual captured rows")
+        if (
+            replay.counts,
+            replay.strategy,
+            replay.selected_key,
+        ) != (
+            case.output_replay.counts,
+            case.output_replay.strategy,
+            case.output_replay.selected_key,
+        ):
+            raise ValueError("portable replay observations differ from actual captured rows")
     return reproduce_bundle(
         directory, regenerator=regenerate_study_record, expected_sha256=expected_sha256
     )
