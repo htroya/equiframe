@@ -1,6 +1,6 @@
 # Arquitectura de EquiFrame
 
-Estado actual: pasos 1 a 10 implementados en su alcance técnico; núcleo `0.10.0` y paquete experimental `0.10.1`. El núcleo incorpora el migrador declarativo solicitado antes del paso 11. La aceptación del servicio/DW real, el corpus, las revisiones independientes y la evaluación científica siguen pendientes. Fuente histórica del diseño: borrador identificado en [trazabilidad](THESIS_TRACEABILITY.md). La [arquitectura del paso 8](STEP_08_DESIGN.md), el [paso 9](STEP_09_DESIGN.md), la [evaluación del paso 10](STEP_10_EVALUATION.md) y el [diseño del migrador](MIGRATION_DESIGN.md) conservan sus decisiones y evidencias. Las secciones fechadas por versiones anteriores describen esa evolución; no sustituyen este estado actual.
+Estado actual: candidatos núcleo y benchmark `0.11.0`, sobre pasos 1–10 técnicos y migrador, con Verify operacional y ETL local. Las revisiones actuales contribuyen a 11–13 y la preparación de distribución sin cerrar sus criterios externos. La aceptación del servicio/DW real, el corpus, las revisiones independientes y la evaluación científica siguen pendientes. Fuente histórica del diseño: borrador identificado en [trazabilidad](THESIS_TRACEABILITY.md). La [arquitectura del paso 8](STEP_08_DESIGN.md), el [paso 9](STEP_09_DESIGN.md), la [evaluación del paso 10](STEP_10_EVALUATION.md) y el [diseño del migrador](MIGRATION_DESIGN.md) conservan sus decisiones y evidencias. Las secciones fechadas por versiones anteriores describen esa evolución; no sustituyen este estado actual.
 
 ## 1. Propósito y alcance
 
@@ -8,7 +8,7 @@ EquiFrame permite a programadores y analistas expresar qué debe conservar una t
 
 Se implementa como biblioteca Python de propósito general con contratos configurables, API `import equiframe as ef`, tipos e inyección de dependencias para proyectos externos, scripts y notebooks. La instalación base tiene utilidad propia; los motores son extras. El objetivo `pip install equiframe` exige una publicación verificable posterior. Estos requisitos de producto acordados por Hernán no se atribuyen como texto ya presente en el borrador histórico. Desarrolladores, analistas y arquitectos pueden reutilizar el núcleo sin SERCOP/OCI/DW. La extensibilidad del migrador se concreta en protocolos y registros explícitos; su IR inicial cubre una intersección de tres motores. El dominio SERCOP es un consumidor de las interfaces. El servicio, el procesamiento distribuido y la traducción de programas Python/SQL arbitrarios quedan fuera de ese IR.
 
-El alcance científico principal contiene nulos/tipos (`nulls_types`), joins (`joins`) y agregaciones (`aggregations`), cruzados con Pandas–Polars, Pandas–DuckDB y Polars–DuckDB: nueve estratos. Las cinco familias genéricas del software añaden duplicados/orden (`duplicates_order`) y fechas (`dates`) como capacidades reutilizables. Declararlas en los formatos no obliga a presentar cinco familias como resultados científicos de la tesis. EquiFrame Verify es el nombre comercial de la validación independiente de equivalencia, representada metodológicamente por O; los módulos y tipos `oracle` existentes conservan su API.
+El alcance científico principal contiene nulos/tipos (`nulls_types`), joins (`joins`) y agregaciones (`aggregations`), cruzados con Pandas–Polars, Pandas–DuckDB y Polars–DuckDB: nueve estratos. Las cinco familias genéricas del software añaden duplicados/orden (`duplicates_order`) y fechas (`dates`) como capacidades reutilizables. Declararlas en los formatos no obliga a presentar cinco familias como resultados científicos de la tesis. Verify es también una API operacional reutilizable del núcleo; su dimensión científica O conserva independencia y revisión. Los módulos y tipos `oracle` existentes mantienen su API mediante un puente tipado.
 
 ## 2. Distribuciones y dependencias
 
@@ -325,3 +325,18 @@ evidencias no es un bundle portátil del benchmark. Los presupuestos son
 checkpoints cooperativos; no ofrecen una cuota dura de RSS. Los controles reales
 de wheel/sdist/instalación y sus límites están en la
 [revisión del migrador](MIGRATION_REVIEW.md); la publicación sigue pendiente.
+
+## Recorrido local 0.11.0
+
+`ingest_file` fija fuente original y esquema; `run_workflow` fija entradas y
+encadena migraciones nativas ya existentes. Cada checkpoint conserva comparación
+entre motores y frente a esperado. `verify_migration` inspecciona después esa
+evidencia sin ejecutar. `ParquetDestination` vuelve a leer el gate de Verify,
+valida staging y publica una versión mediante un puntero local. `bundle` permite
+copiar el expediente cerrado sin cambiar bytes históricos.
+
+No existe dependencia core→benchmark ni acceso desde M/B a O/otras salidas.
+La publicación local no implementa el gateway/DW. Ingestión materializa JSON y
+recibos; los presupuestos siguen siendo cooperativos y por etapas. El IR común
+no acepta cualquier ETL; la [matriz](SEMANTIC_SUPPORT.md) identifica condiciones,
+rechazos y huecos sin extrapolar todos los cruces posibles.

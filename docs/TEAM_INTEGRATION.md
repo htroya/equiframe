@@ -2,9 +2,8 @@
 
 Este documento define entregas técnicas propuestas. Las tareas ya asignadas por el equipo son: José crea la VM y el acceso Python compartido; Jhair construye el DW; Hernán desarrolla y evalúa EquiFrame. Los detalles de sus componentes se acuerdan con sus responsables.
 
-Estado actual: núcleo `equiframe 0.10.0` y consumidor
-`equiframe-benchmark 0.10.1`, pasos 1–10 técnicos y migrador declarativo previo al
-paso 11. Las herramientas locales y las interfaces consumidoras están
+Estado actual: candidatos `equiframe 0.11.0` y `equiframe-benchmark 0.11.0`,
+con Verify, ETL, migración y destino local. Las herramientas locales y las interfaces consumidoras están
 implementadas; el servicio/DW real, el corpus y la aceptación científica siguen
 pendientes. Las propuestas de despliegue de este documento no acreditan entregas
 de José o Jhair. Los controles de distribución y sus pendientes se registran en
@@ -215,6 +214,16 @@ no autoriza publicar en el DW ni confirma independencia del esperado.
 `read_migration` y `migration verify` comprueban evidencia física, inventario,
 referencias, snapshots y reportes locales sin ETL. Esa integridad no certifica
 revisores, autenticidad humana o corrección del esperado. Las referencias del
-migrador mantienen rutas locales absolutas; no constituyen el bundle portátil de
-estudio. Los presupuestos son cooperativos y no cuotas duras de memoria. El
+migrador inicial mantienen rutas locales absolutas; no constituyen el bundle
+portátil de estudio. En 0.11.0, `export_bundle`/`import_bundle` conserva esos bytes
+y resuelve sólo capturas verificadas dentro de un inventario cerrado; no cambia
+el bundle de estudio. Los presupuestos son cooperativos y no cuotas duras de memoria. El
 servicio mantiene sus propios límites agregados, permisos y controles de carga.
+
+## Consumidor público acotado actual
+
+El [ejemplo SERCOP](SERCOP_EXAMPLE.md) usa la API oficial pública y un snapshot
+fijado fuera de Git. Su carga Parquet local y reconciliación manual de dos awards
+prueban el consumidor de Hernán; no acreditan conexión al servicio de José,
+esquema DW de Jhair, escritores compartidos ni aceptación en OCI. El contrato de
+entrega de esos responsables continúa vigente, sin modificar sus carpetas.

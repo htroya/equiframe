@@ -21,7 +21,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.run_platform_matrix
     name: Python 3.12 / ${{ matrix.os }} / ${{ matrix.architecture }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 35
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
@@ -66,6 +66,8 @@ jobs:
         run: uv run --locked --all-extras pytest -q
       - name: Build wheel and sdist with locked backend
         run: uv run --locked --all-extras python -m build --no-isolation
+      - name: Strict wheel and sdist metadata validation
+        run: uv run --locked --all-extras twine check --strict dist/*
       - name: Verify base, ML, engines and wheel examples outside checkout
         run: uv run --locked --all-extras python tools/verify_distribution.py
       - name: Install locked benchmark environment
@@ -89,6 +91,9 @@ jobs:
       - name: Build benchmark wheel and sdist
         working-directory: packages/equiframe-benchmark
         run: uv run --locked --all-extras python -m build --no-isolation
+      - name: Strict benchmark metadata validation
+        working-directory: packages/equiframe-benchmark
+        run: uv run --locked --all-extras twine check --strict dist/*
       - name: Verify pip installation and benchmark consumer outside checkout
         working-directory: packages/equiframe-benchmark
         run: uv run --locked --all-extras python tools/verify_distribution.py

@@ -1,12 +1,12 @@
 # Calidad, pruebas y operación
 
-Requisitos de desarrollo y verificación. Los pasos 1 y 2 incorporan pruebas reales de contratos, serialización, propiedades, tiempo y CLI; tipado/estilo, build e instalación limpia se ejecutan también en CI. [Comandos del paquete](../packages/equiframe/README.md). Las áreas de pasos posteriores de la matriz siguen siendo requisitos pendientes, no controles ya implementados.
+Requisitos de desarrollo y verificación. Estado actual 2026-10-03: CI manual `workflow_dispatch`, matriz de plataformas opcional y candidato 0.11.0 validado localmente en Windows x64/Python 3.12.4. No se ejecutaron jobs remotos nuevos ni se cambió cuota/facturación. Los pasos 1 y 2 incorporaron pruebas de contratos, serialización, propiedades, tiempo y CLI; sus descripciones de CI abajo son históricas. [Comandos del paquete](../packages/equiframe/README.md). Las áreas de pasos posteriores de la matriz siguen siendo requisitos pendientes, no controles ya implementados.
 
 ## 1. Contrato de entrega por incremento
 
 Un incremento está terminado cuando cumple su alcance funcional, pruebas de comportamiento, tipado, estilo, documentación ejecutable y empaquetado correspondiente. Las pruebas deben detectar fallos relevantes, no reproducir línea por línea la implementación. Cobertura numérica por sí sola no prueba corrección.
 
-El paso 1 crea CI con permisos mínimos (`contents: read`), dependencias fijadas y acciones verificadas/pinadas. La CI usa Python 3.12. La matriz actual incluye Windows x64, Ubuntu x64/ARM64 y macOS Intel/Apple Silicon; la evidencia de cada entrega distingue configuración y checks completados. Los controles de paquete opcional prueban también la importación sin motores o ML instalados.
+El paso 1 crea CI con permisos mínimos (`contents: read`), dependencias fijadas y acciones verificadas/pinadas. La CI usa Python 3.12. La matriz configurada manualmente incluye Windows x64, Ubuntu x64/ARM64 y macOS Intel/Apple Silicon; la evidencia de cada entrega distingue configuración y checks completados. Los controles de paquete opcional prueban también la importación sin motores o ML instalados.
 
 ## 2. Matriz de pruebas requerida
 
@@ -66,8 +66,9 @@ Cada integrante trabaja en su clon y rama. Los datos compartidos se identifican 
 CI Python 3.12 en Windows x64, Ubuntu x64/ARM64 y macOS x64/ARM64 ejecuta la suite anterior y
 regresiones de motores instalados, sin reemplazarlos por mocks ni saltarlos. La
 instalación de desarrollo usa `uv sync --locked --all-extras`; comandos `uv run`
-conservan ese perfil. La matriz tiene triggers de push y pull_request para
-todas las ramas, incluidos colaboradores y PR dependientes.
+conservan ese perfil. La configuración histórica de ese paso tuvo triggers push/pull_request. La
+actual usa sólo workflow_dispatch y gate explícito; ninguna rama/PR activa hoy
+esa matriz automáticamente.
 
 El verificador instala el wheel en entornos runtime-only fuera del checkout: base,
 arrow, pandas, polars, duckdb y engines, con versiones del lock. Comprueba extras
@@ -117,7 +118,8 @@ conflictos y cronología de revisión, fallos, integridad, JSON estricto,
 publicación concurrente exclusiva, grupos transitivos, propiedades de ausencia
 de fuga y rechazo de calibración/prueba en entrenamiento.
 
-CI ejecuta ambos paquetes en la matriz de cinco plataformas. La verificación
+La configuración de aquel paso previó ambos paquetes en cinco plataformas;
+la configuración actual manual no acredita ejecución de esa matriz del candidato. La verificación
 de distribución instala wheels por nombre con pip en otro directorio,
 comprueba imports ligeros y rutas instaladas, ejecuta las pruebas/piloto contra
 el wheel y reconstruye el mismo wheel desde sdist. Identidades de tests son
@@ -168,3 +170,23 @@ La distribución instala el ejemplo de integración fuera del checkout y verific
 las suites contra el wheel reconstruido desde sdist. Fixtures e identidades de
 prueba no son datos SERCOP ni revisiones académicas. El cierre real depende de
 entregables externos identificados en el [informe](STEP_09_REVIEW.md).
+
+## Controles actuales Verify/ETL y distribución
+
+La [revisión actual](VERIFY_ETL_REVIEW_20261003.md) separa baseline del commit
+`bb0b3aa`, suites nuevas, regresiones posteriores y pruebas instaladas. La
+[matriz semántica](SEMANTIC_SUPPORT.md) enlaza casos a test nodes existentes,
+sin extrapolar un producto cartesiano. Los tests de fallo de carga, gate alterado,
+fuente/checkpoint sustituido y comparaciones forjadas protegen contra éxito falso.
+
+El job manual de calidad reserva 90 minutos para comprobar los dos paquetes,
+incluidas las suites de fuente y las suites instaladas desde sdist. Las suites
+locales completas de fuente tardaron aproximadamente once y doce minutos por
+paquete; el límite anterior de 35 minutos dejaba escaso margen para las cuatro
+suites, instalaciones y ejemplos secuenciales. El nuevo límite conserva la
+activación explícita; no ejecuta jobs ni acredita tiempos en runners remotos.
+
+Twine `check --strict` valida metadatos del wheel/sdist; no certifica licencia ni
+publicación. El [manifest de release](RELEASE_CANDIDATE.md) identifica bytes,
+commit y recibos de comandos. La automatización de publicación está preparada
+fuera de `workflows/`, requiere decisiones resueltas y jamás se invocó aquí.

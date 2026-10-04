@@ -26,7 +26,7 @@ EquiFrame conserva los datos, tipos y diagnósticos necesarios para revisar el r
 - Isolation Forest y MAD por familia, calibración normal externa con alpha explícito,
   restauración JSON sin pickle e híbrido H que conserva componentes no evaluables.
 
-**Versiones: núcleo 0.10.0 y benchmark 0.10.1 (paso 10 técnico y migrador).** Una ejecución `completed` confirma que la
+**Candidato actual: núcleo y benchmark 0.11.0**, con Verify reutilizable, ingestión, workflows, carga local y evidencia portátil. Una ejecución `completed` confirma que la
 transformación terminó y se materializó. La [comparación semántica](docs/COMPARISON.md)
 evalúa salidas materializadas. [R](docs/RULES.md) evalúa reglas seleccionadas del
 contrato sobre una captura. El benchmark técnico conserva revisiones pendientes;
@@ -54,11 +54,12 @@ La tesis mantiene tres familias principales y las tres parejas, con nueve
 estratos; las cinco familias genéricas de perfiles son capacidades del producto.
 
 La [revisión del tutor](docs/THESIS_TUTOR_REVIEW_20261003.md) registra los cambios
-del Word y los requisitos empíricos aún pendientes. El paso 11 no se ha iniciado.
+del Word histórico y los requisitos empíricos pendientes. La revisión actual y su alcance están en [VERIFY_ETL_REVIEW](docs/VERIFY_ETL_REVIEW_20261003.md); no cierran la evaluación científica.
 
 **Objetivo futuro:** publicar EquiFrame en PyPI para que cualquier persona pueda
-usar `pip install equiframe`. Se abordará después de completar el paso 10 y
-una nueva ronda de revisión. Las instrucciones locales siguientes sirven para
+usar `pip install equiframe`. El candidato 0.11.0 incorpora construcción,
+Twine y verificadores de instalaciones limpias; licencia, titularidad del nombre,
+acceso público y publicación conservan su decisión propia. Las instrucciones locales siguientes sirven para
 desarrollo; no representan el cumplimiento de ese objetivo ni una publicación.
 
 Se requiere **Python 3.12**. El paquete se instala desde este repositorio privado
@@ -99,9 +100,11 @@ Las capacidades incompatibles se informan explícitamente. Consulte la
 
 ## Compatibilidad e integración
 
-La configuración de CI ejecuta el mismo paquete en Windows x64, Linux x64/ARM64
-y macOS Intel/Apple Silicon. Cada job comprueba tipos, pruebas con motores reales,
-construcción e instalación limpia del wheel.
+La CI actual se inicia manualmente (`workflow_dispatch`) y exige activar
+explícitamente la matriz Windows x64, Linux x64/ARM64 y macOS Intel/Apple Silicon.
+Esos jobs están configurados para comprobar tipos, pruebas, construcción e
+instalación limpia; esta entrega ejecuta controles locales en Windows x64/Python
+3.12.4. No se han ejecutado los jobs remotos del candidato.
 [Evidencia de compatibilidad y revisión](docs/STEP_03_REVIEW.md).
 
 Los runners de GitHub son entornos temporales de prueba. El workflow no despliega
@@ -119,6 +122,11 @@ describe los límites y las entregas necesarias; la conexión real sigue pendien
 |---|---|
 | [API y ejemplos](packages/equiframe/README.md) | Instalación, ejecución, contratos, CLI y límites |
 | [Referencia de formatos](docs/API_CONTRACTS.md) | Tipos públicos, estados y serialización |
+| [Verify reutilizable](docs/VERIFY.md) | Dimensiones, esperados, O y bundles portátiles |
+| [ETL completo](docs/ETL.md) | CSV/JSON/JSONL, etapas y publicación Parquet |
+| [SERCOP fijado](docs/SERCOP_EXAMPLE.md) | Granos, API oficial y reconciliación acotada |
+| [Matriz de soporte](docs/SEMANTIC_SUPPORT.md) | Operación, tipo, motor, política y pruebas |
+| [Candidato de release](docs/RELEASE_CANDIDATE.md) | Artefactos, controles y decisiones pendientes |
 | [Comparación](docs/COMPARISON.md) | API, autorizaciones, evidencia y presupuestos |
 | [Reglas R](docs/RULES.md) | Semántica, cobertura, catálogo y límites |
 | [Perfiles y preprocesamiento](docs/PROFILES.md) | Fórmulas, soporte, recibos y medianas congeladas |
@@ -136,7 +144,7 @@ describe los límites y las entregas necesarias; la conexión real sigue pendien
 
 ```text
 packages/equiframe/            biblioteca y pruebas
-packages/equiframe-benchmark/  EquiFrame Verify, evaluación, reproducción y pruebas
+packages/equiframe-benchmark/  puente O científico, evaluación, reproducción y pruebas
 packages/equiframe-data/       especificación de acceso a datos
 packages/equiframe-sercop/     especificación de integración de dominio
 services/data-gateway/         especificación del servicio de datos

@@ -339,3 +339,21 @@ despliegues. El cambio ajeno presente en `HERNAN_ROADMAP.md` permanece intacto.
 | A108 | Distinguir en reportes comparación con esperado de EquiFrame Verify (O) | El HTML anterior decía «Independent verification» sin recoger autoría/revisión humana. Se conserva la clave histórica de API y se añade el estado explícito `not_established`, con cada comparación y su evidencia por separado. El lector acepta formatos históricos completos para preservar expedientes; integridad y corrección siguen siendo diferentes. No modifica etiquetas ni algoritmo R/M/B/H. |
 | A109 | Contrastar las seis direcciones con semántica de las tres familias y esperados literales | Las pruebas invocan ambos adaptadores reales, conservan NULL/NaN, ocurrencias many-to-many y claves, y separan montos Decimal por moneda. Las seis direcciones son capacidad técnica; el protocolo científico sigue declarando origen y destino de cada ensayo y no hereda validez bidireccional de los tests sintéticos. |
 | A110 | Entrega documental actual de capítulos 1–2 y anexos preparatorios | La instrucción actual sustituye el alcance editorial previo de A97/A102 para esta entrega parcial, sin afirmar aceptación del tutor. El requisito superior a 10.000 se refiere a filas reales utilizadas en aprendizaje; interpretación por modelo, corpus, grupos, calibración, etiquetas y revisión humana permanecen pendientes. El plan nuevo distingue soporte H–R del soporte común R/M/B/H y presupone revisión antes de entrenamiento/calibración. |
+
+## Verify reutilizable y ETL local — 2026-10-03
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A111 | Verify operacional en core, O opcional y puente benchmark | Artefactos externos sin rehacer ETL; acuerdo, esperado, R e independencia separados. Los nombres declarados no autentican revisores. APIs oracle históricas se preservan. |
+| A112 | Ingestión y grano explícitos, IR nativo acotado y checkpoints | IDs/money/ausencias se conservan o se rechazan con recibos; no inferir esquemas aprobados ni traducir programas arbitrarios. Matriz trazable con rechazos deliberados. |
+| A113 | Carga Parquet local con gate releído, staging, versiones y puntero | Utilidad ETL sin DW/OCI; idempotencia y conservación, atomicidad de visibilidad local sin prometer durabilidad eléctrica/transacción distribuida. Resume rechazado. |
+| A114 | Evidencia portátil sin reescribir formatos históricos | Inventario/hash/tamaño y resolver limitado a capturas; lectura reconstruye vínculos/estados sin ejecutar motores ni callbacks. Hash no equivale a autenticidad. |
+| A115 | Candidato 0.11.0, Python 3.12, CI manual y publicación separada | Twine, builds/instalaciones limpias y manifest; no ampliar plataformas por configuración. Licencia, titularidad, acceso público y publicación son decisiones pendientes. |
+| A116 | Validación SERCOP de subconjunto manual identificado | Tres paquetes/dos awards, grano (ocid,award_id), puentes sin monto y monedas separadas; seis direcciones técnicas. No corpus, O humano, DW ni entrenamiento real. |
+| A117 | JSON vacío inválido y límites timestamp comprobados por registro | La pasada extra reprodujo éxito ficticio de JSON vacío y overflow fuera de cuarentena. Un `[]` declarado o stream JSONL vacío conserva tabla vacía válida; ticks int64 extremos exactos se aceptan y desbordamientos siguen rechazo/cuarentena. Es corrección de ingeniería sin cambio experimental. |
+| A118 | Nombres de publicación inequívocos sin distinguir mayúsculas | Windows podía sobrescribir `Table.parquet` con `table.parquet` y devolver éxito. API/recibo rechazan estas colisiones antes de escribir; la versión previa se conserva. No se normalizan ni fusionan datos y no cambia el protocolo científico. |
+
+Se revisó el cambio preexistente del roadmap y se preservó su planificación
+11–20, conciliando descripciones vigentes con evidencia. No modifica el diseño
+experimental de tres parejas/tres familias/nueve estratos ni transforma filas
+fuente/fixtures/reutilizaciones en registros efectivos de aprendizaje.

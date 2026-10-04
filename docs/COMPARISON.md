@@ -243,3 +243,13 @@ representación original. `iter_differences` comprueba SHA-256/tamaño y devuelv
 todos los registros. `read_comparison` revalida el manifiesto; la lectura de sus
 artefactos es explícita. Fallos de creación/publicación de evidencia se elevan al
 llamante, porque no puede entregarse un resultado persistido fiable.
+
+## Composición con Verify 0.11.0
+
+`compare` conserva su contrato y significado: equivalencia observada bajo una
+política explícita. `verify` usa esas comparaciones completas para separar acuerdo
+entre salidas de cada salida frente a esperado, técnica, integridad, R, cobertura
+y revisión O. Dos motores coincidentes pueden estar equivocados; el ejemplo
+`verify_generic.py` conserva acuerdo aprobado y dos esperados incumplidos.
+Lectura/carga no reduce esas dimensiones a la integridad SHA del expediente.
+[API y límites](VERIFY.md).

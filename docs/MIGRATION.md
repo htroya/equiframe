@@ -8,8 +8,11 @@ relacional describe las operaciones que ejecutan ambos compiladores.
 
 El [diseño previo](MIGRATION_DESIGN.md) documenta la arquitectura. Las
 comprobaciones de distribución y sus límites se registran en
-[la revisión técnica](MIGRATION_REVIEW.md). Esta entrega precede al paso 11;
-no incorpora una evaluación científica sobre datos reales.
+[la revisión técnica histórica](MIGRATION_REVIEW.md). La extensión 0.11.0
+incorpora [Verify](VERIFY.md), [workflows y operadores ETL](ETL.md) y
+[bundles portátiles](VERIFY.md#evidencia-portable). La [matriz vigente](SEMANTIC_SUPPORT.md)
+complementa las restricciones de la versión inicial descrita abajo. La validación
+SERCOP acotada no constituye evaluación científica de la tesis.
 
 ## Instalar y ejecutar
 

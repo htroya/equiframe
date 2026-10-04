@@ -107,3 +107,10 @@ overflow, cancelación, límites, evidencia alterada, CLI, imports base ligeros,
 tipos estrictos, wheel y sdist comprobados fuera del checkout. Estos son criterios
 del plan, no resultados anticipados. Las pruebas locales se ejecutarán sin
 habilitar GitHub Actions. Publicación PyPI y evidencia científica siguen pendientes.
+
+## Extensión posterior 0.11.0
+
+Este documento conserva el diseño/evidencia del migrador inicial. La ampliación
+actual tiene [diseño ETL](ETL_DESIGN.md), [diseño Verify](VERIFY_DESIGN.md),
+[matriz trazable](SEMANTIC_SUPPORT.md) y [revisión actual](VERIFY_ETL_REVIEW_20261003.md).
+No reutiliza los resultados históricos como validación del código nuevo.

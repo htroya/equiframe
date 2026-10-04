@@ -126,3 +126,10 @@ registro de un motor no acredita compatibilidad semántica universal.
 GitHub Actions permanece deshabilitado por cuota; los controles son locales.
 No se publica en PyPI ni se inicia el paso 11. La preparación de wheels no
 resuelve por sí sola licencia, titularidad del nombre o publicación pública.
+
+## Extensión posterior 0.11.0
+
+Este documento conserva el diseño/evidencia del migrador inicial. La ampliación
+actual tiene [diseño ETL](ETL_DESIGN.md), [diseño Verify](VERIFY_DESIGN.md),
+[matriz trazable](SEMANTIC_SUPPORT.md) y [revisión actual](VERIFY_ETL_REVIEW_20261003.md).
+No reutiliza los resultados históricos como validación del código nuevo.
