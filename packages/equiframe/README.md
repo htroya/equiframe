@@ -1,4 +1,9 @@
-# EquiFrame 0.11.0 — Verify, ETL y migración nativa
+# EquiFrame 0.11.1 — Verify, ETL y migración nativa
+
+La revisión 0.11.1 corrige aislamiento decimal, presupuestos de expansión JSON y
+vinculación de controles a los bytes comprobados. Los acuerdos de integración
+del equipo conservan su alcance; el [informe integral](../../docs/COMPREHENSIVE_REVIEW_20261003.md)
+identifica pruebas finales y pendientes externos.
 
 El README forma parte de los metadatos del wheel/sdist. Los enlaces al monorepo
 pueden requerir acceso al repositorio privado. Los ejemplos, tests, herramientas
@@ -24,8 +29,8 @@ la experiencia pública objetivo, posterior al paso 10 y a una nueva ronda de re
 paquete ajeno. Use el wheel del equipo o este checkout:
 
 ```bash
-python -m pip install ./dist/equiframe-0.11.0-py3-none-any.whl
-python -m pip install "./dist/equiframe-0.11.0-py3-none-any.whl[duckdb]"
+python -m pip install ./dist/equiframe-0.11.1-py3-none-any.whl
+python -m pip install "./dist/equiframe-0.11.1-py3-none-any.whl[duckdb]"
 # Alternativas: [arrow], [pandas], [polars], [engines] o [ml].
 # Desde el checkout del equipo:
 python -m pip install ".[engines]"
@@ -426,8 +431,8 @@ uv run --locked --all-extras python tools/verify_distribution.py
 ```
 
 El backend y sus dependencias están en el lock; `--no-isolation` usa ese entorno.
-Build produce `dist/equiframe-0.11.0-py3-none-any.whl` y
-`dist/equiframe-0.11.0.tar.gz`. El verificador crea entornos temporales fuera del checkout, instala dependencias runtime del lock y el wheel sin editable,
+Build produce `dist/equiframe-0.11.1-py3-none-any.whl` y
+`dist/equiframe-0.11.1.tar.gz`. El verificador crea entornos temporales fuera del checkout, instala dependencias runtime del lock y el wheel sin editable,
 comprueba `py.typed` e importación sin motores/ML/dev, valida cinco ejemplos por
 CLI y reconstruye desde el sdist comparando todos los bytes del wheel.
 También instala cada extra y la combinación engines sin editable, ejecuta los ejemplos copiados fuera del checkout y comprueba roundtrips de API y errores/códigos de CLI instalada, ejecuta
@@ -442,7 +447,7 @@ uv run --locked --all-extras python tools/generate_assets.py
 ```
 
 Cambiar dependencias exige resolver un nuevo lock y repetir CI. `pip install
-dist/equiframe-0.11.0-py3-none-any.whl` funciona, pero solo el lock reproduce el
+dist/equiframe-0.11.1-py3-none-any.whl` funciona, pero solo el lock reproduce el
 entorno comprobado. Los fixtures no fijan cohorte, escala monetaria real, alpha
 ni tamaño del benchmark. Detectores y perfiles permanecen fuera de esta versión.
 
@@ -489,7 +494,7 @@ python examples/compare_local.py --work-dir comparison-runs
 defecto (índices separados no evaluables). Permisos suplementarios requieren
 justificación: `column_order="ignored"`, `physical_types="lossless"` o
 `index="ignore"`. Son parte de `ComparisonSpec`, documento independiente 1.0;
-no cambian bytes/huellas de Contract 1.0. La versión actual del paquete es 0.11.0 y la
+no cambian bytes/huellas de Contract 1.0. La versión actual del paquete es 0.11.1 y la
 revisión del contrato conserva su función propia.
 
 Se verifican datos y restricciones del esquema de salida, incluidas claves antes
@@ -606,7 +611,7 @@ los componentes solicitados y mantiene los estados originales de R/H.
 Equivalencia entre motores no acredita corrección independiente. No se entrena
 durante la migración ni se traduce código Python/SQL arbitrario.
 
-## Verify y recorrido ETL de 0.11.0
+## Verify y recorrido ETL de 0.11.1
 
 El extra `arrow` permite verificar artefactos externos sin motores. `engines`
 permite el recorrido nativo completo. La instalación base sigue sin cargar

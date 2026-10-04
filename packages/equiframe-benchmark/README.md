@@ -6,9 +6,15 @@ y JSON Schema completos se incluyen en el **sdist**; el wheel contiene la API,
 CLI y recursos runtime. Hasta resolver licencia y acceso público, use artefactos
 identificados del equipo y `--no-index --find-links` para evitar paquetes ajenos.
 
-Distribución experimental `equiframe-benchmark 0.11.0`, Python 3.12. Catálogo,
+Distribución experimental `equiframe-benchmark 0.11.1`, Python 3.12. Catálogo,
 EquiFrame Verify (validación independiente de equivalencia), grupos transitivos,
-particiones y evaluación para `equiframe 0.11.0`. El núcleo no importa este paquete.
+particiones y evaluación para `equiframe 0.11.1`. El núcleo no importa este paquete.
+
+La revisión 0.11.1 refuerza reproducción, inventarios de O y el puente Verify.
+Añade `evaluate_pairwise` y `PairwiseReport` para los seis contrastes descriptivos
+R/M/B/H con soportes y denominadores propios. [Uso y ejemplo](../../docs/PAIRWISE_EVALUATION.md).
+El reporte complementario conserva el protocolo y las seis tablas históricas;
+su uso como análisis científico principal necesita una nueva congelación.
 
 El paso 8 incorpora `equiframe-benchmark validate`, `split` y `pilot`, y usa
 la orquestación operacional en las quince ejecuciones nativas del piloto.
@@ -34,7 +40,7 @@ No está publicado en PyPI. Con los dos wheels construidos y dependencias
 disponibles se puede instalar por nombre:
 
 ```bash
-python -m pip install packages/equiframe/dist/equiframe-0.11.0-py3-none-any.whl packages/equiframe-benchmark/dist/equiframe_benchmark-0.11.0-py3-none-any.whl
+python -m pip install packages/equiframe/dist/equiframe-0.11.1-py3-none-any.whl packages/equiframe-benchmark/dist/equiframe_benchmark-0.11.1-py3-none-any.whl
 ```
 
 El piloto genera 5 escenarios, 35 candidatos, 15 perfiles y 4 grupos. Las
@@ -108,7 +114,7 @@ uv run --locked --all-extras python -m build --no-isolation
 uv run --locked --all-extras python tools/verify_distribution.py
 ```
 
-La última comprobación requiere el wheel de `equiframe 0.11.0` construido en
+La última comprobación requiere el wheel de `equiframe 0.11.1` construido en
 `../equiframe/dist`. Instala ambos paquetes por nombre con pip fuera del checkout,
 comprueba imports ligeros, ejecuta la suite y piloto instalados, y reconstruye
 el wheel desde sdist. La matriz de cinco plataformas está disponible solo mediante
@@ -237,7 +243,7 @@ un nombre ni publica en PyPI. Ver [diseño](../../docs/STEP_10_DESIGN.md),
 [evaluación](../../docs/STEP_10_EVALUATION.md) e
 [inventario de distribución](../../docs/STEP_10_DISTRIBUTION.md).
 
-## Puente de Verify 0.11.0
+## Puente de Verify 0.11.1
 
 `OracleVerificationBridge` y `oracle_verification_bridge` vinculan los tipos
 históricos `Scenario`, `Candidate`, `OracleResult` con `VerificationBinding`,
@@ -246,6 +252,6 @@ API. El plan y la dependencia del esperado se suministran explícitamente; no se
 infieren revisores reales ni se autentican nombres JSON. El núcleo puede usar
 Verify sin instalar este paquete.
 
-Se fijó `equiframe==0.11.0`; extras y locks reflejan esa pareja. Twine se incorpora
+Se fijó `equiframe==0.11.1`; extras y locks reflejan esa pareja. Twine se incorpora
 al entorno de desarrollo. La CI es manual y la matriz remota del candidato no fue
 ejecutada. [Candidato, controles y pendientes](https://github.com/htroya/equiframe/blob/main/docs/RELEASE_CANDIDATE.md).

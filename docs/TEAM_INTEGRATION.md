@@ -2,7 +2,7 @@
 
 Este documento define entregas técnicas propuestas. Las tareas ya asignadas por el equipo son: José crea la VM y el acceso Python compartido; Jhair construye el DW; Hernán desarrolla y evalúa EquiFrame. Los detalles de sus componentes se acuerdan con sus responsables.
 
-Estado actual: candidatos `equiframe 0.11.0` y `equiframe-benchmark 0.11.0`,
+Estado actual: candidatos `equiframe 0.11.1` y `equiframe-benchmark 0.11.0`,
 con Verify, ETL, migración y destino local. Las herramientas locales y las interfaces consumidoras están
 implementadas; el servicio/DW real, el corpus y la aceptación científica siguen
 pendientes. Las propuestas de despliegue de este documento no acreditan entregas
@@ -141,6 +141,12 @@ genéricos de comercio y sensores no son entregas del DW ni evidencia de VM.
 
 
 ## 8. Ubicación del DW y del programa de conexión
+
+La guía Word `ACTIVIDADES_JOSE_JHAIR.docx` conserva la opción comunicada de
+usar AWS, Azure o Hetzner cuando no haya capacidad OCI. José mantiene la elección
+y preparación de la VM Ubuntu/Python 3.12; las garantías del cliente, snapshots,
+concurrencia y recuperación son las mismas. Las referencias OCI describen el
+entorno inicialmente previsto y no retiran esas alternativas de la guía Word.
 
 El DW, DuckDB real y su programa/biblioteca de conexión estarán en la VM OCI.
 `packages/equiframe-data` versiona el código de acceso a desplegar allí; un cliente

@@ -53,6 +53,55 @@ def test_selection_vector_substitution_rejected(make_case, tmp_path):
         eb.TrainingSelection(manifest=manifest, training=training)
 
 
+@pytest.mark.parametrize("partition", ("training", "calibration"))
+def test_selection_rejects_hash_valid_difference_inventory_contradicting_o(
+    make_case, tmp_path, partition
+):
+    catalog, splits, kwargs = selection_data(make_case, tmp_path)
+    if partition == "calibration":
+        scenario = catalog.scenarios[0]
+        others = tuple(independent_scenario(scenario, i, (f"isolated:{i}",)) for i in range(5))
+        catalog = catalog.model_copy(update={"scenarios": (scenario, *others)})
+        for seed in range(100):
+            splits = eb.make_splits(catalog, seed=seed, weights=(3, 1, 2))
+            if any(
+                a.scenario_id == scenario.scenario_id and a.partition == partition
+                for a in splits.assignments
+            ):
+                break
+        else:
+            pytest.fail("test fixture did not produce the intended calibration partition")
+    key = next(iter(kwargs["candidates"]))
+    scenario = catalog.scenarios[0]
+    expected = ef.read_table(scenario.expected)
+    different = ef.compare(
+        ef.ArrowInput(expected.slice(0, expected.num_rows - 1)),
+        scenario.expected,
+        contract=scenario.comparison.contract,
+        policy=scenario.comparison.policy,
+        reference="expected",
+        work_dir=tmp_path,
+    )
+    assert different.state == "different" and different.counts.difference_records > 0
+    original = kwargs["oracles"][key]
+    kwargs["oracles"][key] = eb.OracleResult.model_validate(
+        original.model_copy(
+            update={
+                "comparison": original.comparison.model_copy(
+                    update={"differences": different.differences}
+                )
+            }
+        )
+    )
+    selector = (
+        eb.select_normal_training if partition == "training" else eb.select_normal_calibration
+    )
+    with pytest.raises(
+        ValueError, match="oracle difference inventory disagrees with recorded counts"
+    ):
+        selector(catalog, splits, **kwargs)
+
+
 @pytest.mark.parametrize(
     "fault",
     (

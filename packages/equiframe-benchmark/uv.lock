@@ -187,7 +187,7 @@ wheels = [
 
 [[package]]
 name = "equiframe"
-version = "0.11.0"
+version = "0.11.1"
 source = { directory = "../equiframe" }
 dependencies = [
     { name = "pydantic" },
@@ -246,7 +246,7 @@ dev = [
 
 [[package]]
 name = "equiframe-benchmark"
-version = "0.11.0"
+version = "0.11.1"
 source = { editable = "." }
 dependencies = [
     { name = "equiframe", extra = ["arrow"] },

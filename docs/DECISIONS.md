@@ -357,3 +357,15 @@ Se revisó el cambio preexistente del roadmap y se preservó su planificación
 11–20, conciliando descripciones vigentes con evidencia. No modifica el diseño
 experimental de tres parejas/tres familias/nueve estratos ni transforma filas
 fuente/fixtures/reutilizaciones en registros efectivos de aprendizaje.
+
+## Revisión integral conforme a la última tesis y guía del equipo — 2026-10-03
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A119 | Candidato núcleo/benchmark 0.11.1, con la misma resolución de dependencias | Identifica los fixes y la API descriptiva adicional sin reemplazar artefactos 0.11.0. DetectorVersions conserva productores anteriores; formatos históricos 1.0 no se reescriben. |
+| A120 | Aislar operaciones exactas del contexto decimal del consumidor | Traps, rango de exponentes y flags externos podían cambiar ingestión, IR, ejecución y R. Contexto propio y validación de escala/rango preservan valores y no autorizan pérdida de precisión. R conserva precisión 1000; cambia la huella de su implementación y se regenera el catálogo. Estudios congelados con la huella anterior conservan su revisión; usar R corregida requiere nueva evidencia/congelación. |
+| A121 | Presupuestos y cancelación durante expansión JSON; exponentes inválidos explícitos | La colección expandida podía crecer antes del control max_records. Se aplica presupuesto restante antes de convertir escalares y se conserva rechazo/cuarentena para exponentes fuera de rango. Parseo sigue materializado, acotado por bytes y controles cooperativos. |
+| A122 | Contrastar evidencia física con conteos y clasificación declarada | Reproducción portátil, selección normal y puente Verify rechazan contradicciones de conteos o tipo de candidato. Se usan opciones congeladas y referencia peer, sin modificar etiquetas válidas ni fabricar revisiones. |
+| A123 | Reporte pareado aditivo y descriptivo, separado del protocolo histórico | La tesis vigente distingue soportes por contraste de intersección común. evaluate_pairwise conserva el EvaluationReport y seis CSV, añade seis pares R/M/B/H y scientific=false. Su uso principal requiere protocolo nuevo revisado/congelado antes de la prueba; no se reinterpretan resultados ni cambia bootstrap/AP. |
+| A124 | Vincular controles a fuente y artefactos del candidato | Huellas antes/después y wheels de dependencias locales evitan aprobar bytes nuevos con recibos antiguos; se exige limpieza del cierre de fuentes al emitir manifest. Listas condicionales de uv.sources se rechazan explícitamente por no estar soportadas. Vinculación no autentica ejecutores ni sustituye aprobación de licencia/publicación. |
+| A125 | Preservar las guías y responsabilidades comunicadas, incluida flexibilidad de VM | Tesis y guías se mantienen idénticas en hash. El Word de José permite OCI o alternativas AWS/Azure/Hetzner; se aclara esa flexibilidad sin elegir/desplegar proveedor, construir su gateway o redefinir el DW de Jhair. |

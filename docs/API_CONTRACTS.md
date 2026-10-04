@@ -1,6 +1,6 @@
 # API Python y contratos de intercambio
 
-Versiones candidatas actuales: `equiframe 0.11.0` y `equiframe-benchmark 0.11.0`, formatos independientes `1.0`, Verify operacional, migrador y ETL local. El [README del
+Versiones candidatas actuales: `equiframe 0.11.1` y `equiframe-benchmark 0.11.1`, formatos independientes `1.0`, Verify operacional, migrador y ETL local. El [README del
 paquete](../packages/equiframe/README.md) contiene instalación, comandos y un
 ejemplo Python ejecutable. Las secciones por versión conservan la evolución de la API. La aceptación del servicio real, la evaluación científica y la comprobación final de las distribuciones actuales conservan sus controles propios.
 
@@ -22,7 +22,7 @@ equivalencia; la notación O y los nombres existentes `oracle`, `OracleResult`,
 | `contract_fingerprint(contract) -> str` | SHA-256 hexadecimal de esos bytes; no equivalencia tabular |
 | `contract_json_schema() -> dict[str, object]` | JSON Schema generado desde `Contract` |
 
-La API explícita está en `equiframe.__all__`; `__version__` es `0.11.0`.
+La API explícita está en `equiframe.__all__`; `__version__` es `0.11.1`.
 Los constructores usan Pydantic estricto/inmutable, rechazan extras y conservan
 colecciones como tuplas. La validación de JSON permite arrays sin introducir
 coerciones numéricas con pérdida. No se interpreta código en documentos.
@@ -353,7 +353,7 @@ decisiones completas; soporte ausente produce motivos no evaluables.
 | `ReductionOptions`, `ReductionObservation`, `ReducedTable`, `ReductionResult` | Presupuestos, precondiciones/firma, posiciones y estados de reducción |
 | `reduce_case`, `read_reduction` | Reducción por filas entre tablas y lectura de evidencia verificada |
 
-Siete esquemas nuevos 1.0 en el paso 8. `DetectorVersions` acepta actualmente 0.7.0/0.8.0/0.8.1/0.9.0/0.10.0/0.11.0 sin cambiar el
+Siete esquemas nuevos 1.0 en el paso 8. `DetectorVersions` acepta actualmente 0.7.0/0.8.0/0.8.1/0.9.0/0.10.0/0.11.0/0.11.1 sin cambiar el
 algoritmo IF/MAD. El núcleo no importa benchmark ni acepta O como entrada del
 runner. [Uso y códigos CLI](ORCHESTRATION.md), [diseño y límites](STEP_08_DESIGN.md).
 

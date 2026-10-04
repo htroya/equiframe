@@ -7,6 +7,7 @@ import json
 from dataclasses import dataclass
 from decimal import Decimal, localcontext
 
+from equiframe._decimal import exact_decimal_context
 from equiframe.contracts import (
     BooleanType,
     Contract,
@@ -90,8 +91,7 @@ def integer_bounds(dtype: IntegerType) -> tuple[int, int]:
 
 
 def decimal_limit(dtype: DecimalType) -> Decimal:
-    with localcontext() as context:
-        context.prec = 100
+    with localcontext(exact_decimal_context()):
         return Decimal(10) ** (dtype.precision - dtype.scale) - Decimal(10) ** -dtype.scale
 
 
@@ -116,8 +116,7 @@ def _literal(expression: LiteralExpression) -> IRColumn:
         lower, upper = integer_bounds(dtype)
         valid = lower <= value.value <= upper
     elif isinstance(dtype, DecimalType) and isinstance(value, DecimalValue):
-        with localcontext() as context:
-            context.prec = 100
+        with localcontext(exact_decimal_context()):
             exponent = value.value.as_tuple().exponent
             assert isinstance(exponent, int)
             valid = (

@@ -26,12 +26,19 @@ EquiFrame conserva los datos, tipos y diagnósticos necesarios para revisar el r
 - Isolation Forest y MAD por familia, calibración normal externa con alpha explícito,
   restauración JSON sin pickle e híbrido H que conserva componentes no evaluables.
 
-**Candidato actual: núcleo y benchmark 0.11.0**, con Verify reutilizable, ingestión, workflows, carga local y evidencia portátil. Una ejecución `completed` confirma que la
+**Candidato actual: núcleo y benchmark 0.11.1**, con Verify reutilizable, ingestión, workflows, carga local y evidencia portátil. Una ejecución `completed` confirma que la
 transformación terminó y se materializó. La [comparación semántica](docs/COMPARISON.md)
 evalúa salidas materializadas. [R](docs/RULES.md) evalúa reglas seleccionadas del
 contrato sobre una captura. El benchmark técnico conserva revisiones pendientes;
 la evaluación científica sigue en la
 [hoja de ruta](docs/HERNAN_ROADMAP.md).
+
+La [revisión integral 0.11.1](docs/COMPREHENSIVE_REVIEW_20261003.md) fortalece
+decimales exactos, límites de ingestión y coherencia de evidencia. El benchmark
+añade [contrastes pareados descriptivos](docs/PAIRWISE_EVALUATION.md) con métricas,
+denominadores y exclusiones por pareja de métodos, preservando reportes previos.
+La [matriz de preservación](docs/COMPREHENSIVE_REVIEW_SCOPE_20261003.md) vincula
+estos cambios con la última tesis y las actividades comunicadas a José y Jhair.
 
 `ef.run_pipeline` integra ejecución/R/perfil/M/B/H y comparación opcional, con
 eventos append-only, manifiesto verificable y reportes JSON/HTML. Incluye CLI
@@ -57,7 +64,7 @@ La [revisión del tutor](docs/THESIS_TUTOR_REVIEW_20261003.md) registra los camb
 del Word histórico y los requisitos empíricos pendientes. La revisión actual y su alcance están en [VERIFY_ETL_REVIEW](docs/VERIFY_ETL_REVIEW_20261003.md); no cierran la evaluación científica.
 
 **Objetivo futuro:** publicar EquiFrame en PyPI para que cualquier persona pueda
-usar `pip install equiframe`. El candidato 0.11.0 incorpora construcción,
+usar `pip install equiframe`. El candidato 0.11.1 incorpora construcción,
 Twine y verificadores de instalaciones limpias; licencia, titularidad del nombre,
 acceso público y publicación conservan su decisión propia. Las instrucciones locales siguientes sirven para
 desarrollo; no representan el cumplimiento de ese objetivo ni una publicación.

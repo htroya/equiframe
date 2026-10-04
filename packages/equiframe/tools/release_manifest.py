@@ -26,6 +26,81 @@ REQUIRED_CHECK_STAGES = (
 )
 
 
+def source_snapshot(package: Path) -> dict[str, Any]:
+    """Identify tested worktree bytes, including locally resolved dependencies."""
+    repository = Path(git_output(package, "rev-parse", "--show-toplevel")).resolve()
+    pending = [package.resolve()]
+    visited: set[Path] = set()
+    inventory: dict[str, str] = {}
+    while pending:
+        current = pending.pop()
+        if current in visited:
+            continue
+        if not current.is_relative_to(repository):
+            raise SystemExit("local check dependencies must belong to the source repository")
+        visited.add(current)
+        relative = current.relative_to(repository).as_posix()
+        paths = git_output(
+            repository,
+            "ls-files",
+            "-z",
+            "--cached",
+            "--others",
+            "--exclude-standard",
+            "--",
+            ":(literal)" + relative,
+        ).split("\0")
+        for name in paths:
+            if not name:
+                continue
+            file = repository / name
+            if file.is_symlink() or not file.is_file():
+                raise SystemExit("check source must contain regular existing files: " + name)
+            inventory[name] = hashlib.sha256(file.read_bytes()).hexdigest()
+        project = tomllib.loads((current / "pyproject.toml").read_text(encoding="utf-8"))
+        sources = project.get("tool", {}).get("uv", {}).get("sources", {})
+        for source in sources.values():
+            if isinstance(source, list):
+                raise SystemExit(
+                    "conditional uv sources require explicit candidate binding support"
+                )
+            if isinstance(source, dict) and isinstance(source.get("path"), str):
+                pending.append((current / source["path"]).resolve())
+    encoded = json.dumps(inventory, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return {
+        "algorithm": "sha256-git-worktree-v1",
+        "packages": sorted(path.relative_to(repository).as_posix() for path in visited),
+        "file_count": len(inventory),
+        "sha256": hashlib.sha256(encoded).hexdigest(),
+    }
+
+
+def artifact_inventory(paths: tuple[Path, ...]) -> list[dict[str, Any]]:
+    return [
+        {
+            "file": path.name,
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            "size_bytes": path.stat().st_size,
+        }
+        for path in paths
+        if path.is_file()
+    ]
+
+
+def dependency_artifacts(package: Path) -> tuple[Path, ...]:
+    """Wheels consumed by installed tests for locally resolved dependencies."""
+    repository = Path(git_output(package, "rev-parse", "--show-toplevel")).resolve()
+    paths = []
+    for relative in source_snapshot(package)["packages"]:
+        dependency = repository / relative
+        if dependency.resolve() == package.resolve():
+            continue
+        project = tomllib.loads((dependency / "pyproject.toml").read_text("utf-8"))["project"]
+        stem = project["name"].replace("-", "_") + "-" + project["version"]
+        paths.append(dependency / "dist" / (stem + "-py3-none-any.whl"))
+    return tuple(paths)
+
+
 def git_output(directory: Path, *arguments: str) -> str:
     try:
         result = subprocess.run(
@@ -51,20 +126,23 @@ def verified_source_commit(package: Path, requested: str | None) -> str:
         raise SystemExit("commit must be an exact 40-character source revision")
     if commit != head:
         raise SystemExit("commit must identify the verified package Git HEAD exactly")
-    relative = package.relative_to(repository)
-    project = (relative / "pyproject.toml").as_posix()
-    git_output(repository, "ls-files", "--error-unmatch", "--", project)
-    status = git_output(
-        repository,
-        "status",
-        "--porcelain=v1",
-        "-z",
-        "--untracked-files=all",
-        "--",
-        ":(literal)" + relative.as_posix(),
-    )
-    if status:
-        raise SystemExit("verified package must have no tracked changes or untracked source files")
+    for relative in source_snapshot(package)["packages"]:
+        project = (Path(relative) / "pyproject.toml").as_posix()
+        git_output(repository, "ls-files", "--error-unmatch", "--", project)
+        status = git_output(
+            repository,
+            "status",
+            "--porcelain=v1",
+            "-z",
+            "--untracked-files=all",
+            "--",
+            ":(literal)" + relative,
+        )
+        if status:
+            raise SystemExit(
+                "verified package and local dependencies must have no tracked changes "
+                "or untracked source files"
+            )
     return commit
 
 
@@ -181,6 +259,11 @@ def read_check_receipts(
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     receipts = []
     successful: set[str] = set()
+    bound: set[str] = set()
+    current_source = source_snapshot(package)
+    current_artifacts = artifact_inventory(artifacts)
+    dependencies = dependency_artifacts(package)
+    current_dependencies = artifact_inventory(dependencies)
     failed_commands = 0
     for path in paths:
         raw = path.read_bytes()
@@ -213,6 +296,28 @@ def read_check_receipts(
                 stage = check_stage(command, package, artifacts)
                 if stage is not None:
                     successful.add(stage)
+                    before, after = check.get("source_before"), check.get("source_after")
+                    if (
+                        before == current_source
+                        and after == current_source
+                        and (
+                            stage not in {"build", "twine", "distribution"}
+                            or check.get("artifacts") == current_artifacts
+                        )
+                        and (
+                            stage not in {"twine", "distribution"}
+                            or check.get("artifacts_before") == current_artifacts
+                        )
+                        and (
+                            stage != "distribution"
+                            or (
+                                len(current_dependencies) == len(dependencies)
+                                and check.get("dependency_artifacts") == current_dependencies
+                                and check.get("dependency_artifacts_before") == current_dependencies
+                            )
+                        )
+                    ):
+                        bound.add(stage)
         receipts.append(
             {
                 "file": path.name,
@@ -226,6 +331,10 @@ def read_check_receipts(
         "successful_stages": [stage for stage in REQUIRED_CHECK_STAGES if stage in successful],
         "missing_stages": [stage for stage in REQUIRED_CHECK_STAGES if stage not in successful],
         "failed_commands": failed_commands,
+        "source_snapshot": current_source,
+        "dependency_artifacts": current_dependencies,
+        "source_bound_stages": [stage for stage in REQUIRED_CHECK_STAGES if stage in bound],
+        "unbound_stages": [stage for stage in REQUIRED_CHECK_STAGES if stage not in bound],
         "receipts_authenticated": False,
     }
     return receipts, completion
@@ -264,6 +373,11 @@ def main() -> None:
         )
     if completion["failed_commands"]:
         blockers.append("one or more supplied execution receipts records a failed command")
+    if completion["unbound_stages"]:
+        blockers.append(
+            "checks are not bound to current source/artifact bytes; stages: "
+            + ", ".join(completion["unbound_stages"])
+        )
     tools = {tool: importlib.metadata.version(tool) for tool in ("build", "hatchling", "twine")}
     manifest = {
         "schema_version": "1.0",
@@ -274,14 +388,7 @@ def main() -> None:
         "generated_at": datetime.now(UTC).isoformat(),
         "python_support": project["requires-python"],
         "environment": {"python": sys.version, "platform": platform.platform(), "tools": tools},
-        "artifacts": [
-            {
-                "file": path.name,
-                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-                "size_bytes": path.stat().st_size,
-            }
-            for path in artifacts
-        ],
+        "artifacts": artifact_inventory(artifacts),
         "checks": receipts,
         "check_completion": completion,
         "evidence_scope": {

@@ -9,9 +9,10 @@ import json
 import math
 import re
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date
-from decimal import Decimal, localcontext
+from decimal import Decimal, InvalidOperation, localcontext
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, Self
 from uuid import uuid4
@@ -19,6 +20,7 @@ from uuid import uuid4
 from pydantic import Field, model_validator
 
 from equiframe._base import FrozenModel, NonNegativeInt, Text
+from equiframe._decimal import exact_decimal_context
 from equiframe.contracts import (
     BooleanType,
     ColumnSpec,
@@ -167,24 +169,42 @@ def _path(value: object, parts: tuple[str, ...]) -> object:
 
 
 def _records(
-    value: object, parts: tuple[str, ...], ancestors: tuple[object, ...] = (), location: str = "$"
+    value: object,
+    parts: tuple[str, ...],
+    ancestors: tuple[object, ...] = (),
+    location: str = "$",
+    *,
+    max_records: int | None = None,
+    check: Callable[[], None] | None = None,
 ) -> list[tuple[object, tuple[object, ...], str]]:
-    if not parts:
-        if isinstance(value, list):
-            raise ValueError("array grain requires an explicit '*' in records_path")
-        return [(value, ancestors, location)]
-    part, remaining = parts[0], parts[1:]
-    if part == "*":
-        if not isinstance(value, list):
-            raise ValueError("records_path '*' requires an array")
-        result = []
-        for index, child in enumerate(value):
-            result.extend(_records(child, remaining, (*ancestors, value), f"{location}[{index}]"))
-        return result
-    child = _path(value, (part,))
-    if child is _MISSING:
-        raise ValueError("records_path field is absent")
-    return _records(child, remaining, (*ancestors, value), location + "." + part)
+    result: list[tuple[object, tuple[object, ...], str]] = []
+
+    def visit(
+        current: object, remaining: tuple[str, ...], parents: tuple[object, ...], path: str
+    ) -> None:
+        if check:
+            check()
+        if not remaining:
+            if isinstance(current, list):
+                raise ValueError("array grain requires an explicit '*' in records_path")
+            if max_records is not None and len(result) >= max_records:
+                raise ResourceLimitError("expanded records exceed ingestion record budget")
+            result.append((current, parents, path))
+            return
+        part, suffix = remaining[0], remaining[1:]
+        if part == "*":
+            if not isinstance(current, list):
+                raise ValueError("records_path '*' requires an array")
+            for index, child in enumerate(current):
+                visit(child, suffix, (*parents, current), f"{path}[{index}]")
+        else:
+            child = _path(current, (part,))
+            if child is _MISSING:
+                raise ValueError("records_path field is absent")
+            visit(child, suffix, (*parents, current), path + "." + part)
+
+    visit(value, parts, ancestors, location)
+    return result
 
 
 def _arrow_type(field: FieldMapping) -> Any:
@@ -250,8 +270,7 @@ def _convert(value: object, field: FieldMapping) -> object:
         if isinstance(value, Decimal):
             # JSON numeric exponents must not expand to an unbounded plain string
             # before precision/range validation (e.g. a tiny 1e-999999999 token).
-            with localcontext() as context:
-                context.prec = 100
+            with localcontext(exact_decimal_context()):
                 if (
                     not value.is_finite()
                     or value.copy_abs() > decimal_limit(dtype)
@@ -273,8 +292,7 @@ def _convert(value: object, field: FieldMapping) -> object:
         if field.thousands_separator:
             text = text.replace(field.thousands_separator, "")
         text = text.replace(field.decimal_separator, ".")
-        with localcontext() as context:
-            context.prec = 100
+        with localcontext(exact_decimal_context()):
             decimal_number = Decimal(text)
             if (
                 decimal_number.copy_abs() > decimal_limit(dtype)
@@ -338,7 +356,19 @@ def _json(text: str) -> object:
     def invalid(value: str) -> object:
         raise ValueError("nonfinite_json_number")
 
-    return json.loads(text, parse_float=Decimal, object_pairs_hook=pairs, parse_constant=invalid)
+    def decimal_number(value: str) -> Decimal:
+        # Decimal construction preserves the numeric token exactly, but rejects
+        # exponents beyond its implementation range. Isolate even those errors
+        # from the consumer's traps and flags, then apply the declared row policy.
+        try:
+            with localcontext(exact_decimal_context()):
+                return Decimal(value)
+        except InvalidOperation as error:
+            raise ValueError("json_decimal_outside_supported_range") from error
+
+    return json.loads(
+        text, parse_float=decimal_number, object_pairs_hook=pairs, parse_constant=invalid
+    )
 
 
 def ingest_file(
@@ -467,7 +497,12 @@ def ingest_file(
                     continue
                 try:
                     root = _json(document)
-                    records = _records(root, spec.records_path)
+                    records = _records(
+                        root,
+                        spec.records_path,
+                        max_records=spec.max_records - count,
+                        check=context.check if context else None,
+                    )
                 except ValueError as error:
                     if count >= spec.max_records:
                         raise ResourceLimitError(

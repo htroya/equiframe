@@ -106,11 +106,25 @@ def receipt(
     *,
     failed: int | None = None,
     cwd: Path | None = None,
+    bound: bool = True,
 ) -> Path:
     results = [
         {"command": command, "exit_code": 1 if index == failed else 0, "cwd": str(cwd or package)}
         for index, command in enumerate(commands)
     ]
+    if bound:
+        snapshot = MODULE["source_snapshot"](package)
+        artifacts = MODULE["artifact_inventory"](tuple(sorted((package / "dist").iterdir())))
+        dependencies = MODULE["artifact_inventory"](MODULE["dependency_artifacts"](package))
+        for result in results:
+            result.update(
+                source_before=snapshot,
+                source_after=snapshot,
+                artifacts=artifacts,
+                artifacts_before=artifacts,
+                dependency_artifacts=dependencies,
+                dependency_artifacts_before=dependencies,
+            )
     path.write_text(
         json.dumps(
             {
@@ -155,6 +169,8 @@ def test_clean_git_head_and_complete_declarations_identify_current_bytes(
     }
     assert result["check_completion"]["successful_stages"] == list(STAGES)
     assert result["check_completion"]["missing_stages"] == []
+    assert result["check_completion"]["source_bound_stages"] == list(STAGES)
+    assert result["check_completion"]["unbound_stages"] == []
     assert not result["check_completion"]["receipts_authenticated"]
     assert result["published"] is False and result["publication_blockers"]
     assert "not authenticated" in result["evidence_scope"]["artifacts"]
@@ -340,3 +356,139 @@ def test_missing_identified_artifact_is_rejected(
     next((package / "dist").glob(artifact)).unlink()
     with pytest.raises(SystemExit, match="build the identified wheel and sdist first"):
         manifest(monkeypatch, package, tmp_path / "manifest.json")
+
+
+def test_legacy_receipts_remain_readable_without_claiming_current_source_validation(
+    package: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    checks = receipt(tmp_path / "checks.json", package, declared_commands(package), bound=False)
+    result = manifest(monkeypatch, package, tmp_path / "manifest.json", checks)
+    assert result["check_completion"]["successful_stages"] == list(STAGES)
+    assert result["check_completion"]["source_bound_stages"] == []
+    assert result["check_completion"]["unbound_stages"] == list(STAGES)
+    assert any("not bound to current" in value for value in result["publication_blockers"])
+
+
+def test_previous_source_receipts_do_not_validate_new_clean_commit(
+    package: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    checks = receipt(tmp_path / "checks.json", package, declared_commands(package))
+    (package / "README.md").write_text("Changed after all recorded checks.\n", encoding="utf-8")
+    git(package, "add", "README.md")
+    git(package, "commit", "-qm", "new unchecked source")
+    result = manifest(monkeypatch, package, tmp_path / "manifest.json", checks)
+    assert result["check_completion"]["unbound_stages"] == list(STAGES)
+
+
+def test_source_changed_during_command_does_not_validate_its_stage(
+    package: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    checks = receipt(tmp_path / "checks.json", package, declared_commands(package))
+    document = json.loads(checks.read_bytes())
+    document["results"][5]["source_after"]["sha256"] = "0" * 64
+    checks.write_text(json.dumps(document), encoding="utf-8")
+    result = manifest(monkeypatch, package, tmp_path / "manifest.json", checks)
+    assert result["check_completion"]["unbound_stages"] == ["pytest"]
+
+
+@pytest.mark.parametrize("changed", ["*.whl", "*.tar.gz"])
+def test_replaced_artifact_invalidates_build_metadata_and_installation_receipts(
+    package: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, changed: str
+) -> None:
+    checks = receipt(tmp_path / "checks.json", package, declared_commands(package))
+    next((package / "dist").glob(changed)).write_bytes(b"replacement not previously checked")
+    result = manifest(monkeypatch, package, tmp_path / "manifest.json", checks)
+    assert result["check_completion"]["unbound_stages"] == ["build", "twine", "distribution"]
+
+
+def test_local_dependency_worktree_is_included_in_tested_source(package: Path) -> None:
+    dependency = package.parent / "dependency"
+    synthetic_package(dependency)
+    project = package / "pyproject.toml"
+    project.write_text(
+        project.read_text(encoding="utf-8")
+        + '\n[tool.uv.sources]\ndependency = { path = "../dependency" }\n',
+        encoding="utf-8",
+    )
+    git(package, "add", "..")
+    git(package, "commit", "-qm", "local dependency")
+    before = MODULE["source_snapshot"](package)
+    (dependency / "README.md").write_text("Changed dependency.\n", encoding="utf-8")
+    after = MODULE["source_snapshot"](package)
+    assert before["packages"] == ["packages/dependency", "packages/synthetic"]
+    assert before["sha256"] != after["sha256"]
+    assert before["file_count"] == after["file_count"]
+
+
+def test_new_source_file_changes_snapshot_but_ignored_runtime_does_not(package: Path) -> None:
+    before = MODULE["source_snapshot"](package)
+    (package / ".venv" / "runtime.txt").write_text("different runtime", encoding="utf-8")
+    assert MODULE["source_snapshot"](package) == before
+    (package / "new_module.py").write_text("pass\n", encoding="utf-8")
+    after = MODULE["source_snapshot"](package)
+    assert after["sha256"] != before["sha256"]
+    assert after["file_count"] == before["file_count"] + 1
+
+
+def with_local_dependency(package: Path) -> Path:
+    dependency = package.parent / "dependency"
+    synthetic_package(dependency)
+    project = package / "pyproject.toml"
+    project.write_text(
+        project.read_text(encoding="utf-8")
+        + '\n[tool.uv.sources]\ndependency={path="../dependency"}\n',
+        encoding="utf-8",
+    )
+    git(package, "add", "..")
+    git(package, "commit", "-qm", "local dependency")
+    return dependency
+
+
+@pytest.mark.parametrize("action", ["replace", "remove"])
+def test_dependency_wheel_replacement_invalidates_installed_checks_only(
+    package: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, action: str
+) -> None:
+    dependency = with_local_dependency(package)
+    checks = receipt(tmp_path / "checks.json", package, declared_commands(package))
+    before = MODULE["source_snapshot"](package)
+    wheel = next((dependency / "dist").glob("*.whl"))
+    if action == "remove":
+        wheel.unlink()
+    else:
+        wheel.write_bytes(b"untested dependency wheel")
+    assert MODULE["source_snapshot"](package) == before
+    result = manifest(monkeypatch, package, tmp_path / "manifest.json", checks)
+    assert result["check_completion"]["unbound_stages"] == ["distribution"]
+
+
+def test_absent_dependency_wheel_cannot_bind_installed_checks(
+    package: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    dependency = with_local_dependency(package)
+    next((dependency / "dist").glob("*.whl")).unlink()
+    checks = receipt(tmp_path / "checks.json", package, declared_commands(package))
+    result = manifest(monkeypatch, package, tmp_path / "manifest.json", checks)
+    assert result["check_completion"]["unbound_stages"] == ["distribution"]
+
+
+def test_dirty_dependency_cannot_be_attributed_to_clean_parent_commit(
+    package: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    dependency = with_local_dependency(package)
+    (dependency / "README.md").write_text("Uncommitted dependency.\n", encoding="utf-8")
+    checks = receipt(tmp_path / "checks.json", package, declared_commands(package))
+    with pytest.raises(SystemExit, match="local dependencies must have no tracked changes"):
+        manifest(monkeypatch, package, tmp_path / "manifest.json", checks)
+
+
+def test_conditional_local_sources_are_rejected_instead_of_omitting_dependency_bytes(
+    package: Path,
+) -> None:
+    project = package / "pyproject.toml"
+    project.write_text(
+        project.read_text(encoding="utf-8")
+        + '\n[tool.uv.sources]\ndependency=[{path="../dependency"}]\n',
+        encoding="utf-8",
+    )
+    with pytest.raises(SystemExit, match="conditional uv sources"):
+        MODULE["source_snapshot"](package)

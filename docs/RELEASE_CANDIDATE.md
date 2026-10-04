@@ -1,6 +1,6 @@
-# Candidatos Python 0.11.0
+# Candidatos Python 0.11.1
 
-Dos distribuciones: `equiframe==0.11.0` y `equiframe-benchmark==0.11.0`.
+Dos distribuciones: `equiframe==0.11.1` y `equiframe-benchmark==0.11.1`.
 El benchmark fija exactamente el núcleo en base/extras; `uv` usa una fuente
 local sólo para desarrollo. Los metadatos publicados del wheel contienen la
 dependencia por nombre/version y ninguna obligación de ruta local.
@@ -92,11 +92,29 @@ artefactos están en `dist` de cada paquete.
 Instalación identificada, sin resolver proyectos ajenos en un índice:
 
 ```bash
-python -m pip install --no-index --find-links /ruta/wheels equiframe==0.11.0 equiframe-benchmark==0.11.0
+python -m pip install --no-index --find-links /ruta/wheels equiframe==0.11.1 equiframe-benchmark==0.11.1
 ```
 
 Esa carpeta debe contener también las dependencias runtime necesarias; los
 verificadores crean entornos con versiones del lock antes de instalar los wheels.
+
+## Controles vinculados a los bytes actuales
+
+Desde 0.11.1 cada control registra huellas `source_before`/`source_after` de los
+archivos versionados y nuevos no ignorados del paquete y de sus dependencias
+locales declaradas en `tool.uv.sources`. El benchmark incorpora así los bytes
+del núcleo usados por sus pruebas. El driver aborta si cambian durante o entre
+controles; los locks y las versiones runtime se mantienen separados de esta
+huella de fuente. Construcción, Twine e instalación se vinculan además al
+wheel/sdist exactos, y los últimos dos exigen bytes constantes antes y después.
+
+`check_completion.source_bound_stages` contiene las etapas vinculadas a los
+bytes actuales. Las etapas sin ese vínculo aparecen en `unbound_stages` y
+bloquean publicación. Los recibos históricos siguen siendo legibles: conservar
+su comando exitoso no acredita validación del candidato nuevo. El driver usa
+una carpeta pytest propia junto al recibo para evitar colisiones entre rondas.
+Esta vinculación detecta evidencia desactualizada; conserva
+`receipts_authenticated=false` y no es una firma ni acredita ejecución externa.
 
 ## CI y publicación separadas
 

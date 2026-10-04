@@ -6,6 +6,7 @@ from collections.abc import Mapping
 from decimal import Decimal, localcontext
 from typing import TYPE_CHECKING, Any
 
+from equiframe._decimal import exact_decimal_context
 from equiframe.contracts import (
     BooleanType,
     Contract,
@@ -190,15 +191,14 @@ def _aggregate(frame: pl.DataFrame, node: Aggregate, validated: ValidatedIR) -> 
                 # Polars grouped Decimal SUM can wrap i128. A conservative native
                 # bound proves safety before any sum; it may reject cancellation.
                 if frame.height:
-                    with localcontext() as context:
-                        context.prec = 100
+                    with localcontext(exact_decimal_context()):
                         threshold = Decimal((10**38 - 1) // frame.height).scaleb(-scale)
                     maximum = frame.select(promoted.abs().max()).item()
                     if maximum is not None and maximum > threshold:
                         raise CapabilityError(
                             "Polars SUM exceeds conservative exact accumulation bound"
                         )
-                zero = Decimal(0).scaleb(-scale)
+                zero = Decimal((0, (0,), -scale))
                 result = (
                     pl.when(column.count() == 0)
                     .then(

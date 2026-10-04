@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.11.1 — 2026-10-03
+
+- Decimales exactos de ingestión, IR, ejecución nativa y sumas R aislados del
+  contexto decimal del consumidor, conservando sus flags y sin autorizar redondeo.
+- Exponentes JSON fuera de rango siguen rechazo/cuarentena; expansión de registros
+  comprueba presupuesto y cancelación antes de materializar la colección completa.
+- Recibos de calidad vinculados a bytes de fuente, dependencias locales y
+  wheel/sdist; evidencia histórica legible pero insuficiente para un candidato nuevo.
+- Productores 0.11.1 añadidos a DetectorVersions conservando los anteriores y
+  esquemas 1.0. Python 3.12, motores y dependencias bloqueadas sin ampliar soporte.
+
 ## 0.11.0 — 2026-10-03
 
 - Verify reutilizable para artefactos, ejecuciones y migraciones; dimensiones

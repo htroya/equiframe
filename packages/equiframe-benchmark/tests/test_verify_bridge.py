@@ -68,3 +68,16 @@ def test_bridge_rejects_a_different_candidate_identity(make_case, tmp_path):
         oracle_verification_bridge(
             scenario, changed, result, output_name="candidate", plan_sha256="1" * 64
         )
+
+
+def test_bridge_rejects_changed_candidate_kind_without_relabeling_o(make_case, tmp_path):
+    data = make_case()
+    scenario, candidate = data[:2]
+    result = oracle(data, tmp_path)
+    inconsistent = eb.OracleResult.model_validate(
+        result.model_copy(update={"candidate_kind": "mutation", "mutation_effect": "no_effect"})
+    )
+    with pytest.raises(ValueError, match="oracle candidate kind differs"):
+        oracle_verification_bridge(
+            scenario, candidate, inconsistent, output_name="candidate", plan_sha256="1" * 64
+        )

@@ -51,6 +51,7 @@ jobs:
               if source['git_head']!=os.environ['EXPECTED_COMMIT'] or source['package_clean'] is not True or source['project_tracked'] is not True: raise SystemExit('unverified package source')
               checks=manifest['check_completion']
               if set(checks['required_stages'])!=required or set(checks['successful_stages'])!=required or checks['missing_stages'] or checks['failed_commands']!=0: raise SystemExit('incomplete candidate checks')
+              if set(checks.get('source_bound_stages', []))!=required or checks.get('unbound_stages', required): raise SystemExit('checks not bound to current source and artifacts')
               name=manifest['distribution']
               if name not in {'equiframe','equiframe-benchmark'} or name in distributions: raise SystemExit('unexpected or repeated distribution')
               distributions.add(name)

@@ -213,6 +213,8 @@ def oracle_verification_bridge(
     validate_packet(scenario, candidate, oracle.packet)
     if oracle.scenario_sha256 != digest(scenario) or oracle.candidate_sha256 != digest(candidate):
         raise ValueError("oracle belongs to different scenario/candidate identities")
+    if oracle.candidate_kind != candidate.kind:
+        raise ValueError("oracle candidate kind differs")
     if oracle.assignment:
         validate_assignment(scenario, candidate, oracle.packet, oracle.assignment)
     binding = VerificationBinding.model_validate(

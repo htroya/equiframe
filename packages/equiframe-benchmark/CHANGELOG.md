@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.11.1 — 2026-10-03
+
+- Reproducción portátil compara conteos/estrategia/clave con las filas capturadas,
+  usando opciones congeladas y referencia peer; lectura local preserva TableArtifact.
+- Selección normal de entrenamiento/calibración comprueba el inventario físico
+  de diferencias; puente Verify exige el tipo de candidato ligado a O.
+- API evaluate_pairwise y PairwiseReport: seis contrastes descriptivos R/M/B/H,
+  soporte confirmado común a cada pareja, denominadores, discordancias y exclusiones.
+  No modifica el freeze, las seis tablas previas ni resultados científicos.
+- Dependencia exacta de equiframe 0.11.1; ejemplo pareado y esquema JSON propios,
+  comprobados también en el consumidor instalado fuera del checkout.
+
 ## 0.11.0 — 2026-10-03
 
 - Puente tipado `OracleVerificationBridge`/`oracle_verification_bridge` para

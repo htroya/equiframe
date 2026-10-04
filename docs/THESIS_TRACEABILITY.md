@@ -80,11 +80,17 @@ y revisiones humanas pendientes.
 
 ## Matriz de requisitos
 
+La matriz siguiente describe la entrega vigente de capítulos 1–2 y anexos
+preparatorios, identificada en «Segunda entrega editorial final». Las referencias
+3.x conservan su ubicación histórica como trazabilidad del diseño, sin declarar
+un capítulo 3 entregado en el Word vigente. A100/A101/A110 prevalecen sobre
+A96/A98: tres parejas principales, N efectivo de aprendizaje y soportes pareados.
+
 | ID | Sección | Requisito vigente / cobertura técnica | Componente / paso de Hernán | Evidencia de aceptación |
 |---|---|---|---|---|
 | T01 | 1.3, 1.4, 3.3 | Tres familias del contraste; cinco disponibles en software | Contratos/catálogo, 1/4/6; A96 | Casos y reglas de las tres familias; adicionales separados |
-| T02 | 1.4, 3.1 | Pandas–DuckDB principal; Polars como comprobación adicional | Adaptadores/evaluación, 2/10; A96 | Un protocolo y resultados del contraste principal; extras separados |
-| T03 | 3.2 | Snapshot original, SHA-256, inventario y más de 10.000 adjudicaciones identificables, cobertura/exclusiones | Puertos/manifiestos, 1/2/9; adquisición compartida con Jhair; A98 | Hashes, unidad `ocid`/`award.id` y recuento real verificables |
+| T02 | 1.4; diseño histórico 3.1 | Pandas–Polars, Pandas–DuckDB y Polars–DuckDB principales; tres familias, nueve estratos | Adaptadores/evaluación, 2/10; A100 | Protocolo fijado por pareja, capturas nativas y resultados separados sin contar reutilizaciones como nuevas muestras |
+| T03 | 1.4; diseño histórico 3.2 | Snapshot original, SHA-256 e inventario; más de 10.000 registros reales efectivos de aprendizaje, con soporte/grupos y exclusiones | Puertos/manifiestos, 1/2/9; adquisición compartida con Jhair; A101/A110 | Procedencia y hashes del corpus; N_fit real por modelo/familia, sin sustituirlo por adjudicaciones, filas de calibration/test o cuotas heredadas |
 | T04 | 3.2, 3.5 | Compilación OCDS y cohorte temporal validada | Dominio de Jhair; consumo en 9 | Contrato de dominio y perfilado real |
 | T05 | 3.3 | Contratos independientes del motor; normalización permitida | Contratos/normalización, 1/3 | Pruebas de ausencia, precisión, orden y multiplicidad |
 | T06 | 3.3.1 | R fijada antes de mutantes finales | Reglas, 4/6 | Revisión/commit de reglas y catálogo |
@@ -100,7 +106,7 @@ y revisiones humanas pendientes.
 | T16 | 3.6 | IF y MAD con calibración externa | Modelos, 7 | Scores, umbrales, igualdad estricta y no estimable |
 | T17 | 3.7 | Dependencias transitivas dentro de una partición | Benchmark, 6 | Componentes conexos y ausencia de fuga |
 | T18 | 3.7, 3.9 | Piloto y congelación; prueba no selecciona parámetros | Benchmark, 6/7/10 | FreezeManifest y auditoría de cambios |
-| T19 | 3.8 | Métricas sobre intersección evaluable, cobertura y denominadores | Evaluación, 10 | Conteos y métricas regenerables |
+| T19 | 1.4, A.7; diseño histórico 3.8 | Soporte pareado de los métodos comparados, con O confirmado; intersección común R/M/B/H adicional, cobertura y denominadores | Evaluación, 10; A110 | Conteos y métricas regenerables por soporte; el reporte histórico conserva su intersección común y no se renombra como protocolo principal vigente |
 | T20 | 3.8 | Incertidumbre por grupos y costos desglosados | Evaluación, 10 | Remuestreo trazable y medición controlada |
 | T21 | 3.9 | Reproducción por otro integrante | Entrega, 10 | Registro independiente con contenido y decisiones |
 | T22 | 1.4, 3.5 | Ejecución local, sin plataforma distribuida | Arquitectura | Núcleo local y VM como apoyo colaborativo |

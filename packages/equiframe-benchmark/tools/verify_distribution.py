@@ -86,6 +86,7 @@ assert 'equiframe_benchmark' not in sys.modules
 assert not any(n in sys.modules for n in ('pyarrow','pandas','polars','duckdb','numpy','sklearn'))
 import equiframe_benchmark as eb
 assert callable(eb.oracle_verification_bridge)
+assert callable(eb.evaluate_pairwise)
 assert callable(ef.verify) and callable(ef.read_bundle)
 assert not any(n in sys.modules for n in ('pyarrow','pandas','polars','duckdb','numpy','sklearn'))
 for module in (ef, eb):
@@ -101,6 +102,9 @@ assert importlib.metadata.version('equiframe') == sys.argv[3]
         )
         shutil.copytree(
             ROOT / "tests", work / "tests", ignore=shutil.ignore_patterns("__pycache__")
+        )
+        shutil.copytree(
+            ROOT / "examples", work / "examples", ignore=shutil.ignore_patterns("__pycache__")
         )
         sources = work / "declared-source-packages"
         for project in (CORE, ROOT):

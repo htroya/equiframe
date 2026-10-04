@@ -6,6 +6,7 @@ from collections.abc import Mapping
 from decimal import Decimal, localcontext
 from typing import TYPE_CHECKING, Any, cast
 
+from equiframe._decimal import exact_decimal_context
 from equiframe.contracts import (
     BooleanType,
     Contract,
@@ -99,8 +100,7 @@ def _expression(expression: Expression, frame: pd.DataFrame, columns: Any) -> pd
         left = _expression(expression.left, frame, columns).astype(object)
         right = _expression(expression.right, frame, columns).astype(object)
         operation = {"add": "add", "subtract": "sub", "multiply": "mul"}[expression.operation]
-        with localcontext() as context:
-            context.prec = 100
+        with localcontext(exact_decimal_context()):
             return cast("pd.Series[Any]", getattr(left, operation)(right))
     if isinstance(expression, Coalesce):
         result = _expression(expression.arguments[0], frame, columns)
@@ -203,8 +203,7 @@ def _aggregate(frame: pd.DataFrame, node: Aggregate, validated: ValidatedIR) -> 
                     if group is not None
                     else None
                 )
-                with localcontext() as context:
-                    context.prec = 100
+                with localcontext(exact_decimal_context()):
                     if measure.operation == "sum":
                         value = (
                             grouping.sum(min_count=1)

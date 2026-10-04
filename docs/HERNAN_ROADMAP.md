@@ -13,7 +13,7 @@ En los pasos de revisión, el entregable puede ser evidencia y documentación si
 cambios de código cuando no se encuentren defectos. Los pasos nuevos están
 **planificados, con avances acotados documentados abajo**. El estado técnico
 de partida era núcleo 0.10.0/benchmark 0.10.1 (pasos 1–10 y migrador); el candidato
-actual es 0.11.0 para ambos. Se preservan todos los pasos 11–20 incorporados por
+actual es 0.11.1 para ambos. Se preservan todos los pasos 11–20 incorporados por
 Hernán y la distinción entre ingeniería implementada y cierre científico pendiente.
 
 | Estado de esta entrega | Evidencia y límite |
@@ -105,7 +105,7 @@ e [informe](STEP_06_REVIEW.md). Piloto de 5 escenarios/35 candidatos/15 perfiles
 
 **Objetivo:** disponer de un benchmark trazable antes de ajustar detectores.
 
-**Trabajo:** crear distribución `equiframe-benchmark`; catálogo de cinco familias, resultados esperados independientes, mutaciones candidatas, controles correctos, registro de revisión ciega y estados pendientes. Construir grupos por dependencias transitivas, splits por grupos y validación de fuga. Meta 60 escenarios/300 perfiles sujeta a evidencia; desarrollar equivalentes por motor necesarios.
+**Trabajo:** crear distribución `equiframe-benchmark`; catálogo técnico de cinco familias, resultados esperados independientes, mutaciones candidatas, controles correctos, registro de revisión ciega y estados pendientes. Construir grupos por dependencias transitivas, splits por grupos y validación de fuga. Informar cantidades efectivas por familia/partición conforme al corpus y su revisión; 60 escenarios/300 perfiles son cuotas históricas sustituidas y no metas de la tesis vigente. Desarrollar equivalentes nativos por motor necesarios para los nueve estratos principales.
 
 **Aceptación:** etiquetas no proceden de detectores; mutante sin efecto reconocido; revisores/autores controlados; ningún grupo cruza particiones. Mostrar cantidad real por familia/partición y pendientes, sin inventar aprobaciones. Catálogo técnico puede completarse mientras las revisiones humanas siguen pendientes; el cierre científico requiere esas revisiones.
 
@@ -149,7 +149,7 @@ distribución pública en 16–20, conforme a la ampliación indicada por Herná
 
 **Trabajo:** completar la evaluación e inventariar los requisitos para una distribución pública posterior: licencia, control del nombre, metadatos y versiones soportadas. Resolver decisiones metodológicas, congelar manifests, ejecutar R/M/B/H en prueba, métricas pareadas/cobertura, incertidumbre por grupos si procede, costos controlados y tablas regenerables. Medir recursos, revisar API/documentación, construir distribuciones y bundle de reproducción; repetición independiente por compañero. No publicar en PyPI en este paso: primero debe completarse y realizarse la revisión de 11–15; los requisitos de distribución se resuelven en 16–20.
 
-**Aceptación:** comparación principal usa misma intersección evaluable; métricas indefinidas explícitas; no se ajusta con prueba; resultados negativos se conservan; otro integrante reproduce contenido y decisiones. Wheel/sdist y dependencias exactas comprobados; soporte ARM64 solo si probado. Capítulos 4/5 se redactan con resultados reales. La publicación pública no es un criterio de cierre del paso 10: queda pendiente de 11–18 y de la tarea explícita de publicación del paso 19.
+**Aceptación:** cada contraste principal usa el mismo soporte pareado evaluable de sus dos métodos y O confirmado; la intersección común R/M/B/H se informa adicionalmente con cobertura y denominadores. El reporte histórico del paso 10 mantiene su protocolo: adoptar el protocolo principal vigente exige una nueva congelación, sin reinterpretar resultados previos. Métricas indefinidas explícitas; no se ajusta con prueba; resultados negativos se conservan; otro integrante reproduce contenido y decisiones. Wheel/sdist y dependencias exactas comprobados; soporte ARM64 solo si probado. Los capítulos de resultados futuros se redactan con evidencia real; la entrega Word vigente contiene 1–2 y anexos preparatorios. La publicación pública queda pendiente de 11–18 y de la tarea explícita del paso 19.
 
 ## Paso 11. Revisión de fallas y correcciones verificables
 

@@ -25,6 +25,24 @@ def portable(tmp_path_factory):
     producer = root / "producer"
     producer.mkdir()
     definition = native_definition(producer / "data")
+    definition = definition.model_copy(
+        update={
+            "cases": tuple(
+                case.model_copy(
+                    update={
+                        "pipeline": case.pipeline.model_copy(
+                            update={
+                                "comparison_options": ef.ComparisonOptions(
+                                    batch_rows=2, partitions=3, max_examples=0
+                                )
+                            }
+                        )
+                    }
+                )
+                for case in definition.cases
+            )
+        }
+    )
     frozen = create_freeze(definition)
     result = run_study(frozen, registry=registry(), work_dir=producer)
     output = root / "portable"
@@ -50,6 +68,30 @@ def test_relocation_regenerates_all_components_without_original_sources(portable
     }
     table = ef.read_table(bundle_artifact(bundle, output, original))
     assert all(str(value) == "10.20" for value in table.column("amount").to_pylist())
+
+
+def test_portable_replay_preserves_frozen_comparison_options_and_role(portable, monkeypatch):
+    from equiframe_benchmark.study import StudyResult
+
+    output, _, _ = portable
+    captured = load_document(StudyResult, output / "study" / "study.json")
+    original_compare = ef.compare
+    replays = []
+
+    def captured_compare(*args, **kwargs):
+        compared = original_compare(*args, **kwargs)
+        replays.append(compared)
+        return compared
+
+    monkeypatch.setattr(ef, "compare", captured_compare)
+    receipt = reproduce_study_bundle(output)
+    assert receipt.status == "reproduced"
+    confirmed = tuple(case for case in captured.cases if case.record.oracle_state == "confirmed")
+    assert len(replays) == len(confirmed) > 0
+    for replay, case in zip(replays, confirmed, strict=True):
+        assert replay.options == case.output_replay.options
+        assert replay.reference == case.output_replay.reference == "peer"
+        assert replay.counts == case.output_replay.counts
 
 
 def test_rehashed_csv_tampering_contradicts_original_study_inventory(portable, tmp_path):
@@ -162,4 +204,73 @@ def test_study_record_budget_is_checked_before_json_model_loading(portable, monk
     maximum = 32
     monkeypatch.setattr(module, "BundleLimits", lambda: BundleLimits(max_record_bytes=maximum))
     with pytest.raises(ef.ResourceLimitError, match="JSON exceeds byte budget"):
+        reproduce_study_bundle(output)
+
+
+def test_rehashed_replay_counts_must_match_actual_portable_rows(portable, tmp_path):
+    import shutil
+
+    from equiframe_benchmark.reproduction import read_bundle
+    from equiframe_benchmark.study import StudyResult
+
+    original, bundle, _ = portable
+    output = tmp_path / "forged-replay-counts"
+    shutil.copytree(original, output)
+    path = output / "study" / "study.json"
+    study = load_document(StudyResult, path)
+    case = study.cases[0]
+    replay = case.output_replay
+    assert case.record.oracle_state == "confirmed" and replay.state == "equivalent"
+    # Change the whole receipt chain coherently while preserving the actual rows.
+    # Hash integrity alone must not authorize invented replay observations.
+    counts = replay.counts.model_copy(
+        update={
+            "left_rows": replay.counts.left_rows + 1,
+            "right_rows": replay.counts.right_rows + 1,
+            "matched_rows": replay.counts.matched_rows + 1,
+        }
+    )
+    replay = ef.ComparisonResult.model_validate(replay.model_copy(update={"counts": counts}))
+    case = case.model_copy(update={"output_replay": replay})
+    replay_uri = replay.differences.uri.rsplit("/", 1)[0] + "/comparison.json"
+    replay_file = next(item for item in bundle.files if item.source_uri == replay_uri)
+    changed = {
+        replay_file.path: replay,
+        "study/case-0/case.json": case,
+    }
+    for name, document in changed.items():
+        target = output / name
+        target.unlink()
+        save_document(document, target)
+    evidence = tuple(
+        item.model_copy(
+            update={
+                "sha256": hashlib.sha256((output / "study" / item.path).read_bytes()).hexdigest(),
+                "size_bytes": (output / "study" / item.path).stat().st_size,
+            }
+        )
+        if "study/" + item.path in changed
+        else item
+        for item in study.evidence
+    )
+    forged = study.model_copy(update={"cases": (case, *study.cases[1:]), "evidence": evidence})
+    path.unlink()
+    save_document(forged, path)
+    changed["study/study.json"] = forged
+    files = tuple(
+        item.model_copy(
+            update={
+                "sha256": hashlib.sha256((output / item.path).read_bytes()).hexdigest(),
+                "size_bytes": (output / item.path).stat().st_size,
+            }
+        )
+        if item.path in changed
+        else item
+        for item in bundle.files
+    )
+    manifest = output / "bundle.json"
+    manifest.unlink()
+    save_document(bundle.model_copy(update={"files": files}), manifest)
+    assert read_bundle(output).files == files
+    with pytest.raises(ValueError, match="replay observations differ from actual captured rows"):
         reproduce_study_bundle(output)
