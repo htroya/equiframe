@@ -434,3 +434,28 @@ independiente de preservación está en
 locales no se incorporan al repositorio de código. La revisión editorial y los
 controles del candidato 0.11.0 no acreditan aceptación del tutor, corpus efectivo,
 etiquetas/revisiones humanas, entrenamiento científico, DW/OCI ni publicación PyPI.
+
+## Revisión integral del software 0.11.1 — 2026-10-03
+
+La [matriz de preservación](COMPREHENSIVE_REVIEW_SCOPE_20261003.md) fija la última
+tesis y ambas guías por SHA-256; permanecen intactas. No se editan las catorce
+actividades ni las carpetas de José/Jhair. Las aclaraciones del repositorio
+incorporan los proveedores alternativos de VM que constan en el Word de José,
+sin retirar opciones ni añadir entregables obligatorios.
+
+Las decisiones A119–A126 registran correcciones de decimales/presupuestos y
+evidencia, vinculación de controles y el reporte pareado descriptivo. El código
+conserva R/M/B/H/O, tres parejas × tres familias, nueve estratos y N efectivo de
+aprendizaje. La huella de R corregida exige evidencia nueva cuando se use en un
+estudio, sin reescribir freezes previos.
+
+El reporte aditivo expone soporte por contraste conforme al plan vigente, pero
+no reemplaza el protocolo común histórico ni acredita análisis científico
+principal. Esa adopción requiere revisión y congelación antes de la prueba.
+No se entrenan modelos del estudio, inventan etiquetas o recalibran parámetros.
+
+La [revisión final](COMPREHENSIVE_REVIEW_20261003.md) acredita nueve controles por
+distribución y 1041/454 pruebas de fuente repetidas desde instalaciones externas.
+Tres casos de symlinks se omiten por privilegios Windows; no se extrapola a
+otras plataformas ni al corpus/servicio/DW reales. Los pendientes empíricos,
+humanos y de publicación conservan su responsable y aceptación propia.

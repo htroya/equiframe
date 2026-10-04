@@ -73,10 +73,60 @@ cobertura independiente: núcleo 232 pruebas en la revisión amplia inicial;
 benchmark 56 en selección/calibración/estudio/bundle/puente; reporte pareado y
 evaluación/tablas 66. La prueba de catálogo regenerado aprobó por separado.
 
-Las suites completas y controles finales del candidato se registrarán aquí
-al concluir su ejecución. Las evidencias detalladas quedan fuera de Git en
-`revision_global_equiframe_20261003` del workspace de tesis. Un resultado de
-fuente no se atribuye a una instalación limpia hasta ejecutar su verificador.
+Fuente final comprobada: **`0721b562927dbd99c4d030bdb48c16e5189ffca1`**.
+Los commits posteriores de documentación no cambian los bytes de los paquetes.
+Entorno ejecutado: **Windows x64 / Python 3.12.4**, `uv 0.11.6`, dependencias
+del lock, `PYTHONUTF8=1`. Núcleo y benchmark se comprobaron en paralelo; las
+duraciones son tiempos de validación local, no mediciones aisladas de rendimiento.
+
+| Control final ejecutado | Núcleo 0.11.1 | Benchmark 0.11.1 |
+|---|---|---|
+| Sync locked, Ruff, formato, mypy y assets | Cinco controles, todos exit 0 | Cinco controles, todos exit 0 |
+| Suite completa de fuente | **1041 passed, 1 skipped**, 773.80 s | **454 passed, 2 skipped**, 675.47 s |
+| Construcción wheel/sdist | Exit 0, 20.83 s | Exit 0, 13.84 s |
+| Twine estricto sobre los dos archivos exactos | Exit 0 | Exit 0 |
+| Suite instalada fuera del checkout | **1041 passed, 1 skipped**, 722.64 s | **454 passed, 2 skipped**, 687.82 s |
+| Verificador completo de distribución | Exit 0, 1052.61 s | Exit 0, 851.92 s |
+| Manifiesto ligado a fuente/artefactos | Nueve etapas completas, cero faltantes/no vinculadas/fallidas | Nueve etapas completas; incluye wheel exacto del núcleo |
+
+Hay **1495 pruebas aprobadas** en las dos suites de fuente, repetidas desde
+instalaciones externas; no se suman esas repeticiones como casos nuevos.
+Las tres omisiones corresponden exclusivamente a creación de enlaces simbólicos
+sin privilegios en esta cuenta Windows. El núcleo omite una prueba de bundle;
+el benchmark, una de freeze y otra de reproducción. No son fallos del producto
+ni acreditan haber ejecutado esas ramas en esta cuenta.
+
+El verificador del núcleo comprueba base y seis extras, import ligero, API/CLI,
+consumidor tipado, ejemplos nativos/ETL/Verify y reconstrucción byte a byte desde
+sdist. El benchmark comprueba instalación de ambas distribuciones, API pareada,
+su ejemplo JSON dentro de la suite instalada, piloto nativo, integración,
+evaluación y reproducción de seis CSV, además de wheel idéntico desde sdist.
+Los ejemplos negativos mantienen diferencias, alertas o estados parciales
+previstos; que el verificador termine 0 no convierte esos datos en correctos.
+El piloto conserva 35 revisiones pendientes y ninguna etiqueta confirmada.
+
+Las evidencias detalladas quedan fuera de Git en
+`revision_global_equiframe_20261003` del workspace de tesis:
+`core-final-complete/checks.json`, `benchmark-final-complete/checks.json`, sus
+logs, `software-evidence-final.json`, `core-manifest-final.json` y
+`benchmark-manifest-final.json`. Los manifests registran `published=false`;
+licencia, nombre/Trusted Publisher, acceso y publicación conservan sus cuatro
+bloqueos externos. Los recibos no autentican identidad o ejecución externa.
+
+| Recibo final | SHA-256 |
+|---|---|
+| Núcleo checks.json | `b56685aca97349b6ccae60d43a77d5325850ea164bd7773bba81dd20e496aeb2` |
+| Benchmark checks.json | `ec335a4bf6929730132899277365c35c48834951be9832484abee738f05cc7e7` |
+
+| Artefacto final local | SHA-256 |
+|---|---|
+| equiframe-0.11.1-py3-none-any.whl | `5f0deb33f200b59e62fee3c3a2dcfb62cf3362eede546f264594c24662a3a1b9` |
+| equiframe-0.11.1.tar.gz | `70ed4b1efc1934e27395c2b62a6f7a75d7afc6d866c76b3425b78b20a14b59bf` |
+| equiframe_benchmark-0.11.1-py3-none-any.whl | `8e2b06aa6139c9e3d08506fe5f74b78684bd288637f6e6d7f9e3f8b8ef152b7d` |
+| equiframe_benchmark-0.11.1.tar.gz | `4065387c2f167ea44bb38ff621339afdab431e7775e9b1a4dcb6d8346503ac48` |
+
+Las versiones 0.11.0 y sus informes siguen conservados. No se activaron jobs de
+GitHub Actions, publicación PyPI ni despliegues de infraestructura en esta ronda.
 
 La revisión cruzada reprodujo además el exceso de presupuesto al rechazar un
 CSV mal formado. Cinco de siete casos adicionales fallaron antes del arreglo;

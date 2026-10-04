@@ -18,7 +18,7 @@ Hernán y la distinción entre ingeniería implementada y cierre científico pen
 
 | Estado de esta entrega | Evidencia y límite |
 |---|---|
-| Implementado y ejecutado localmente | Verify, ingestión, workflow, IR ampliado, Parquet y bundles; [revisión](VERIFY_ETL_REVIEW_20261003.md) |
+| Implementado y ejecutado localmente | Verify, ingestión, workflow, IR ampliado, Parquet/bundles, correcciones y reporte pareado descriptivo; [revisión 0.11.1](COMPREHENSIVE_REVIEW_20261003.md), [historia 0.11.0](VERIFY_ETL_REVIEW_20261003.md) |
 | Validación real acotada del paso 14 | API SERCOP fijada, tres paquetes/dos awards, seis direcciones y esperado manual; no corpus científico |
 | Preparación técnica de 16–18 | Candidatos wheel/sdist, Twine y consumidores limpios; no cierre de licencia/titularidad/aceptación externa |
 | Pendiente de insumos externos | DW/OCI del paso 15, corpus efectivo, revisión científica doble/arbitraje, licencia/nombre/acceso público |

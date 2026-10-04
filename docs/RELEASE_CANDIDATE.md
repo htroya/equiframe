@@ -57,7 +57,8 @@ La fuente debe pertenecer a un repositorio Git real: el helper resuelve
 `--commit`, debe coincidir íntegramente con ese HEAD. `pyproject.toml` debe estar
 versionado y el paquete comprobado debe estar limpio, sin cambios tracked ni
 archivos untracked no ignorados dentro de su propia carpeta. Esta comprobación
-no exige que las demás carpetas del monorepo estén limpias. Un SHA inventado,
+se aplica también a dependencias locales `path` del paquete; las carpetas ajenas
+a ese cierre del monorepo no necesitan estar limpias. Un SHA inventado,
 otra revisión o una copia sin Git no acredita la fuente y se rechaza.
 
 Cada recibo `--checks` debe contener comandos y exit codes válidos, y su `cwd`
@@ -107,6 +108,11 @@ del núcleo usados por sus pruebas. El driver aborta si cambian durante o entre
 controles; los locks y las versiones runtime se mantienen separados de esta
 huella de fuente. Construcción, Twine e instalación se vinculan además al
 wheel/sdist exactos, y los últimos dos exigen bytes constantes antes y después.
+La instalación del benchmark registra también el wheel exacto del núcleo en
+`dependency_artifacts_before`/`dependency_artifacts`. Un wheel ausente o
+sustituido invalida esa etapa aunque la fuente no cambie. Se soportan fuentes
+locales `path` simples dentro del repositorio; listas condicionales de fuentes
+se rechazan explícitamente para impedir omisiones silenciosas.
 
 `check_completion.source_bound_stages` contiene las etapas vinculadas a los
 bytes actuales. Las etapas sin ese vínculo aparecen en `unbound_stages` y
@@ -115,6 +121,13 @@ su comando exitoso no acredita validación del candidato nuevo. El driver usa
 una carpeta pytest propia junto al recibo para evitar colisiones entre rondas.
 Esta vinculación detecta evidencia desactualizada; conserva
 `receipts_authenticated=false` y no es una firma ni acredita ejecución externa.
+Use un recibo fuera del árbol de fuente o dentro de `dist/`, ignorado por Git;
+un recibo no ignorado escrito dentro del paquete cambia su propia huella.
+
+La [revisión integral final](COMPREHENSIVE_REVIEW_20261003.md) registra las nueve
+etapas aprobadas de ambos candidatos 0.11.1, las suites instaladas, sus tres
+omisiones Windows y los SHA-256 exactos. La evidencia 0.11.0 de `09c3dfb` citada
+arriba permanece histórica y no es la validación de estos artefactos.
 
 ## CI y publicación separadas
 

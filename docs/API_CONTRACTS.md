@@ -567,3 +567,19 @@ Los formatos previos de migración no se reescriben: el bundle conserva sus byte
 y resuelve URI históricas sólo a miembros capturados de hash/tamaño idénticos.
 Un hash confiable externo puede fijar el manifiesto del bundle. Campos nuevos de
 expedientes 0.11.0 no se anuncian como lectores de candidatos intermedios privados.
+
+## Revisión compatible 0.11.1
+
+`equiframe_benchmark.evaluate_pairwise(report) -> PairwiseReport` deriva seis
+soportes descriptivos R/M/B/H desde un EvaluationReport validado. Conserva el
+informe/digest/protocolo original y recalcula sus métricas al leer; incorpora
+un JSON Schema propio 1.0, sin cambiar EvaluationReport ni los seis CSV.
+O debe estar confirmado y ambos métodos completos; alertas parciales y motivos
+de exclusión permanecen visibles. El resultado conserva `scientific=False` y
+no reemplaza una congelación previa. [Semántica y ejemplo](PAIRWISE_EVALUATION.md).
+
+Ingestión y operaciones decimales nativas/R usan contexto propio sin alterar
+el del consumidor; pérdida de escala/rango sigue siendo rechazo. La expansión
+JSON y el registro de errores de parser respetan max_records. No se añaden
+formatos de ejecución, tipos de dominio ni permisos del servicio/DW.
+[Pruebas completas y compatibilidad](COMPREHENSIVE_REVIEW_20261003.md).
