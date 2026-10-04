@@ -1,0 +1,38 @@
+tabla,columna,descripción,tipo,valor_ejemplo
+snapshot,snapshot_id,Identificador único del snapshot,STRING,20231001
+snapshot,snapshot_timestamp,Marca de tiempo del snapshot, TIMESTAMP,2023-10-01 12:00:00
+dim_entidad,entidad_id,Identificador natural de la entidad,STRING,ENT-001
+dim_entidad,entidad_nombre,Nombre de la entidad,STRING,Ministerio de Salud
+dim_entidad,entidad_tipo,Tipo de entidad,STRING,Gobierno
+dim_entidad,entidad_ubicación,Ubicación,STRING,Guayaquil
+dim_proveedor,proveedor_id,Identificador natural del proveedor,STRING,PROV-001
+dim_proveedor,proveedor_nombre,Nombre del proveedor,STRING,Company S.A.
+dim_proveedor,proveedor_tipo,Tipo de proveedor,STRING,Privado
+dim_proveedor,proveedor_país,País del proveedor,STRING,Ecuador
+dim_item,item_id,Identificador del bien/servicio,STRING,ITEM-001
+dim_item,item_descripcion,Descripción del item,STRING,Medicamentos
+dim_item,item_unidad_medida,Unidad de medida,STRING,Und
+dim_fecha,fecha_surrogate_key,Clave surrogate fecha,BIGINT,20231001
+dim_fecha,fecha,Fecha completa, DATE,2023-10-01
+dim_fecha,año,Año,INTEGER,2023
+dim_fecha,mes,Mes,INTEGER,10
+dim_fecha,día,Día,INTEGER,1
+dim_fecha,trimestre,Trimestre,INTEGER,4
+fact_adjudicacion,fact_id,Clave surrogate de la fact,BIGINT,1
+fact_adjudicacion,snapshot_id,FK a snapshot,STRING,20231001
+fact_adjudicacion,ocid,Identificador OCDS del contrato,STRING,ocds-123abc
+fact_adjudicacion,award_id,Identificador de la adjudicación,STRING,award-001
+fact_adjudicacion,monto,Monto adjudicado,DECIMAL(18,2),15000.75
+fact_adjudicacion,moneda,Moneda ISO 4217,STRING,USD
+fact_adjudicacion,estado,Estado de la adjudicación,STRING, adjudicado
+fact_adjudicacion,fecha_procedimiento,Fecha de inicio del procedimiento, DATE,2023-09-15
+fact_adjudicacion,fecha_adjudicacion,Fecha de adjudicación, DATE,2023-10-01
+recon_excepciones,excepción_id,Clave surrogate excepción,BIGINT,1
+recon_excepciones,snapshot_id,FK snapshot,STRING,20231001
+recon_excepciones,ocid,OCID relacionado,STRING,ocds-123abc
+recon_excepciones,award_id,Award relacionado,STRING,award-001
+recon_excepciones,campo,Campo con discrepancia,STRING,monto
+recon_excepciones,valor_origen,Valor desde fuente original,STRING,15000.75
+recon_excepciones,valor_destino,Valor en DW,STRING,15000.00
+recon_excepciones,diferencia,Diferencia numérica,DECIMAL(18,2),0.75
+recon_excepciones,descripción,Descripción de la excepción,STRING,Redondeo de monto
