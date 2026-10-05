@@ -182,6 +182,13 @@ class ComparisonResult(FrozenModel):
     peak_disk_bytes: NonNegativeInt
     versions: tuple[VersionInfo, ...]
 
+    def __bool__(self) -> bool:
+        """Object existence must never imply observed equivalence."""
+        raise TypeError(
+            "ComparisonResult has no truth value; use assert_equivalent(result) "
+            "or inspect result.state and result.complete explicitly"
+        )
+
     @model_validator(mode="after")
     def consistent(self) -> Self:
         from equiframe.comparison import comparison_fingerprint
@@ -199,6 +206,21 @@ class ComparisonResult(FrozenModel):
             fail(
                 "comparison_completeness", "complete requires both sources and strategy", "complete"
             )
+        if self.complete:
+            for source, rows in (
+                (self.left, self.counts.left_rows),
+                (self.right, self.counts.right_rows),
+            ):
+                if (
+                    source is not None
+                    and source.table is not None
+                    and source.table.row_count != rows
+                ):
+                    fail(
+                        "comparison_counts",
+                        "final row count differs from captured table metadata",
+                        "counts",
+                    )
         if self.counts.matched_rows > min(self.counts.left_rows, self.counts.right_rows):
             fail("comparison_counts", "matched rows exceed observed rows", "counts")
         if self.counts.contract_violations > self.counts.difference_records:

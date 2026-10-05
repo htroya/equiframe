@@ -45,7 +45,7 @@ def _check(
             state=state,
             reason=reason,
             output=output,
-            comparison_id=comparison.comparison_id if comparison else None,
+            comparison_id=comparison.comparison_id if comparison is not None else None,
         )
     )
 

@@ -723,3 +723,32 @@ Guías del monorepo: [Verify](https://github.com/htroya/equiframe/blob/main/docs
 [ETL](https://github.com/htroya/equiframe/blob/main/docs/ETL.md),
 [matriz](https://github.com/htroya/equiframe/blob/main/docs/SEMANTIC_SUPPORT.md),
 [preparación de release](https://github.com/htroya/equiframe/blob/main/docs/RELEASE_CANDIDATE.md).
+
+## Aserciones en pruebas y pipelines
+
+```python
+import equiframe as ef
+
+result = ef.diff(candidate, expected, keys=["id"])
+ef.assert_equivalent(result)
+```
+
+`assert_equivalent` pasa solo con un resultado `equivalent` completo y válido
+bajo la garantía observada del contrato. `equivalence_decision` devuelve el
+contrato machine-readable de aceptación y `EquivalencePolicy` puede fijar
+huellas/referencia o exigir integridad de evidencia bajo una raíz explícita.
+Diferencia, no evaluabilidad, garantía, evidencia y configuración tienen errores
+tipados. Los diagnósticos son redactados por defecto; guarde el reporte antes de
+asertar para conservarlo también al fallar. No hay plugin ni nueva dependencia.
+
+Cambio de compatibilidad deliberado: `bool(result)`, `if result:` y `assert result`
+lanzan `TypeError` para los tres estados de `ComparisonResult`; la existencia de
+un objeto no implica equivalencia. Use la aserción o campos explícitos. El
+formato JSON 1.0 no cambia. `EquivalenceDecision` también exige `.accepted`.
+
+[Guía, códigos, privacidad y receta CI](../../docs/ASSERTIONS.md). La receta
+`examples/assertion_ci.py --case equivalent --output safe-report --work-dir private-runs`
+usa datos sintéticos. `different` y `not_evaluable` fallan deliberadamente
+conservando cuatro archivos redactados. Nunca suba automáticamente las capturas
+privadas o diferencias crudas como artefacto CI. La demostración local no
+acredita ejecución remota ni integración con el servicio de terceros.

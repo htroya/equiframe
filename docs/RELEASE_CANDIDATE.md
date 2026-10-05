@@ -1,5 +1,8 @@
 # Candidatos Python 0.11.1
 
+La [ficha STEP4](STEP4_CANDIDATE.md) identifica aserciones, integración y cambio
+observable de truth testing, con evidencia local y límites de CI remota.
+
 La [ficha STEP3](STEP3_CANDIDATE.md) identifica el reporte común, sus controles
 y límites de evidencia. Los recibos anteriores siguen siendo históricos.
 
@@ -173,3 +176,35 @@ y [Twine](https://twine.readthedocs.io/en/stable/) orientan metadatos/construcci
 `twine check --strict` aprobado valida artefactos; no elimina decisiones de
 licencia, titularidad o publicación. La etiqueta científica O mantiene gates
 humanos separados del release.
+
+## Dependencias locales realmente cargadas en STEP4
+
+La huella del cierre de fuente por sí sola no garantiza qué instalación ha
+importado Python. Durante STEP4 la verificación del wheel detectó una fixture
+adversarial rechazada antes por el nuevo validador; el entorno de fuente del
+benchmark todavía tenía una copia en caché del núcleo anterior. Ese intento se
+conserva como fallido/superado y no valida el candidato final.
+
+El driver ahora reinstala explícitamente las dependencias `path` del cierre
+local, y comprueba las rutas de import y hashes de archivos runtime frente a sus
+fuentes antes de aceptar los controles. La verificación de distribución sigue
+instalando los wheels identificados fuera del checkout. Los recibos nuevos
+separan esa vinculación runtime (`local_dependency_runtime_bound_stages`) de
+la huella de archivos fuente. Las etapas sin prueba cargada aparecen en
+`local_dependency_runtime_unbound_stages` y bloquean el candidato. Los antiguos
+no se interpretan como prueba de qué bytes se cargaron. No se cambian locks,
+versiones o dependencias para evitar el problema de caché.
+
+La fixture conserva dos defensas: contradicciones de conteos/metadatos se
+rechazan al validar el modelo; una observación de alineación falsificada pero
+estructuralmente válida atraviesa el expediente rehasheado y debe ser rechazada
+al volver a comprobar las filas portátiles reales. No se elimina ese control
+profundo para hacer pasar la suite.
+
+Los candidatos privados conservan por ahora el número 0.11.1 y se identifican
+por commit y hash de artefacto. En un entorno existente no asuma que la igualdad
+de versión implica los mismos bytes. Tras preparar sus dependencias bloqueadas,
+reinstale explícitamente los wheels exactos elegidos, por ejemplo con
+`python -m pip install --force-reinstall --no-deps /ruta/equiframe-0.11.1-py3-none-any.whl /ruta/equiframe_benchmark-0.11.1-py3-none-any.whl`.
+Los verificadores del candidato utilizan entornos limpios e identifican los
+artefactos; este comando no resuelve los pendientes de publicación/licencia.

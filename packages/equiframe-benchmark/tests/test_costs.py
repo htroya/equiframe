@@ -229,7 +229,7 @@ def test_monitor_failure_never_skips_callbacks_or_fabricates_cpu_rss(tmp_path, f
         assert record.resources.rss_baseline_bytes is None
         assert record.resources.sampled_rss_peak_bytes is None
         assert record.resources.issues
-        assert record.profile_m or record.comparison
+        assert record.profile_m is not None or record.comparison is not None
     assert read_costs(tmp_path / result.cost_id) == result
 
 
@@ -377,7 +377,7 @@ def test_original_expected_execution_metadata_survives_cost_measurement(tmp_path
     assert all(
         r.comparison.right.execution == spec.reference
         for r in (*result.warmups, *result.observations)
-        if r.comparison
+        if r.comparison is not None
     )
     assert read_costs(tmp_path / result.cost_id) == result
 
@@ -437,7 +437,7 @@ def test_expected_execution_with_other_inputs_same_outputs_remains_not_evaluable
     )
     assert not result.complete and calls == {"profile_m": 6, "comparison": 6}
     for record in (*result.warmups, *result.observations):
-        if record.comparison:
+        if record.comparison is not None:
             assert record.state == "not_evaluable"
             assert record.comparison.right.execution == expected
             assert any(
@@ -496,7 +496,7 @@ def test_complete_processing_of_invalid_expected_is_not_evaluable_cost(tmp_path)
     )
     assert not result.complete and calls == {"profile_m": 6, "comparison": 6}
     for record in (*result.warmups, *result.observations):
-        if record.comparison:
+        if record.comparison is not None:
             assert record.comparison.complete and record.comparison.state == "not_evaluable"
             assert record.state == "not_evaluable" and record.resources.wall_seconds > 0
             assert any(d.code == "invalid_expected" for d in record.comparison.diagnostics)

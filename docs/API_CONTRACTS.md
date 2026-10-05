@@ -568,7 +568,23 @@ y resuelve URI históricas sólo a miembros capturados de hash/tamaño idéntico
 Un hash confiable externo puede fijar el manifiesto del bundle. Campos nuevos de
 expedientes 0.11.0 no se anuncian como lectores de candidatos intermedios privados.
 
-## Revisión compatible 0.11.1
+## Revisión del candidato 0.11.1
+
+La entrega [STEP4: aserciones e integración](ASSERTIONS.md) incorpora
+`assert_equivalent`, `equivalence_decision`, `EquivalencePolicy`,
+`EquivalenceDecision` y la familia de errores `Equivalence*Error`. Los esquemas
+policy/decision 1.0 complementan el resultado existente y no sustituyen su
+veredicto. Persistencia verificada es un requisito opcional explícito.
+
+**Cambio observable de compatibilidad:** `ComparisonResult.__bool__` lanza
+`TypeError` para todos los estados; migre `assert result` al gate y comprobaciones
+de ausencia a `result is not None`. La decisión exige su campo `.accepted`.
+Los campos y esquemas anteriores conservan sus bytes. La validación del
+resultado completo también rechaza conteos que contradigan metadatos de filas
+en capturas presentes; un expediente inconsistente no gana compatibilidad por
+haber sido aceptado antes. Este cambio se documenta
+aunque el candidato permanezca privado y Alpha.
+
 
 La entrega aditiva [STEP3: reporte común](REPORTS.md) incorpora
 `ComparisonReport`, `ReportOptions`, `ReportCount`, `ReportValue`,

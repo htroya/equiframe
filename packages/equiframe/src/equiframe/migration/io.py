@@ -44,7 +44,7 @@ def _legacy_summary(result: MigrationResult) -> dict[str, object]:
         "source_exit_code": result.source.exit_code if result.source else None,
         "target_exit_code": result.target.exit_code if result.target else None,
         "difference_records": result.comparison.counts.difference_records
-        if result.comparison
+        if result.comparison is not None
         else None,
         "equivalence_is_independent_correctness": False,
     }
@@ -52,10 +52,14 @@ def _legacy_summary(result: MigrationResult) -> dict[str, object]:
 
 def _comparison_summary(result: ComparisonResult | None, *, requested: bool) -> dict[str, object]:
     return {
-        "state": result.state if result else "not_evaluable" if requested else "not_requested",
-        "complete": result.complete if result else False,
-        "comparison_id": result.comparison_id if result else None,
-        "difference_records": result.counts.difference_records if result else None,
+        "state": result.state
+        if result is not None
+        else "not_evaluable"
+        if requested
+        else "not_requested",
+        "complete": result.complete if result is not None else False,
+        "comparison_id": result.comparison_id if result is not None else None,
+        "difference_records": result.counts.difference_records if result is not None else None,
     }
 
 

@@ -492,3 +492,337 @@ def test_conditional_local_sources_are_rejected_instead_of_omitting_dependency_b
     )
     with pytest.raises(SystemExit, match="conditional uv sources"):
         MODULE["source_snapshot"](package)
+
+
+@pytest.fixture
+def candidate_driver(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
+    tools = Path(__file__).parents[1] / "tools"
+    monkeypatch.syspath_prepend(str(tools))
+    return runpy.run_path(str(tools / "check_candidate.py"))
+
+
+@pytest.fixture
+def local_runtime(package: Path, tmp_path: Path) -> tuple[Path, Path, Path]:
+    """A real isolated interpreter with synthetic dependency bytes, no downloads."""
+    import shutil
+
+    dependency = with_local_dependency(package)
+    project = dependency / "pyproject.toml"
+    project.write_text(
+        project.read_text().replace("synthetic-release-check", "runtime-dependency"),
+        encoding="utf-8",
+    )
+    for artifact in (dependency / "dist").iterdir():
+        artifact.rename(
+            artifact.with_name(
+                artifact.name.replace("synthetic_release_check", "runtime_dependency")
+            )
+        )
+    source = dependency / "src" / "candidate_dependency"
+    source.mkdir(parents=True)
+    (source / "__init__.py").write_text(
+        "from .implementation import VERSION\n"
+        'if VERSION != "new":\n    raise RuntimeError("stale bytecode loaded")\n',
+        encoding="utf-8",
+    )
+    (source / "implementation.py").write_text('VERSION = "new"\n', encoding="utf-8")
+    (source / "py.typed").write_text("", encoding="utf-8")
+    environment = tmp_path / "isolated-runtime"
+    subprocess.run([sys.executable, "-m", "venv", "--without-pip", str(environment)], check=True)
+    python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+    library = Path(
+        subprocess.check_output(
+            [str(python), "-I", "-c", "import sysconfig; print(sysconfig.get_path('purelib'))"],
+            text=True,
+        ).strip()
+    )
+    installed = library / source.name
+    shutil.copytree(source, installed)
+    return python, source, installed
+
+
+def test_local_runtime_binding_records_exact_installed_source_bytes(
+    package: Path,
+    tmp_path: Path,
+    candidate_driver: dict[str, Any],
+    local_runtime: tuple[Path, Path, Path],
+) -> None:
+    python, source, installed = local_runtime
+    binding = candidate_driver["local_dependency_runtime_binding"](
+        package, [str(python)], tmp_path / "fresh-bytecode"
+    )
+    assert binding["verified"] is True
+    assert MODULE["runtime_binding_matches"](binding, package)
+    imported = binding["resolved_dependencies"][0]["imports"][0]
+    assert imported["origin"] == str(installed / "__init__.py")
+    assert imported["root"] != str(source)
+    assert imported["files"] == {
+        path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in source.iterdir()
+    }
+    binding["resolved_dependencies"][0]["imports"][0]["files"]["implementation.py"] = "0" * 64
+    assert not MODULE["runtime_binding_matches"](binding, package)
+
+
+@pytest.mark.parametrize("kind", ["stale", "missing", "extra"])
+def test_source_snapshot_cannot_conceal_stale_local_runtime(
+    package: Path,
+    tmp_path: Path,
+    candidate_driver: dict[str, Any],
+    local_runtime: tuple[Path, Path, Path],
+    kind: str,
+) -> None:
+    python, source, installed = local_runtime
+    before = MODULE["source_snapshot"](package)
+    project_bytes = (source.parents[1] / "pyproject.toml").read_bytes()
+    if kind == "stale":
+        # uv's metadata cache can leave an old private module while the current
+        # worktree snapshot and the public package/version continue looking valid.
+        (source / "implementation.py").write_text('VERSION = "newer"\n', encoding="utf-8")
+        assert MODULE["source_snapshot"](package) != before
+    elif kind == "missing":
+        (installed / "implementation.py").unlink()
+    else:
+        (installed / "obsolete.py").write_text("pass\n", encoding="utf-8")
+    assert (source.parents[1] / "pyproject.toml").read_bytes() == project_bytes
+    binding = candidate_driver["local_dependency_runtime_binding"](
+        package, [str(python)], tmp_path / "fresh-bytecode"
+    )
+    assert binding["verified"] is False
+    assert "local dependency runtime" in binding["error"]
+
+
+def test_fresh_bytecode_prefix_prevents_valid_timestamp_stale_pyc(
+    package: Path,
+    tmp_path: Path,
+    candidate_driver: dict[str, Any],
+    local_runtime: tuple[Path, Path, Path],
+) -> None:
+    python, _source, installed = local_runtime
+    implementation = installed / "implementation.py"
+    implementation.write_text('VERSION = "old"\n', encoding="utf-8")
+    original = implementation.stat()
+    subprocess.run([str(python), "-I", "-m", "py_compile", str(implementation)], check=True)
+    implementation.write_text('VERSION = "new"\n', encoding="utf-8")
+    os.utime(implementation, ns=(original.st_atime_ns, original.st_mtime_ns))
+    stale = subprocess.run(
+        [str(python), "-I", "-c", "import candidate_dependency"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert stale.returncode != 0 and "stale bytecode loaded" in stale.stderr
+    binding = candidate_driver["local_dependency_runtime_binding"](
+        package, [str(python)], tmp_path / "fresh-bytecode"
+    )
+    assert binding["verified"] is True
+
+
+def test_runtime_mismatch_stops_driver_after_sync_before_any_source_controls(
+    package: Path,
+    tmp_path: Path,
+    candidate_driver: dict[str, Any],
+    local_runtime: tuple[Path, Path, Path],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    python, _source, installed = local_runtime
+    (installed / "implementation.py").write_text('VERSION = "old"\n', encoding="utf-8")
+    binding = candidate_driver["local_dependency_runtime_binding"](
+        package, [str(python)], tmp_path / "fresh-bytecode"
+    )
+    calls = []
+    run = candidate_driver["run_checks"]
+    monkeypatch.setitem(run.__globals__, "local_dependency_runtime_binding", lambda *_: binding)
+
+    def execute(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        calls.append(command)
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(subprocess, "run", execute)
+    # Snapshot calls use git/subprocess too, so freeze those independently.
+    snapshot = binding["source_snapshot"]
+    monkeypatch.setitem(run.__globals__, "source_snapshot", lambda _: snapshot)
+    output = tmp_path / "driver.json"
+    with pytest.raises(SystemExit, match="runtime binding failed"):
+        run(
+            package,
+            output,
+            snapshot,
+            (),
+            (),
+            declared_commands(package),
+            [str(python)],
+            tmp_path / "fresh-bytecode",
+            {"PYTHONDONTWRITEBYTECODE": "1", "PYTHONPYCACHEPREFIX": str(tmp_path)},
+        )
+    assert calls == [declared_commands(package)[0]]
+    document = json.loads(output.read_bytes())
+    assert len(document["results"]) == 1
+    assert document["results"][0]["local_dependency_runtime_binding"]["verified"] is False
+
+
+def test_driver_reinstalls_local_closure_and_holds_sync(
+    package: Path,
+    tmp_path: Path,
+    candidate_driver: dict[str, Any],
+    local_runtime: tuple[Path, Path, Path],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    main = candidate_driver["main"]
+    captured = []
+    monkeypatch.setitem(main.__globals__, "run_checks", lambda *args: captured.append(args))
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "check_candidate.py",
+            "--package",
+            str(package),
+            "--uv",
+            "uv",
+            "--output",
+            str(tmp_path / "checks.json"),
+        ],
+    )
+    main()
+    commands = captured[0][5]
+    assert commands[0][-2:] == ["--reinstall-package", "runtime-dependency"]
+    assert all("--no-sync" in command for command in commands[1:])
+    artifacts = tuple(sorted((package / "dist").iterdir()))
+    commands[7] += [str(path) for path in artifacts]
+    assert [MODULE["check_stage"](command, package, artifacts) for command in commands] == list(
+        STAGES
+    )
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [
+        ["--reinstall-package"],
+        ["--reinstall-package", "--locked"],
+        ["--reinstall-package", "undeclared-package"],
+        ["--reinstall-package", "runtime-dependency", "--reinstall-package", "runtime-dependency"],
+        ["--reinstall"],
+        ["--reinstall-package=runtime-dependency"],
+        ["--python", "3.12", "--python", "3.12"],
+        ["--locked"],
+    ],
+)
+def test_locked_sync_rejects_unbounded_or_malformed_reinstall_options(
+    package: Path,
+    local_runtime: tuple[Path, Path, Path],
+    extra: list[str],
+) -> None:
+    assert (
+        MODULE["check_stage"](["uv", "sync", "--locked", "--all-extras", *extra], package, ())
+        is None
+    )
+
+
+def test_legacy_source_binding_does_not_claim_dependency_runtime_proof(
+    package: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    with_local_dependency(package)
+    checks = receipt(tmp_path / "checks.json", package, declared_commands(package))
+    result = manifest(monkeypatch, package, tmp_path / "manifest.json", checks)
+    completion = result["check_completion"]
+    assert completion["source_bound_stages"] == list(STAGES)
+    assert completion["local_dependency_runtime_bound_stages"] == []
+    assert completion["local_dependency_runtime_unbound_stages"] == list(STAGES)
+    assert any("imported bytes" in reason for reason in result["publication_blockers"])
+
+
+@pytest.mark.parametrize("tamper", [None, "hash", "path", "missing", "type"])
+def test_only_complete_matching_runtime_inventory_binds_receipts(
+    package: Path,
+    tmp_path: Path,
+    candidate_driver: dict[str, Any],
+    local_runtime: tuple[Path, Path, Path],
+    tamper: str | None,
+) -> None:
+    python, _source, _installed = local_runtime
+    binding = candidate_driver["local_dependency_runtime_binding"](
+        package, [str(python)], tmp_path / "fresh-bytecode"
+    )
+    checks = receipt(tmp_path / "checks.json", package, declared_commands(package))
+    document = json.loads(checks.read_bytes())
+    for result in document["results"]:
+        result["local_dependency_runtime_binding"] = json.loads(json.dumps(binding))
+    altered = document["results"][5]["local_dependency_runtime_binding"]
+    imported = altered["resolved_dependencies"][0]["imports"][0]
+    if tamper == "hash":
+        imported["files"]["implementation.py"] = "0" * 64
+    elif tamper == "path":
+        imported["root"] = None
+    elif tamper == "missing":
+        altered["resolved_dependencies"] = []
+    elif tamper == "type":
+        altered["resolved_dependencies"] = [None]
+    checks.write_text(json.dumps(document), encoding="utf-8")
+    _, completion = MODULE["read_check_receipts"](
+        [checks], package, tuple(sorted((package / "dist").iterdir()))
+    )
+    assert completion["local_dependency_runtime_unbound_stages"] == (
+        [] if tamper is None else ["pytest"]
+    )
+    assert completion["source_bound_stages"] == list(STAGES)
+
+
+def test_transitive_dependency_names_are_reinstalled_and_recognized(package: Path) -> None:
+    dependency = with_local_dependency(package)
+    transitive = package.parent / "transitive"
+    synthetic_package(transitive)
+    project = transitive / "pyproject.toml"
+    project.write_text(project.read_text().replace("synthetic-release-check", "transitive"))
+    project = dependency / "pyproject.toml"
+    project.write_text(
+        project.read_text() + '\n[tool.uv.sources]\ntransitive={path="../transitive"}\n'
+    )
+    assert MODULE["local_dependency_names"](package) == ["synthetic-release-check", "transitive"]
+    command = [
+        "uv",
+        "sync",
+        "--locked",
+        "--all-extras",
+        "--reinstall-package",
+        "synthetic-release-check",
+        "--reinstall-package",
+        "transitive",
+    ]
+    assert MODULE["check_stage"](command, package, ()) == "locked_sync"
+
+
+def test_probe_and_source_controls_share_sanitized_import_environment(
+    package: Path,
+    tmp_path: Path,
+    candidate_driver: dict[str, Any],
+    local_runtime: tuple[Path, Path, Path],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    python, _source, _installed = local_runtime
+    shadow = tmp_path / "shadow" / "candidate_dependency"
+    shadow.mkdir(parents=True)
+    (shadow / "__init__.py").write_text('raise RuntimeError("shadowed dependency")\n')
+    monkeypatch.setenv("PYTHONPATH", str(shadow.parent))
+    polluted = subprocess.run(
+        [str(python), "-c", "import candidate_dependency"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert polluted.returncode != 0 and "shadowed dependency" in polluted.stderr
+    monkeypatch.setenv("PYTHONHOME", str(tmp_path / "wrong-python-home"))
+    environment = candidate_driver["candidate_environment"](tmp_path / "fresh-bytecode")
+    assert "PYTHONPATH" not in environment and "PYTHONHOME" not in environment
+    assert environment["PYTHONNOUSERSITE"] == "1"
+    assert environment["PYTHONDONTWRITEBYTECODE"] == "1"
+    assert (
+        candidate_driver["local_dependency_runtime_binding"](
+            package, [str(python)], tmp_path / "fresh-bytecode", environment
+        )["verified"]
+        is True
+    )
+    subprocess.run(
+        [str(python), "-c", "import candidate_dependency"], env=environment, cwd=package, check=True
+    )

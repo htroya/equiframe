@@ -489,7 +489,7 @@ def read_study(
             raise ef.ArtifactIntegrityError("case receipt contradicts the final study")
         if case.pipeline and ef.read_pipeline(folder / case.pipeline.pipeline_id) != case.pipeline:
             raise ef.ArtifactIntegrityError("pipeline evidence contradicts its study case")
-        if case.output_replay:
+        if case.output_replay is not None:
             replay = case.output_replay
             for ref in (replay.differences, *(s.data for s in (replay.left, replay.right) if s)):
                 _owned(directory, ref, listed)

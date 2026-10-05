@@ -207,7 +207,7 @@ def test_study_record_budget_is_checked_before_json_model_loading(portable, monk
         reproduce_study_bundle(output)
 
 
-def test_rehashed_replay_counts_must_match_actual_portable_rows(portable, tmp_path):
+def test_rehashed_replay_observations_must_match_actual_portable_rows(portable, tmp_path):
     import shutil
 
     from equiframe_benchmark.reproduction import read_bundle
@@ -230,7 +230,17 @@ def test_rehashed_replay_counts_must_match_actual_portable_rows(portable, tmp_pa
             "matched_rows": replay.counts.matched_rows + 1,
         }
     )
-    replay = ef.ComparisonResult.model_validate(replay.model_copy(update={"counts": counts}))
+    # STEP4 rejects count contradictions against retained capture metadata before
+    # a forged document can enter the portable receipt chain.
+    with pytest.raises(ValueError, match="final row count differs from captured table metadata"):
+        ef.ComparisonResult.model_validate(replay.model_copy(update={"counts": counts}))
+    # Keep the deeper rehashed-chain attack: a structurally valid but invented
+    # alignment observation must still be checked against the actual replay.
+    # The output/capture bindings and recorded rows remain intact.
+    invented_strategy = "multiset" if replay.strategy != "multiset" else "sequence"
+    replay = ef.ComparisonResult.model_validate(
+        replay.model_copy(update={"strategy": invented_strategy, "selected_key": None})
+    )
     case = case.model_copy(update={"output_replay": replay})
     replay_uri = replay.differences.uri.rsplit("/", 1)[0] + "/comparison.json"
     replay_file = next(item for item in bundle.files if item.source_uri == replay_uri)

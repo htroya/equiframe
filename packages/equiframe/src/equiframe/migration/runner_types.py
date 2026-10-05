@@ -353,7 +353,7 @@ class MigrationResult(FrozenModel):
 
     @property
     def state(self) -> Literal["equivalent", "different", "not_evaluable"]:
-        return self.comparison.state if self.comparison else "not_evaluable"
+        return self.comparison.state if self.comparison is not None else "not_evaluable"
 
     @property
     def verification(self) -> Literal["correct", "divergent", "not_evaluable", "not_requested"]:
@@ -362,7 +362,11 @@ class MigrationResult(FrozenModel):
         checks = (self.verification_source, self.verification_target)
         if any(c is None or not c.complete or c.state == "not_evaluable" for c in checks):
             return "not_evaluable"
-        return "divergent" if any(c and c.state == "different" for c in checks) else "correct"
+        return (
+            "divergent"
+            if any(c is not None and c.state == "different" for c in checks)
+            else "correct"
+        )
 
     @property
     def exit_code(self) -> int:
