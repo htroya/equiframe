@@ -1,0 +1,646 @@
+{
+  "$defs": {
+    "ComparisonValue": {
+      "additionalProperties": false,
+      "description": "Lossless scalar evidence. Numeric text; dates/instants use integer epochs.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "null",
+            "nan",
+            "infinity",
+            "boolean",
+            "integer",
+            "string",
+            "decimal",
+            "float",
+            "date",
+            "timestamp"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "timezone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timezone"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "s",
+                "ms",
+                "us",
+                "ns"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "ComparisonValue",
+      "type": "object"
+    },
+    "ReportCount": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "precision": {
+          "enum": [
+            "exact",
+            "lower_bound",
+            "estimate",
+            "unknown"
+          ],
+          "title": "Precision",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "rows",
+            "records",
+            "occurrences"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "name",
+        "value",
+        "precision",
+        "unit"
+      ],
+      "title": "ReportCount",
+      "type": "object"
+    },
+    "ReportEvidenceManifest": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptance": {
+          "enum": [
+            "satisfied",
+            "not_satisfied"
+          ],
+          "title": "Acceptance",
+          "type": "string"
+        },
+        "access": {
+          "const": "caller_managed_local_storage_no_encryption",
+          "default": "caller_managed_local_storage_no_encryption",
+          "title": "Access",
+          "type": "string"
+        },
+        "available_records": {
+          "minimum": 0,
+          "title": "Available Records",
+          "type": "integer"
+        },
+        "counts_final": {
+          "title": "Counts Final",
+          "type": "boolean"
+        },
+        "display_complete": {
+          "title": "Display Complete",
+          "type": "boolean"
+        },
+        "evaluation_complete": {
+          "title": "Evaluation Complete",
+          "type": "boolean"
+        },
+        "included_examples": {
+          "minimum": 0,
+          "title": "Included Examples",
+          "type": "integer"
+        },
+        "inspection": {
+          "enum": [
+            "result_only",
+            "verified_differences"
+          ],
+          "title": "Inspection",
+          "type": "string"
+        },
+        "metadata_withheld": {
+          "title": "Metadata Withheld",
+          "type": "boolean"
+        },
+        "mode": {
+          "enum": [
+            "diagnostic",
+            "detail",
+            "reproduction"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "raw_retention": {
+          "const": "unchanged_in_original_comparison",
+          "default": "unchanged_in_original_comparison",
+          "title": "Raw Retention",
+          "type": "string"
+        },
+        "report_retention": {
+          "const": "until_caller_deletes",
+          "default": "until_caller_deletes",
+          "title": "Report Retention",
+          "type": "string"
+        },
+        "reproduction": {
+          "enum": [
+            "not_requested",
+            "requires_verified_export",
+            "exported_materialized_inputs"
+          ],
+          "title": "Reproduction",
+          "type": "string"
+        },
+        "reproduction_scope": {
+          "const": "materialized_comparison_only_no_transform_reexecution",
+          "default": "materialized_comparison_only_no_transform_reexecution",
+          "title": "Reproduction Scope",
+          "type": "string"
+        },
+        "required_exhaustive": {
+          "title": "Required Exhaustive",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "unmet_requirements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unmet Requirements",
+          "type": "array"
+        },
+        "values_withheld": {
+          "title": "Values Withheld",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "mode",
+        "inspection",
+        "evaluation_complete",
+        "counts_final",
+        "available_records",
+        "included_examples",
+        "display_complete",
+        "values_withheld",
+        "metadata_withheld",
+        "required_exhaustive",
+        "acceptance",
+        "unmet_requirements",
+        "reproduction"
+      ],
+      "title": "ReportEvidenceManifest",
+      "type": "object"
+    },
+    "ReportPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "ReportPolicy",
+      "type": "object"
+    },
+    "ReportValue": {
+      "additionalProperties": false,
+      "properties": {
+        "disclosure": {
+          "enum": [
+            "visible",
+            "redacted",
+            "omitted"
+          ],
+          "title": "Disclosure",
+          "type": "string"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "native_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Native Type"
+        },
+        "physical_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Physical Type"
+        },
+        "representation": {
+          "title": "Representation",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ComparisonValue"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "disclosure",
+        "kind",
+        "representation"
+      ],
+      "title": "ReportValue",
+      "type": "object"
+    },
+    "ReportViewPolicy": {
+      "additionalProperties": false,
+      "description": "Safe publication policy: column-redaction selectors never leave the builder.",
+      "properties": {
+        "include_metadata": {
+          "title": "Include Metadata",
+          "type": "boolean"
+        },
+        "include_values": {
+          "title": "Include Values",
+          "type": "boolean"
+        },
+        "max_examples": {
+          "minimum": 0,
+          "title": "Max Examples",
+          "type": "integer"
+        },
+        "max_report_bytes": {
+          "exclusiveMinimum": 0,
+          "title": "Max Report Bytes",
+          "type": "integer"
+        },
+        "max_value_chars": {
+          "exclusiveMinimum": 0,
+          "title": "Max Value Chars",
+          "type": "integer"
+        },
+        "mode": {
+          "enum": [
+            "diagnostic",
+            "detail",
+            "reproduction"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "redacted_column_count": {
+          "minimum": 0,
+          "title": "Redacted Column Count",
+          "type": "integer"
+        },
+        "require_exhaustive": {
+          "title": "Require Exhaustive",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "mode",
+        "include_values",
+        "include_metadata",
+        "redacted_column_count",
+        "max_examples",
+        "max_value_chars",
+        "max_report_bytes",
+        "require_exhaustive"
+      ],
+      "title": "ReportViewPolicy",
+      "type": "object"
+    },
+    "ReportWitness": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate": {
+          "items": {
+            "$ref": "#/$defs/ReportValue"
+          },
+          "title": "Candidate",
+          "type": "array"
+        },
+        "candidate_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Candidate Count"
+        },
+        "category": {
+          "enum": [
+            "contract",
+            "content",
+            "schema"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "column": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Column"
+        },
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "key": {
+          "items": {
+            "$ref": "#/$defs/ReportValue"
+          },
+          "title": "Key",
+          "type": "array"
+        },
+        "key_columns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Key Columns",
+          "type": "array"
+        },
+        "other_position": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Other Position"
+        },
+        "position": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Position"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "reference": {
+          "items": {
+            "$ref": "#/$defs/ReportValue"
+          },
+          "title": "Reference",
+          "type": "array"
+        },
+        "reference_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reference Count"
+        }
+      },
+      "required": [
+        "category",
+        "code",
+        "reason",
+        "position",
+        "other_position",
+        "column",
+        "columns",
+        "key_columns",
+        "key",
+        "candidate",
+        "reference",
+        "candidate_count",
+        "reference_count"
+      ],
+      "title": "ReportWitness",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One sanitized source for JSON, console, standalone HTML and notebooks.\n\nFormatting this object performs no file IO, imports no notebook framework and\nnever evaluates a source. JSON is a view, not a serialized ComparisonResult.",
+  "properties": {
+    "complete": {
+      "title": "Complete",
+      "type": "boolean"
+    },
+    "contract_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Contract Sha256",
+      "type": "string"
+    },
+    "counts": {
+      "items": {
+        "$ref": "#/$defs/ReportCount"
+      },
+      "title": "Counts",
+      "type": "array"
+    },
+    "coverage": {
+      "enum": [
+        "complete",
+        "partial"
+      ],
+      "title": "Coverage",
+      "type": "string"
+    },
+    "evidence": {
+      "$ref": "#/$defs/ReportEvidenceManifest"
+    },
+    "examples": {
+      "items": {
+        "$ref": "#/$defs/ReportWitness"
+      },
+      "title": "Examples",
+      "type": "array"
+    },
+    "next_action": {
+      "title": "Next Action",
+      "type": "string"
+    },
+    "options": {
+      "$ref": "#/$defs/ReportViewPolicy"
+    },
+    "policies": {
+      "items": {
+        "$ref": "#/$defs/ReportPolicy"
+      },
+      "title": "Policies",
+      "type": "array"
+    },
+    "reasons": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reasons",
+      "type": "array"
+    },
+    "reference": {
+      "enum": [
+        "peer",
+        "expected"
+      ],
+      "title": "Reference",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "const": "output_schema",
+      "default": "output_schema",
+      "title": "Scope",
+      "type": "string"
+    },
+    "spec_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Spec Sha256",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "equivalent",
+        "different",
+        "not_evaluable"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "strategy": {
+      "enum": [
+        "pending",
+        "sequence",
+        "key",
+        "multiset",
+        "matching"
+      ],
+      "title": "Strategy",
+      "type": "string"
+    }
+  },
+  "required": [
+    "state",
+    "complete",
+    "reference",
+    "strategy",
+    "coverage",
+    "contract_sha256",
+    "spec_sha256",
+    "counts",
+    "reasons",
+    "next_action",
+    "policies",
+    "examples",
+    "evidence",
+    "options"
+  ],
+  "title": "ComparisonReport",
+  "type": "object"
+}

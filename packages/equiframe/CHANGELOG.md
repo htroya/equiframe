@@ -2,6 +2,20 @@
 
 ## Sin publicar — revisión del candidato 0.11.1
 
+- STEP3: `comparison_report` produce un `ComparisonReport` 1.0 común para JSON,
+  consola, HTML y notebooks; redacción conservadora por defecto, tipos escalares
+  fieles, posiciones por lado y recuentos exactos/cotas/desconocidos. No vuelve
+  a ejecutar fuentes ni cambia `ComparisonResult` o el comparador.
+- `write_comparison_report` y `read_comparison_report` publican/leen vistas
+  independientes. Inspección de evidencia con raíz autorizada, límites, hashes
+  y defensas frente a archivos corruptos/rutas/symlinks. Reproducción opcional
+  de capturas materializadas con contexto y manifiesto; ejecución original,
+  cifrado, borrado de originales y assertion helpers quedan fuera del alcance.
+- HTML escapado sin scripts/recursos remotos y CSP; texto con controles visibles;
+  pruebas de redacción, claves con ámbito, límites y fallos de publicación. El
+  ejemplo de reporte corre también desde wheel, y la lectura/render usa la base
+  instalada sin dependencias tabulares ni notebook.
+
 - STEP2: `diff` acepta tablas eager pandas/Polars/Arrow, construye contratos a
   partir del esquema derecho y delega al mismo núcleo de comparación.
   `DiffContract`, constructores de clave/bolsa/secuencia y `read_diff_contract`
@@ -13,7 +27,7 @@
   Las opciones de comparación, diagnósticos y estados conservan su significado.
 - Pruebas de paridad pública, captura, procedencia y claves globales; ejemplo
   directo ejecutado por el verificador del wheel fuera del checkout. No añade
-  HTML/aserciones, amplía versiones/plataformas ni publica paquetes.
+  HTML/aserciones en STEP2, amplía versiones/plataformas ni publica paquetes.
 - Cuarentena explícita del auxiliar incompleto `equiframe.benchmark`: sus siete
   funciones conservan los argumentos anteriores pero lanzan
   `UnsupportedBenchmarkError` antes de leer entradas, entrenar o escribir.

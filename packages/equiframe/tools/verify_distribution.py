@@ -101,6 +101,25 @@ print('Clean installed profile:',extra,'outside checkout; light import verified'
                 cwd=project,
                 env=profile_env,
             )
+        report_example = project / "report_local.py"
+        shutil.copyfile(ROOT / "examples" / "report_local.py", report_example)
+        run(
+            [str(python), "-I", str(report_example), "--output", str(project / "reports")],
+            cwd=project,
+            env=profile_env,
+        )
+        base_python = work / "runtime" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+        run(
+            [
+                str(base_python),
+                "-I",
+                str(report_example),
+                "--render-only",
+                str(project / "reports" / "detail" / "report.json"),
+            ],
+            cwd=project,
+            env=profile_env,
+        )
         if extra == "arrow":
             verify_example = project / "verify_generic.py"
             shutil.copyfile(ROOT / "examples" / "verify_generic.py", verify_example)
@@ -323,7 +342,8 @@ root = Path(sys.prefix).resolve()
 assert Path(equiframe.__file__).resolve().is_relative_to(root), equiframe.__file__
 assert Path(equiframe.__file__).with_name('py.typed').is_file()
 assert equiframe.__version__ == importlib.metadata.version('equiframe') == sys.argv[1]
-for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy', 'pyarrow', 'pytest', 'hypothesis'):
+for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy', 'pyarrow',
+             'pytest', 'hypothesis', 'IPython', 'jupyter'):
     assert importlib.util.find_spec(name) is None, name
 print('Installed wheel imports from clean site-packages without engines/ML/dev tools')
 assert equiframe.ComparisonOptions().batch_rows > 0
@@ -515,6 +535,9 @@ assert Path(equiframe.__file__).resolve().is_relative_to(Path(sys.prefix).resolv
             "order: tuple[ef.SortSpec, ...]) -> tuple[ef.DiffContract, ...]:\n"
             "    return (ef.bag_contract(columns), ef.keyed_contract(columns, keys=['id']), "
             "ef.sequence_contract(columns, by=order))\n"
+            "def presentation(result: ef.ComparisonResult) -> tuple[ef.ComparisonReport, str]:\n"
+            "    report = ef.comparison_report(result, options=ef.ReportOptions())\n"
+            "    return report, report.to_html()\n"
             "import pandas as pd\n"
             "import polars as pl\n"
             "import pyarrow as pa\n"

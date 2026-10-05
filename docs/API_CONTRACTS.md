@@ -570,6 +570,18 @@ expedientes 0.11.0 no se anuncian como lectores de candidatos intermedios privad
 
 ## Revisión compatible 0.11.1
 
+La entrega aditiva [STEP3: reporte común](REPORTS.md) incorpora
+`ComparisonReport`, `ReportOptions`, `ReportCount`, `ReportValue`,
+`ReportWitness`, `ReportPolicy`, `ReportViewPolicy`, `ReportEvidenceManifest`,
+`ReportPublicationManifest`, `comparison_report`, `write_comparison_report`,
+`read_comparison_report` y los tres `render_comparison_*`. Sus esquemas 1.0
+son independientes de los formatos anteriores. La misma vista filtrada alimenta
+JSON/texto/HTML/notebook, preservando juicio y cobertura. La lectura opcional de
+evidencia exige una raíz explícita; la reproducción exportada solo conserva
+comparaciones materializadas admitidas y su contexto. No cambia la captura
+original, no añade aserciones ni reejecuta fuentes.
+
+
 La entrega aditiva [STEP2: entrada directa](DIFF.md) incorpora `diff`,
 `DiffCaptureOptions`, `DiffContract`, `PolicyProvenance`, `bag_contract`,
 `keyed_contract`, `sequence_contract`, `infer_diff_contract` y

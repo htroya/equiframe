@@ -395,3 +395,16 @@ decisiones humanas/legales pendientes.
 
 Estas decisiones son de API y captura; no cambian el protocolo experimental,
 las etiquetas, los detectores ni los requisitos de revisión científica.
+
+## Reporte común STEP3 — 2026-10-05
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A134 | Añadir una vista `ComparisonReport` 1.0 separada | JSON/texto/HTML/notebook consumen un modelo filtrado sin IO de fuentes. El juicio, el comparador y los formatos previos no cambian. [API](REPORTS.md). |
+| A135 | Separar divulgación, evaluación y aceptación de evidencia | Valores/nombres/rutas se ocultan por defecto. Límites de ejemplos no reducen el recorrido; evidencia exhaustiva insuficiente tiene requisito insatisfecho independiente del juicio. |
+| A136 | Verificar diferencias solo bajo una raíz explícita y presupuestos | Manifiesto, tamaño, hash, estructura y alineación registrada se comprueban sin abrir orígenes. Corrupción falla explícitamente; un hash no autentica al productor. |
+| A137 | Limitar reproducción a capturas materializadas con contexto suficiente | Exportación explícita incluye entradas, índices admitidos, spec, opciones y versiones; rechaza comparaciones incompletas y ExecutionResult. No promete reproducir transformaciones o servicios. |
+| A138 | Conservar la retención previa y publicar vistas de mínimo acceso | No se borran ni debilitan snapshots/diferencias existentes. Reportes nuevos piden directorios/archivos privados, no cifrado ni ACL remota. Publicación fallida no se considera éxito; HTML mantiene escape/CSP sin scripts. |
+
+Son decisiones operativas de presentación y evidencia, sin cambios del protocolo
+experimental, etiquetas, detectores o requisitos de revisión científica.
