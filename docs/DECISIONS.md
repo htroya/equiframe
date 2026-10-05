@@ -382,3 +382,16 @@ Ambas decisiones son correcciones de ingeniería del candidato privado 0.11.1;
 no cambian el protocolo experimental, sus etiquetas ni sus resultados. La
 [ficha](STEP1_CANDIDATE.md) mantiene separadas fuente, ejecución, artefactos y
 decisiones humanas/legales pendientes.
+
+## Entrada breve STEP2 — 2026-10-05
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A129 | Añadir `diff` como fachada del mismo comparador | DataFrames eager pandas/Polars y tablas Arrow se capturan fielmente antes de usar el núcleo vigente. La derecha es esperado por defecto; `compare` mantiene su default peer. Se conservan estados, diagnósticos, matching máximo y fallback de claves. [API](DIFF.md). |
+| A130 | Añadir constructores tipados y procedencia separada 1.0 | `DiffContract` contiene el `ComparisonSpec` existente y el origen de cada campo hoja. `read_diff_contract(result)` descubre su compañero y verifica vínculo con comparación/spec/referencia; no cambia el formato anterior ni constituye firma o aprobación humana. |
+| A131 | Inferir solo de metadatos de la referencia con defaults visibles | No se leen diferencias del candidato para relajar el contrato. Nulabilidad permanece abierta; exactitud numérica usa escala sin interpretación `unspecified`, sin adivinar unidad de negocio. Tolerancia/unidades y restricciones se declaran explícitamente. Las claves nunca se infieren. |
+| A132 | Rechazar materialización lazy y semántica no representable en la fachada inicial | No se ejecuta SQL/relación DuckDB ni plan Polars por pasar un objeto a `diff`. Categorías, metadatos sin política y tipos no fieles fallan explícitamente. Se mantiene la ruta previa de snapshots/ejecuciones materializadas con contrato. Captura y comparación tienen límites cooperativos separados. |
+| A133 | Mantener STEP2 independiente de presentaciones y aserciones futuras | El retorno es el `ComparisonResult` vigente. No se introducen HTML, redacción, assertion helpers, publicación, cambios de licencia ni ampliación de versiones. Los ejemplos se verifican mediante consumidores de wheel y los dos paquetes repiten sus gates del candidato. |
+
+Estas decisiones son de API y captura; no cambian el protocolo experimental,
+las etiquetas, los detectores ni los requisitos de revisión científica.

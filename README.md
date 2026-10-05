@@ -38,6 +38,30 @@ La última línea tiene la forma `different 2 <URI del archivo de diferencias>`.
 
 No uses `pip install equiframe` para obtener este candidato: el nombre podría resolver un paquete ajeno. Para reproducir el entorno de desarrollo utiliza `uv.lock` y la [instalación reproducible](packages/equiframe/README.md#instalación-reproducible). También pueden usarse los wheels identificados del equipo según la [guía de distribución](docs/RELEASE_CANDIDATE.md).
 
+### Comparar DataFrames o tablas directamente
+
+`ef.diff` acepta DataFrames eager de pandas/Polars y tablas Arrow. El esperado
+está a la derecha; infiere tipos de su esquema, conserva políticas estrictas y
+solo usa claves declaradas:
+
+```python
+import equiframe as ef
+import pyarrow as pa
+
+expected = pa.table({"id": ["A", "B"], "quantity": [10, 20]})
+candidate = pa.table({"id": ["B", "A"], "quantity": [21, 10]})
+result = ef.diff(candidate, expected, keys=["id"])
+print(result.state, result.complete)  # different True
+print(ef.read_diff_contract(result).model_dump_json(indent=2))
+```
+
+Los [constructores tipados y la procedencia](docs/DIFF.md) permiten inspeccionar
+o fijar todas las políticas. La fachada devuelve el `ComparisonResult` existente
+y preserva sus estados, diagnósticos y evidencia. Índices significativos y
+representaciones ambiguas no se ignoran silenciosamente. Relaciones DuckDB y
+planes lazy requieren materialización explícita; [límites de captura, errores
+y tipos admitidos](docs/DIFF.md#entradas-materialización-y-fidelidad).
+
 ### Comparar archivos de tu proyecto
 
 Con un contrato y dos archivos Parquet propios, la API disponible es `ef.compare`:
@@ -64,7 +88,7 @@ for difference in ef.iter_differences(result.differences):
 
 `my-contract.json` define el esquema de salida y sus políticas; los archivos del ejemplo anterior pertenecen al consumidor. Para ver cómo construir un contrato completo, consulta [el ejemplo Arrow](packages/equiframe/examples/compare_local.py) o la [referencia de contratos](docs/API_CONTRACTS.md).
 
-Cada lado admite `ArrowInput`, `ArtifactRef` local, `Path` a Arrow IPC **file** o Parquet, `TableArtifact` y `ExecutionResult` con estado `completed`. Los DataFrames no se aceptan directamente en `compare`: deben capturarse mediante ejecución o convertirse explícitamente a un transporte que preserve las distinciones necesarias. La comparación no vuelve a ejecutar los motores.
+Cada lado admite `ArrowInput`, `ArtifactRef` local, `Path` a Arrow IPC **file** o Parquet, `TableArtifact` y `ExecutionResult` con estado `completed`. Para DataFrames directos use `diff`; `compare` conserva sus entradas materializadas y no vuelve a ejecutar los motores.
 
 ### Interpretar el resultado
 
@@ -93,6 +117,7 @@ El estado de ejecución `completed` solo indica que la transformación terminó 
 |---|---|---|
 | Contratos tipados | `Contract`, `validate_contract`, CLI de contratos | Esquema, claves, unidades, ausencias, orden y políticas explícitas; validar metadatos no evalúa los datos |
 | Comparación de resultados | `compare`, `read_comparison`, `iter_differences` | Clave verificada, multiconjunto o secuencia; normalizaciones autorizadas, tolerancias y evidencia completa |
+| Entrada directa | `diff`, `read_diff_contract`, constructores de contrato | pandas/Polars/Arrow eager; políticas y procedencia inspeccionables, referencia derecha y captura acotada |
 | Ejecución nativa | `execute`, `TransformationRegistry` | Callbacks pandas, DataFrame/LazyFrame Polars y consultas DuckDB parametrizadas |
 | Migración declarativa | `check_migration`, `migrate`, `read_migration` | Plan relacional cerrado, implementaciones nativas y seis direcciones entre los tres motores, dentro de las capacidades admitidas |
 | Verificación | `verify`, `verify_migration` | Separa acuerdo entre salidas, comparación contra esperado, integridad, reglas, cobertura y revisión independiente |
@@ -207,6 +232,7 @@ Estos son comandos para ejecutar, no una declaración de que una revisión concr
 | [Integración OCI](docs/OCI_INTEGRATION.md) | Proveedores, snapshots y responsabilidades del servicio/DW |
 | [Calidad](docs/QUALITY.md) y [release](docs/RELEASE_CANDIDATE.md) | Pruebas, artefactos, evidencia y decisiones pendientes |
 | [Ficha operativa STEP1](docs/STEP1_CANDIDATE.md) | Candidato exacto, capacidades declaradas/verificadas, decisiones semánticas, backlog y pilotos definidos |
+| [Entrada directa STEP2](docs/DIFF.md) | Fachada, constructores tipados, procedencia, captura y límites explícitos |
 
 Las revisiones históricas y la planificación del proyecto permanecen en `docs/`. Documentan decisiones y pendientes; no sustituyen el alcance actual de la API ni resultados de ejecución del candidato.
 

@@ -570,6 +570,16 @@ expedientes 0.11.0 no se anuncian como lectores de candidatos intermedios privad
 
 ## Revisión compatible 0.11.1
 
+La entrega aditiva [STEP2: entrada directa](DIFF.md) incorpora `diff`,
+`DiffCaptureOptions`, `DiffContract`, `PolicyProvenance`, `bag_contract`,
+`keyed_contract`, `sequence_contract`, `infer_diff_contract` y
+`read_diff_contract`. La firma, procedencia, ejemplos y límites se definen en
+esa página. `diff` devuelve el `ComparisonResult` existente y usa referencia
+derecha esperada por defecto; `compare` mantiene el default peer. Contratos,
+especificaciones y resultados anteriores conservan sus esquemas 1.0; los dos
+esquemas nuevos pertenecen a la declaración/las opciones de captura de la
+fachada. No incluye nuevos métodos de presentación ni aserciones.
+
 `equiframe_benchmark.evaluate_pairwise(report) -> PairwiseReport` deriva seis
 soportes descriptivos R/M/B/H desde un EvaluationReport validado. Conserva el
 informe/digest/protocolo original y recalcula sus métricas al leer; incorpora

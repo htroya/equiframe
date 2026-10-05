@@ -1,5 +1,6 @@
 """Typed contracts and local native execution; import does not load engines/ML."""
 
+from equiframe._diff_capture import DiffCaptureOptions
 from equiframe.adapters import DuckDBAdapter, PandasAdapter, PolarsAdapter
 from equiframe.bundle import (
     BundleReference,
@@ -98,6 +99,15 @@ from equiframe.detectors import (
     read_detector_bundle,
     score_detectors,
     write_detector_bundle,
+)
+from equiframe.diff import DiffInput, diff, read_diff_contract
+from equiframe.diff_contracts import (
+    DiffContract,
+    PolicyProvenance,
+    bag_contract,
+    infer_diff_contract,
+    keyed_contract,
+    sequence_contract,
 )
 from equiframe.errors import (
     ArtifactIntegrityError,
@@ -408,6 +418,9 @@ __all__ = [
     "DetectorScores",
     "DetectorSupport",
     "DetectorVersions",
+    "DiffCaptureOptions",
+    "DiffContract",
+    "DiffInput",
     "DuckDBAdapter",
     "DuckDBTransformation",
     "EngineAdapter",
@@ -501,6 +514,7 @@ __all__ = [
     "PolarsAdapter",
     "PolarsInput",
     "PolarsTransformation",
+    "PolicyProvenance",
     "PreconditionSpec",
     "PreprocessorBundle",
     "ProfileFeature",
@@ -576,6 +590,7 @@ __all__ = [
     "WorkflowSpec",
     "WorkflowStage",
     "__version__",
+    "bag_contract",
     "calibrate_detectors",
     "canonical_contract_bytes",
     "check_migration",
@@ -588,18 +603,21 @@ __all__ = [
     "detect",
     "detect_component",
     "detector_fingerprint",
+    "diff",
     "evaluate_rules",
     "execute",
     "export_bundle",
     "fit_detectors",
     "fit_preprocessor",
     "import_bundle",
+    "infer_diff_contract",
     "ingest_file",
     "inspect_bundle",
     "inspect_evidence",
     "ir_fingerprint",
     "iter_differences",
     "iter_rule_findings",
+    "keyed_contract",
     "migrate",
     "migration_summary",
     "native_compiler_registry",
@@ -610,6 +628,7 @@ __all__ = [
     "read_comparison",
     "read_contract",
     "read_detector_bundle",
+    "read_diff_contract",
     "read_migration",
     "read_pipeline",
     "read_preprocessor",
@@ -626,6 +645,7 @@ __all__ = [
     "run_pipeline",
     "run_workflow",
     "score_detectors",
+    "sequence_contract",
     "transform_profiles",
     "validate_contract",
     "validate_ir",

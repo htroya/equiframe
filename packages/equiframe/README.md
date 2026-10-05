@@ -44,6 +44,32 @@ incluso cuando estén instalados. Una dependencia ausente produce
 `missing_optional_dependency` e indica el extra. No se necesitan cambios de
 `sys.path`, rutas del repositorio ni VM.
 
+## Comparación directa
+
+`ef.diff(candidate, expected, keys=["id"])` compara DataFrames eager pandas o
+Polars y tablas Arrow mediante el núcleo existente. La derecha es el esperado
+por defecto. Devuelve `ComparisonResult`; `ef.read_diff_contract(result)` permite
+inspeccionar el contrato, las políticas y la procedencia de cada campo.
+`bag_contract`, `keyed_contract`, `sequence_contract` e `infer_diff_contract`
+construyen declaraciones tipadas y serializables sin duplicar el comparador.
+
+Desde el wheel con el extra correspondiente:
+
+```bash
+python examples/diff_local.py --engine arrow
+python examples/diff_local.py --engine pandas
+python examples/diff_local.py --engine polars
+```
+
+Los ejemplos se distribuyen en el sdist. [API, ejemplos y límites](../../docs/DIFF.md).
+Tipos se infieren solo del esquema derecho; nulabilidad no se deduce de muestras,
+la igualdad numérica es exacta sin interpretación de unidades y no se aprenden
+tolerancias. No se ejecutan planes lazy ni relaciones DuckDB. Índices relevantes,
+categorías y metadatos sin política no se descartan para hacer pasar una prueba.
+`DiffCaptureOptions` limita captura nativa separadamente de `ComparisonOptions`;
+son controles cooperativos, no cuotas duras de memoria. Fallos previos al contrato
+o de publicación pueden lanzar excepciones sin reporte persistido.
+
 ## Ejecución mínima funcional
 
 Con el wheel y el extra `duckdb`, desde cualquier directorio:

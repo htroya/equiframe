@@ -88,6 +88,19 @@ print('Clean installed profile:',extra,'outside checkout; light import verified'
         comparison_example = project / "compare_local.py"
         shutil.copyfile(ROOT / "examples" / "compare_local.py", comparison_example)
         run([str(python), "-I", str(comparison_example)], cwd=project, env=profile_env)
+        diff_example = project / "diff_local.py"
+        shutil.copyfile(ROOT / "examples" / "diff_local.py", diff_example)
+        direct_engines = (
+            ("arrow", "pandas", "polars")
+            if extra == "engines"
+            else (extra if extra in ("pandas", "polars") else "arrow",)
+        )
+        for direct_engine in direct_engines:
+            run(
+                [str(python), "-I", str(diff_example), "--engine", direct_engine],
+                cwd=project,
+                env=profile_env,
+            )
         if extra == "arrow":
             verify_example = project / "verify_generic.py"
             shutil.copyfile(ROOT / "examples" / "verify_generic.py", verify_example)
@@ -493,6 +506,22 @@ assert Path(equiframe.__file__).resolve().is_relative_to(Path(sys.prefix).resolv
             "contract: ef.Contract) -> ef.ComparisonResult:\n"
             "    options = ef.ComparisonOptions(batch_rows=2)\n"
             "    return ef.compare(a, b, contract=contract, options=options)\n"
+            "def direct(a: ef.DiffInput, b: ef.DiffInput) -> ef.ComparisonResult:\n"
+            "    result = ef.diff(a, b, keys=['id'], "
+            "capture_options=ef.DiffCaptureOptions(max_rows=100))\n"
+            "    declaration: ef.DiffContract = ef.read_diff_contract(result)\n"
+            "    return ef.diff(a, b, contract=declaration)\n"
+            "def builders(columns: tuple[ef.ColumnSpec, ...], "
+            "order: tuple[ef.SortSpec, ...]) -> tuple[ef.DiffContract, ...]:\n"
+            "    return (ef.bag_contract(columns), ef.keyed_contract(columns, keys=['id']), "
+            "ef.sequence_contract(columns, by=order))\n"
+            "import pandas as pd\n"
+            "import polars as pl\n"
+            "import pyarrow as pa\n"
+            "def native_diff(a: pd.DataFrame, b: pl.DataFrame) -> ef.ComparisonResult:\n"
+            "    declaration = ef.infer_diff_contract(pa.schema([('id', pa.int64())]), "
+            "keys=['id'])\n"
+            "    return ef.diff(a, b, contract=declaration)\n"
             "def profile(run: ef.ExecutionResult, spec: ef.ProfileSpec) -> ef.ProfileResult:\n"
             "    return ef.profile_execution(run, spec=spec)\n"
             "def matrix(training: ef.NormalTrainingProfiles, spec: ef.ProfileSpec, "

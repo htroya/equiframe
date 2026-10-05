@@ -1,5 +1,9 @@
 # Candidatos Python 0.11.1
 
+La [ficha STEP2](STEP2_CANDIDATE.md) registra la entrada directa y las nueve
+etapas de ambos paquetes en Linux/Python 3.12.14, con los artefactos exactos.
+No amplía la matriz remota ni reemplaza la identidad de recibos anteriores.
+
 La [ficha operativa STEP1](STEP1_CANDIDATE.md) identifica el saneamiento actual
 y sus recibos. Las ejecuciones históricas citadas en esta guía conservan su
 revisión; no se atribuyen automáticamente al candidato nuevo.
