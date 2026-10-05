@@ -83,7 +83,7 @@ if result.state != "equivalent" or not result.complete:
     raise AssertionError(f"Comparación no aceptada: {result.state}, complete={result.complete}")
 ```
 
-**Limitación actual de la CLI:** `equiframe compare` puede devolver código 0 cuando la referencia esperada es inválida y el resultado es `not_evaluable` con `complete=True`. No bases una aceptación automática solo en ese código; comprueba `state == "equivalent"` y `complete` mediante la API o el resultado JSON.
+**Gate de la CLI corregido:** `equiframe compare` devuelve 0 solo para `equivalent` completo, 1 para `different` completo y 3 para `not_evaluable`, también cuando la referencia esperada es inválida con `complete=True`. Los errores de configuración o persistencia salen con código no cero. La [tabla de decisiones y sus regresiones](docs/STEP1_SEMANTIC_RFC.md) fija el contrato; los [recibos del candidato](docs/STEP1_CANDIDATE.md) distinguen fuente, controles locales y validación remota.
 
 El estado de ejecución `completed` solo indica que la transformación terminó y su salida se materializó; no acredita equivalencia, corrección ni ausencia de anomalías. [Estados y evidencia de comparación](docs/COMPARISON.md#estados-y-evidencia).
 
@@ -169,7 +169,7 @@ Durante la serie 0.x, los cambios incompatibles requieren changelog y migración
 
 La evaluación se documenta en la distribución separada [equiframe-benchmark](packages/equiframe-benchmark/README.md), con escenarios, particiones, revisión y reproducción. Sus controles técnicos no reemplazan la evidencia empírica ni la revisión independiente pendientes.
 
-El auxiliar reciente [`equiframe.benchmark`](packages/equiframe/src/equiframe/benchmark.py) y su [ejemplo local](packages/equiframe/examples/benchmark_local.py) del paquete núcleo están incompletos: incluyen métricas de relleno, una comparación limitada a conteos y reutilización de datos de ajuste para calibración. No deben usarse para reportar precisión, recall, F1 o conclusiones de equivalencia. Su revisión y validación siguen pendientes; no son el recorrido de comparación mostrado arriba.
+El auxiliar [`equiframe.benchmark`](packages/equiframe/src/equiframe/benchmark.py) del núcleo está en cuarentena: se retiró la implementación que incluía métricas de relleno, comparación por conteos y reutilización de datos de ajuste para calibración. Sus siete helpers solo lanzan `UnsupportedBenchmarkError`, sin leer datos, ejecutar ETL, entrenar, calcular métricas ni escribir resultados. `python -m equiframe.benchmark` y su [entrada local](packages/equiframe/examples/benchmark_local.py) salen con código 2 y diagnóstico; `--help` sale 0. La distribución `equiframe-benchmark` conserva su protocolo propio y no es un reemplazo directo de ese auxiliar. [Pruebas de cuarentena](packages/equiframe/tests/test_benchmark_quarantine.py).
 
 ## Desarrollo y contribución
 
@@ -206,6 +206,7 @@ Estos son comandos para ejecutar, no una declaración de que una revisión concr
 | [Benchmark](packages/equiframe-benchmark/README.md) | Escenarios, revisión, particiones, evaluación y reproducción |
 | [Integración OCI](docs/OCI_INTEGRATION.md) | Proveedores, snapshots y responsabilidades del servicio/DW |
 | [Calidad](docs/QUALITY.md) y [release](docs/RELEASE_CANDIDATE.md) | Pruebas, artefactos, evidencia y decisiones pendientes |
+| [Ficha operativa STEP1](docs/STEP1_CANDIDATE.md) | Candidato exacto, capacidades declaradas/verificadas, decisiones semánticas, backlog y pilotos definidos |
 
 Las revisiones históricas y la planificación del proyecto permanecen en `docs/`. Documentan decisiones y pendientes; no sustituyen el alcance actual de la API ni resultados de ejecución del candidato.
 

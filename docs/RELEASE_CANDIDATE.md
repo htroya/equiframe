@@ -1,5 +1,9 @@
 # Candidatos Python 0.11.1
 
+La [ficha operativa STEP1](STEP1_CANDIDATE.md) identifica el saneamiento actual
+y sus recibos. Las ejecuciones históricas citadas en esta guía conservan su
+revisión; no se atribuyen automáticamente al candidato nuevo.
+
 Dos distribuciones: `equiframe==0.11.1` y `equiframe-benchmark==0.11.1`.
 El benchmark fija exactamente el núcleo en base/extras; `uv` usa una fuente
 local sólo para desarrollo. Los metadatos publicados del wheel contienen la
