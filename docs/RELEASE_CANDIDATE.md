@@ -1,5 +1,8 @@
 # Candidatos Python 0.11.1
 
+La [ficha STEP3](STEP3_CANDIDATE.md) identifica el reporte común, sus controles
+y límites de evidencia. Los recibos anteriores siguen siendo históricos.
+
 La [ficha STEP2](STEP2_CANDIDATE.md) registra la entrada directa y las nueve
 etapas de ambos paquetes en Linux/Python 3.12.14, con los artefactos exactos.
 No amplía la matriz remota ni reemplaza la identidad de recibos anteriores.

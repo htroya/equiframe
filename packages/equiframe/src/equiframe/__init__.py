@@ -17,6 +17,11 @@ from equiframe.comparison import (
     iter_differences,
     read_comparison,
 )
+from equiframe.comparison_report import (
+    comparison_report,
+    read_comparison_report,
+    write_comparison_report,
+)
 from equiframe.comparison_types import (
     AppliedPolicy,
     ComparisonCounts,
@@ -248,6 +253,22 @@ from equiframe.registry import (
     Transformation,
     TransformationRegistry,
 )
+from equiframe.report_rendering import (
+    render_comparison_html,
+    render_comparison_notebook,
+    render_comparison_text,
+)
+from equiframe.report_types import (
+    ComparisonReport,
+    ReportCount,
+    ReportEvidenceManifest,
+    ReportOptions,
+    ReportPolicy,
+    ReportPublicationManifest,
+    ReportValue,
+    ReportViewPolicy,
+    ReportWitness,
+)
 from equiframe.reporting import pipeline_summary, render_report, write_report
 from equiframe.rule_types import (
     CheckResult,
@@ -380,6 +401,7 @@ __all__ = [
     "ComparisonInput",
     "ComparisonOptions",
     "ComparisonPolicy",
+    "ComparisonReport",
     "ComparisonResult",
     "ComparisonSource",
     "ComparisonSpec",
@@ -532,6 +554,14 @@ __all__ = [
     "ReductionOptions",
     "ReductionResult",
     "RelationalPlan",
+    "ReportCount",
+    "ReportEvidenceManifest",
+    "ReportOptions",
+    "ReportPolicy",
+    "ReportPublicationManifest",
+    "ReportValue",
+    "ReportViewPolicy",
+    "ReportWitness",
     "ResourceLimitError",
     "RuleContext",
     "RuleCoverage",
@@ -597,6 +627,7 @@ __all__ = [
     "combine_decisions",
     "compare",
     "comparison_fingerprint",
+    "comparison_report",
     "contract_fingerprint",
     "contract_json_schema",
     "default_rule_registry",
@@ -626,6 +657,7 @@ __all__ = [
     "profile_spec_fingerprint",
     "read_bundle",
     "read_comparison",
+    "read_comparison_report",
     "read_contract",
     "read_detector_bundle",
     "read_diff_contract",
@@ -639,6 +671,9 @@ __all__ = [
     "read_verification",
     "read_workflow",
     "reduce_case",
+    "render_comparison_html",
+    "render_comparison_notebook",
+    "render_comparison_text",
     "render_migration_report",
     "render_report",
     "rule_set_fingerprint",
@@ -653,6 +688,7 @@ __all__ = [
     "verify",
     "verify_events",
     "verify_migration",
+    "write_comparison_report",
     "write_contract",
     "write_detector_bundle",
     "write_preprocessor",

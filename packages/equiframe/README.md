@@ -70,6 +70,31 @@ categorías y metadatos sin política no se descartan para hacer pasar una prueb
 son controles cooperativos, no cuotas duras de memoria. Fallos previos al contrato
 o de publicación pueden lanzar excepciones sin reporte persistido.
 
+## Reporte común y privado
+
+`ef.comparison_report(result)` produce una vista JSON/texto/HTML/notebook sin
+abrir archivos ni reejecutar datos. `report.to_text()`, `report.to_html()` y
+`report._repr_html_()` usan el mismo contenido filtrado. Valores, nombres y rutas
+están ocultos por defecto. `ReportOptions` separa divulgación, ejemplos y
+presupuestos de inspección de los límites originales de evaluación.
+
+`ef.write_comparison_report(result, Path("private-report"))` guarda los tres
+formatos e inventario en un directorio nuevo. `ef.read_comparison_report` lee la
+vista sin dependencias tabulares/notebook. Un `evidence_root` explícito habilita
+verificación acotada de diferencias; el modo `reproduction` exige permiso
+explícito de valores/metadatos y copia capturas admitidas con contexto suficiente
+para volver a compararlas, sin reejecutar transformaciones originales.
+
+Recuentos desconocidos, cotas inferiores y exactos tienen etiquetas diferentes.
+En bolsa no se inventan filas modificadas. El límite de vista no cambia juicio
+ni cobertura, y los originales brutos no se borran ni se redactan por implicación.
+[API, privacidad y límites](../../docs/REPORTS.md).
+
+```bash
+python examples/report_local.py --output report-example
+python examples/report_local.py --render-only report-example/detail/report.json
+```
+
 ## Ejecución mínima funcional
 
 Con el wheel y el extra `duckdb`, desde cualquier directorio:

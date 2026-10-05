@@ -62,6 +62,21 @@ representaciones ambiguas no se ignoran silenciosamente. Relaciones DuckDB y
 planes lazy requieren materialización explícita; [límites de captura, errores
 y tipos admitidos](docs/DIFF.md#entradas-materialización-y-fidelidad).
 
+### Leer un reporte común
+
+```python
+report = ef.comparison_report(result)
+print(report.to_text())
+html = report.to_html()
+# En un notebook, mostrar report usa la misma vista filtrada
+```
+
+El reporte independiente conserva juicio y cobertura sin reejecutar orígenes.
+Por defecto oculta valores, nombres y rutas. El detalle verificado, la divulgación
+explícita, los recuentos exactos/cotas/desconocidos y la exportación acotada de
+capturas se describen en [Reportes y privacidad](docs/REPORTS.md). Limitar ejemplos
+no limita la evaluación ni convierte evidencia parcial en equivalencia.
+
 ### Comparar archivos de tu proyecto
 
 Con un contrato y dos archivos Parquet propios, la API disponible es `ef.compare`:
@@ -118,6 +133,7 @@ El estado de ejecución `completed` solo indica que la transformación terminó 
 | Contratos tipados | `Contract`, `validate_contract`, CLI de contratos | Esquema, claves, unidades, ausencias, orden y políticas explícitas; validar metadatos no evalúa los datos |
 | Comparación de resultados | `compare`, `read_comparison`, `iter_differences` | Clave verificada, multiconjunto o secuencia; normalizaciones autorizadas, tolerancias y evidencia completa |
 | Entrada directa | `diff`, `read_diff_contract`, constructores de contrato | pandas/Polars/Arrow eager; políticas y procedencia inspeccionables, referencia derecha y captura acotada |
+| Reporte común | `comparison_report`, `write_comparison_report`, `read_comparison_report` | JSON/texto/HTML/notebook sobre una vista filtrada, inspección acotada y exportación explícita de capturas |
 | Ejecución nativa | `execute`, `TransformationRegistry` | Callbacks pandas, DataFrame/LazyFrame Polars y consultas DuckDB parametrizadas |
 | Migración declarativa | `check_migration`, `migrate`, `read_migration` | Plan relacional cerrado, implementaciones nativas y seis direcciones entre los tres motores, dentro de las capacidades admitidas |
 | Verificación | `verify`, `verify_migration` | Separa acuerdo entre salidas, comparación contra esperado, integridad, reglas, cobertura y revisión independiente |
@@ -233,6 +249,7 @@ Estos son comandos para ejecutar, no una declaración de que una revisión concr
 | [Calidad](docs/QUALITY.md) y [release](docs/RELEASE_CANDIDATE.md) | Pruebas, artefactos, evidencia y decisiones pendientes |
 | [Ficha operativa STEP1](docs/STEP1_CANDIDATE.md) | Candidato exacto, capacidades declaradas/verificadas, decisiones semánticas, backlog y pilotos definidos |
 | [Entrada directa STEP2](docs/DIFF.md) | Fachada, constructores tipados, procedencia, captura y límites explícitos |
+| [Reportes STEP3](docs/REPORTS.md) | Modelo común, evidencia, redacción, límites y reproducción materializada |
 
 Las revisiones históricas y la planificación del proyecto permanecen en `docs/`. Documentan decisiones y pendientes; no sustituyen el alcance actual de la API ni resultados de ejecución del candidato.
 
