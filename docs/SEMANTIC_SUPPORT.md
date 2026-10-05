@@ -1,5 +1,9 @@
 # Matriz de soporte comprobable
 
+El [inventario operativo STEP1](STEP1_CAPABILITIES.md) añade etapa, adaptador,
+tipo, rol y nivel de verificación del candidato actual. No sustituye los casos
+de esta matriz ni convierte resultados históricos en ejecuciones nuevas.
+
 [SEMANTIC_SUPPORT.json](SEMANTIC_SUPPORT.json) es la matriz legible por máquina.
 Cada fila declara operación, tipo/fixture, motor, dirección, política, resultado
 esperado, estado y nodo pytest concreto. No expande combinaciones sin pruebas.

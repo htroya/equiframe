@@ -1,5 +1,20 @@
 # Changelog
 
+## Sin publicar — revisión del candidato 0.11.1
+
+- Cuarentena explícita del auxiliar incompleto `equiframe.benchmark`: sus siete
+  funciones conservan los argumentos anteriores pero lanzan
+  `UnsupportedBenchmarkError` antes de leer entradas, entrenar o escribir.
+  Se retiran las métricas ficticias, la calibración con datos de entrenamiento
+  y el proxy de conteo presentado como R; no hay resultados sustitutos.
+- El módulo y `examples/benchmark_local.py` terminan con código 2 y una guía al
+  paquete separado `equiframe_benchmark`; `--help` sigue disponible. Ese paquete
+  no es un reemplazo directo: conserva sus requisitos de revisión y protocolo.
+  Las API soportadas del núcleo, sus formatos y el import ligero no cambian.
+- `equiframe compare` devuelve 0 solo para una comparación completa y
+  `equivalent`, 1 para una completa y `different`, y 3 para todo `not_evaluable`,
+  incluida una referencia esperada inválida con `complete=True`.
+
 ## 0.11.1 — 2026-10-03
 
 - Decimales exactos de ingestión, IR, ejecución nativa y sumas R aislados del

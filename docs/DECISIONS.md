@@ -370,3 +370,15 @@ fuente/fixtures/reutilizaciones en registros efectivos de aprendizaje.
 | A124 | Vincular controles a fuente y artefactos del candidato | Huellas antes/después y wheels de dependencias locales evitan aprobar bytes nuevos con recibos antiguos; se exige limpieza del cierre de fuentes al emitir manifest. Listas condicionales de uv.sources se rechazan explícitamente por no estar soportadas. Vinculación no autentica ejecutores ni sustituye aprobación de licencia/publicación. |
 | A125 | Preservar las guías y responsabilidades comunicadas, incluida flexibilidad de VM | Tesis y guías se mantienen idénticas en hash. El Word de José permite OCI o alternativas AWS/Azure/Hetzner; se aclara esa flexibilidad sin elegir/desplegar proveedor, construir su gateway o redefinir el DW de Jhair. |
 | A126 | Aplicar max_records también al registrar errores de parser | La revisión cruzada confirmó exceso tras una fila válida seguida de CSV mal formado, y casos con presupuesto cero. Se comprueba límite antes de añadir cuarentena; se preservan errores dentro del presupuesto. Se interrumpen y repiten controles finales para vincular evidencia a la corrección. |
+
+## Saneamiento operativo STEP1 — 2026-10-04
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A127 | Poner en cuarentena el auxiliar `equiframe.benchmark` del núcleo | El borrador mezclaba métricas de relleno, conteos como divergencia y ajuste/calibración compartidos. Se retira su ejecución y se conservan siete nombres únicamente como guards que fallan explícitamente; CLI/ejemplo salen 2 salvo ayuda. La distribución separada `equiframe-benchmark` conserva su API, particiones, R/M/B/H/O y gates, sin convertirse en reemplazo directo. No se reinterpreta ninguna salida previa como evidencia científica. [Disposición y pruebas](STEP1_BACKLOG.md). |
+| A128 | Aceptar en CLI únicamente equivalencia completa | `invalid_expected` puede tener recorrido completo y debe salir 3, nunca 0. Se preservan los estados del núcleo y los hechos parciales; no se crea un combinador de resultados. [Contrato y tabla ejecutable](STEP1_SEMANTIC_RFC.md). |
+
+Ambas decisiones son correcciones de ingeniería del candidato privado 0.11.1;
+no cambian el protocolo experimental, sus etiquetas ni sus resultados. La
+[ficha](STEP1_CANDIDATE.md) mantiene separadas fuente, ejecución, artefactos y
+decisiones humanas/legales pendientes.

@@ -1,14 +1,13 @@
 """Stable API error codes and printable JSON paths; issues omit rejected inputs."""
 
 import json
-from typing import Union
 from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
 class ValidationIssue:
     code: str
-    location: tuple[Union[str, int], ...]
+    location: tuple[str | int, ...]
     message: str
 
     @property

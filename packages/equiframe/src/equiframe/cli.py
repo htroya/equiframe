@@ -372,7 +372,10 @@ def compare_command(
             sort_keys=True,
         )
     )
-    raise typer.Exit(code=3 if not result.complete else int(result.state == "different"))
+    # Traversal can be complete while an invalid expected reference prevents a verdict.
+    if not result.complete or result.state == "not_evaluable":
+        raise typer.Exit(code=3)
+    raise typer.Exit(code=0 if result.state == "equivalent" else 1)
 
 
 @app.command("report")
