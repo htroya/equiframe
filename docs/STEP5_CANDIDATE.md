@@ -103,6 +103,7 @@ se versiona y `THESIS_TRACEABILITY.md` permanece byte a byte por instrucción.
 
 La última instrucción del usuario exige completar los pasos 5, 6, 7, 8, 9 y 10
 secuencialmente y subir el conjunto a main al final. STEP5 se conserva como
-commit inmutable en la rama candidata y PR borrador; este documento no acredita
-pasos posteriores ni integración a main. El recibo externo identifica SHA y
+commit inmutable en la rama candidata. No se creó PR: esa acción requiere
+autorización adicional. Este documento no acredita pasos posteriores ni
+integración a main. El recibo externo identifica SHA y
 árbol exactos, kit, controles y el estado observado de la rama remota.
