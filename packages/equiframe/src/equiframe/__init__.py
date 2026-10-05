@@ -2,6 +2,17 @@
 
 from equiframe._diff_capture import DiffCaptureOptions
 from equiframe.adapters import DuckDBAdapter, PandasAdapter, PolarsAdapter
+from equiframe.assertion_types import EquivalenceDecision, EquivalencePolicy
+from equiframe.assertions import (
+    EquivalenceAssertionError,
+    EquivalenceDifferentError,
+    EquivalenceEvidenceError,
+    EquivalenceGuaranteeError,
+    EquivalenceInputError,
+    EquivalenceNotEvaluableError,
+    assert_equivalent,
+    equivalence_decision,
+)
 from equiframe.bundle import (
     BundleReference,
     EvidenceBundle,
@@ -449,6 +460,14 @@ __all__ = [
     "EngineCapabilities",
     "EquiFrameError",
     "EquiJoin",
+    "EquivalenceAssertionError",
+    "EquivalenceDecision",
+    "EquivalenceDifferentError",
+    "EquivalenceEvidenceError",
+    "EquivalenceGuaranteeError",
+    "EquivalenceInputError",
+    "EquivalenceNotEvaluableError",
+    "EquivalencePolicy",
     "EvidenceBundle",
     "EvidenceEvent",
     "EvidenceFile",
@@ -620,6 +639,7 @@ __all__ = [
     "WorkflowSpec",
     "WorkflowStage",
     "__version__",
+    "assert_equivalent",
     "bag_contract",
     "calibrate_detectors",
     "canonical_contract_bytes",
@@ -635,6 +655,7 @@ __all__ = [
     "detect_component",
     "detector_fingerprint",
     "diff",
+    "equivalence_decision",
     "evaluate_rules",
     "execute",
     "export_bundle",

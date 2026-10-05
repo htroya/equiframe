@@ -749,7 +749,7 @@ def read_costs(path: Path) -> CostComparisonResult:
         relative = f"{record.phase}-{record.repetition}-{record.method}/observation.json"
         if relative not in listed or load_document(CostObservation, directory / relative) != record:
             raise ef.ArtifactIntegrityError("cost observation contradicts its final manifest")
-        if record.comparison:
+        if record.comparison is not None:
             refs = [record.comparison.differences] + [
                 source.data
                 for source in (record.comparison.left, record.comparison.right)

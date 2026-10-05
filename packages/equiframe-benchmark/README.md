@@ -104,7 +104,7 @@ integridad/trazabilidad, no identidad humana ni veracidad de un productor hostil
 Desde `packages/equiframe-benchmark`, con `uv` en PATH:
 
 ```bash
-uv sync --locked --all-extras
+uv sync --locked --all-extras --reinstall-package equiframe
 uv run --locked --all-extras ruff check .
 uv run --locked --all-extras ruff format --check .
 uv run --locked --all-extras mypy
@@ -255,3 +255,14 @@ Verify sin instalar este paquete.
 Se fijó `equiframe==0.11.1`; extras y locks reflejan esa pareja. Twine se incorpora
 al entorno de desarrollo. La CI es manual y la matriz remota del candidato no fue
 ejecutada. [Candidato, controles y pendientes](https://github.com/htroya/equiframe/blob/main/docs/RELEASE_CANDIDATE.md).
+
+### Núcleo local usado por las pruebas
+
+Durante cambios del mismo candidato, `uv` puede reutilizar una instalación en
+caché de la dependencia local. Reinstale `equiframe` con el comando anterior
+antes de controles manuales del benchmark. Para un candidato identificado use
+`python ../equiframe/tools/check_candidate.py --package . --output /ruta/checks.json`:
+el driver reinstala dependencias locales y comprueba sus rutas de import y hashes
+runtime frente a la fuente antes de cada etapa. La suite instalada sigue
+consumiendo los wheels exactos fuera del checkout. Son pruebas de ingeniería,
+no ejecución independiente del protocolo científico.

@@ -5,6 +5,7 @@ import hashlib
 import importlib.metadata
 import json
 import platform
+import re
 import subprocess
 import sys
 import tomllib
@@ -73,6 +74,120 @@ def source_snapshot(package: Path) -> dict[str, Any]:
         "file_count": len(inventory),
         "sha256": hashlib.sha256(encoded).hexdigest(),
     }
+
+
+def local_dependency_names(package: Path) -> list[str]:
+    """Distribution names in the same local source closure used by receipts."""
+    repository = Path(git_output(package, "rev-parse", "--show-toplevel")).resolve()
+    names = []
+    for relative in source_snapshot(package)["packages"]:
+        dependency = repository / relative
+        if dependency == package.resolve():
+            continue
+        project = tomllib.loads((dependency / "pyproject.toml").read_text("utf-8"))["project"]
+        name = project["name"]
+        if (
+            not isinstance(name, str)
+            or re.fullmatch(r"[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*", name) is None
+        ):
+            raise SystemExit("invalid local dependency distribution name")
+        names.append(re.sub(r"[-_.]+", "-", name).lower())
+    if len(names) != len(set(names)):
+        raise SystemExit("local dependency distribution names must be unique")
+    return sorted(names)
+
+
+def local_dependency_sources(package: Path) -> list[dict[str, Any]]:
+    """Enumerate Git-visible runtime files, without executing configuration code.
+
+    This bounded checker supports ordinary src-layout Python packages. Other
+    layouts need explicit support rather than silently omitting their bytes.
+    """
+    repository = Path(git_output(package, "rev-parse", "--show-toplevel")).resolve()
+    dependencies = []
+    for relative in source_snapshot(package)["packages"]:
+        dependency = repository / relative
+        if dependency == package.resolve():
+            continue
+        project = tomllib.loads((dependency / "pyproject.toml").read_text("utf-8"))["project"]
+        files: dict[str, dict[str, str]] = {}
+        for name in git_output(
+            repository,
+            "ls-files",
+            "-z",
+            "--cached",
+            "--others",
+            "--exclude-standard",
+            "--",
+            ":(literal)" + relative + "/src",
+        ).split("\0"):
+            if not name:
+                continue
+            source = repository / name
+            local = source.relative_to(dependency / "src")
+            import_name = local.parts[0]
+            if (
+                len(local.parts) < 2
+                or not import_name.isidentifier()
+                or not (dependency / "src" / import_name / "__init__.py").is_file()
+            ):
+                raise SystemExit("local dependency binding requires regular src-layout packages")
+            files.setdefault(import_name, {})[Path(*local.parts[1:]).as_posix()] = hashlib.sha256(
+                source.read_bytes()
+            ).hexdigest()
+        if not files:
+            raise SystemExit("local dependency has no Git-visible src package files")
+        dependencies.append(
+            {
+                "distribution": re.sub(r"[-_.]+", "-", project["name"]).lower(),
+                "source_package": relative,
+                "imports": [
+                    {"name": name, "files": dict(sorted(values.items()))}
+                    for name, values in sorted(files.items())
+                ],
+            }
+        )
+    return dependencies
+
+
+def runtime_binding_matches(binding: Any, package: Path) -> bool:
+    """A source-only receipt never proves which local dependency bytes resolved."""
+    if not isinstance(binding, dict):
+        return False
+    if (
+        binding.get("algorithm") != "sha256-imported-local-source-v1"
+        or binding.get("verified") is not True
+        or binding.get("source_dependencies") != local_dependency_sources(package)
+        or binding.get("source_snapshot") != source_snapshot(package)
+    ):
+        return False
+    observed = binding.get("resolved_dependencies")
+    expected = binding["source_dependencies"]
+    if not isinstance(observed, list) or len(observed) != len(expected):
+        return False
+    for dependency, source in zip(observed, expected, strict=True):
+        if (
+            not isinstance(dependency, dict)
+            or dependency.get("distribution") != source["distribution"]
+        ):
+            return False
+        imports = dependency.get("imports")
+        if not isinstance(imports, list) or len(imports) != len(source["imports"]):
+            return False
+        for imported, wanted in zip(imports, source["imports"], strict=True):
+            if not isinstance(imported, dict):
+                return False
+            origin, root = imported.get("origin"), imported.get("root")
+            if (
+                imported.get("name") != wanted["name"]
+                or imported.get("files") != wanted["files"]
+                or not isinstance(origin, str)
+                or not isinstance(root, str)
+                or not Path(root).is_absolute()
+                or origin != str(Path(root) / "__init__.py")
+            ):
+                return False
+    return True
 
 
 def artifact_inventory(paths: tuple[Path, ...]) -> list[dict[str, Any]]:
@@ -219,12 +334,23 @@ def check_stage(command: list[str], package: Path, artifacts: tuple[Path, ...]) 
     program, arguments = parts
     if program == "locked_sync":
         remaining = arguments.copy()
-        if "--python" in remaining:
-            index = remaining.index("--python")
-            if index + 1 >= len(remaining) or remaining[index + 1].startswith("-"):
-                return None
-            del remaining[index : index + 2]
-        if set(remaining) == {"--locked", "--all-extras"}:
+        reinstall = []
+        for option in ("--python", "--reinstall-package"):
+            while option in remaining:
+                index = remaining.index(option)
+                if index + 1 >= len(remaining) or remaining[index + 1].startswith("-"):
+                    return None
+                value = remaining[index + 1]
+                del remaining[index : index + 2]
+                if option == "--reinstall-package":
+                    reinstall.append(value)
+                elif option in remaining:
+                    return None
+        if (
+            sorted(remaining) == ["--all-extras", "--locked"]
+            and len(reinstall) == len(set(reinstall))
+            and set(reinstall).issubset(local_dependency_names(package))
+        ):
             return "locked_sync"
     elif program == "ruff":
         if arguments == ["check", "."]:
@@ -260,6 +386,7 @@ def read_check_receipts(
     receipts = []
     successful: set[str] = set()
     bound: set[str] = set()
+    runtime_bound: set[str] = set()
     current_source = source_snapshot(package)
     current_artifacts = artifact_inventory(artifacts)
     dependencies = dependency_artifacts(package)
@@ -296,6 +423,10 @@ def read_check_receipts(
                 stage = check_stage(command, package, artifacts)
                 if stage is not None:
                     successful.add(stage)
+                    if not dependencies or runtime_binding_matches(
+                        check.get("local_dependency_runtime_binding"), package
+                    ):
+                        runtime_bound.add(stage)
                     before, after = check.get("source_before"), check.get("source_after")
                     if (
                         before == current_source
@@ -335,6 +466,14 @@ def read_check_receipts(
         "dependency_artifacts": current_dependencies,
         "source_bound_stages": [stage for stage in REQUIRED_CHECK_STAGES if stage in bound],
         "unbound_stages": [stage for stage in REQUIRED_CHECK_STAGES if stage not in bound],
+        "local_dependency_runtime_bound_stages": [
+            stage for stage in REQUIRED_CHECK_STAGES if stage in runtime_bound
+        ],
+        "local_dependency_runtime_unbound_stages": [
+            stage for stage in REQUIRED_CHECK_STAGES if stage not in runtime_bound
+        ]
+        if dependencies
+        else [],
         "receipts_authenticated": False,
     }
     return receipts, completion
@@ -377,6 +516,11 @@ def main() -> None:
         blockers.append(
             "checks are not bound to current source/artifact bytes; stages: "
             + ", ".join(completion["unbound_stages"])
+        )
+    if completion["local_dependency_runtime_unbound_stages"]:
+        blockers.append(
+            "local dependency imported bytes are not bound to current source; stages: "
+            + ", ".join(completion["local_dependency_runtime_unbound_stages"])
         )
     tools = {tool: importlib.metadata.version(tool) for tool in ("build", "hatchling", "twine")}
     manifest = {

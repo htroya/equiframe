@@ -8,6 +8,8 @@ from typing import cast
 
 import typer
 
+from equiframe.assertion_types import EquivalencePolicy
+from equiframe.assertions import equivalence_decision
 from equiframe.bundle import export_bundle, import_bundle, inspect_bundle
 from equiframe.comparison import compare
 from equiframe.comparison_types import ComparisonSpec
@@ -348,7 +350,7 @@ def compare_command(
     expected: bool = typer.Option(False),
     output: Path = typer.Option(Path("equiframe-runs")),
 ) -> None:
-    """Compare complete Arrow/Parquet content. Exit 0 equal, 1 different, 3 unavailable."""
+    """Compare materialized content. Exit 0 equal, 1 different, 2 invalid, 3 unavailable."""
     try:
         document = load_json(ComparisonSpec, spec)
         result = compare(
@@ -362,20 +364,51 @@ def compare_command(
     except Exception as error:
         _failure(error)
         return
-    typer.echo(
-        json.dumps(
-            {
-                "comparison_id": result.comparison_id,
-                "state": result.state,
-                "complete": result.complete,
-            },
-            sort_keys=True,
+    # A producer failure or malformed result is unavailable, never a verdict. Keep
+    # this separate from configuration validation so it cannot become exit 2.
+    try:
+        decision = equivalence_decision(
+            result,
+            policy=EquivalencePolicy(require_persisted_evidence=True),
+            evidence_root=output,
         )
-    )
-    # Traversal can be complete while an invalid expected reference prevents a verdict.
-    if not result.complete or result.state == "not_evaluable":
+        summary = {
+            "comparison_id": result.comparison_id,
+            "state": decision.state,
+            "complete": decision.complete,
+            "accepted": decision.accepted,
+            "code": decision.code,
+            "evidence_status": decision.evidence_status,
+        }
+    except Exception as error:
+        _failure(error, input_validation=False)
+        return
+    typer.echo(json.dumps(summary, sort_keys=True))
+    if decision.accepted:
+        raise typer.Exit(code=0)
+    # These diagnostics are deliberately fixed text. Diagnostic messages, column
+    # names, producer exception text, and raw values belong in private evidence.
+    if decision.state == "different" and decision.complete:
+        typer.echo(
+            "comparison_different: complete comparison found differences; "
+            "inspect a redacted comparison report before sharing evidence",
+            err=True,
+        )
+        raise typer.Exit(code=1)
+    if decision.state == "equivalent":
+        typer.echo(
+            "comparison_unavailable: finalized comparison evidence could not be verified; "
+            "restore the evidence or rerun before accepting equivalence",
+            err=True,
+        )
         raise typer.Exit(code=3)
-    raise typer.Exit(code=0 if result.state == "equivalent" else 1)
+    # Traversal can be complete while an invalid expected reference prevents a verdict.
+    typer.echo(
+        "comparison_not_evaluable: equivalence was not established; "
+        "check the declared contract, input availability, and comparison limits",
+        err=True,
+    )
+    raise typer.Exit(code=3)
 
 
 @app.command("report")

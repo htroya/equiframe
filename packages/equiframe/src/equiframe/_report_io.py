@@ -66,9 +66,18 @@ class EvidenceInspection:
     reference_excess: int
 
 
+class EvidencePathError(ArtifactIntegrityError):
+    """A comparison evidence path or file type violates confinement requirements."""
+
+
 def _require(condition: bool, message: str) -> None:
     if not condition:
         raise ArtifactIntegrityError(message)
+
+
+def _path_require(condition: bool, message: str) -> None:
+    if not condition:
+        raise EvidencePathError(message)
 
 
 def _limits(max_bytes: int, max_records: int, max_examples: int) -> None:
@@ -82,16 +91,19 @@ def _limits(max_bytes: int, max_records: int, max_examples: int) -> None:
 
 
 def _absolute(path: Path) -> Path:
-    _require(".." not in path.parts, "parent traversal is not permitted")
+    _path_require(".." not in path.parts, "parent traversal is not permitted")
     # resolve() would erase a symlink before inspection.
-    return path.absolute()
+    try:
+        return path.absolute()
+    except OSError as error:
+        raise ArtifactIOError("cannot determine absolute evidence path") from error
 
 
 def _directory(path: Path) -> Path:
     path = _absolute(path)
     try:
         for item in (*reversed(path.parents), path):
-            _require(
+            _path_require(
                 stat.S_ISDIR(item.lstat().st_mode), "evidence directories must not be symlinks"
             )
     except OSError as error:
@@ -100,20 +112,26 @@ def _directory(path: Path) -> Path:
 
 
 def _reference_path(ref: ArtifactRef, root: Path) -> Path:
-    parts = urlsplit(ref.uri)
-    _require(
+    try:
+        parts = urlsplit(ref.uri)
+    except ValueError:
+        raise EvidencePathError("evidence URI is invalid") from None
+    _path_require(
         parts.scheme == "file" and not parts.netloc and not parts.query and not parts.fragment,
         "evidence requires a local file URI without a host",
     )
-    decoded = unquote(parts.path, errors="strict")
-    _require(
+    try:
+        decoded = unquote(parts.path, errors="strict")
+    except UnicodeError:
+        raise EvidencePathError("evidence path encoding is invalid") from None
+    _path_require(
         not decoded.startswith("//") and "\\" not in decoded and "\x00" not in decoded,
         "network or malformed evidence paths are not permitted",
     )
     path = Path(url2pathname(parts.path))
-    _require(path.is_absolute(), "evidence paths must be absolute")
+    _path_require(path.is_absolute(), "evidence paths must be absolute")
     path = _absolute(path)
-    _require(path.is_relative_to(root), "evidence reference is outside the authorized root")
+    _path_require(path.is_relative_to(root), "evidence reference is outside the authorized root")
     return path
 
 
@@ -129,7 +147,7 @@ def _open_regular(path: Path) -> Iterator[BinaryIO]:
     directory_descriptors: list[int] = []
     try:
         before = path.lstat()
-        _require(stat.S_ISREG(before.st_mode), "evidence must be a regular file, not a link")
+        _path_require(stat.S_ISREG(before.st_mode), "evidence must be a regular file, not a link")
         flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NONBLOCK", 0)
         if os.open in os.supports_dir_fd and hasattr(os, "O_NOFOLLOW"):
             directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
@@ -143,9 +161,9 @@ def _open_regular(path: Path) -> Iterator[BinaryIO]:
             descriptor = os.open(path, flags)
             _directory(parent)
         after = os.fstat(descriptor)
+        _path_require(stat.S_ISREG(after.st_mode), "evidence must remain a regular file")
         _require(
-            stat.S_ISREG(after.st_mode)
-            and (before.st_dev, before.st_ino) == (after.st_dev, after.st_ino),
+            (before.st_dev, before.st_ino) == (after.st_dev, after.st_ino),
             "evidence file changed while opening",
         )
         with os.fdopen(descriptor, "rb") as stream:
@@ -196,7 +214,7 @@ def _read_document[T: FrozenModel](path: Path, model: type[T], budget: int) -> t
 def _manifest(result: ComparisonResult, root: Path, max_bytes: int) -> tuple[Path, int]:
     root = _directory(root)
     path = _reference_path(result.differences, root)
-    _require(
+    _path_require(
         path.name == "differences.jsonl" and path.parent.name == result.comparison_id,
         "evidence must use the comparison identifier and conventional filenames",
     )

@@ -408,3 +408,17 @@ las etiquetas, los detectores ni los requisitos de revisión científica.
 
 Son decisiones operativas de presentación y evidencia, sin cambios del protocolo
 experimental, etiquetas, detectores o requisitos de revisión científica.
+
+
+## Aserciones e integración STEP4 — 2026-10-05
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A139 | Gate explícito sobre `ComparisonResult` | Solo equivalencia completa y consistente; garantía observada del contrato, sin afirmar corrección del negocio o equivalencia universal. Política puede fijar hashes y referencia. |
+| A140 | Persistencia exigida de forma explícita y acotada | Política y raíz autorizada se exigen juntas; se reutiliza la inspección del manifiesto/diferencias, sin IO por defecto ni lectura implícita de fuentes. Integridad no autentica origen. |
+| A141 | Rechazar truth testing de resultados | Cambio observable deliberado: `__bool__` lanza `TypeError` en todos los estados. Migración a aserción, `.accepted` o comprobación explícita de campos/ausencia. Formatos previos intactos. |
+| A142 | Compartir aceptación y separar diagnósticos de máquina | Errores tipados, decisión versionada y CLI con códigos existentes; JSON stdout y mensajes redactados stderr. No se crea otra CLI. |
+| A143 | Integración pytest sin plugin, artefactos con lista cerrada | Guardar reporte redactado antes de fallar, capturas privadas aparte y upload `always()`. La demostración local y CI remota se declaran por separado; no se modifican permisos/workflows. |
+
+Son decisiones operativas de API y aceptación de resultados. No modifican
+protocolo experimental, detectores, etiquetas ni requisitos científicos.

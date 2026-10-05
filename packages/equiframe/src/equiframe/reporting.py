@@ -38,7 +38,7 @@ def pipeline_summary(result: PipelineResult) -> dict[str, object]:
             "complete": result.comparison.complete,
             "reference": result.spec.comparison_reference,
         }
-        if result.comparison
+        if result.comparison is not None
         else None,
         "detector_bundle_sha256": result.detection.bundle_sha256 if result.detection else None,
         "scientific_equivalence_confirmed": False,

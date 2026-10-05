@@ -185,7 +185,7 @@ def _verify_pipeline_artifacts(directory: Path, result: PipelineResult) -> None:
         )
     if result.profile:
         references.extend(result.profile.metadata.artifacts)
-    if result.comparison:
+    if result.comparison is not None:
         references.append(result.comparison.differences)
         references.extend(
             source.data

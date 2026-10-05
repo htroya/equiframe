@@ -174,9 +174,9 @@ class PipelineResult(FrozenModel):
                 raise ValueError("detection and hybrid must describe one identical profile")
         elif self.hybrid.m.decision != "not_evaluable":
             raise ValueError("missing detector cannot produce an M decision")
-        if self.comparison and not self.comparison_requested:
+        if self.comparison is not None and not self.comparison_requested:
             raise ValueError("unexpected comparison")
-        if self.comparison and (
+        if self.comparison is not None and (
             self.comparison.spec.contract != self.spec.execution.contract
             or self.comparison.spec.policy != self.spec.comparison_policy
             or self.comparison.options != self.spec.comparison_options
@@ -204,7 +204,10 @@ class PipelineResult(FrozenModel):
             d.result.complete for d in (*self.detection.m, *self.detection.b)
         ):
             raise ValueError("detector stage completeness contradicts its result")
-        if self.comparison and (self.stages[4].state == "completed") != self.comparison.complete:
+        if (
+            self.comparison is not None
+            and (self.stages[4].state == "completed") != self.comparison.complete
+        ):
             raise ValueError("comparison stage completeness contradicts its result")
         if (self.stages[5].state == "completed") != self.hybrid.result.complete:
             raise ValueError("hybrid stage completeness contradicts its result")
@@ -232,7 +235,7 @@ class PipelineResult(FrozenModel):
         alert = self.hybrid.r.decision == "alert" or self.hybrid.result.decision == "alert"
         if self.detection:
             alert |= any(d.result.decision == "alert" for d in self.detection.b)
-        return int(alert or bool(self.comparison and self.comparison.state == "different"))
+        return int(alert or (self.comparison is not None and self.comparison.state == "different"))
 
 
 def unavailable(reason: str) -> ComponentDecision:

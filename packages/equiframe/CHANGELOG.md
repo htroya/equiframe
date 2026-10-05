@@ -2,6 +2,24 @@
 
 ## Sin publicar — revisión del candidato 0.11.1
 
+- El verificador del candidato actualiza dependencias locales `path` y vincula
+  sus bytes runtime importados al cierre de fuente, para impedir que una copia
+  antigua del mismo candidato valide accidentalmente el benchmark nuevo.
+- STEP4: `assert_equivalent`, `equivalence_decision`, `EquivalencePolicy` y
+  `EquivalenceDecision` exigen equivalencia completa bajo contrato, con hashes
+  y referencia fijables y evidencia persistida verificable de forma opcional.
+  Errores tipados distinguen diferencia, no evaluabilidad, garantía, evidencia
+  y configuración; diagnóstico seguro y esquema de aceptación propio 1.0.
+- Cambio de compatibilidad deliberado: truth testing de `ComparisonResult` y
+  `EquivalenceDecision` lanza `TypeError`; use la aserción o campos explícitos.
+  No cambia el formato serializado previo. No se convierte `not_evaluable` en
+  `False`, diferencia ni éxito.
+- CLI compare conserva códigos 0/1/2/3 y JSON stdout, añade diagnósticos seguros
+  stderr y valida el resultado antes de emitir éxito. Recetas pytest/CI guardan
+  una vista redactada antes del fallo, con cuatro archivos permitidos. Pruebas
+  instaladas comprueban éxito/fallo y privacidad; no se añade plugin, dependencia,
+  workflow remoto ni publicación.
+
 - STEP3: `comparison_report` produce un `ComparisonReport` 1.0 común para JSON,
   consola, HTML y notebooks; redacción conservadora por defecto, tipos escalares
   fieles, posiciones por lado y recuentos exactos/cotas/desconocidos. No vuelve

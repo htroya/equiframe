@@ -90,7 +90,7 @@ class IntegrationComparison(Document):
     def consistent(self) -> Self:
         if (self.code == "comparison_recorded") != (self.result is not None):
             raise ValueError("recorded comparison requires its result")
-        if self.result and self.result.reference != (
+        if self.result is not None and self.result.reference != (
             "expected" if self.right_engine == "expected" else "peer"
         ):
             raise ValueError("comparison reference contradicts its declared role")
@@ -258,7 +258,10 @@ class IntegrationResult(Document):
             return 3
         return int(
             any(run.result and run.result.exit_code == 1 for run in self.runs)
-            or any(item.result and item.result.state == "different" for item in self.comparisons)
+            or any(
+                item.result is not None and item.result.state == "different"
+                for item in self.comparisons
+            )
         )
 
 

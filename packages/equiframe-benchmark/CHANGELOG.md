@@ -1,5 +1,14 @@
 # Changelog
 
+## Sin publicar — compatibilidad STEP4
+
+- Compruebe presencia de comparaciones con `is not None`; `ComparisonResult`
+  rechaza conversión booleana para impedir aceptación accidental. Consumidores
+  de integración, costes y reproducción conservan sus estados y condiciones.
+  La prueba de expediente rehasheado conserva rechazo temprano de conteos y
+  validación profunda de observaciones contra filas reales. Sin cambios
+  metodológicos, dependencias o formatos.
+
 ## 0.11.1 — 2026-10-03
 
 - Reproducción portátil compara conteos/estrategia/clave con las filas capturadas,

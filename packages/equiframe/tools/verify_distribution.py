@@ -120,6 +120,85 @@ print('Clean installed profile:',extra,'outside checkout; light import verified'
             cwd=project,
             env=profile_env,
         )
+        assertion_example = project / "assertion_ci.py"
+        shutil.copyfile(ROOT / "examples" / "assertion_ci.py", assertion_example)
+        assertion_engines = (
+            ("arrow", "pandas", "polars", "duckdb")
+            if extra == "engines"
+            else (extra if extra in ("pandas", "polars", "duckdb") else "arrow",)
+        )
+        for engine in assertion_engines:
+            for scenario, expected_exit in (
+                ("equivalent", 0),
+                ("different", 1),
+                ("not_evaluable", 3),
+            ):
+                destination = project / f"assertion-{engine}-{scenario}"
+                private = project / f"private-{engine}-{scenario}"
+                completed = subprocess.run(
+                    [
+                        str(python),
+                        "-I",
+                        str(assertion_example),
+                        "--case",
+                        scenario,
+                        "--engine",
+                        engine,
+                        "--output",
+                        str(destination),
+                        "--work-dir",
+                        str(private),
+                    ],
+                    cwd=project,
+                    env=profile_env,
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                )
+                if completed.returncode != expected_exit:
+                    raise RuntimeError(
+                        f"installed assertion recipe {engine}/{scenario} returned "
+                        f"{completed.returncode}, expected {expected_exit}: {completed.stderr}"
+                    )
+                if "Traceback" in completed.stdout + completed.stderr:
+                    raise RuntimeError("installed assertion recipe exposed a traceback")
+                print(f"Installed assertion recipe {engine}/{scenario}: exit {expected_exit}")
+                consumer_check = r"""
+import importlib.util, sys
+from pathlib import Path
+import equiframe as ef
+private, report, scenario = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
+assert {p.name for p in report.iterdir()} == {
+    'report.json', 'report.txt', 'report.html', 'evidence-manifest.json'}
+result, = [ef.read_comparison(p) for p in private.glob('*/comparison.json')]
+decision = ef.equivalence_decision(result,
+    policy=ef.EquivalencePolicy(require_persisted_evidence=True), evidence_root=private)
+assert decision.state == scenario and decision.accepted == (scenario == 'equivalent')
+assert decision.evidence_status == 'verified'
+assert ef.EquivalenceDecision.model_validate_json(decision.model_dump_json()) == decision
+try:
+    ef.assert_equivalent(result)
+except ef.EquivalenceAssertionError as error:
+    assert scenario != 'equivalent' and error.code == scenario
+else:
+    assert scenario == 'equivalent'
+for name in ('pyarrow', 'pandas', 'polars', 'duckdb', 'numpy', 'sklearn', 'pytest'):
+    assert importlib.util.find_spec(name) is None, name
+print('Base-only installed assertion consumer:', scenario)
+"""
+                run(
+                    [
+                        str(base_python),
+                        "-I",
+                        "-c",
+                        consumer_check,
+                        str(private),
+                        str(destination),
+                        scenario,
+                    ],
+                    cwd=project,
+                    env=profile_env,
+                )
         if extra == "arrow":
             verify_example = project / "verify_generic.py"
             shutil.copyfile(ROOT / "examples" / "verify_generic.py", verify_example)
@@ -348,6 +427,8 @@ for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy', 'pyarrow',
 print('Installed wheel imports from clean site-packages without engines/ML/dev tools')
 assert equiframe.ComparisonOptions().batch_rows > 0
 assert callable(equiframe.compare) and callable(equiframe.iter_differences)
+assert callable(equiframe.assert_equivalent) and callable(equiframe.equivalence_decision)
+assert equiframe.EquivalencePolicy().guarantee == 'observed_contract'
 assert callable(equiframe.evaluate_rules) and callable(equiframe.iter_rule_findings)
 assert callable(equiframe.profile_execution) and callable(equiframe.fit_preprocessor)
 assert callable(equiframe.transform_profiles) and callable(equiframe.read_preprocessor)
@@ -538,6 +619,10 @@ assert Path(equiframe.__file__).resolve().is_relative_to(Path(sys.prefix).resolv
             "def presentation(result: ef.ComparisonResult) -> tuple[ef.ComparisonReport, str]:\n"
             "    report = ef.comparison_report(result, options=ef.ReportOptions())\n"
             "    return report, report.to_html()\n"
+            "def acceptance(result: ef.ComparisonResult, root: Path) -> ef.EquivalenceDecision:\n"
+            "    policy = ef.EquivalencePolicy(require_persisted_evidence=True)\n"
+            "    ef.assert_equivalent(result, policy=policy, evidence_root=root)\n"
+            "    return ef.equivalence_decision(result, policy=policy, evidence_root=root)\n"
             "import pandas as pd\n"
             "import polars as pl\n"
             "import pyarrow as pa\n"
