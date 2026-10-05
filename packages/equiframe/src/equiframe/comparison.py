@@ -17,6 +17,7 @@ from typing import BinaryIO, Literal
 from uuid import uuid4
 
 from equiframe._comparison_io import batches, file_ref, snapshot
+from equiframe._diff_capture import _CapturedInput, _NativeInput
 from equiframe.comparison_types import (
     AppliedPolicy,
     ComparisonCounts,
@@ -40,7 +41,7 @@ from equiframe.errors import (
     ResourceLimitError,
 )
 from equiframe.execution import CancellationToken, _versions
-from equiframe.execution_types import ExecutionResult, TableArtifact
+from equiframe.execution_types import ExecutionResult, PhysicalColumn, TableArtifact
 from equiframe.local import LocalArtifactStore, local_path
 from equiframe.normalization import (
     equal,
@@ -56,6 +57,7 @@ from equiframe.tables import ArrowInput
 from equiframe.types import ArtifactRef, ComparisonState
 
 type ComparisonInput = ArrowInput | ArtifactRef | TableArtifact | ExecutionResult | Path
+type _ComparisonInput = ComparisonInput | _NativeInput | _CapturedInput
 
 
 def comparison_fingerprint(spec: ComparisonSpec) -> str:
@@ -193,9 +195,14 @@ class _Work:
             )
         )
 
-    def source(self, value: ComparisonInput, side: Side) -> ComparisonSource:
+    def source(self, value: _ComparisonInput, side: Side) -> ComparisonSource:
         execution = None
         table = None
+        captured = None
+        if isinstance(value, (_NativeInput, _CapturedInput)):
+            captured = value.load() if isinstance(value, _NativeInput) else value.loaded
+            self.check()
+            value = ArrowInput(captured.table)
         if isinstance(value, ExecutionResult):
             execution = ExecutionResult.model_validate(value)
             if execution.state != "completed" or execution.output is None:
@@ -216,6 +223,46 @@ class _Work:
                 "compare accepts ArrowInput, ArtifactRef, TableArtifact, ExecutionResult or Path"
             )
         data = snapshot(value, self.directory, self.options, self.check)
+        if captured is not None:
+            import pyarrow.compute as pc
+
+            def describe(
+                loaded: object, native: tuple[tuple[str, str], ...]
+            ) -> tuple[PhysicalColumn, ...]:
+                import pyarrow as pa
+
+                assert isinstance(loaded, pa.Table)
+                types = dict(native)
+                return tuple(
+                    PhysicalColumn(
+                        name=field.name,
+                        engine_type=types.get(field.name, str(field.type)),
+                        arrow_type=str(field.type),
+                        null_count=loaded.column(field.name).null_count,
+                        nan_count=(
+                            int(pc.sum(pc.is_nan(loaded.column(field.name))).as_py() or 0)
+                            if pa.types.is_floating(field.type)
+                            else 0
+                        ),
+                    )
+                    for field in loaded.schema
+                )
+
+            index = captured.index if captured.meaningful_index else None
+            index_ref = (
+                snapshot(ArrowInput(index), self.directory, self.options, self.check)
+                if index is not None
+                else None
+            )
+            table = TableArtifact(
+                name=self.spec.contract.output.name,
+                data=data,
+                row_count=captured.table.num_rows,
+                columns=describe(captured.table, captured.native_types),
+                index=index_ref,
+                index_columns=describe(index, ()) if index is not None else (),
+                notes=captured.notes,
+            )
         result = ComparisonSource(data=data, table=table, execution=execution)
         self.sources[side] = result
         if table and table.index:
@@ -613,6 +660,30 @@ def compare(
     snapshots. Operational failures return not_evaluable; invalid API configuration
     and inability to create/publish evidence raise. No transformations are executed.
     """
+    return _compare(
+        left,
+        right,
+        contract=contract,
+        policy=policy,
+        options=options,
+        reference=reference,
+        work_dir=work_dir,
+        cancellation=cancellation,
+    )
+
+
+def _compare(
+    left: _ComparisonInput,
+    right: _ComparisonInput,
+    *,
+    contract: Contract,
+    policy: ComparisonPolicy | None = None,
+    options: ComparisonOptions | None = None,
+    reference: Literal["peer", "expected"] = "peer",
+    work_dir: Path | None = None,
+    cancellation: CancellationToken | None = None,
+) -> ComparisonResult:
+    """One comparison kernel; the facade only adds capture and contract construction."""
     spec = ComparisonSpec(contract=contract, policy=policy or ComparisonPolicy())
     options = ComparisonOptions.model_validate(options or ComparisonOptions())
     if reference not in ("peer", "expected"):
@@ -641,7 +712,7 @@ def compare(
                                 > options.max_numeric_digits
                             ):
                                 raise ResourceLimitError("max_numeric_digits in declared tolerance")
-            inputs: tuple[tuple[Side, ComparisonInput], ...] = (("left", left), ("right", right))
+            inputs: tuple[tuple[Side, _ComparisonInput], ...] = (("left", left), ("right", right))
             for input_side, value in inputs:
                 side = input_side
                 work.check()

@@ -2,6 +2,18 @@
 
 ## Sin publicar — revisión del candidato 0.11.1
 
+- STEP2: `diff` acepta tablas eager pandas/Polars/Arrow, construye contratos a
+  partir del esquema derecho y delega al mismo núcleo de comparación.
+  `DiffContract`, constructores de clave/bolsa/secuencia y `read_diff_contract`
+  hacen visibles todas las políticas y su procedencia sin cambiar los formatos
+  anteriores. Claves explícitas, valores estrictos y fallback existente.
+- Captura nativa con límites de filas/bytes, snapshots aislados, conservación de
+  índices significativos y rechazos explícitos para categorías, metadatos sin
+  política, tipos no fieles, planes lazy y relaciones DuckDB. No ejecuta SQL.
+  Las opciones de comparación, diagnósticos y estados conservan su significado.
+- Pruebas de paridad pública, captura, procedencia y claves globales; ejemplo
+  directo ejecutado por el verificador del wheel fuera del checkout. No añade
+  HTML/aserciones, amplía versiones/plataformas ni publica paquetes.
 - Cuarentena explícita del auxiliar incompleto `equiframe.benchmark`: sus siete
   funciones conservan los argumentos anteriores pero lanzan
   `UnsupportedBenchmarkError` antes de leer entradas, entrenar o escribir.
