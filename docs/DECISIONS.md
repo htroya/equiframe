@@ -422,3 +422,15 @@ experimental, etiquetas, detectores o requisitos de revisión científica.
 
 Son decisiones operativas de API y aceptación de resultados. No modifican
 protocolo experimental, detectores, etiquetas ni requisitos científicos.
+
+## Primer uso y recetas STEP5 — 2026-10-05
+
+| ID | Decisión | Motivo y consecuencias |
+|---|---|---|
+| A144 | Entregar un kit privado autocontenido de tres recetas sobre wheel exacto | Instalación limpia, pins y hashes del lock, inventario cerrado y ejecución fuera del checkout. Los datos son sintéticos y no se descargan implícitamente; no se publica el nombre en PyPI. |
+| A145 | Usar migración nativa existente y conservar esperado separado | El IR acotado ejecuta pandas y DuckDB de forma real con Decimal, NULL y multiplicidad. Un error compartido conserva acuerdo entre motores y falla frente al esperado; no se simula un traductor arbitrario ni se amplía semántica. |
+| A146 | Separar consumidor técnico y aceptación humana | Pruebas instaladas y revisión independiente automatizada verifican comportamiento; cinco minutos sigue siendo meta sin validar. Se entrega un protocolo/formulario pendiente para tiempo, ayuda, errores, plataforma y comprensión, sin fabricar observaciones. |
+
+Son decisiones de documentación, consumo y verificación operativa. No alteran
+protocolo experimental, etiquetas, detectores, interfaces públicas, soporte
+Python, publicación ni responsabilidades del servicio/DW.

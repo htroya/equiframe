@@ -11,6 +11,8 @@ import tomllib
 import zipfile
 from pathlib import Path
 
+from verify_first_use import verify_first_use
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -500,6 +502,7 @@ print('Installed wheel API roundtrips all five fixtures exactly')
                     "installed CLI exposed a traceback or reported success on failure"
                 )
         verify_extras(uv, wheel, work, env)
+        verify_first_use(work / "first-use", uv=uv, environment=env)
         source_dir = work / "sdist"
         source_dir.mkdir()
         with tarfile.open(sdist, "r:gz") as archive:
@@ -538,6 +541,15 @@ print('Installed wheel API roundtrips all five fixtures exactly')
             "schemas/ingestion-spec-1.0.schema.json",
             "schemas/load-receipt-1.0.schema.json",
             "tools/release_manifest.py",
+            "tools/build_first_use_kit.py",
+            "tools/verify_first_use.py",
+            "examples/first_use/README.md",
+            "examples/first_use/INTERPRETATION.md",
+            "examples/first_use/OBSERVATION.md",
+            "examples/first_use/requirements.lock",
+            "examples/first_use/verify_kit.py",
+            "examples/refactor_comparison.py",
+            "examples/migrate_duckdb_recipe.py",
         ):
             if not (source / path).is_file():
                 raise RuntimeError("sdist is missing " + path)

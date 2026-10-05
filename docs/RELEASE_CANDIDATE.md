@@ -1,5 +1,8 @@
 # Candidatos Python 0.11.1
 
+La [ficha STEP5](STEP5_CANDIDATE.md) añade tres recetas y kit instalable
+autocontenido; mantiene separada su aceptación técnica de la observación humana.
+
 La [ficha STEP4](STEP4_CANDIDATE.md) identifica aserciones, integración y cambio
 observable de truth testing, con evidencia local y límites de CI remota.
 
@@ -208,3 +211,18 @@ reinstale explícitamente los wheels exactos elegidos, por ejemplo con
 `python -m pip install --force-reinstall --no-deps /ruta/equiframe-0.11.1-py3-none-any.whl /ruta/equiframe_benchmark-0.11.1-py3-none-any.whl`.
 Los verificadores del candidato utilizan entornos limpios e identifican los
 artefactos; este comando no resuelve los pendientes de publicación/licencia.
+
+## Consumo de primer uso STEP5
+
+El verificador de distribución del núcleo construye un kit con el wheel exacto,
+los scripts, guías y pins/hashes de dependencias del lock sin modificarlo. Lo
+copia fuera del checkout, crea un entorno limpio, verifica el import instalado y
+los códigos/reporte de las tres recetas y pytest. `build_first_use_kit.py` rechaza
+un inventario inesperado, pins desactualizados y archivos no regulares; el kit
+incluye su verificador y manifiesto. Los hashes verifican consistencia, no origen.
+No se distribuyen entornos ni dependencias binarias dentro de ese kit.
+
+Esta verificación y la revisión técnica independiente del consumidor no son una
+observación de una persona nueva. El formulario de primer uso sigue pendiente y
+registra tiempo total, instalación, ayuda, errores, plataforma y comprensión.
+No se amplía soporte Python/plataformas ni se activa un workflow remoto.

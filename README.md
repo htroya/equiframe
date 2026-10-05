@@ -21,7 +21,23 @@ Su enfoque combina contratos tipados, captura de las distinciones admitidas y co
 
 ## Inicio rápido
 
-### Instalar desde el repositorio
+### Tres recetas desde un artefacto instalado
+
+La [guía de primer uso](packages/equiframe/examples/first_use/README.md) reúne
+instalación limpia con dependencias fijadas y hashes, un refactor pandas con
+una diferencia localizable, migración nativa acotada pandas → DuckDB y regresión
+pytest/CI con evidencia antes del fallo. El kit privado incluye el wheel exacto
+y funciona fuera del checkout. No necesita datos, servicios ni descargas ocultas.
+
+El primer caso señala `id="B"`, `total_cents`: entero `2001` frente a `2000`,
+política exacta en centavos USD. Su código 1 es la regresión deliberada; la guía
+incluye corrección, extensión sin clave y los tres estados.
+[Interpretación](packages/equiframe/examples/first_use/INTERPRETATION.md) ·
+[Registro de observación](packages/equiframe/examples/first_use/OBSERVATION.md) ·
+[Validación y pendientes STEP5](docs/STEP5_CANDIDATE.md).
+La meta de cinco minutos y la aceptación humana siguen pendientes de observación.
+
+### Instalar desde el repositorio para desarrollo
 
 Necesitas acceso al repositorio y un entorno con Python 3.12. Para comparar datos locales basta el extra `arrow`; no hace falta instalar los tres motores.
 
@@ -254,6 +270,7 @@ Estos son comandos para ejecutar, no una declaración de que una revisión concr
 | [Calidad](docs/QUALITY.md) y [release](docs/RELEASE_CANDIDATE.md) | Pruebas, artefactos, evidencia y decisiones pendientes |
 | [Ficha operativa STEP1](docs/STEP1_CANDIDATE.md) | Candidato exacto, capacidades declaradas/verificadas, decisiones semánticas, backlog y pilotos definidos |
 | [Entrada directa STEP2](docs/DIFF.md) | Fachada, constructores tipados, procedencia, captura y límites explícitos |
+| [Primer uso STEP5](packages/equiframe/examples/first_use/README.md) | Tres recetas, instalación fijada, interpretación y observación humana pendiente |
 | [Aserciones STEP4](docs/ASSERTIONS.md) | Gate público, contrato de integración, pytest, CLI y artefactos seguros |
 | [Reportes STEP3](docs/REPORTS.md) | Modelo común, evidencia, redacción, límites y reproducción materializada |
 

@@ -2,6 +2,14 @@
 
 ## Sin publicar — revisión del candidato 0.11.1
 
+- STEP5: kit de primer uso con tres recetas autocontenidas, wheel identificado,
+  dependencias bloqueadas con hashes, guía de interpretación y formulario de
+  observación humana sin completar. Refactor pandas con clave/bolsa, migración
+  nativa acotada pandas → DuckDB y receta pytest/CI existente con evidencia
+  previa al fallo. El verificador instala el kit fuera del checkout y comprueba
+  códigos, reportes y políticas; no se anuncia una prueba humana de cinco minutos,
+  nueva compatibilidad, nueva semántica, CI remota ni publicación.
+
 - El verificador del candidato actualiza dependencias locales `path` y vincula
   sus bytes runtime importados al cierre de fuente, para impedir que una copia
   antigua del mismo candidato valide accidentalmente el benchmark nuevo.

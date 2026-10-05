@@ -22,6 +22,22 @@ registra los controles completados. No se requiere una VM ni un DW para usar el
 núcleo. Licencia y publicación externa pendientes; no hay paquete del equipo en PyPI.
 
 
+## Tres recetas para el primer uso
+
+Use la [guía autocontenida](examples/first_use/README.md) y el kit privado con
+wheel exacto, dependencias fijadas con hashes y scripts independientes del
+checkout. Incluye refactor pandas (valor/tipo/política y extensión sin clave),
+migración nativa acotada pandas → DuckDB (esperado separado, Decimal/NULL) y
+regresión pytest/CI con reporte redactado exportado antes del fallo.
+
+`tools/build_first_use_kit.py --output /ruta/nueva` prepara el kit desde el wheel
+construido. `tools/verify_first_use.py` lo instala en un entorno nuevo, verifica
+el import instalado y ejecuta los casos con sus códigos esperados. Este control
+se integra en la verificación de distribución. No instala globalmente, modifica
+el lock, publica en PyPI ni demuestra CI remota. Los hashes identifican bytes,
+no autentican autores. El [registro humano](examples/first_use/OBSERVATION.md)
+conserva pendiente la meta de diagnóstico en cinco minutos.
+
 ## Instalación base y extras
 
 La distribución todavía no está publicada en PyPI. `pip install equiframe` es
