@@ -4,7 +4,7 @@ import importlib.util
 import inspect
 from pathlib import Path
 from types import ModuleType
-from typing import Literal
+from typing import Annotated, Literal
 
 import pytest
 from pydantic import BaseModel, Field
@@ -28,7 +28,7 @@ def sample_function(flag: bool = True, *, mode: Literal["small", "large"] = "sma
 
 def test_finite_discrete_values_preserve_boolean_identity():
     assert inventory.finite_values(bool) == [False, True]
-    assert inventory.finite_values(Literal["a", "b"] | None) == ["a", "b"]
+    assert inventory.finite_values(Literal["a", "b"] | None) == ["a", "b", None]
     assert inventory.finite_values(int) == []
     assert inventory.encoded(inspect.Parameter.empty) == {"required": True}
 
@@ -81,3 +81,88 @@ def test_source_import_cannot_claim_installed_inventory(monkeypatch, tmp_path):
     )
     with pytest.raises(ValueError, match="outside this interpreter"):
         inventory.installed_identity(module, "not-a-real-distribution")
+
+
+def test_required_and_unbounded_options_do_not_invent_defaults_or_upper_bounds():
+    required = inventory.option_record("field:required", int, inspect.Parameter.empty)
+    assert required["required"] is True
+    assert required["default"] is None
+    assert "declared upper boundary" not in required["continuous_classes"]
+    optional = inventory.option_record("field:optional", int | None, None)
+    assert optional["finite_values"] == [None]
+    assert optional["continuous_classes"] == ["admitted representative", "wrong Python/JSON type"]
+    collection = inventory.option_record("field:tuple", tuple[Literal["a", "b"], ...], ())
+    assert collection["finite_values"] == []
+    assert collection["collection_member_values"] == [{"member_index": 0, "values": ["a", "b"]}]
+
+
+def test_owned_public_method_options_are_in_the_audit_universe():
+    class Port:
+        def load(self, *, allow: bool = False):
+            return allow
+
+    exported = ModuleType("fixture")
+    exported.__all__ = ["Port"]
+    exported.Port = Port
+    document = {
+        "environment": {},
+        "commit": "a" * 40,
+        "wheel_sha256": "b" * 64,
+        "exports": inventory.inspect_exports(exported, {}),
+        "cli": [],
+        "distributions": [],
+    }
+    rows = {row["id"]: row for row in inventory.obligations(document)}
+    assert "method:fixture.Port.load" in rows
+    assert "parameter:fixture.Port.load:allow:default" in rows
+    assert "parameter:fixture.Port.load:allow:value:false" in rows
+    assert "parameter:fixture.Port.load:allow:value:true" in rows
+    assert "parameter:fixture.Port.load:allow:invalid" in rows
+
+
+def test_optional_nested_limits_keep_branch_identity_instead_of_fake_intersection():
+    annotation = Annotated[int, Field(ge=2, le=9)] | None
+    record = inventory.option_record("field:optional", annotation, None)
+    assert record["bounds"] == {"branches": [{"path": "union:0", "bounds": {"ge": 2, "le": 9}}]}
+    assert "union:0 declared lower boundary" in record["continuous_classes"]
+    assert "union:0 declared upper boundary" in record["continuous_classes"]
+    mixed = Annotated[int, Field(ge=2, le=9)] | Annotated[float, Field(gt=20, lt=30)]
+    limits = inventory.bounds(mixed)
+    assert "ge" not in limits and "lt" not in limits
+    assert limits["branches"][0]["bounds"] == {"ge": 2, "le": 9}
+    assert limits["branches"][1]["bounds"] == {"gt": 20, "lt": 30}
+
+
+def test_computed_outcome_properties_are_outputs_without_invented_defaults():
+    class Outcome:
+        @property
+        def accepted(self) -> bool:
+            raise RuntimeError("Inspection must never execute a property")
+
+        @property
+        def state(self) -> Literal["good", "bad", "unknown"]:
+            raise RuntimeError("Inspection must never execute a property")
+
+    exported = ModuleType("fixture")
+    exported.__all__ = ["Outcome"]
+    exported.Outcome = Outcome
+    records = inventory.inspect_exports(exported, {})
+    properties = records[0]["properties"]
+    assert properties[0]["finite_values"] == [False, True]
+    assert properties[1]["finite_values"] == ["good", "bad", "unknown"]
+    rows = inventory.obligations(
+        {
+            "environment": {},
+            "commit": "a" * 40,
+            "wheel_sha256": "b" * 64,
+            "exports": records,
+            "cli": [],
+            "distributions": [],
+        }
+    )
+    ids = {row["id"] for row in rows}
+    assert "property:fixture.Outcome.accepted:value:false" in ids
+    assert 'property:fixture.Outcome.state:value:"unknown"' in ids
+    assert not any(
+        identifier.startswith("property:") and identifier.endswith(":default") for identifier in ids
+    )

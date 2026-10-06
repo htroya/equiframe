@@ -25,31 +25,36 @@ spec = ef.IngestionSpec(
     fields=(
         ef.FieldMapping(
             column=ef.ColumnSpec(
-                name="id", logical_type=ef.StringType(), nullable=False,
+                name="id",
+                logical_type=ef.StringType(),
+                nullable=False,
                 null_policy=ef.NullPolicy(representations=("null",)),
             ),
             path=("id",),
         ),
         ef.FieldMapping(
             column=ef.ColumnSpec(
-                name="money", logical_type=ef.DecimalType(precision=10, scale=2),
-                nullable=True, null_policy=ef.NullPolicy(representations=("null",)),
+                name="money",
+                logical_type=ef.DecimalType(precision=10, scale=2),
+                nullable=True,
+                null_policy=ef.NullPolicy(representations=("null",)),
                 numeric_policy=ef.NumericPolicy(comparison="exact", unit="USD"),
             ),
-            path=("money",), null_tokens=("NULL",),
+            path=("money",),
+            null_tokens=("NULL",),
         ),
     ),
 )
 result = ef.ingest_file(path, spec=spec, work_dir=Path("ingestion"), batch_rows=2)
 if result.state != "completed" or result.output is None:
     raise RuntimeError("Review the ingestion receipt before accepting these data")
-expected = pa.table({
-    "id": ["001", "001", "002"],
-    "money": pa.array([Decimal("1.10"), Decimal("1.10"), None],
-                      type=pa.decimal128(10, 2)),
-})
-comparison = ef.diff(ef.read_table(result.output), expected,
-                     work_dir=Path("comparison"))
+expected = pa.table(
+    {
+        "id": ["001", "001", "002"],
+        "money": pa.array([Decimal("1.10"), Decimal("1.10"), None], type=pa.decimal128(10, 2)),
+    }
+)
+comparison = ef.diff(ef.read_table(result.output), expected, work_dir=Path("comparison"))
 report = ef.write_comparison_report(comparison, Path("report"))
 print(report.to_text())
 ef.assert_equivalent(comparison)

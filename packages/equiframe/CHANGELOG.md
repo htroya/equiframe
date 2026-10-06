@@ -1,3 +1,34 @@
+# Private installed-product alpha 0.12.0a1 — 2026-10-06
+
+- Give the new candidate a distinct version; retain exact prior 0.11.1 artifacts
+  and historical reader compatibility. Benchmark pins the matching core version
+- Add genuine native right/full joins with explicit matchable-key cardinality,
+  deterministic key-based deduplication and rejection of unresolved ties
+- Add exact Decimal multiplication, explicit Decimal rounding and bounded pandas
+  Decimal division. Per-engine unsupported precision/rounding/division paths
+  reject rather than convert a shared output or relabel floating results
+- Admit timestamp IR unit/zone transport and native pandas/Polars DST localization
+  under explicit fold/gap policies. Reject unrepresentable NaT ticks and native
+  int64 localization wrap; equal incorrect native outputs must not be accepted
+- Preserve typed both-empty outer joins and widen DuckDB multiplication operands
+  before its intermediate calculation. Add independent literal regressions
+- Add optional `batch_rows=4096` to `ingest_file` and `FileInput`. Stream CSV/JSONL
+  converted batches and canonical receipt JSON while preserving raw source bytes,
+  positions, quarantine, exact values and old-format JSON bytes. Complete receipt
+  objects, full JSON documents and eager source resolution remain memory bounds
+- Document normal pip resolution through a private wheelhouse, base/extra and
+  historical lifecycle checks. No public upload or new license is implied
+- Add installed public-option inventory, explicit audit obligations and machine
+  case receipts; discovery and line coverage are not behavioral completeness
+- Exercise finite comparison/report/acceptance matrices and independent real-data
+  consumer programs separately from the historical synthetic A–H journeys
+
+New IR defaults serialize in the historical shape to preserve old fingerprints;
+new options have explicit serialization and compiler identities. Public imports,
+existing formats, R/M/B/H/O independence and scientific protocols remain intact.
+Unsupported platforms, unbound option interactions and the broader security
+assessment remain explicit; no 100% behavior, universal platform or security claim.
+
 # Post-roadmap review: correctness and reusable Python integrations
 
 ## Private consolidation — 2026-10-06 (candidate still identified by commit/hash)

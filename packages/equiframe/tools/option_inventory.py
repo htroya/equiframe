@@ -21,8 +21,8 @@ import zipfile
 from collections import Counter
 from enum import Enum
 from pathlib import Path
-from types import ModuleType
-from typing import Any, Literal, get_args, get_origin
+from types import ModuleType, UnionType
+from typing import Annotated, Any, Literal, Union, get_args, get_origin
 
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
@@ -55,18 +55,107 @@ def encoded(value: Any) -> Any:
 
 
 def finite_values(annotation: Any) -> list[Any]:
-    """Direct Literal/Enum/bool alternatives, including optional/annotated unions."""
+    """Direct Literal/Enum/bool/None alternatives, not collection-member values."""
     if annotation is bool:
         return [False, True]
-    if get_origin(annotation) is Literal:
+    if annotation is type(None):
+        return [None]
+    origin = get_origin(annotation)
+    if origin is Annotated:
+        return finite_values(get_args(annotation)[0])
+    if origin is Literal:
         return list(get_args(annotation))
     if isinstance(annotation, type) and issubclass(annotation, Enum):
         return [member.value for member in annotation]
     result: list[Any] = []
-    for argument in get_args(annotation):
-        for value in finite_values(argument):
-            if not any(type(value) is type(old) and value == old for old in result):
-                result.append(value)
+    if origin in (Union, UnionType):
+        for argument in get_args(annotation):
+            for value in finite_values(argument):
+                if not any(type(value) is type(old) and value == old for old in result):
+                    result.append(value)
+    return result
+
+
+def open_domain(annotation: Any) -> bool:
+    origin = get_origin(annotation)
+    if origin is Annotated:
+        return open_domain(get_args(annotation)[0])
+    if origin in (Union, UnionType):
+        return any(open_domain(argument) for argument in get_args(annotation))
+    return not (
+        annotation in (bool, type(None))
+        or origin is Literal
+        or (isinstance(annotation, type) and issubclass(annotation, Enum))
+    )
+
+
+def collection_values(annotation: Any) -> list[dict[str, Any]]:
+    origin = get_origin(annotation)
+    if origin is Annotated:
+        return collection_values(get_args(annotation)[0])
+    if origin in (Union, UnionType):
+        return [value for argument in get_args(annotation) for value in collection_values(argument)]
+    if origin not in (tuple, list, set, frozenset, dict):
+        return []
+    return [
+        {"member_index": index, "values": finite_values(argument)}
+        for index, argument in enumerate(get_args(annotation))
+        if argument is not Ellipsis and finite_values(argument)
+    ]
+
+
+def bounds(annotation: Any, metadata: Any = ()) -> dict[str, Any]:
+    """Preserve conditional branch/member limits; never intersect unrelated unions."""
+    candidates = list(metadata)
+    origin = get_origin(annotation)
+    arguments = get_args(annotation)
+    branches = []
+    if origin is Annotated:
+        candidates.extend(arguments[1:])
+        child = bounds(arguments[0])
+        branches.extend(child.pop("branches", []))
+        direct = child
+    else:
+        direct = {}
+        for index, argument in enumerate(arguments):
+            if argument is Ellipsis or origin is Literal:
+                continue
+            child = bounds(argument)
+            if child:
+                branches.append(
+                    {
+                        "path": ("union" if origin in (Union, UnionType) else "member")
+                        + ":"
+                        + str(index),
+                        "bounds": child,
+                    }
+                )
+    while candidates:
+        item = candidates.pop()
+        candidates.extend(getattr(item, "metadata", ()))
+        for name in ("gt", "ge", "lt", "le", "min_length", "max_length", "multiple_of"):
+            value = getattr(item, name, None)
+            if value is not None:
+                direct[name] = encoded(value)
+    if branches:
+        direct["branches"] = branches
+    return direct
+
+
+def boundary_classes(limits: dict[str, Any], prefix: str = "") -> list[str]:
+    result = []
+    if any(name in limits for name in ("gt", "ge", "min_length")):
+        result += [
+            prefix + "declared lower boundary",
+            prefix + "just outside declared lower boundary",
+        ]
+    if any(name in limits for name in ("lt", "le", "max_length")):
+        result += [
+            prefix + "declared upper boundary",
+            prefix + "just outside declared upper boundary",
+        ]
+    for branch in limits.get("branches", []):
+        result += boundary_classes(branch["bounds"], prefix + branch["path"] + " ")
     return result
 
 
@@ -80,21 +169,23 @@ def _annotation(annotation: Any) -> str:
 
 def option_record(identifier: str, annotation: Any, default: Any, **extra: Any) -> dict[str, Any]:
     values = finite_values(annotation)
+    limits = extra.pop("bounds", bounds(annotation))
+    required = extra.pop(
+        "required", default is PydanticUndefined or default is inspect.Parameter.empty
+    )
+    classes = []
+    if open_domain(annotation):
+        classes = ["admitted representative", "wrong Python/JSON type"]
+        classes += boundary_classes(limits)
     return {
         "id": identifier,
         "annotation": _annotation(annotation),
-        "default": encoded(default),
+        "required": required,
+        "default": None if required else encoded(default),
         "finite_values": [encoded(value) for value in values],
-        "continuous_classes": []
-        if values
-        else [
-            "admitted representative",
-            "declared lower boundary",
-            "declared upper boundary",
-            "just outside each declared boundary",
-            "wrong Python/JSON type",
-            "missing required",
-        ],
+        "collection_member_values": collection_values(annotation),
+        "continuous_classes": classes,
+        "bounds": limits,
         **extra,
     }
 
@@ -191,11 +282,37 @@ def inspect_exports(module: ModuleType, known: dict[int, str]) -> list[dict[str,
                     serialization_alias=field.serialization_alias,
                     default_factory=encoded(field.default_factory),
                     constraints=[encoded(item) for item in field.metadata],
+                    bounds=bounds(field.annotation, field.metadata),
                     description=field.description,
                 )
                 for field_name, field in value.model_fields.items()
             ]
         if isinstance(value, type):
+            record["properties"] = []
+            for property_name, descriptor in sorted(vars(value).items()):
+                if property_name.startswith("_") or not isinstance(descriptor, property):
+                    continue
+                from typing import get_type_hints
+
+                try:
+                    output_type = get_type_hints(descriptor.fget).get("return", Any)
+                except (TypeError, NameError):
+                    output_type = Any
+                record["properties"].append(
+                    {
+                        "id": "property:" + name + "." + property_name,
+                        "name": property_name,
+                        "read_only": descriptor.fset is None,
+                        "return_annotation": _annotation(output_type),
+                        "finite_values": finite_values(output_type),
+                        "output_classes": (
+                            ["valid declared output", "incomplete or unavailable output"]
+                            if open_domain(output_type)
+                            else []
+                        ),
+                        "documented_exit_codes_require_binding": property_name == "exit_code",
+                    }
+                )
             record["methods"] = [
                 {
                     "name": member,
@@ -216,7 +333,11 @@ def inspect_cli(module_name: str, command_name: str) -> list[dict[str, Any]]:
 
     def walk(command: Any, path: str) -> None:
         parameters = []
-        for parameter in command.params:
+        help_option = command.get_help_option(command.context_class(command))
+        discovered = list(command.params)
+        if help_option is not None and not any(p.name == help_option.name for p in discovered):
+            discovered.append(help_option)
+        for parameter in discovered:
             values = list(getattr(parameter.type, "choices", ()))
             if getattr(parameter, "is_bool_flag", False):
                 values = [False, True]
@@ -327,6 +448,23 @@ def obligations(inventory: dict[str, Any]) -> list[dict[str, Any]]:
             }
         )
 
+    def add_option(option: dict[str, Any]) -> None:
+        if option.get("required"):
+            add(option["id"] + ":required_omission", "required argument omitted")
+        else:
+            add(option["id"] + ":default", "default", option["default"])
+        for value in option["finite_values"]:
+            add(option["id"] + ":value:" + _key(value), value, option["default"])
+        add(option["id"] + ":invalid", "wrong type / unsupported discrete value")
+        for member in option.get("collection_member_values", []):
+            for value in member["values"]:
+                add(
+                    option["id"] + ":member:" + str(member["member_index"]) + ":" + _key(value),
+                    {"collection_member": value},
+                )
+        for index, boundary in enumerate(option.get("continuous_classes", [])):
+            add(option["id"] + ":class:" + str(index), boundary, option["default"])
+
     for record in inventory["exports"]:
         if record["alias_of"]:
             continue
@@ -336,16 +474,27 @@ def obligations(inventory: dict[str, Any]) -> list[dict[str, Any]]:
         for option in record.get("fields", []) + (
             [] if record["kind"] == "model" else record["parameters"]
         ):
-            add(option["id"] + ":default", "default", option["default"])
-            for value in option["finite_values"]:
-                add(option["id"] + ":value:" + _key(value), value, option["default"])
-            add(option["id"] + ":invalid", "wrong type / unsupported discrete value")
-            for index, boundary in enumerate(option.get("continuous_classes", [])):
-                add(option["id"] + ":class:" + str(index), boundary, option["default"])
+            add_option(option)
+        for property_record in record.get("properties", []):
+            add(
+                property_record["id"],
+                {"surface_kind": "computed_property", "read_only_output": True},
+            )
+            for value in property_record["finite_values"]:
+                add(property_record["id"] + ":value:" + _key(value), {"observed_output": value})
+            for index, output_class in enumerate(property_record["output_classes"]):
+                add(property_record["id"] + ":class:" + str(index), output_class)
+        for method in record.get("methods", []):
+            add("method:" + record["name"] + "." + method["name"], "declared public method")
+            for option in method["parameters"]:
+                add_option(option)
     for command in inventory["cli"]:
         add(command["id"], "command and exit-code semantics")
         for option in command["parameters"]:
-            add(option["id"] + ":default", "default", option["default"])
+            if option.get("required"):
+                add(option["id"] + ":required_omission", "required argument omitted")
+            else:
+                add(option["id"] + ":default", "default", option["default"])
             for value in option["finite_values"]:
                 add(option["id"] + ":value:" + _key(value), value, option["default"])
             add(option["id"] + ":invalid", "invalid argument")
@@ -354,6 +503,24 @@ def obligations(inventory: dict[str, Any]) -> list[dict[str, Any]]:
             for availability in ("present", "absent"):
                 add(
                     "dependency:" + distribution["distribution"] + ":" + extra + ":" + availability,
+                    availability,
+                )
+        requirements = sorted(
+            {
+                match.group(0)
+                for requirement in distribution["requires_dist"]
+                if (match := re.match(r"[A-Za-z0-9_.-]+", requirement)) is not None
+            }
+        )
+        for dependency in requirements:
+            for availability in ("present", "absent"):
+                add(
+                    "requirement:"
+                    + distribution["distribution"]
+                    + ":"
+                    + dependency
+                    + ":"
+                    + availability,
                     availability,
                 )
     return rows

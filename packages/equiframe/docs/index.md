@@ -50,6 +50,13 @@ redistribution rights. See [release and rollback](releasing.md) and
 11. [Adoption](adoption.md) and [maintenance](maintenance.md): consented real-project
     observations, later-change retention, useful issue reports and critical trust incidents
 
+## New candidate guides
+
+- [Normal pip installation through the private channel](installed-private.md)
+- [Native relational extensions and per-engine limits](migration-ir.md)
+- [CSV/JSONL batches and exact ingestion receipts](ingestion.md)
+- [Installed option inventory and honest coverage denominators](option-audit.md)
+
 ## Reading this handbook without the repository
 
 The source distribution contains `README.md`, this `docs/` directory, examples,

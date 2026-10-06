@@ -1,3 +1,16 @@
+# Private installed-product alpha 0.12.0a1 — 2026-10-06
+
+- Pin the exact matching `equiframe[arrow]==0.12.0a1` core and align engine/ML extras
+- Admit the new producer version in embedded detector-bearing current schemas
+  while retaining prior producer values and historical artifact readers
+- Revalidate this separate distribution through normal private pip resolution,
+  isolated wheel/sdist builds, all extras and installed compatibility receipts
+
+No detector, scientific partition, label/reviewer requirement, bootstrap,
+evaluation protocol or historic result is changed. Package installation and
+technical verification do not establish a completed scientific experiment or
+public distribution rights.
+
 # Post-roadmap review: shared integration and bounded repeated work
 
 Private 0.11.1 candidate, identified by commit and artifact hashes.
