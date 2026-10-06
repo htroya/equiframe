@@ -127,9 +127,7 @@ import equiframe as ef
 
 def test_optimized_totals(tmp_path):
     candidate, expected = materialize("good")
-    ef.assert_equivalent(
-        ef.diff(candidate, expected, contract=declaration(), work_dir=tmp_path)
-    )
+    ef.assert_equivalent(ef.diff(candidate, expected, contract=declaration(), work_dir=tmp_path))
 ```
 
 **Artifacts/limits:** private full captures and differences; minimized
