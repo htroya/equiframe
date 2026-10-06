@@ -107,14 +107,10 @@ def test_direct_arithmetic_preserves_native_support_and_exact_boundary_values(en
     plan, schema = fixture("direct")
     compiled = native_compiler_registry().resolve(engine).compile(plan, schema)
     previous_identity, _, _ = compilation_identity(validate_ir(plan, schema), engine)
-    if engine == "polars":
-        assert compiled.transformation.code_version == "migration-native-ir1.0/polars"
-        assert compiled.transformation.transformation_id == previous_identity
-    else:
-        assert compiled.transformation.code_version == (
-            f"migration-native-ir1.0/{engine}/arithmetic-checks-v1"
-        )
-        assert compiled.transformation.transformation_id != previous_identity
+    assert compiled.transformation.code_version == (
+        f"migration-native-ir1.0/{engine}/product-semantics-v2"
+    )
+    assert compiled.transformation.transformation_id != previous_identity
     result = run(
         plan,
         schema,

@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Literal, Self
+from typing import Annotated, Any, Literal, Self, cast
 
-from pydantic import Field, model_validator
+from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
 
 from equiframe._base import FrozenModel, Identifier, Text, _ExplicitOutcome
-from equiframe.contracts import LogicalType
-from equiframe.values import ScalarValue
+from equiframe.contracts import DecimalType, LogicalType
+from equiframe.values import ScalarValue, TimeZone
 
 Engine = Literal["pandas", "polars", "duckdb"]
 
@@ -56,12 +56,42 @@ class IsNaN(FrozenModel):
 
 class Arithmetic(FrozenModel):
     kind: Literal["arithmetic"] = "arithmetic"
-    operation: Literal["add", "subtract", "multiply"]
+    operation: Literal["add", "subtract", "multiply", "divide"]
     left: Expression
     right: Expression
     logical_type: LogicalType
     unit: Text
     overflow: Literal["reject"] = "reject"
+    rounding: Literal["exact", "half_even", "half_away_from_zero"] = "exact"
+
+    @model_serializer(mode="wrap")
+    def historical_defaults(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        result = cast("dict[str, Any]", handler(self))
+        if self.rounding == "exact":
+            result.pop("rounding", None)
+        return result
+
+    @model_validator(mode="after")
+    def rounding_scope(self) -> Self:
+        if self.operation != "divide" and self.rounding != "exact":
+            raise ValueError("only division declares rounding; use DecimalRound explicitly")
+        return self
+
+
+class DecimalRound(FrozenModel):
+    kind: Literal["decimal_round"] = "decimal_round"
+    argument: Expression
+    logical_type: DecimalType
+    rounding: Literal["half_even", "half_away_from_zero"]
+    overflow: Literal["reject"] = "reject"
+
+
+class LocalizeTimestamp(FrozenModel):
+    kind: Literal["localize_timestamp"] = "localize_timestamp"
+    argument: Expression
+    timezone: TimeZone
+    ambiguous: Literal["reject", "earlier", "later"]
+    nonexistent: Literal["reject"] = "reject"
 
 
 class Coalesce(FrozenModel):
@@ -86,11 +116,24 @@ Expression = Annotated[
     | IsNull
     | IsNaN
     | Arithmetic
+    | DecimalRound
+    | LocalizeTimestamp
     | Coalesce
     | Conditional,
     Field(discriminator="kind"),
 ]
-for _model in (Compare, Boolean, Not, IsNull, IsNaN, Arithmetic, Coalesce, Conditional):
+for _model in (
+    Compare,
+    Boolean,
+    Not,
+    IsNull,
+    IsNaN,
+    Arithmetic,
+    DecimalRound,
+    LocalizeTimestamp,
+    Coalesce,
+    Conditional,
+):
     _model.model_rebuild()
 
 
@@ -146,6 +189,16 @@ class EquiJoin(FrozenModel):
     how: Literal["inner", "left", "right", "full", "semi", "anti"]
     null_keys: Literal["equal", "never"]
     right_prefix: Text = "right."
+    cardinality: Literal["one_to_one", "one_to_many", "many_to_one", "many_to_many"] = (
+        "many_to_many"
+    )
+
+    @model_serializer(mode="wrap")
+    def historical_defaults(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        result = cast("dict[str, Any]", handler(self))
+        if self.cardinality == "many_to_many":
+            result.pop("cardinality", None)
+        return result
 
 
 class Measure(FrozenModel):
@@ -198,8 +251,24 @@ class Deduplicate(FrozenModel):
     node_id: Identifier
     source: Identifier
     keys: Annotated[tuple[Text, ...], Field(min_length=1, max_length=256)]
-    keep: Literal["identical"] = "identical"
+    keep: Literal["identical", "first"] = "identical"
     nulls: Literal["equal"] = "equal"
+    by: Annotated[tuple[SortKey, ...], Field(max_length=32)] = ()
+    ties: Literal["reject"] = "reject"
+
+    @model_serializer(mode="wrap")
+    def historical_defaults(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        result = cast("dict[str, Any]", handler(self))
+        if not self.by:
+            result.pop("by", None)
+        result.pop("ties", None)
+        return result
+
+    @model_validator(mode="after")
+    def deterministic_selection(self) -> Self:
+        if (self.keep == "first") != bool(self.by):
+            raise ValueError("keep=first requires by; keep=identical forbids by")
+        return self
 
 
 Node = Annotated[

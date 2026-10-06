@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Iterator
 from dataclasses import dataclass
 from decimal import Decimal, localcontext
 
@@ -41,6 +42,7 @@ from .types import (
     Compare,
     Concatenate,
     Conditional,
+    DecimalRound,
     Deduplicate,
     EquiJoin,
     Expression,
@@ -48,6 +50,7 @@ from .types import (
     IRColumn,
     IsNaN,
     LiteralExpression,
+    LocalizeTimestamp,
     Node,
     NodeSchema,
     Not,
@@ -159,37 +162,75 @@ def expression_type(
         left = expression_type(expression.left, columns, depth=depth + 1)
         right = expression_type(expression.right, columns, depth=depth + 1)
         dtype = expression.logical_type
-        if left.logical_type != right.logical_type:
-            raise CapabilityError("arithmetic requires identical operand types")
+        if isinstance(dtype, DecimalType) and dtype.precision > 38:
+            raise CapabilityError("native Decimal arithmetic supports precision<=38")
         operand = left.logical_type
-        if left.unit != right.unit or expression.unit != left.unit:
-            raise CapabilityError("arithmetic requires explicit matching units")
+        if expression.operation in ("add", "subtract") or isinstance(operand, IntegerType):
+            if left.logical_type != right.logical_type:
+                raise CapabilityError("arithmetic requires identical operand types")
+            if left.unit != right.unit or expression.unit != left.unit:
+                raise CapabilityError("arithmetic requires explicit matching units")
         if isinstance(operand, IntegerType) and isinstance(dtype, IntegerType):
+            if expression.operation == "divide":
+                raise CapabilityError("division requires Decimal operands and output")
             if not operand.signed:
                 raise CapabilityError("arithmetic currently requires signed integers")
             if expression.operation == "multiply" and operand.bits > 32:
                 raise CapabilityError(
                     "exact common integer multiplication requires <=32 bit operands"
                 )
-        elif isinstance(operand, DecimalType) and isinstance(dtype, DecimalType):
-            if (
-                expression.operation == "multiply"
-                or operand.precision > 37
+        elif (
+            isinstance(operand, DecimalType)
+            and isinstance(right.logical_type, DecimalType)
+            and isinstance(dtype, DecimalType)
+        ):
+            if expression.operation in ("add", "subtract") and (
+                operand.precision > 37
                 or dtype.scale != operand.scale
                 or dtype.precision < operand.precision + 1
             ):
                 raise CapabilityError(
                     "decimal add/subtract requires same scale and one guard digit"
                 )
+            if expression.operation == "multiply" and (
+                dtype.scale != operand.scale + right.logical_type.scale
+                or operand.precision + right.logical_type.precision > 38
+            ):
+                raise CapabilityError(
+                    "exact Decimal multiply requires summed operand scales "
+                    "and summed precision <=38"
+                )
         else:
-            raise CapabilityError(
-                "arithmetic supports signed integer or exact decimal add/subtract"
-            )
+            raise CapabilityError("arithmetic supports signed integer or exact Decimal operands")
         return IRColumn(
             name="arithmetic",
             logical_type=dtype,
             nullable=left.nullable or right.nullable,
             unit=expression.unit,
+        )
+    if isinstance(expression, DecimalRound):
+        if expression.logical_type.precision > 38:
+            raise CapabilityError("native DecimalRound supports precision<=38")
+        argument = expression_type(expression.argument, columns, depth=depth + 1)
+        if not isinstance(argument.logical_type, DecimalType):
+            raise CapabilityError("DecimalRound requires a Decimal argument")
+        if expression.logical_type.scale > argument.logical_type.scale:
+            raise CapabilityError("DecimalRound output scale cannot exceed input scale")
+        return argument.model_copy(
+            update={"name": "decimal_round", "logical_type": expression.logical_type}
+        )
+    if isinstance(expression, LocalizeTimestamp):
+        argument = expression_type(expression.argument, columns, depth=depth + 1)
+        dtype = argument.logical_type
+        if not isinstance(dtype, TimestampType) or dtype.timezone is not None:
+            raise CapabilityError(
+                "LocalizeTimestamp requires naive timestamps; zone conversion is not localization"
+            )
+        return argument.model_copy(
+            update={
+                "name": "localize_timestamp",
+                "logical_type": TimestampType(unit=dtype.unit, timezone=expression.timezone),
+            }
         )
     if isinstance(expression, Coalesce):
         if any(contains_arithmetic(item) for item in expression.arguments):
@@ -256,7 +297,7 @@ def expression_type(
 
 
 def contains_arithmetic(expression: Expression) -> bool:
-    if isinstance(expression, Arithmetic):
+    if isinstance(expression, (Arithmetic, DecimalRound, LocalizeTimestamp)):
         return True
     if isinstance(expression, (Column, LiteralExpression)):
         return False
@@ -352,10 +393,6 @@ def validate_ir(plan: RelationalPlan, contract: Contract) -> ValidatedIR:
                 for c in schemas[node.source]
             )
         elif isinstance(node, EquiJoin):
-            if node.how in ("right", "full"):
-                raise CapabilityError(
-                    "right/full joins remain explicitly unsupported by the common IR"
-                )
             _unique(tuple(k.left for k in node.keys))
             _unique(tuple(k.right for k in node.keys))
             for key in node.keys:
@@ -367,14 +404,17 @@ def validate_ir(plan: RelationalPlan, contract: Contract) -> ValidatedIR:
                     raise ValueError("join keys must have identical types and units")
                 if isinstance(left.logical_type, FloatType):
                     raise CapabilityError("float join keys are not supported")
-            columns = schemas[node.left] + (
+            columns = tuple(
+                c.model_copy(update={"nullable": c.nullable or node.how in ("right", "full")})
+                for c in schemas[node.left]
+            ) + (
                 ()
                 if node.how in ("semi", "anti")
                 else tuple(
                     c.model_copy(
                         update={
                             "name": node.right_prefix + c.name,
-                            "nullable": c.nullable or node.how == "left",
+                            "nullable": c.nullable or node.how in ("left", "full"),
                         }
                     )
                     for c in schemas[node.right]
@@ -389,10 +429,12 @@ def validate_ir(plan: RelationalPlan, contract: Contract) -> ValidatedIR:
         elif isinstance(node, Deduplicate):
             columns = schemas[node.source]
             _unique(node.keys)
-            if set(node.keys) != {c.name for c in columns}:
+            if node.keep == "identical" and set(node.keys) != {c.name for c in columns}:
                 raise CapabilityError("deduplicate identical requires every column as key")
-            if any(isinstance(c.logical_type, FloatType) for c in columns):
-                raise CapabilityError("float deduplicate keys remain unsupported")
+            _unique(tuple(key.column for key in node.by))
+            for name in (*node.keys, *(key.column for key in node.by)):
+                if isinstance(_column(name, columns).logical_type, FloatType):
+                    raise CapabilityError("float deduplicate keys/tiebreak remain unsupported")
         elif isinstance(node, Aggregate):
             _unique(node.group_by)
             groups = tuple(_column(name, schemas[node.source]) for name in node.group_by)
@@ -462,10 +504,6 @@ def validate_ir(plan: RelationalPlan, contract: Contract) -> ValidatedIR:
             for c in columns
         ):
             raise CapabilityError("native common IR supports decimal precision<=38")
-        if any(isinstance(c.logical_type, TimestampType) for c in columns):
-            raise CapabilityError(
-                "timestamp IR transport is not supported by the common compiler yet"
-            )
         schemas[node.node_id] = columns
     if plan.output not in schemas:
         raise ValueError("IR output node does not exist")
@@ -531,3 +569,21 @@ def literal_scalar(expression: LiteralExpression) -> bool | int | float | str | 
     if isinstance(value, (BooleanValue, IntegerValue, FloatValue, DecimalValue, StringValue)):
         return value.value
     raise CapabilityError("unsupported IR literal")
+
+
+def iter_expressions(expression: Expression) -> Iterator[Expression]:
+    """Walk a closed expression without importing any optional runtime."""
+    yield expression
+    if isinstance(expression, (Column, LiteralExpression)):
+        return
+    children: tuple[Expression, ...]
+    if isinstance(expression, (Arithmetic, Compare)):
+        children = (expression.left, expression.right)
+    elif isinstance(expression, (Boolean, Coalesce)):
+        children = expression.arguments
+    elif isinstance(expression, Conditional):
+        children = (expression.predicate, expression.then, expression.otherwise)
+    else:
+        children = (expression.argument,)
+    for child in children:
+        yield from iter_expressions(child)

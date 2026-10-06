@@ -317,7 +317,7 @@ def test_error_bearing_arithmetic_cannot_be_pruned_by_later_project():
 
 
 @pytest.mark.parametrize("how", ("right", "full"))
-def test_right_full_have_explicit_capability_diagnostics(how):
+def test_right_full_require_both_sides_in_output_contract(how):
     schema = contract(
         {"left": [column("key", StringType())], "right": [column("key", StringType())]},
         [column("key", StringType())],
@@ -341,10 +341,10 @@ def test_right_full_have_explicit_capability_diagnostics(how):
     for engine in ENGINES:
         check = ef.native_compiler_registry().resolve(engine).check(plan, schema)
         assert not check.supported
-        assert "right/full" in check.diagnostics[0].message
+        assert "output names/order" in check.diagnostics[0].message
 
 
-def test_timestamp_ir_remains_explicitly_rejected():
+def test_zoned_nanosecond_timestamp_ir_has_per_engine_support():
     stamp = column("t", StringType()).model_copy(
         update={
             "logical_type": TimestampType(unit="ns", timezone="UTC"),
@@ -362,5 +362,8 @@ def test_timestamp_ir_remains_explicitly_rejected():
     plan = RelationalPlan(nodes=(Scan(node_id="s", table="input"),), output="s")
     for engine in ENGINES:
         check = ef.native_compiler_registry().resolve(engine).check(plan, schema)
-        assert not check.supported
-        assert "timestamp" in check.diagnostics[0].message
+        if engine == "duckdb":
+            assert not check.supported
+            assert "timestamp" in check.diagnostics[0].message
+        else:
+            assert check.supported

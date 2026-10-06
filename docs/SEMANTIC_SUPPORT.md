@@ -88,3 +88,17 @@ de tamaño de lote, multiplicidad y orden. Categorías, índices y extensiones
 conservan el rechazo/políticas de etapas previas; no se anuncian como nuevas
 capacidades DuckDB. La aceptación humana, DW real y mediciones de escala siguen
 siendo evidencias distintas.
+
+
+## Extensiones de producto 0.12.0a1
+
+El [contrato actual del IR](../packages/equiframe/docs/migration-ir.md) sustituye
+las antiguas limitaciones globales sobre right/full y timestamp por soporte
+condicionado por motor. La matriz JSON conserva el registro existente y añade
+casos con IDs `IR12-*`; no se crea un catálogo paralelo. El universo finito de
+cardinalidad comprende 6 joins × 4 cardinalidades × 2 políticas NULL × 3 motores
+sobre un fixture compuesto. Transporte temporal cubre 4 unidades × 2 zonas
+(naive/UTC) × 3 motores, contando rechazos esperados aparte. Otros fixtures
+prueban valores literales, seis direcciones, empates, permutaciones, overflow y
+DST. Ni este universo ni la colección fuente certifican todos los valores,
+planes, zonas o plataformas; el recibo del wheel exacto se entrega aparte.

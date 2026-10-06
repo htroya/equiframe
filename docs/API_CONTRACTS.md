@@ -687,3 +687,17 @@ failures/consumer budgets. Native arithmetic corrections and strict optional
 configuration validation are described in the current packaged changelog and
 upgrading guide. These are ordinary functional/architectural changes; historical
 scientific evidence is not rewritten or reinterpreted.
+
+
+## Extensión nativa de producto 0.12.0a1
+
+[Contrato detallado](../packages/equiframe/docs/migration-ir.md): joins right/full
+con cardinalidad de claves emparejables, deduplicación determinista por clave,
+multiplicación Decimal exacta, `DecimalRound`, división Decimal con escala y
+redondeo declarados, transporte timestamp de unidad/zona exactas y
+`LocalizeTimestamp` con gap rechazado y fold reject/earlier/later.
+Pandas, Polars y DuckDB ejecutan implementaciones propias. Los límites por motor
+y la restricción de sufijos Sort para controles DuckDB permanecen explícitos.
+Los defaults nuevos se omiten en nodos con forma histórica, conservando los
+fingerprints IR/spec 1.0. No se reescriben expedientes anteriores ni se cambia
+el alcance metodológico o la independencia R/M/B/H/O.

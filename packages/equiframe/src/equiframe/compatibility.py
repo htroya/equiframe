@@ -253,10 +253,12 @@ _COMPARISON = CapabilityStage(
     ),
 )
 _COMMON_MIGRATION = (
-    "Closed IR: Scan, Project, Filter, widening Cast, inner/left/semi/anti EquiJoin, "
-    "Aggregate, Sort, Concatenate and identical-row Deduplicate; typed closed expressions",
-    "Decimal precision <=38; timestamp IR, float join/group/sort keys and floating "
-    "sum/min/max are rejected; count_valid may consume float",
+    "Closed IR: Scan, Project, Filter, widening Cast, inner/left/right/full/semi/anti EquiJoin "
+    "with matchable-key cardinality, Aggregate, Sort, Concatenate and deterministic Deduplicate",
+    "Decimal precision <=38; exact multiply declares summed scales; DecimalRound declares "
+    "precision/scale and rounding; division/localization have per-engine capability boundaries",
+    "Timestamp transport preserves declared unit/zone; float join/group/sort/dedup keys and "
+    "floating sum/min/max remain rejected; count_valid may consume float",
     "No arbitrary Python/SQL translation, remote execution, implicit casts or cross-engine "
     "fallback; validate_ir and both compiler checks remain authoritative",
 )
@@ -264,6 +266,9 @@ _MIGRATION_TESTS = (
     "tests/test_migration_backends.py::test_each_native_adapter_is_invoked_once_without_other_backend_fallback",
     "tests/test_migration_backends.py::test_native_decimal_sum_currency_groups_and_all_null",
     "tests/test_migration_semantic_directions.py::test_semantic_native_directions_and_independent_validation_scope",
+    "tests/test_migration_product_semantics.py::test_join_cardinality_composite_key_option_matrix",
+    "tests/test_migration_product_semantics.py::test_timestamp_ir_exact_unit_zone_transport",
+    "tests/test_migration_product_semantics.py::test_decimal_multiply_exact_scale_and_round",
 )
 
 
@@ -420,11 +425,15 @@ def get_adapter_capabilities() -> tuple[AdapterCapability, ...]:
         else:
             execution = _native_stage(engine)
             specific = {
-                "pandas": "Pandas native compiler retains Arrow-backed dtypes and null masks",
-                "polars": "Polars decimal sums use a conservative overflow bound; safe "
-                "cancellation of large terms may still be rejected",
-                "duckdb": "DuckDB rejects unsupported intermediate Aggregate/Sort placements "
-                "that an optimizer could prune; final checked Sort remains conditional",
+                "pandas": "Pandas retains Arrow dtypes/null masks, exact or explicitly rounded "
+                "Decimal division, timestamp s/ms/us/ns and explicit DST localization",
+                "polars": "Polars timestamp IR requires ms/us/ns; Decimal division rejected; "
+                "Decimal multiply requires sum(operand precision + scale)<=38; native sums "
+                "retain a conservative bound and localization declares DST policies",
+                "duckdb": "DuckDB timestamp IR requires naive s/ms/us/ns or zoned UTC us; "
+                "Decimal division and DST localization rejected; exact rounding supports "
+                "half_away_from_zero; checked arithmetic/aggregate/sort/cardinality/dedup "
+                "nodes require only a final Sort suffix to prevent optimizer pruning",
             }
             migration = CapabilityStage(
                 stage="migration",

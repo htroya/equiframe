@@ -112,3 +112,41 @@ mapping remain external responsibilities. The separate SERCOP/DW scripts in the
 repository are owner-maintained prototypes, excluded from the two distributable
 packages. Neither this port nor those scripts establish production readiness,
 accepted real DW integration or support for every Python platform/data type.
+
+## Arrow/Parquet partitions and external-source boundaries
+
+The current `DataSource.resolve` and `TableInput.load` ports return an eager
+`LoadedTable`; `ArtifactInput` verifies one local Arrow IPC or Parquet file and
+then materializes its table. A directory of Hive partitions or a remote object
+prefix is not an accepted `ArtifactRef`. Do not present those interfaces as a
+streaming dataset scanner.
+
+The existing comparison reader already iterates Arrow record batches and Parquet
+batches under `ComparisonOptions.batch_rows`, and spills comparison partitions
+to private SQLite. New [CSV/JSONL ingestion batches](ingestion.md) emit a normal
+multi-batch Arrow IPC artifact that this reader can consume without a new file
+format. An IPC record batch or Parquet decode may allocate before a checkpoint;
+these are cooperative bounds. `read_table` and execution remain eager.
+
+An application can use the existing explicit source port to capture its own
+partitioned dataset, but must pin the complete fragment inventory, versions,
+schemas, multiplicity and order policy, verify every fragment, and return the
+complete declared table. Comparing partitions separately can miss cross-partition
+keys, duplicates or moves. No new partition-directory connector, implicit
+partition-column coercion, concatenation protocol or distributed executor is
+implemented or needed for the bounded local ingestion change.
+
+SQLite remains the implemented external-producer reference described above:
+a single owned native read transaction, explicit schemas, detached immutable
+Arrow bytes and the existing `SnapshotClient` contract. Its supported schema,
+size limits and consistency tests are specific to that producer. They do not
+establish PostgreSQL isolation or a generic DB-API connector.
+
+No requested source, schema or credentials demonstrate a need for new Excel,
+PostgreSQL or object-storage connectors in this change. Those remain external
+extensions, not installed capabilities. An Excel producer must declare formula
+versus cached values, cell types and textual identifiers; PostgreSQL needs an
+owned consistent multi-query snapshot and exact type mappings; object storage
+needs a fixed inventory/version identity, bounded transport and verified bytes.
+Use existing `DataSource`/`SnapshotClient` ports if such a concrete consumer is
+provided. None of this changes the data-service or domain-warehouse ownership.

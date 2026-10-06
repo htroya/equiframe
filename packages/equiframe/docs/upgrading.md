@@ -188,3 +188,20 @@ The wheel now carries [A–H runnable journeys](journeys.md) and the complete
 use need not depend on a checkout. These are synthetic engineering examples;
 they do not establish independent human adoption, domain/DW acceptance or a
 completed security assessment.
+
+
+## 0.12.0a1 native relational additions
+
+The [IR extension reference](migration-ir.md) specifies the new outer joins,
+cardinality, deterministic deduplication, Decimal operations and timestamp/DST
+contracts. Existing `EquiJoin` defaults remain many-to-many; existing identical
+dedup and arithmetic behavior remain unchanged. New default fields are omitted
+from old-shaped serialization to preserve historical IR/spec fingerprints.
+Historical evidence is read without rewriting bytes, schemas or old compiler
+identities. New compilers carry `product-semantics-v2` identities. Previously
+blanket-rejected operations now have explicit per-engine admitted subsets.
+
+Do not infer division/localization support from capture support: DuckDB rejects
+both native paths, and Polars rejects Decimal division and timestamp seconds.
+Check both compilers before migrating; a source test is not installed-wheel
+validation. These additions do not alter thesis families, partitions or R/M/B/H/O.

@@ -301,7 +301,7 @@ verify(outputs, *, contract, expected=None, provenance=None, reviews=(),
 verify_migration(path, *, work_dir=None, provenance=None, reviews=(),
                  request_review=False) -> VerificationResult
 
-ingest_file(path, *, spec, work_dir, context=None) -> IngestionResult
+ingest_file(path, *, spec, work_dir, context=None, batch_rows=4096) -> IngestionResult
 run_workflow(spec, *, source, work_dir, expected=None,
              cancellation=None) -> WorkflowResult
 ```
@@ -328,6 +328,9 @@ ETL models include `FileInput`, `IngestionSpec`, `IngestionResult`,
 `WorkflowInputBinding`, `WorkflowRequest`, `WorkflowResult`, `Destination`,
 `ParquetDestination` and `LoadReceipt`. Ingestion uses explicit CSV/JSON/JSONL
 schema/grain/path rules and retains original sources/quarantine receipts.
+[CSV/JSONL batching](ingestion.md) limits accepted-value arrays, with complete
+receipt tuples retained; full JSON and execution inputs still materialize.
+`FileInput(path, spec, batch_rows=4096)` accepts the same positive integer knob.
 Workflows fix inputs and native checkpoints, retain failed/skipped stages and
 have no resume guarantee. Local Parquet publication is a separate verified
 workflow; it does not implement a shared production data gateway.
@@ -399,3 +402,12 @@ codes in CI without preserving the underlying failure. `--help` normally exits 0
 The historical `equiframe.benchmark` helper is **unsupported and quarantined**:
 its helpers raise `UnsupportedBenchmarkError`; CLI exits 2 except help. Use the
 separate experimental package only within its documented scope.
+
+
+## Native IR additions in 0.12.0a1
+
+See the [executable contract reference](migration-ir.md) for `EquiJoin.cardinality`,
+right/full joins, `Deduplicate.keep="first"` and its deterministic `by`,
+`DecimalRound`, Decimal `Arithmetic` multiply/divide, and `LocalizeTimestamp`.
+Both new expression models are experimental public exports. Engine-specific
+rejections remain part of the capability contract, not fallback behavior.

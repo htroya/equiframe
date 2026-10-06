@@ -197,8 +197,11 @@ The migration IR includes Scan, Project, Filter, exact Cast, EquiJoin,
 Aggregate, Sort, Concatenate and Deduplicate, with closed typed expressions
 including Arithmetic, Coalesce and Conditional. It has explicit NULL-join,
 NULL-group, empty-sum, tie and multiplicity policies. It does not translate
-arbitrary Python/SQL. Its common decimal precision is at most 38; timestamps,
-float join/group/order keys and float SUM/min/max remain outside this IR.
+arbitrary Python/SQL. Its common decimal precision is at most 38. Right/full joins, matchable-key
+cardinality, deterministic key deduplication, exact Decimal multiplication,
+declared rounding/division and timestamp transport/localization have the
+[per-engine contracts and bounds](migration-ir.md). Float join/group/order
+keys and float SUM/min/max remain outside this IR.
 `count_valid` can admit float. Native admission can reject a mathematically safe
 case conservatively, for example a Polars sum with cancelling large terms.
 

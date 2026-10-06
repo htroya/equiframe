@@ -13,6 +13,7 @@ from equiframe.contracts import (
     IntegerType,
     LogicalType,
     StringType,
+    TimestampType,
 )
 from equiframe.errors import CapabilityError
 from equiframe.registry import DuckDBTransformation
@@ -39,6 +40,7 @@ from ..types import (
     CompilationDiagnostic,
     Concatenate,
     Conditional,
+    DecimalRound,
     Deduplicate,
     EquiJoin,
     Expression,
@@ -47,6 +49,7 @@ from ..types import (
     IsNaN,
     IsNull,
     LiteralExpression,
+    LocalizeTimestamp,
     Not,
     Project,
     RelationalPlan,
@@ -58,10 +61,11 @@ from ..validation import (
     compilation_identity,
     contains_arithmetic,
     expression_type,
+    iter_expressions,
     references,
 )
 
-_COMPILER_VERSION = "migration-native-ir1.0/duckdb/arithmetic-checks-v1"
+_COMPILER_VERSION = "migration-native-ir1.0/duckdb/product-semantics-v2"
 
 
 def quote(name: str) -> str:
@@ -86,6 +90,17 @@ def _dtype(dtype: LogicalType) -> str:
         return "VARCHAR"
     if isinstance(dtype, DateType):
         return "DATE"
+    if isinstance(dtype, TimestampType):
+        return (
+            "TIMESTAMPTZ"
+            if dtype.timezone is not None
+            else {
+                "s": "TIMESTAMP_S",
+                "ms": "TIMESTAMP_MS",
+                "us": "TIMESTAMP",
+                "ns": "TIMESTAMP_NS",
+            }[dtype.unit]
+        )
     raise CapabilityError("unsupported DuckDB IR type")
 
 
@@ -121,6 +136,17 @@ def _expression(expression: Expression, columns: tuple[IRColumn, ...]) -> str:
         left = _expression(expression.left, columns)
         right = _expression(expression.right, columns)
         operand = expression_type(expression.left, columns).logical_type
+        if expression.operation == "multiply" and isinstance(operand, DecimalType):
+            right_type = expression_type(expression.right, columns).logical_type
+            assert isinstance(right_type, DecimalType)
+            # Widen before multiplication: DuckDB otherwise uses a DECIMAL(18)
+            # intermediate for <=18-digit operands even when the outer cast is
+            # DECIMAL(38). Preserve each original scale during promotion.
+            return (
+                f"CAST((CAST({left} AS DECIMAL(38,{operand.scale})) * "
+                f"CAST({right} AS DECIMAL(38,{right_type.scale}))) "
+                f"AS {_dtype(expression.logical_type)})"
+            )
         intermediate = (
             "HUGEINT" if isinstance(operand, IntegerType) else _dtype(expression.logical_type)
         )
@@ -128,6 +154,11 @@ def _expression(expression: Expression, columns: tuple[IRColumn, ...]) -> str:
         return (
             f"CAST((CAST({left} AS {intermediate}) {operator} "
             f"CAST({right} AS {intermediate})) AS {_dtype(expression.logical_type)})"
+        )
+    if isinstance(expression, DecimalRound):
+        return (
+            f"CAST(round({_expression(expression.argument, columns)}, "
+            f"{expression.logical_type.scale}) AS {_dtype(expression.logical_type)})"
         )
     if isinstance(expression, Coalesce):
         return (
@@ -212,6 +243,26 @@ class DuckDBCompiler:
                     ),
                 )
             for schema in validated.node_schemas:
+                if any(
+                    isinstance(column.logical_type, TimestampType)
+                    and column.logical_type.timezone is not None
+                    and (column.logical_type.unit != "us" or column.logical_type.timezone != "UTC")
+                    for column in schema.columns
+                ):
+                    return CompilationCheck(
+                        engine=self.engine,
+                        supported=False,
+                        diagnostics=(
+                            CompilationDiagnostic(
+                                code="timestamp_unit_zone_not_supported",
+                                message=(
+                                    "DuckDB timestamp IR zoned transport requires exact "
+                                    "microseconds and UTC session zone"
+                                ),
+                                node_id=schema.node_id,
+                            ),
+                        ),
+                    )
                 if any("\x00" in column.name for column in schema.columns):
                     return CompilationCheck(
                         engine=self.engine,
@@ -251,12 +302,53 @@ class DuckDBCompiler:
                     if isinstance(node, Filter)
                     else ()
                 )
+                for expression in expressions:
+                    for item in iter_expressions(expression):
+                        message = None
+                        if isinstance(item, LocalizeTimestamp):
+                            message = (
+                                "DuckDB timestamp localization cannot preserve "
+                                "explicit DST ambiguity/gap rejection policies"
+                            )
+                        if isinstance(item, Arithmetic) and item.operation == "divide":
+                            message = (
+                                "DuckDB Decimal division produces DOUBLE and cannot "
+                                "preserve the declared exact/rounding contract"
+                            )
+                        if (
+                            isinstance(item, DecimalRound)
+                            and item.rounding != "half_away_from_zero"
+                        ):
+                            message = (
+                                "DuckDB exact Decimal rounding supports half_away_from_zero only"
+                            )
+                        if message:
+                            return CompilationCheck(
+                                engine=self.engine,
+                                supported=False,
+                                diagnostics=(
+                                    CompilationDiagnostic(
+                                        code="native_decimal_not_supported",
+                                        message=message,
+                                        node_id=node.node_id,
+                                    ),
+                                ),
+                            )
                 if any(
                     contains_arithmetic(expression)
                     and (
-                        not isinstance(expression, Arithmetic)
-                        or contains_arithmetic(expression.left)
-                        or contains_arithmetic(expression.right)
+                        not isinstance(expression, (Arithmetic, DecimalRound))
+                        or (
+                            isinstance(expression, Arithmetic)
+                            and (
+                                contains_arithmetic(expression.left)
+                                or contains_arithmetic(expression.right)
+                            )
+                        )
+                        or (
+                            isinstance(expression, DecimalRound)
+                            and contains_arithmetic(expression.argument)
+                        )
                     )
                     for expression in expressions
                 ):
@@ -282,6 +374,8 @@ class DuckDBCompiler:
                     )
                 if not (
                     isinstance(node, Aggregate)
+                    or (isinstance(node, EquiJoin) and node.cardinality != "many_to_many")
+                    or (isinstance(node, Deduplicate) and node.keep == "first")
                     or (isinstance(node, Sort) and node.ties == "reject")
                     or (
                         isinstance(node, Project)
@@ -403,7 +497,21 @@ class DuckDBCompiler:
             elif isinstance(node, Concatenate):
                 body = " UNION ALL ".join(f"SELECT * FROM {names[ref]}" for ref in node.sources)
             elif isinstance(node, Deduplicate):
-                body = f"SELECT DISTINCT * FROM {names[node.source]}"
+                if node.keep == "identical":
+                    body = f"SELECT DISTINCT * FROM {names[node.source]}"
+                else:
+                    partition = ", ".join(quote(name) for name in node.keys)
+                    order_by = ", ".join(
+                        quote(key.column)
+                        + (" ASC" if key.direction == "ascending" else " DESC")
+                        + " NULLS "
+                        + key.nulls.upper()
+                        for key in node.by
+                    )
+                    body = (
+                        f"SELECT * FROM {names[node.source]} QUALIFY row_number() "
+                        f"OVER (PARTITION BY {partition} ORDER BY {order_by}) = 1"
+                    )
             else:
                 body = f"SELECT {_projection(validated, node.node_id)} FROM {names[node.source]}"
                 if node.ties == "reject":
@@ -419,6 +527,52 @@ class DuckDBCompiler:
                     + key.nulls.upper()
                     for key in node.by
                 )
+            guards = []
+            if isinstance(node, EquiJoin) and node.cardinality != "many_to_many":
+                for ref, keys, unique in (
+                    (
+                        node.left,
+                        tuple(key.left for key in node.keys),
+                        node.cardinality in ("one_to_one", "one_to_many"),
+                    ),
+                    (
+                        node.right,
+                        tuple(key.right for key in node.keys),
+                        node.cardinality in ("one_to_one", "many_to_one"),
+                    ),
+                ):
+                    if unique:
+                        where = (
+                            " WHERE " + " AND ".join(quote(key) + " IS NOT NULL" for key in keys)
+                            if node.null_keys == "never"
+                            else ""
+                        )
+                        grouped = ", ".join(quote(key) for key in keys)
+                        guards.append(
+                            f"EXISTS (SELECT 1 FROM {names[ref]}{where} "
+                            f"GROUP BY {grouped} HAVING count(*) > 1)"
+                        )
+            if isinstance(node, Deduplicate) and node.keep == "first":
+                keys = tuple(dict.fromkeys((*node.keys, *(key.column for key in node.by))))
+                grouped = ", ".join(quote(key) for key in keys)
+                guards.append(
+                    f"EXISTS (SELECT 1 FROM {names[node.source]} "
+                    f"GROUP BY {grouped} HAVING count(*) > 1)"
+                )
+            if guards:
+                # A separate UNION branch evaluates violations even if the join
+                # or selected input is empty. Later pruning nodes are rejected.
+                message = (
+                    "Join violates declared cardinality"
+                    if isinstance(node, EquiJoin)
+                    else "Deduplicate encountered forbidden tiebreak ties"
+                )
+                failure = ", ".join(
+                    f"CAST(error('{message}') AS {_dtype(column.logical_type)}) "
+                    f"AS {quote(column.name)}"
+                    for column in validated.schema(node.node_id)
+                )
+                body = f"({body}) UNION ALL SELECT {failure} WHERE " + " OR ".join(guards)
             clauses.append(names[node.node_id] + " AS (" + body + ")")
         sql = (
             "WITH "

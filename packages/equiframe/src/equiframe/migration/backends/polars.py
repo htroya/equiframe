@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from decimal import Decimal, localcontext
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 from equiframe._decimal import exact_decimal_context
 from equiframe.contracts import (
@@ -16,6 +16,7 @@ from equiframe.contracts import (
     IntegerType,
     LogicalType,
     StringType,
+    TimestampType,
 )
 from equiframe.errors import CapabilityError
 from equiframe.registry import PolarsTransformation
@@ -30,8 +31,10 @@ from ..types import (
     Column,
     Compare,
     CompilationCheck,
+    CompilationDiagnostic,
     Concatenate,
     Conditional,
+    DecimalRound,
     Deduplicate,
     EquiJoin,
     Expression,
@@ -39,6 +42,7 @@ from ..types import (
     IsNaN,
     IsNull,
     LiteralExpression,
+    LocalizeTimestamp,
     Not,
     Project,
     RelationalPlan,
@@ -50,6 +54,7 @@ from ..validation import (
     decimal_limit,
     expression_type,
     integer_bounds,
+    iter_expressions,
     literal_scalar,
 )
 
@@ -74,6 +79,8 @@ def _dtype(dtype: LogicalType) -> Any:
         return pl.String
     if isinstance(dtype, DateType):
         return pl.Date
+    if isinstance(dtype, TimestampType) and dtype.unit != "s":
+        return pl.Datetime(dtype.unit, time_zone=dtype.timezone)
     raise CapabilityError("unsupported Polars IR type")
 
 
@@ -87,7 +94,16 @@ def _expression(expression: Expression, columns: Any) -> pl.Expr:
         return pl.lit(scalar, dtype=_dtype(expression.logical_type))
     if isinstance(expression, Arithmetic):
         operand = expression_type(expression.left, columns).logical_type
-        scale = operand.scale if isinstance(operand, DecimalType) else 0
+        scale = (
+            (
+                expression.logical_type.scale
+                if expression.operation == "multiply"
+                and isinstance(expression.logical_type, DecimalType)
+                else operand.scale
+            )
+            if isinstance(operand, DecimalType)
+            else 0
+        )
         left = _expression(expression.left, columns).cast(pl.Decimal(38, scale), strict=True)
         right = _expression(expression.right, columns).cast(pl.Decimal(38, scale), strict=True)
         result = {
@@ -96,6 +112,28 @@ def _expression(expression: Expression, columns: Any) -> pl.Expr:
             "multiply": lambda: left * right,
         }[expression.operation]()
         return result.cast(_dtype(expression.logical_type), strict=True)
+    if isinstance(expression, DecimalRound):
+        mode: Literal["half_away_from_zero", "half_to_even"] = (
+            "half_away_from_zero"
+            if expression.rounding == "half_away_from_zero"
+            else "half_to_even"
+        )
+        return (
+            _expression(expression.argument, columns)
+            .round(expression.logical_type.scale, mode=mode)
+            .cast(_dtype(expression.logical_type), strict=True)
+        )
+    if isinstance(expression, LocalizeTimestamp):
+        ambiguity: Literal["raise", "earliest", "latest"] = (
+            "raise"
+            if expression.ambiguous == "reject"
+            else "earliest"
+            if expression.ambiguous == "earlier"
+            else "latest"
+        )
+        return _expression(expression.argument, columns).dt.replace_time_zone(
+            expression.timezone, ambiguous=ambiguity, non_existent="raise"
+        )
     if isinstance(expression, Coalesce):
         return pl.coalesce([_expression(item, columns) for item in expression.arguments])
     if isinstance(expression, Conditional):
@@ -132,6 +170,29 @@ def _expression(expression: Expression, columns: Any) -> pl.Expr:
     if isinstance(expression, IsNaN):
         return argument.is_nan().fill_null(False)
     raise CapabilityError("unknown Polars expression")
+
+
+def _check_localizations(frame: pl.DataFrame, expression: Expression, columns: Any) -> None:
+    """Validate each fallible native localization before relational pruning."""
+    import polars as pl
+
+    for item in iter_expressions(expression):
+        if not isinstance(item, LocalizeTimestamp):
+            continue
+        dtype = expression_type(item.argument, columns).logical_type
+        assert isinstance(dtype, TimestampType)
+        before = _expression(item.argument, columns).cast(pl.Int64)
+        after = _expression(item, columns).cast(pl.Int64)
+        # Decimal(38,0) subtraction is native and wide enough for the full
+        # difference of two signed int64 values. An int64 subtraction here
+        # would wrap too and silently certify the broken timestamp kernel.
+        maximum_offset = 86400 * {"s": 1, "ms": 1000, "us": 1000000, "ns": 1000000000}[dtype.unit]
+        delta = (after.cast(pl.Decimal(38, 0)) - before.cast(pl.Decimal(38, 0))).abs()
+        bad = (before.is_not_null() & after.is_null()) | (
+            delta > pl.lit(Decimal(maximum_offset), dtype=pl.Decimal(38, 0))
+        )
+        if frame.select(bad.fill_null(False).any()).item():
+            raise CapabilityError("Polars timestamp localization exceeds faithful int64 range")
 
 
 def _coerce(frame: pl.DataFrame, validated: ValidatedIR, node_id: str) -> pl.DataFrame:
@@ -223,11 +284,85 @@ class PolarsCompiler:
     engine = "polars"
 
     def check(self, plan: RelationalPlan, contract: Contract) -> CompilationCheck:
-        return compiler_check(self.engine, plan, contract)
+        check = compiler_check(self.engine, plan, contract)
+        if check.supported:
+            validated = require_supported(self.engine, plan, contract)
+            if any(
+                isinstance(column.logical_type, TimestampType) and column.logical_type.unit == "s"
+                for schema in validated.node_schemas
+                for column in schema.columns
+            ):
+                return CompilationCheck(
+                    engine=self.engine,
+                    supported=False,
+                    diagnostics=(
+                        CompilationDiagnostic(
+                            code="timestamp_unit_not_supported",
+                            message=(
+                                "Polars timestamp IR cannot preserve seconds physical unit; "
+                                "declare explicit millisecond input"
+                            ),
+                        ),
+                    ),
+                )
+            for node in plan.nodes:
+                if not isinstance(node, (Project, Filter)):
+                    continue
+                expressions = (
+                    tuple(item.expression for item in node.columns)
+                    if isinstance(node, Project)
+                    else (node.predicate,)
+                    if isinstance(node, Filter)
+                    else ()
+                )
+                for expression in expressions:
+                    for item in iter_expressions(expression):
+                        message = None
+                        if isinstance(item, Arithmetic) and item.operation == "divide":
+                            message = (
+                                "Polars Decimal division cannot preserve "
+                                "declared exact/rounding semantics"
+                            )
+                        if isinstance(item, Arithmetic) and item.operation == "multiply":
+                            left = expression_type(
+                                item.left, validated.schema(node.source)
+                            ).logical_type
+                            right = expression_type(
+                                item.right, validated.schema(node.source)
+                            ).logical_type
+                            if (
+                                isinstance(left, DecimalType)
+                                and isinstance(right, DecimalType)
+                                and left.precision + right.precision + left.scale + right.scale > 38
+                            ):
+                                message = (
+                                    "Polars Decimal multiply exceeds conservative "
+                                    "exact intermediate coefficient bound"
+                                )
+                        if message:
+                            return CompilationCheck(
+                                engine=self.engine,
+                                supported=False,
+                                diagnostics=(
+                                    CompilationDiagnostic(
+                                        code="native_decimal_not_supported",
+                                        message=message,
+                                        node_id=node.node_id,
+                                    ),
+                                ),
+                            )
+        return check
 
     def compile(self, plan: RelationalPlan, contract: Contract) -> CompiledPlan:
+        check = self.check(plan, contract)
+        if not check.supported:
+            raise CapabilityError(check.diagnostics[0].message)
         validated = require_supported(self.engine, plan, contract)
-        identifier, ir_sha, contract_sha = compilation_identity(validated, self.engine)
+        identifier, ir_sha, contract_sha = compilation_identity(
+            validated,
+            self.engine,
+            implementation_version="migration-native-ir1.0/polars/product-semantics-v2",
+        )
 
         def transform(tables: Mapping[str, pl.DataFrame], context: RunContext) -> pl.DataFrame:
             import polars as pl
@@ -238,6 +373,10 @@ class PolarsCompiler:
                 if isinstance(node, Scan):
                     frame = tables[node.table].clone()
                 elif isinstance(node, Project):
+                    for item in node.columns:
+                        _check_localizations(
+                            frames[node.source], item.expression, validated.schema(node.source)
+                        )
                     frame = (
                         frames[node.source]
                         .with_columns(
@@ -251,12 +390,41 @@ class PolarsCompiler:
                         .select([item.name for item in node.columns])
                     )
                 elif isinstance(node, Filter):
+                    _check_localizations(
+                        frames[node.source], node.predicate, validated.schema(node.source)
+                    )
                     frame = frames[node.source].filter(
                         _expression(node.predicate, validated.schema(node.source))
                     )
                 elif isinstance(node, Cast):
                     frame = frames[node.source]
                 elif isinstance(node, EquiJoin):
+                    for side, names, unique in (
+                        (
+                            frames[node.left],
+                            [key.left for key in node.keys],
+                            node.cardinality in ("one_to_one", "one_to_many"),
+                        ),
+                        (
+                            frames[node.right],
+                            [key.right for key in node.keys],
+                            node.cardinality in ("one_to_one", "many_to_one"),
+                        ),
+                    ):
+                        matchable = (
+                            side
+                            if node.null_keys == "equal"
+                            else side.filter(
+                                pl.all_horizontal([pl.col(name).is_not_null() for name in names])
+                            )
+                        )
+                        if (
+                            unique
+                            and matchable.select(pl.struct(names).is_duplicated().any()).item()
+                        ):
+                            raise CapabilityError(
+                                "Join violates declared cardinality: " + node.cardinality
+                            )
                     right = frames[node.right].rename(
                         {name: node.right_prefix + name for name in frames[node.right].columns}
                     )
@@ -274,7 +442,20 @@ class PolarsCompiler:
                 elif isinstance(node, Concatenate):
                     frame = pl.concat([frames[ref] for ref in node.sources], how="vertical")
                 elif isinstance(node, Deduplicate):
-                    frame = frames[node.source].unique(subset=list(node.keys), maintain_order=True)
+                    frame = frames[node.source]
+                    if node.keep == "first":
+                        tie_keys = list(
+                            dict.fromkeys((*node.keys, *(key.column for key in node.by)))
+                        )
+                        if frame.select(pl.struct(tie_keys).is_duplicated().any()).item():
+                            raise CapabilityError("Deduplicate encountered forbidden tiebreak ties")
+                        frame = frame.sort(
+                            [key.column for key in node.by],
+                            descending=[key.direction == "descending" for key in node.by],
+                            nulls_last=[key.nulls == "last" for key in node.by],
+                            maintain_order=True,
+                        )
+                    frame = frame.unique(subset=list(node.keys), keep="first", maintain_order=True)
                 else:
                     frame = frames[node.source]
                     if (
@@ -294,7 +475,7 @@ class PolarsCompiler:
             return frames[plan.output]
 
         transformation = PolarsTransformation(
-            identifier, transform, "migration-native-ir1.0/polars"
+            identifier, transform, "migration-native-ir1.0/polars/product-semantics-v2"
         )
         return CompiledPlan(
             self.engine, transformation, ir_sha, contract_sha, self.check(plan, contract)

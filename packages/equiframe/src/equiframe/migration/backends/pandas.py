@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from decimal import Decimal, localcontext
-from typing import TYPE_CHECKING, Any, cast
+from decimal import ROUND_HALF_EVEN, ROUND_HALF_UP, Decimal, Inexact, localcontext
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from equiframe._decimal import exact_decimal_context
 from equiframe.contracts import (
@@ -16,6 +16,7 @@ from equiframe.contracts import (
     IntegerType,
     LogicalType,
     StringType,
+    TimestampType,
 )
 from equiframe.errors import CapabilityError
 from equiframe.registry import PandasTransformation
@@ -32,6 +33,7 @@ from ..types import (
     CompilationCheck,
     Concatenate,
     Conditional,
+    DecimalRound,
     Deduplicate,
     EquiJoin,
     Expression,
@@ -40,6 +42,7 @@ from ..types import (
     IsNaN,
     IsNull,
     LiteralExpression,
+    LocalizeTimestamp,
     Not,
     Project,
     RelationalPlan,
@@ -59,7 +62,7 @@ if TYPE_CHECKING:
 
     from equiframe.execution import RunContext
 
-_COMPILER_VERSION = "migration-native-ir1.0/pandas/arithmetic-checks-v1"
+_COMPILER_VERSION = "migration-native-ir1.0/pandas/product-semantics-v2"
 
 
 def _dtype(dtype: LogicalType) -> Any:
@@ -78,6 +81,8 @@ def _dtype(dtype: LogicalType) -> Any:
         arrow = pa.string()
     elif isinstance(dtype, DateType):
         arrow = pa.date32()
+    elif isinstance(dtype, TimestampType):
+        arrow = pa.timestamp(dtype.unit, tz=dtype.timezone)
     else:
         raise CapabilityError("unsupported Pandas IR type")
     return pd.ArrowDtype(arrow)
@@ -102,12 +107,73 @@ def _expression(expression: Expression, frame: pd.DataFrame, columns: Any) -> pd
     if isinstance(expression, Arithmetic):
         left = _expression(expression.left, frame, columns).astype(object)
         right = _expression(expression.right, frame, columns).astype(object)
-        operation = {"add": "add", "subtract": "sub", "multiply": "mul"}[expression.operation]
-        with localcontext(exact_decimal_context()):
+        operation = {"add": "add", "subtract": "sub", "multiply": "mul", "divide": "truediv"}[
+            expression.operation
+        ]
+        with localcontext(exact_decimal_context()) as decimal_context:
+            if expression.operation == "divide" and expression.rounding == "exact":
+                decimal_context.traps[Inexact] = True
             result = cast("pd.Series[Any]", getattr(left, operation)(right))
+            if expression.operation == "divide":
+                assert isinstance(expression.logical_type, DecimalType)
+                quantum = Decimal(1).scaleb(-expression.logical_type.scale)
+                rounding = (
+                    ROUND_HALF_UP
+                    if expression.rounding == "half_away_from_zero"
+                    else ROUND_HALF_EVEN
+                )
+                result = result.map(
+                    lambda value: (
+                        value if pd.isna(value) else value.quantize(quantum, rounding=rounding)
+                    )
+                )
         # Every expression has its own declared range. Checking only the final
         # projected column lets a later subtraction or predicate conceal overflow.
         return _checked_series(result, expression_type(expression, columns))
+    if isinstance(expression, DecimalRound):
+        argument = _expression(expression.argument, frame, columns).astype(object)
+        with localcontext(exact_decimal_context()):
+            quantum = Decimal(1).scaleb(-expression.logical_type.scale)
+            rounding = (
+                ROUND_HALF_UP if expression.rounding == "half_away_from_zero" else ROUND_HALF_EVEN
+            )
+            result = argument.map(
+                lambda value: (
+                    value if pd.isna(value) else value.quantize(quantum, rounding=rounding)
+                )
+            )
+        return _checked_series(result, expression_type(expression, columns))
+    if isinstance(expression, LocalizeTimestamp):
+        from equiframe._timezones import timezone
+
+        dtype = expression_type(expression.argument, columns).logical_type
+        assert isinstance(dtype, TimestampType)
+        argument = _expression(expression.argument, frame, columns)
+        before = argument.astype(_dtype(IntegerType(bits=64, signed=True)))
+        if before.eq(-(2**63)).fillna(False).any():
+            raise CapabilityError("Pandas LocalizeTimestamp cannot preserve int64-min NaT sentinel")
+        native_dtype: Any = f"datetime64[{dtype.unit}]"
+        naive_values = argument.astype(native_dtype)
+        zone = timezone(expression.timezone)
+        if expression.ambiguous == "reject":
+            localized = naive_values.dt.tz_localize(zone, ambiguous="raise", nonexistent="raise")
+        else:
+            first = naive_values.dt.tz_localize(zone, ambiguous=True, nonexistent="raise")
+            second = naive_values.dt.tz_localize(zone, ambiguous=False, nonexistent="raise")
+            choose_first = (
+                first.le(second) if expression.ambiguous == "earlier" else first.ge(second)
+            )
+            localized = first.where(choose_first, second)
+        localized = _checked_series(localized, expression_type(expression, columns))
+        after = localized.astype(_dtype(IntegerType(bits=64, signed=True)))
+        # A local-to-UTC offset is less than one day. Compare in unbounded
+        # Python integers, because subtracting native int64 ticks can itself
+        # wrap and hide a timezone kernel overflow across centuries.
+        maximum_offset = 86400 * {"s": 1, "ms": 1000, "us": 1000000, "ns": 1000000000}[dtype.unit]
+        delta = (after.astype(object) - before.astype(object)).abs()
+        if (before.notna() & after.isna()).any() or delta.gt(maximum_offset).fillna(False).any():
+            raise CapabilityError("Pandas timestamp localization exceeds faithful int64 range")
+        return localized
     if isinstance(expression, Coalesce):
         result = _expression(expression.arguments[0], frame, columns)
         for item in expression.arguments[1:]:
@@ -286,6 +352,27 @@ class PandasCompiler:
                 elif isinstance(node, EquiJoin):
                     left = frames[node.left]
                     right = frames[node.right]
+                    for side, names, unique in (
+                        (
+                            left,
+                            [key.left for key in node.keys],
+                            node.cardinality in ("one_to_one", "one_to_many"),
+                        ),
+                        (
+                            right,
+                            [key.right for key in node.keys],
+                            node.cardinality in ("one_to_one", "many_to_one"),
+                        ),
+                    ):
+                        matchable = (
+                            side
+                            if node.null_keys == "equal"
+                            else side.loc[side[names].notna().all(axis=1)]
+                        )
+                        if unique and matchable.duplicated(subset=names).any():
+                            raise CapabilityError(
+                                "Join violates declared cardinality: " + node.cardinality
+                            )
                     if node.how in ("semi", "anti"):
                         keys_left = [key.left for key in node.keys]
                         keys_right = [key.right for key in node.keys]
@@ -300,30 +387,75 @@ class PandasCompiler:
                         frame = left.loc[mask if node.how == "semi" else ~mask].copy()
                         frames[node.node_id] = _coerce(frame, validated, node.node_id)
                         continue
+                    incomplete_left = left.iloc[:0]
+                    incomplete_right = right.iloc[:0]
                     if node.null_keys == "never":
-                        right = right.loc[
-                            right[[key.right for key in node.keys]].notna().all(axis=1)
-                        ]
-                        if node.how == "inner":
-                            left = left.loc[
-                                left[[key.left for key in node.keys]].notna().all(axis=1)
-                            ]
+                        left_complete = left[[key.left for key in node.keys]].notna().all(axis=1)
+                        right_complete = right[[key.right for key in node.keys]].notna().all(axis=1)
+                        incomplete_left, incomplete_right = (
+                            left.loc[~left_complete],
+                            right.loc[~right_complete],
+                        )
+                        left, right = left.loc[left_complete], right.loc[right_complete]
                     right = right.rename(
                         columns={name: node.right_prefix + name for name in right.columns}
                     )
-                    frame = left.merge(
-                        right,
-                        how="inner" if node.how == "inner" else "left",
-                        left_on=[key.left for key in node.keys],
-                        right_on=[node.right_prefix + key.right for key in node.keys],
-                        sort=False,
-                    )
+                    if left.empty and right.empty:
+                        # Captured empty Arrow columns can have zero chunks.
+                        # pandas full-join factorization cannot infer their type;
+                        # a native typed empty concatenation is the exact join.
+                        frame = pd.concat([left, right], axis=1)
+                    else:
+                        frame = left.merge(
+                            right,
+                            how=cast(
+                                'Literal["inner", "left", "right", "outer"]',
+                                "outer" if node.how == "full" else node.how,
+                            ),
+                            left_on=[key.left for key in node.keys],
+                            right_on=[node.right_prefix + key.right for key in node.keys],
+                            sort=False,
+                        )
+                    extras = []
+                    if node.how in ("left", "full") and len(incomplete_left):
+                        extras.append(incomplete_left)
+                    if node.how in ("right", "full") and len(incomplete_right):
+                        extras.append(
+                            incomplete_right.rename(
+                                columns={
+                                    name: node.right_prefix + name
+                                    for name in incomplete_right.columns
+                                }
+                            )
+                        )
+                    for extra in extras:
+                        extra = extra.copy()
+                        for column in validated.schema(node.node_id):
+                            if column.name not in extra:
+                                extra[column.name] = pd.Series(
+                                    pd.NA, index=extra.index, dtype=_dtype(column.logical_type)
+                                )
+                        frame = pd.concat([frame, extra[frame.columns]], ignore_index=True)
                 elif isinstance(node, Aggregate):
                     frame = _aggregate(frames[node.source], node, validated)
                 elif isinstance(node, Concatenate):
                     frame = pd.concat([frames[ref] for ref in node.sources], ignore_index=True)
                 elif isinstance(node, Deduplicate):
-                    frame = frames[node.source].drop_duplicates(subset=list(node.keys)).copy()
+                    frame = frames[node.source]
+                    if node.keep == "first":
+                        tie_keys = list(
+                            dict.fromkeys((*node.keys, *(key.column for key in node.by)))
+                        )
+                        if frame.duplicated(subset=tie_keys).any():
+                            raise CapabilityError("Deduplicate encountered forbidden tiebreak ties")
+                        for key in reversed(node.by):
+                            frame = frame.sort_values(
+                                key.column,
+                                ascending=key.direction == "ascending",
+                                na_position=key.nulls,
+                                kind="stable",
+                            )
+                    frame = frame.drop_duplicates(subset=list(node.keys), keep="first").copy()
                 else:
                     frame = frames[node.source].copy(deep=True)
                     if (

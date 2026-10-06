@@ -191,9 +191,11 @@
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
               "conditional": "#/$defs/Conditional",
+              "decimal_round": "#/$defs/DecimalRound",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
+              "localize_timestamp": "#/$defs/LocalizeTimestamp",
               "not": "#/$defs/Not"
             },
             "propertyName": "kind"
@@ -222,6 +224,12 @@
             },
             {
               "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/DecimalRound"
+            },
+            {
+              "$ref": "#/$defs/LocalizeTimestamp"
             },
             {
               "$ref": "#/$defs/Coalesce"
@@ -274,7 +282,8 @@
           "enum": [
             "add",
             "subtract",
-            "multiply"
+            "multiply",
+            "divide"
           ],
           "title": "Operation",
           "type": "string"
@@ -294,9 +303,11 @@
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
               "conditional": "#/$defs/Conditional",
+              "decimal_round": "#/$defs/DecimalRound",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
+              "localize_timestamp": "#/$defs/LocalizeTimestamp",
               "not": "#/$defs/Not"
             },
             "propertyName": "kind"
@@ -327,6 +338,12 @@
               "$ref": "#/$defs/Arithmetic"
             },
             {
+              "$ref": "#/$defs/DecimalRound"
+            },
+            {
+              "$ref": "#/$defs/LocalizeTimestamp"
+            },
+            {
               "$ref": "#/$defs/Coalesce"
             },
             {
@@ -334,6 +351,16 @@
             }
           ],
           "title": "Right"
+        },
+        "rounding": {
+          "default": "exact",
+          "enum": [
+            "exact",
+            "half_even",
+            "half_away_from_zero"
+          ],
+          "title": "Rounding",
+          "type": "string"
         },
         "unit": {
           "minLength": 1,
@@ -425,9 +452,11 @@
                 "column": "#/$defs/Column",
                 "compare": "#/$defs/Compare",
                 "conditional": "#/$defs/Conditional",
+                "decimal_round": "#/$defs/DecimalRound",
                 "is_nan": "#/$defs/IsNaN",
                 "is_null": "#/$defs/IsNull",
                 "literal": "#/$defs/LiteralExpression",
+                "localize_timestamp": "#/$defs/LocalizeTimestamp",
                 "not": "#/$defs/Not"
               },
               "propertyName": "kind"
@@ -456,6 +485,12 @@
               },
               {
                 "$ref": "#/$defs/Arithmetic"
+              },
+              {
+                "$ref": "#/$defs/DecimalRound"
+              },
+              {
+                "$ref": "#/$defs/LocalizeTimestamp"
               },
               {
                 "$ref": "#/$defs/Coalesce"
@@ -814,9 +849,11 @@
                 "column": "#/$defs/Column",
                 "compare": "#/$defs/Compare",
                 "conditional": "#/$defs/Conditional",
+                "decimal_round": "#/$defs/DecimalRound",
                 "is_nan": "#/$defs/IsNaN",
                 "is_null": "#/$defs/IsNull",
                 "literal": "#/$defs/LiteralExpression",
+                "localize_timestamp": "#/$defs/LocalizeTimestamp",
                 "not": "#/$defs/Not"
               },
               "propertyName": "kind"
@@ -845,6 +882,12 @@
               },
               {
                 "$ref": "#/$defs/Arithmetic"
+              },
+              {
+                "$ref": "#/$defs/DecimalRound"
+              },
+              {
+                "$ref": "#/$defs/LocalizeTimestamp"
               },
               {
                 "$ref": "#/$defs/Coalesce"
@@ -1101,9 +1144,11 @@
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
               "conditional": "#/$defs/Conditional",
+              "decimal_round": "#/$defs/DecimalRound",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
+              "localize_timestamp": "#/$defs/LocalizeTimestamp",
               "not": "#/$defs/Not"
             },
             "propertyName": "kind"
@@ -1132,6 +1177,12 @@
             },
             {
               "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/DecimalRound"
+            },
+            {
+              "$ref": "#/$defs/LocalizeTimestamp"
             },
             {
               "$ref": "#/$defs/Coalesce"
@@ -1169,9 +1220,11 @@
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
               "conditional": "#/$defs/Conditional",
+              "decimal_round": "#/$defs/DecimalRound",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
+              "localize_timestamp": "#/$defs/LocalizeTimestamp",
               "not": "#/$defs/Not"
             },
             "propertyName": "kind"
@@ -1200,6 +1253,12 @@
             },
             {
               "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/DecimalRound"
+            },
+            {
+              "$ref": "#/$defs/LocalizeTimestamp"
             },
             {
               "$ref": "#/$defs/Coalesce"
@@ -2126,9 +2185,11 @@
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
               "conditional": "#/$defs/Conditional",
+              "decimal_round": "#/$defs/DecimalRound",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
+              "localize_timestamp": "#/$defs/LocalizeTimestamp",
               "not": "#/$defs/Not"
             },
             "propertyName": "kind"
@@ -2157,6 +2218,12 @@
             },
             {
               "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/DecimalRound"
+            },
+            {
+              "$ref": "#/$defs/LocalizeTimestamp"
             },
             {
               "$ref": "#/$defs/Coalesce"
@@ -2176,9 +2243,11 @@
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
               "conditional": "#/$defs/Conditional",
+              "decimal_round": "#/$defs/DecimalRound",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
+              "localize_timestamp": "#/$defs/LocalizeTimestamp",
               "not": "#/$defs/Not"
             },
             "propertyName": "kind"
@@ -2207,6 +2276,12 @@
             },
             {
               "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/DecimalRound"
+            },
+            {
+              "$ref": "#/$defs/LocalizeTimestamp"
             },
             {
               "$ref": "#/$defs/Coalesce"
@@ -2226,9 +2301,11 @@
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
               "conditional": "#/$defs/Conditional",
+              "decimal_round": "#/$defs/DecimalRound",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
+              "localize_timestamp": "#/$defs/LocalizeTimestamp",
               "not": "#/$defs/Not"
             },
             "propertyName": "kind"
@@ -2257,6 +2334,12 @@
             },
             {
               "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/DecimalRound"
+            },
+            {
+              "$ref": "#/$defs/LocalizeTimestamp"
             },
             {
               "$ref": "#/$defs/Coalesce"
@@ -2506,6 +2589,99 @@
       "title": "DateValue",
       "type": "object"
     },
+    "DecimalRound": {
+      "additionalProperties": false,
+      "properties": {
+        "argument": {
+          "discriminator": {
+            "mapping": {
+              "arithmetic": "#/$defs/Arithmetic",
+              "boolean": "#/$defs/Boolean",
+              "coalesce": "#/$defs/Coalesce",
+              "column": "#/$defs/Column",
+              "compare": "#/$defs/Compare",
+              "conditional": "#/$defs/Conditional",
+              "decimal_round": "#/$defs/DecimalRound",
+              "is_nan": "#/$defs/IsNaN",
+              "is_null": "#/$defs/IsNull",
+              "literal": "#/$defs/LiteralExpression",
+              "localize_timestamp": "#/$defs/LocalizeTimestamp",
+              "not": "#/$defs/Not"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Column"
+            },
+            {
+              "$ref": "#/$defs/LiteralExpression"
+            },
+            {
+              "$ref": "#/$defs/Compare"
+            },
+            {
+              "$ref": "#/$defs/Boolean"
+            },
+            {
+              "$ref": "#/$defs/Not"
+            },
+            {
+              "$ref": "#/$defs/IsNull"
+            },
+            {
+              "$ref": "#/$defs/IsNaN"
+            },
+            {
+              "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/DecimalRound"
+            },
+            {
+              "$ref": "#/$defs/LocalizeTimestamp"
+            },
+            {
+              "$ref": "#/$defs/Coalesce"
+            },
+            {
+              "$ref": "#/$defs/Conditional"
+            }
+          ],
+          "title": "Argument"
+        },
+        "kind": {
+          "const": "decimal_round",
+          "default": "decimal_round",
+          "title": "Kind",
+          "type": "string"
+        },
+        "logical_type": {
+          "$ref": "#/$defs/DecimalType"
+        },
+        "overflow": {
+          "const": "reject",
+          "default": "reject",
+          "title": "Overflow",
+          "type": "string"
+        },
+        "rounding": {
+          "enum": [
+            "half_even",
+            "half_away_from_zero"
+          ],
+          "title": "Rounding",
+          "type": "string"
+        }
+      },
+      "required": [
+        "argument",
+        "logical_type",
+        "rounding"
+      ],
+      "title": "DecimalRound",
+      "type": "object"
+    },
     "DecimalType": {
       "additionalProperties": false,
       "properties": {
@@ -2558,9 +2734,21 @@
     "Deduplicate": {
       "additionalProperties": false,
       "properties": {
+        "by": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SortKey"
+          },
+          "maxItems": 32,
+          "title": "By",
+          "type": "array"
+        },
         "keep": {
-          "const": "identical",
           "default": "identical",
+          "enum": [
+            "identical",
+            "first"
+          ],
           "title": "Keep",
           "type": "string"
         },
@@ -2594,6 +2782,12 @@
         "source": {
           "minLength": 1,
           "title": "Source",
+          "type": "string"
+        },
+        "ties": {
+          "const": "reject",
+          "default": "reject",
+          "title": "Ties",
           "type": "string"
         }
       },
@@ -2870,6 +3064,17 @@
     "EquiJoin": {
       "additionalProperties": false,
       "properties": {
+        "cardinality": {
+          "default": "many_to_many",
+          "enum": [
+            "one_to_one",
+            "one_to_many",
+            "many_to_one",
+            "many_to_many"
+          ],
+          "title": "Cardinality",
+          "type": "string"
+        },
         "how": {
           "enum": [
             "inner",
@@ -3411,9 +3616,11 @@
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
               "conditional": "#/$defs/Conditional",
+              "decimal_round": "#/$defs/DecimalRound",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
+              "localize_timestamp": "#/$defs/LocalizeTimestamp",
               "not": "#/$defs/Not"
             },
             "propertyName": "kind"
@@ -3442,6 +3649,12 @@
             },
             {
               "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/DecimalRound"
+            },
+            {
+              "$ref": "#/$defs/LocalizeTimestamp"
             },
             {
               "$ref": "#/$defs/Coalesce"
@@ -3650,9 +3863,11 @@
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
               "conditional": "#/$defs/Conditional",
+              "decimal_round": "#/$defs/DecimalRound",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
+              "localize_timestamp": "#/$defs/LocalizeTimestamp",
               "not": "#/$defs/Not"
             },
             "propertyName": "kind"
@@ -3681,6 +3896,12 @@
             },
             {
               "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/DecimalRound"
+            },
+            {
+              "$ref": "#/$defs/LocalizeTimestamp"
             },
             {
               "$ref": "#/$defs/Coalesce"
@@ -3716,9 +3937,11 @@
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
               "conditional": "#/$defs/Conditional",
+              "decimal_round": "#/$defs/DecimalRound",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
+              "localize_timestamp": "#/$defs/LocalizeTimestamp",
               "not": "#/$defs/Not"
             },
             "propertyName": "kind"
@@ -3747,6 +3970,12 @@
             },
             {
               "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/DecimalRound"
+            },
+            {
+              "$ref": "#/$defs/LocalizeTimestamp"
             },
             {
               "$ref": "#/$defs/Coalesce"
@@ -4065,6 +4294,102 @@
       "title": "LiteralExpression",
       "type": "object"
     },
+    "LocalizeTimestamp": {
+      "additionalProperties": false,
+      "properties": {
+        "ambiguous": {
+          "enum": [
+            "reject",
+            "earlier",
+            "later"
+          ],
+          "title": "Ambiguous",
+          "type": "string"
+        },
+        "argument": {
+          "discriminator": {
+            "mapping": {
+              "arithmetic": "#/$defs/Arithmetic",
+              "boolean": "#/$defs/Boolean",
+              "coalesce": "#/$defs/Coalesce",
+              "column": "#/$defs/Column",
+              "compare": "#/$defs/Compare",
+              "conditional": "#/$defs/Conditional",
+              "decimal_round": "#/$defs/DecimalRound",
+              "is_nan": "#/$defs/IsNaN",
+              "is_null": "#/$defs/IsNull",
+              "literal": "#/$defs/LiteralExpression",
+              "localize_timestamp": "#/$defs/LocalizeTimestamp",
+              "not": "#/$defs/Not"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Column"
+            },
+            {
+              "$ref": "#/$defs/LiteralExpression"
+            },
+            {
+              "$ref": "#/$defs/Compare"
+            },
+            {
+              "$ref": "#/$defs/Boolean"
+            },
+            {
+              "$ref": "#/$defs/Not"
+            },
+            {
+              "$ref": "#/$defs/IsNull"
+            },
+            {
+              "$ref": "#/$defs/IsNaN"
+            },
+            {
+              "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/DecimalRound"
+            },
+            {
+              "$ref": "#/$defs/LocalizeTimestamp"
+            },
+            {
+              "$ref": "#/$defs/Coalesce"
+            },
+            {
+              "$ref": "#/$defs/Conditional"
+            }
+          ],
+          "title": "Argument"
+        },
+        "kind": {
+          "const": "localize_timestamp",
+          "default": "localize_timestamp",
+          "title": "Kind",
+          "type": "string"
+        },
+        "nonexistent": {
+          "const": "reject",
+          "default": "reject",
+          "title": "Nonexistent",
+          "type": "string"
+        },
+        "timezone": {
+          "minLength": 1,
+          "title": "Timezone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "argument",
+        "timezone",
+        "ambiguous"
+      ],
+      "title": "LocalizeTimestamp",
+      "type": "object"
+    },
     "Measure": {
       "additionalProperties": false,
       "properties": {
@@ -4361,9 +4686,11 @@
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
               "conditional": "#/$defs/Conditional",
+              "decimal_round": "#/$defs/DecimalRound",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
+              "localize_timestamp": "#/$defs/LocalizeTimestamp",
               "not": "#/$defs/Not"
             },
             "propertyName": "kind"
@@ -4392,6 +4719,12 @@
             },
             {
               "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/DecimalRound"
+            },
+            {
+              "$ref": "#/$defs/LocalizeTimestamp"
             },
             {
               "$ref": "#/$defs/Coalesce"
@@ -4427,9 +4760,11 @@
               "column": "#/$defs/Column",
               "compare": "#/$defs/Compare",
               "conditional": "#/$defs/Conditional",
+              "decimal_round": "#/$defs/DecimalRound",
               "is_nan": "#/$defs/IsNaN",
               "is_null": "#/$defs/IsNull",
               "literal": "#/$defs/LiteralExpression",
+              "localize_timestamp": "#/$defs/LocalizeTimestamp",
               "not": "#/$defs/Not"
             },
             "propertyName": "kind"
@@ -4458,6 +4793,12 @@
             },
             {
               "$ref": "#/$defs/Arithmetic"
+            },
+            {
+              "$ref": "#/$defs/DecimalRound"
+            },
+            {
+              "$ref": "#/$defs/LocalizeTimestamp"
             },
             {
               "$ref": "#/$defs/Coalesce"

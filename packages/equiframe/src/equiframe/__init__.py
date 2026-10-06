@@ -239,7 +239,15 @@ from equiframe.migration import (
     render_migration_report,
     validate_ir,
 )
-from equiframe.migration.types import Arithmetic, Coalesce, Concatenate, Conditional, Deduplicate
+from equiframe.migration.types import (
+    Arithmetic,
+    Coalesce,
+    Concatenate,
+    Conditional,
+    DecimalRound,
+    Deduplicate,
+    LocalizeTimestamp,
+)
 from equiframe.pipeline import run_pipeline
 from equiframe.pipeline_types import (
     EvidenceFile,
@@ -473,6 +481,7 @@ __all__ = [
     "DatePolicy",
     "DateType",
     "DateValue",
+    "DecimalRound",
     "DecimalType",
     "DecimalValue",
     "DecisionState",
@@ -556,6 +565,7 @@ __all__ = [
     "LoadedTable",
     "LocalArtifactStore",
     "LocalDataSource",
+    "LocalizeTimestamp",
     "LogicalType",
     "Measure",
     "MigrationOptions",
