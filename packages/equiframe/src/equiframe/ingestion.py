@@ -4,23 +4,24 @@ from __future__ import annotations
 
 import csv
 import hashlib
-import io
 import json
 import math
 import re
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import ExitStack
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal, InvalidOperation, localcontext
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, Self
+from typing import TYPE_CHECKING, Any, Literal, Self, TextIO
 from uuid import uuid4
 
 from pydantic import Field, model_validator
 
 from equiframe._base import FrozenModel, NonNegativeInt, Text, _ExplicitOutcome
 from equiframe._decimal import exact_decimal_context
+from equiframe._document_io import write_document_chunks
 from equiframe.contracts import (
     BooleanType,
     ColumnSpec,
@@ -32,7 +33,7 @@ from equiframe.contracts import (
     TimestampPolicy,
 )
 from equiframe.errors import InvalidExecutionInput, ResourceLimitError
-from equiframe.evidence import publish_json
+from equiframe.evidence import canonical_bytes, publish_json
 from equiframe.local import LocalArtifactStore
 from equiframe.migration.validation import decimal_limit, integer_bounds
 from equiframe.tables import LoadedTable, check_arrow, read_table, require_dependency
@@ -373,10 +374,50 @@ def _json(text: str) -> object:
     )
 
 
+def _jsonl_documents(source: TextIO) -> Iterator[str]:
+    # Preserve the historical str.splitlines() boundaries, including Unicode
+    # separators, without keeping all documents or a second decoded source copy.
+    for physical_line in source:
+        yield from physical_line.splitlines()
+
+
+def _result_chunks(result: IngestionResult, *, context: RunContext | None) -> Iterator[bytes]:
+    """Keep historical canonical JSON bytes without a second complete receipt graph."""
+    sequences = {"conversions": result.conversions, "quarantined": result.quarantined}
+    metadata = result.model_dump(mode="json", exclude=set(sequences))
+    yield b"{"
+    for index, name in enumerate(sorted((*metadata, *sequences))):
+        if context:
+            context.check()
+        yield (b"," if index else b"") + canonical_bytes(name) + b":"
+        if name not in sequences:
+            yield canonical_bytes(metadata[name])
+            continue
+        yield b"["
+        for item_index, item in enumerate(sequences[name]):
+            if context and item_index % 4096 == 0:
+                context.check()
+            yield (b"," if item_index else b"") + canonical_bytes(item.model_dump(mode="json"))
+        yield b"]"
+    yield b"}\n"
+
+
 def ingest_file(
-    path: Path, *, spec: IngestionSpec, work_dir: Path, context: RunContext | None = None
+    path: Path,
+    *,
+    spec: IngestionSpec,
+    work_dir: Path,
+    context: RunContext | None = None,
+    batch_rows: int = 4096,
 ) -> IngestionResult:
-    """Preserve bytes, then parse to declared types. A rejected file has no output."""
+    """Preserve original bytes and parse accepted values in bounded row batches.
+
+    CSV/JSONL decode incrementally. JSON documents, per-document expansion and
+    the public conversion/quarantine receipts still materialize; this is not a
+    hard memory quota. A rejected file never publishes a partial accepted table.
+    """
+    if isinstance(batch_rows, bool) or not isinstance(batch_rows, int) or batch_rows <= 0:
+        raise ValueError("batch_rows must be a positive integer")
     require_dependency("pyarrow", "arrow")
     import pyarrow as pa
 
@@ -407,9 +448,44 @@ def ingest_file(
     conversions: list[ConversionReceipt] = []
     quarantine: list[QuarantinedRecord] = []
     count = 0
+    accepted = 0
+    buffered = 0
+    transport_bytes = 0
+    schema = pa.schema([(f.column.name, _arrow_type(f)) for f in spec.fields])
+    staging = directory / "accepted.arrow.part"
+    writer: Any = None
+
+    def flush() -> None:
+        nonlocal buffered, transport_bytes
+        if not buffered:
+            return
+        table = pa.Table.from_arrays(
+            [
+                pa.array(values[f.column.name], type=_arrow_type(f), from_pandas=False)
+                for f in spec.fields
+            ],
+            schema=schema,
+        )
+        check_arrow(table)
+        transport_bytes += table.nbytes
+        if context:
+            # Batch-local checks must not reset cumulative input budgets.
+            context.check_table(table, output=False, enforce_rows=False)
+            options = context.plan.options
+            if options.max_input_rows is not None and accepted > options.max_input_rows:
+                raise ResourceLimitError("materialized table exceeds row budget")
+            if (
+                options.max_transport_bytes is not None
+                and transport_bytes > options.max_transport_bytes
+            ):
+                raise ResourceLimitError("materialized table exceeds Arrow buffer byte budget")
+        writer.write_table(table)
+        for column_values in values.values():
+            column_values.clear()
+        buffered = 0
 
     def accept(raw: object, root: object, ancestors: tuple[object, ...], location: str) -> bool:
-        nonlocal count
+        nonlocal count, accepted, buffered
         if context:
             context.check()
         if count >= spec.max_records:
@@ -456,111 +532,126 @@ def ingest_file(
         conversions.extend(pending)
         for name, value in converted.items():
             values[name].append(value)
+        accepted += 1
+        buffered += 1
+        if buffered >= batch_rows:
+            flush()
         return True
 
     rejected = False
-    try:
-        text = preserved.read_text(encoding=spec.encoding)
-        if spec.format == "csv":
-            reader = csv.DictReader(
-                io.StringIO(text, newline=""),
-                delimiter=spec.delimiter,
-                fieldnames=None if spec.header else list(spec.fieldnames),
-                strict=True,
-            )
-            names = reader.fieldnames or []
-            if len(names) != len(set(names)) or any(not name for name in names):
-                raise ValueError("invalid_or_duplicate_csv_header")
-            required = {field.path[0] for field in spec.fields if field.missing == "reject"}
-            if required - set(names):
-                raise ValueError("missing_csv_header_field")
-            permitted = {field.path[0] for field in spec.fields}
-            if spec.extra_fields == "reject" and set(names) - permitted:
-                raise ValueError("new_or_extra_csv_header_field")
-            for csv_record in reader:
-                if None in csv_record:
-                    csv_record = {**csv_record, "<surplus_fields>": csv_record[None]}
-                else:
-                    csv_record = {
-                        name: value for name, value in csv_record.items() if value is not None
-                    }
-                if not accept(csv_record, csv_record, (), f"$[{count}]"):
-                    rejected = True
-                    break
-        else:
-            if spec.format == "json" and not text.strip():
-                raise ValueError("empty_json_document")
-            documents = text.splitlines() if spec.format == "jsonl" else [text]
-            for line_number, document in enumerate(documents, 1):
-                if not document.strip():
-                    if spec.format == "jsonl" and not accept(None, None, (), f"line:{line_number}"):
-                        rejected = True
-                        break
-                    continue
-                try:
-                    root = _json(document)
-                    records = _records(
-                        root,
-                        spec.records_path,
-                        max_records=spec.max_records - count,
-                        check=context.check if context else None,
-                    )
-                except ValueError as error:
-                    if count >= spec.max_records:
-                        raise ResourceLimitError(
-                            "records exceed ingestion record budget"
-                        ) from error
-                    quarantine.append(
-                        QuarantinedRecord(
-                            record=count,
-                            path=f"line:{line_number}",
-                            original_text=document,
-                            code=str(error),
-                        )
-                    )
-                    count += 1
-                    if spec.invalid_records == "reject":
-                        rejected = True
-                        break
-                    continue
-                for raw, ancestors, location in records:
-                    if not accept(raw, root, ancestors, f"line:{line_number}" + location):
-                        rejected = True
-                        break
-                if rejected:
-                    break
-    except (UnicodeError, csv.Error, ValueError) as error:
-        if count >= spec.max_records:
-            raise ResourceLimitError("records exceed ingestion record budget") from error
-        quarantine.append(
-            QuarantinedRecord(
-                record=count,
-                path="$",
-                original_text="",
-                code=type(error).__name__ + ":" + str(error),
-            )
-        )
-        count += 1
-        rejected = True
     output = None
-    accepted = len(next(iter(values.values())))
-    if not rejected:
-        table = pa.Table.from_arrays(
-            [
-                pa.array(values[f.column.name], type=_arrow_type(f), from_pandas=False)
-                for f in spec.fields
-            ],
-            names=list(values),
-        )
-        check_arrow(table)
-        if context:
-            context.check_table(table, output=False)
-        target = directory / "accepted.arrow"
-        with pa.OSFile(str(target), "wb") as sink, pa.ipc.new_file(sink, table.schema) as writer:
-            writer.write_table(table)
-        output = LocalArtifactStore(directory / "artifacts").put(
-            target, media_type="application/vnd.apache.arrow.file"
-        )
+    try:
+        with ExitStack() as stack:
+            try:
+                source = stack.enter_context(preserved.open(encoding=spec.encoding))
+                if spec.format != "json":
+                    # A malformed encoding historically rejected the whole source
+                    # before accepting any rows. Keep that contract with a bounded
+                    # validation pass, then parse the same preserved bytes.
+                    while source.read(64 * 1024):
+                        if context:
+                            context.check()
+                    source.seek(0)
+                sink = stack.enter_context(pa.OSFile(str(staging), "wb"))
+                writer = stack.enter_context(pa.ipc.new_file(sink, schema))
+                if spec.format == "csv":
+                    reader = csv.DictReader(
+                        source,
+                        delimiter=spec.delimiter,
+                        fieldnames=None if spec.header else list(spec.fieldnames),
+                        strict=True,
+                    )
+                    names = reader.fieldnames or []
+                    if len(names) != len(set(names)) or any(not name for name in names):
+                        raise ValueError("invalid_or_duplicate_csv_header")
+                    required = {field.path[0] for field in spec.fields if field.missing == "reject"}
+                    if required - set(names):
+                        raise ValueError("missing_csv_header_field")
+                    permitted = {field.path[0] for field in spec.fields}
+                    if spec.extra_fields == "reject" and set(names) - permitted:
+                        raise ValueError("new_or_extra_csv_header_field")
+                    for csv_record in reader:
+                        if None in csv_record:
+                            csv_record = {**csv_record, "<surplus_fields>": csv_record[None]}
+                        else:
+                            csv_record = {
+                                name: value
+                                for name, value in csv_record.items()
+                                if value is not None
+                            }
+                        if not accept(csv_record, csv_record, (), f"$[{count}]"):
+                            rejected = True
+                            break
+                else:
+                    text = source.read() if spec.format == "json" else ""
+                    if spec.format == "json" and not text.strip():
+                        raise ValueError("empty_json_document")
+                    documents = _jsonl_documents(source) if spec.format == "jsonl" else iter([text])
+                    for line_number, document in enumerate(documents, 1):
+                        if not document.strip():
+                            if spec.format == "jsonl" and not accept(
+                                None, None, (), f"line:{line_number}"
+                            ):
+                                rejected = True
+                                break
+                            continue
+                        try:
+                            root = _json(document)
+                            records = _records(
+                                root,
+                                spec.records_path,
+                                max_records=spec.max_records - count,
+                                check=context.check if context else None,
+                            )
+                        except ValueError as error:
+                            if count >= spec.max_records:
+                                raise ResourceLimitError(
+                                    "records exceed ingestion record budget"
+                                ) from error
+                            quarantine.append(
+                                QuarantinedRecord(
+                                    record=count,
+                                    path=f"line:{line_number}",
+                                    original_text=document,
+                                    code=str(error),
+                                )
+                            )
+                            count += 1
+                            if spec.invalid_records == "reject":
+                                rejected = True
+                                break
+                            continue
+                        for raw, ancestors, location in records:
+                            if not accept(raw, root, ancestors, f"line:{line_number}" + location):
+                                rejected = True
+                                break
+                        if rejected:
+                            break
+            except (UnicodeError, csv.Error, ValueError) as error:
+                if count >= spec.max_records:
+                    raise ResourceLimitError("records exceed ingestion record budget") from error
+                quarantine.append(
+                    QuarantinedRecord(
+                        record=count,
+                        path="$",
+                        original_text="",
+                        code=type(error).__name__ + ":" + str(error),
+                    )
+                )
+                count += 1
+                rejected = True
+            if not rejected:
+                flush()
+                if context:
+                    context.check()
+        if not rejected:
+            target = directory / "accepted.arrow"
+            staging.rename(target)
+            output = LocalArtifactStore(directory / "artifacts").put(
+                target, media_type="application/vnd.apache.arrow.file"
+            )
+    finally:
+        staging.unlink(missing_ok=True)
     result = IngestionResult(
         ingestion_id=directory.name,
         spec=spec,
@@ -573,7 +664,7 @@ def ingest_file(
         output=output,
         elapsed_seconds=time.perf_counter() - start,
     )
-    publish_json(result, directory / "ingestion.json")
+    write_document_chunks(directory / "ingestion.json", _result_chunks(result, context=context))
     return result
 
 
@@ -581,9 +672,16 @@ def ingest_file(
 class FileInput:
     path: Path
     spec: IngestionSpec
+    batch_rows: int = 4096
 
     def load(self, context: RunContext) -> LoadedTable:
-        result = ingest_file(self.path, spec=self.spec, work_dir=context.directory, context=context)
+        result = ingest_file(
+            self.path,
+            spec=self.spec,
+            work_dir=context.directory,
+            context=context,
+            batch_rows=self.batch_rows,
+        )
         if result.state != "completed" or result.output is None:
             raise InvalidExecutionInput(
                 "ingestion rejected/quarantined records; inspect ingestion receipt"

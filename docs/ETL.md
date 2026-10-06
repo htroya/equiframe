@@ -77,12 +77,22 @@ aceptada. `quarantined` publica solo aceptados pero conserva cobertura incomplet
 `FileInput.load` exige `completed`: el consumidor decide explícitamente si usar
 un artefacto con cuarentena después de revisar su recibo.
 
-El archivo se copia con comprobación de bytes antes de parsing. La implementación
-actual materializa texto, estructuras JSON, recibos y salida Arrow; no anuncia
-streaming limitado en RSS. `max_source_bytes` se comprueba durante copia;
-`max_records` durante procesamiento del grano expandido. JSON puede haber
-expandido estructuras antes del control de registros. Los controles de contexto
-son cooperativos, sin interrupción de cualquier llamada Python bloqueada.
+El archivo se copia con comprobación de bytes antes de parsing. Desde el candidato
+0.12.0a1, `ingest_file(..., batch_rows=4096)` y `FileInput(..., batch_rows=4096)`
+leen CSV/JSONL incrementalmente y escriben valores aceptados por lotes Arrow.
+El valor debe ser entero positivo, no booleano; no se añade al formato JSON 1.0.
+La validación inicial de encoding conserva rechazo completo antes de aceptar
+filas. Los recibos devueltos permanecen completos en memoria; su publicación
+canónica evita una segunda materialización mediante escritura por fragmentos.
+JSON completo, un documento JSONL grande y su expansión conservan límites
+explícitos; `FileInput.load` sigue materializando la tabla completa.
+
+`max_source_bytes` se comprueba durante copia; `max_records` durante procesamiento
+del grano expandido. Las cuotas de filas/buffers del contexto se acumulan entre
+lotes, sin reiniciarse. Un fallo elimina staging y no publica resultado exitoso;
+una interrupción al serializar recibos puede dejar artefactos privados pero nunca
+`ingestion.json` final. Los controles son cooperativos, no cuotas duras de RSS.
+[Uso, compatibilidad y límites](../packages/equiframe/docs/ingestion.md).
 
 ## Workflow y checkpoints
 
