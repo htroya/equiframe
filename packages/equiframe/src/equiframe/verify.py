@@ -5,12 +5,12 @@ from __future__ import annotations
 import time
 from collections.abc import Mapping
 from datetime import UTC, datetime
-from html import escape
 from itertools import combinations
 from pathlib import Path
 from uuid import uuid4
 
 from equiframe._comparison_io import snapshot
+from equiframe._report_format_v1 import verification_html_v1, verification_summary_v1
 from equiframe.comparison import compare, iter_differences, read_comparison
 from equiframe.comparison_types import ComparisonOptions, ComparisonPolicy, ComparisonResult
 from equiframe.contracts import Contract, TableSpec
@@ -633,61 +633,11 @@ def verify(
 
 
 def verification_summary(result: VerificationResult) -> dict[str, object]:
-    return {
-        "schema_version": "1.0",
-        "verification_id": result.verification_id,
-        "operational_state": result.operational_state,
-        "publishable": result.publishable,
-        "exit_code": result.exit_code,
-        "contract_sha256": result.binding.contract_sha256,
-        "binding": result.binding.model_dump(mode="json"),
-        "dimensions": {
-            name: getattr(result, name).model_dump(mode="json")
-            for name in ("inputs", "technical", "integrity", "agreement", "independent_review")
-        },
-        "expected": [c.model_dump(mode="json") for c in result.expected],
-        "rules": [c.model_dump(mode="json") for c in result.rules],
-        "rule_evaluations": [r.model_dump(mode="json") for r in result.rule_evaluations],
-        "coverage": result.coverage.model_dump(mode="json"),
-        "provenance": result.provenance.model_dump(mode="json") if result.provenance else None,
-        "expected_source_engine": result.expected_source_engine,
-        "elapsed_seconds": result.elapsed_seconds,
-        "engines": [
-            {
-                "output": name,
-                "engine": e.plan.engine,
-                "versions": [v.model_dump(mode="json") for v in e.versions],
-            }
-            for name, e in result.executions
-        ],
-        "comparisons": [
-            {
-                "comparison_id": c.comparison_id,
-                "state": c.state,
-                "reference": c.reference,
-                "counts": c.counts.model_dump(mode="json"),
-                "examples": [d.model_dump(mode="json") for d in c.examples],
-                "examples_truncated": c.counts.difference_records > len(c.examples),
-                "policy": c.spec.policy.model_dump(mode="json"),
-                "differences": c.differences.model_dump(mode="json"),
-            }
-            for c in (*result.comparisons, *result.input_comparisons)
-        ],
-        "identity_authentication": (
-            "Declared identities are not authenticated; hashes prove integrity"
-        ),
-    }
+    return verification_summary_v1(result)
 
 
 def render_verification_report(result: VerificationResult) -> str:
-    from equiframe.evidence import canonical_bytes
-
-    return (
-        '<!doctype html><html lang="en"><meta charset="utf-8"><title>EquiFrame Verify</title>'
-        "<h1>EquiFrame Verify</h1><pre>"
-        + escape(canonical_bytes(verification_summary(result)).decode("utf-8"))
-        + "</pre></html>"
-    )
+    return verification_html_v1(result)
 
 
 def read_verification(path: Path) -> VerificationResult:
@@ -752,11 +702,9 @@ def read_verification(path: Path) -> VerificationResult:
             raise ArtifactIntegrityError("difference counts contradict complete evidence")
         if len(c.examples) != min(count, c.options.max_examples):
             raise ArtifactIntegrityError("comparison examples contradict the configured budget")
-    if parse_json((directory / "report.json").read_bytes()) != verification_summary(result):
+    if parse_json((directory / "report.json").read_bytes()) != verification_summary_v1(result):
         raise ArtifactIntegrityError("verification report contradicts manifest")
-    if (directory / "report.html").read_bytes() != render_verification_report(result).encode(
-        "utf-8"
-    ):
+    if (directory / "report.html").read_bytes() != verification_html_v1(result).encode("utf-8"):
         raise ArtifactIntegrityError("verification HTML contradicts manifest")
     return result
 

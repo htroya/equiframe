@@ -309,6 +309,8 @@ def capture_native(value: object, options: DiffCaptureOptions) -> LoadedTable:
         require_dependency("pyarrow", "polars")
         copied = frame_pl.clone()
         table = copied.to_arrow()
+        if table.shape != copied.shape:
+            raise CapabilityError("Polars direct capture changed table dimensions")
         _check_metadata(table)
         return _finish(
             LoadedTable(

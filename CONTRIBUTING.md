@@ -5,7 +5,7 @@ un clon local; el propietario administra el acceso en **Settings → Collaborato
 
 ## Preparar el entorno
 
-Instale Git, Python 3.12 y un editor. Autentíquese en GitHub con su propia cuenta,
+Instale Git, Python 3.12 o 3.13 y un editor. Autentíquese en GitHub con su propia cuenta,
 clone el repositorio y abra la carpeta que contiene `.git`.
 Las instrucciones de entorno y los controles del paquete están en su
 [README](packages/equiframe/README.md#instalación-reproducible).
@@ -47,6 +47,11 @@ comprobadas. Registre decisiones técnicas en `docs/DECISIONS.md`. Los cambios
 metodológicos requieren también actualizar `docs/THESIS_TRACEABILITY.md`.
 
 Cada cambio de dependencias exige actualizar el lock y repetir sus controles.
+La [política STEP6](docs/COMPATIBILITY.md) exige clasificar nuevas superficies,
+conservar fixtures históricos y verificar el mismo wheel fuera del checkout.
+`tools/verify_compatibility.py` ejecuta perfiles por intérprete y extremos de
+dependencias sin convertir skips, xfails, celdas bloqueadas o planes de CI en
+soporte. Un registro de capacidades no reemplaza un recibo del corpus ejecutado.
 No publique paquetes ni redistribuya datos sin la decisión correspondiente de los autores.
 
 ## Revisión y permisos

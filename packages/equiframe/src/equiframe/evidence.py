@@ -19,6 +19,20 @@ from equiframe.types import ArtifactRef, Sha256
 MAX_DOCUMENT_BYTES = 64 * 1024 * 1024
 
 
+class _EnvironmentManifest(FrozenModel):
+    """The persisted pipeline environment is versioned evidence, not opaque JSON.
+
+    These fields were emitted by the original 1.0 writer. Reading checks their
+    format, without requiring the reader's packages or platform to match them.
+    """
+
+    schema_version: Literal["1.0"]
+    python: str
+    system: str
+    machine: str
+    packages: dict[str, str]
+
+
 def canonical_bytes(value: object) -> bytes:
     return json.dumps(
         value, sort_keys=True, ensure_ascii=True, allow_nan=False, separators=(",", ":")
@@ -230,6 +244,7 @@ def read_pipeline(path: Path, *, verify: bool = True) -> PipelineResult:
         }
         if not required <= {item.path for item in result.evidence}:
             raise ArtifactIntegrityError("final manifest is missing required evidence")
+        load_json(_EnvironmentManifest, directory / "environment.json")
         events = verify_events(directory / "events.jsonl", operation_id=result.pipeline_id)
         if (
             len(events) != result.event_count
@@ -285,11 +300,11 @@ def read_pipeline(path: Path, *, verify: bool = True) -> PipelineResult:
                         matrix.model_dump(mode="json")
                     ):
                         raise ArtifactIntegrityError("scored matrix does not belong to the profile")
-        from equiframe.reporting import pipeline_summary, render_report
+        from equiframe._report_format_v1 import pipeline_html_v1, pipeline_summary_v1
 
-        summary = pipeline_summary(result)
+        summary = pipeline_summary_v1(result)
         if parse_json((directory / "report.json").read_bytes()) != summary or (
-            (directory / "report.html").read_bytes() != render_report(summary).encode("utf8")
+            (directory / "report.html").read_bytes() != pipeline_html_v1(summary).encode("utf8")
         ):
             raise ArtifactIntegrityError("report contradicts the final result")
     return result

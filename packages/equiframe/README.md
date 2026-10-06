@@ -12,14 +12,29 @@ CLI y recursos runtime. Hasta resolver licencia y acceso público, use artefacto
 identificados del equipo y `--no-index --find-links` para evitar paquetes ajenos.
 
 Contratos estrictos, comparación completa y ejecución local con Pandas, Polars y DuckDB.
-Se requiere Python 3.12; los motores se instalan mediante extras. La configuración
-CI manual ofrece una matriz opcional Windows x64, Ubuntu x64/ARM64 y macOS
-Intel/Apple Silicon. El candidato se verifica localmente en Windows x64; no
-se ejecutó esa matriz remota.
-La [revisión actual](../../docs/VERIFY_ETL_REVIEW_20261003.md) y la
-[evidencia histórica](../../docs/STEP_08_REVIEW.md)
-registra los controles completados. No se requiere una VM ni un DW para usar el
-núcleo. Licencia y publicación externa pendientes; no hay paquete del equipo en PyPI.
+Los metadatos permiten Python 3.12 y 3.13 (`>=3.12,<3.14`); los motores se
+instalan mediante extras. Esto no promete cada plataforma ni cada combinación
+numérica del rango. La [política de compatibilidad](../../docs/COMPATIBILITY.md),
+[matriz del candidato](../../docs/STEP6_CANDIDATE.md) y
+[registro de adaptadores](../../docs/ADAPTER_CAPABILITIES.md) delimitan el corpus
+realmente ejecutado con el mismo wheel, versiones resueltas, rechazos y pendientes.
+Las pruebas anteriores de Windows son históricas y no validan este candidato.
+La configuración manual de CI no acredita que haya corrido una matriz remota.
+No se requiere VM ni DW. Licencia y publicación externa siguen pendientes.
+
+`ef.get_stability_register()` clasifica las superficies públicas y sus formatos;
+`ef.get_adapter_capabilities()` permite consultar condiciones y pérdidas conocidas
+sin cargar motores. Una clasificación estable compromete compatibilidad dentro
+de la política; no es certificación externa, promesa de rendimiento ni aprobación
+científica. Los formatos tienen versiones independientes del paquete. Los lectores
+rechazan versiones desconocidas incluso dentro de expedientes cuyos hashes sean
+consistentes. Las fixtures históricas del sdist fijan el compromiso de lectura.
+
+Cambios de dependencias requieren repetir la matriz. Los modelos ML ajustados
+pueden variar entre versiones nativas; se verifica paridad con la versión instalada,
+no identidad universal de árboles, umbrales o decisiones. Polars debe preservar
+las dimensiones durante cada transporte; una conversión que pierde filas/columnas
+produce rechazo explícito antes de presentar un resultado completado.
 
 
 ## Tres recetas para el primer uso

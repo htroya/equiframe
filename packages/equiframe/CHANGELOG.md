@@ -2,6 +2,19 @@
 
 ## Sin publicar — revisión del candidato 0.11.1
 
+- STEP6: clasificación pública de estabilidad, política de deprecación y registro
+  de capacidades por etapa. Lectura de fixtures históricas inmutables; rechaza
+  versiones futuras en los expedientes, incluido environment.json rehasheado.
+  Nuevas guardas Polars rechazan pérdida de dimensiones en captura/conversión.
+- Metadatos Python ampliados a 3.12/3.13 tras evaluación, con locks revisados y
+  matriz ejecutable de extras/dependencias mínimas directas y recientes permitidas.
+  Cada resultado identifica el mismo wheel y su entorno; no acredita SO/arquitecturas
+  no ejecutados, compatibilidad de todo el rango, ni CI remota. Ver STEP6_CANDIDATE.
+- Regresiones de transporte comprueban float16 con un escalar representable en
+  Arrow20, sin admitir ese tipo. El test ML compara los splits con sklearn nativo
+  y mantiene una prueba determinista de rechazo de bosque sin splits; no fija
+  umbrales que difieren entre versiones nativas ni cambia el método del detector.
+
 - STEP5: kit de primer uso con tres recetas autocontenidas, wheel identificado,
   dependencias bloqueadas con hashes, guía de interpretación y formulario de
   observación humana sin completar. Refactor pandas con clave/bolsa, migración

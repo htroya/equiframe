@@ -45,6 +45,15 @@ from equiframe.comparison_types import (
     ComparisonSpec,
     ComparisonValue,
 )
+from equiframe.compatibility import (
+    AdapterCapability,
+    CapabilityStage,
+    CompatibilityPolicy,
+    StabilityRecord,
+    get_adapter_capabilities,
+    get_compatibility_policy,
+    get_stability_register,
+)
 from equiframe.contracts import (
     SCHEMA_VERSION,
     AggregateCheck,
@@ -380,6 +389,7 @@ __version__ = "0.11.1"
 __all__ = [
     "CANONICALIZATION",
     "SCHEMA_VERSION",
+    "AdapterCapability",
     "Aggregate",
     "AggregateCheck",
     "AppliedPolicy",
@@ -396,6 +406,7 @@ __all__ = [
     "BundleReference",
     "CancellationToken",
     "CapabilityError",
+    "CapabilityStage",
     "CardinalityCheck",
     "Cast",
     "CastColumn",
@@ -418,6 +429,7 @@ __all__ = [
     "ComparisonSpec",
     "ComparisonState",
     "ComparisonValue",
+    "CompatibilityPolicy",
     "CompilationCheck",
     "CompilationDiagnostic",
     "CompiledPlan",
@@ -603,6 +615,7 @@ __all__ = [
     "SortKey",
     "SortSpec",
     "SourceReceipt",
+    "StabilityRecord",
     "StageRecord",
     "StageTiming",
     "StringType",
@@ -661,6 +674,9 @@ __all__ = [
     "export_bundle",
     "fit_detectors",
     "fit_preprocessor",
+    "get_adapter_capabilities",
+    "get_compatibility_policy",
+    "get_stability_register",
     "import_bundle",
     "infer_diff_contract",
     "ingest_file",

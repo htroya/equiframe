@@ -1,5 +1,11 @@
 # Changelog
 
+## Sin publicar — compatibilidad STEP6
+
+- Metadatos y lock permiten Python 3.12/3.13; soporte medido solo para las celdas
+  identificadas del candidato, con el mismo núcleo instalado y versiones exactas.
+  No cambia la metodología, los formatos científicos ni la condición experimental.
+
 ## Sin publicar — compatibilidad STEP4
 
 - Compruebe presencia de comparaciones con `is not None`; `ComparisonResult`

@@ -361,6 +361,8 @@ class PolarsInput:
                 self.frame.collect() if isinstance(self.frame, pl.LazyFrame) else self.frame.clone()
             )
         table = frame.to_arrow()
+        if table.shape != frame.shape:
+            raise CapabilityError("Polars input capture changed table dimensions")
         check_arrow(table)
         context.check_table(table, output=False)
         return LoadedTable(

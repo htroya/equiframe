@@ -106,7 +106,7 @@ def test_arrow_detaches_shared_numpy_values_and_validity():
         pa.table({"value": [{"nested": 1}]}),
         pa.table({"value": pa.array(["a"]).dictionary_encode()}),
         pa.table({"value": [b"bytes"]}),
-        pa.table({"value": pa.array([1.0], pa.float16())}),
+        pa.table({"value": pa.array([np.float16(1.0)], pa.float16())}),
         pa.table({"": [1]}),
         pa.Table.from_arrays([pa.array([1]), pa.array([2])], names=["same", "same"]),
     ],
@@ -610,3 +610,15 @@ def test_empty_pandas_frame_with_default_empty_column_index_is_supported():
     loaded = capture(pd.DataFrame())
     assert loaded.table.num_rows == 0 and loaded.table.num_columns == 0
     assert loaded.index is None
+
+
+def test_polars_direct_capture_rejects_lost_cardinality(monkeypatch):
+    frame = pl.DataFrame({"value": [1, 2]})
+    native = pl.DataFrame.to_arrow
+
+    def lossy(value, *args, **kwargs):
+        return native(value, *args, **kwargs).slice(0, 0)
+
+    monkeypatch.setattr(pl.DataFrame, "to_arrow", lossy)
+    with pytest.raises(ef.CapabilityError, match="direct capture changed table dimensions"):
+        capture(frame)

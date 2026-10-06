@@ -6,7 +6,7 @@ EquiFrame permite declarar qué deben conservar tus datos, comparar resultados b
 
 La comparación funciona sobre resultados ya materializados: puedes incorporarla a un proceso existente sin usar el runner de EquiFrame. La equivalencia siempre corresponde a las capturas y políticas evaluadas; dos motores pueden coincidir en un resultado incorrecto.
 
-**Estado actual:** candidato **0.11.1**, clasificado como **Alpha**, para **Python 3.12** (`>=3.12,<3.13`). El repositorio es privado, la licencia de distribución está pendiente y el paquete del equipo **todavía no está publicado en PyPI**. Consulta el [estado del candidato](docs/RELEASE_CANDIDATE.md) antes de distribuir o adoptar un artefacto.
+**Estado actual:** candidato **0.11.1**, clasificado como **Alpha**, con admisión de **Python 3.12 y 3.13** (`>=3.12,<3.14`). El repositorio es privado, la licencia de distribución está pendiente y el paquete del equipo **todavía no está publicado en PyPI**. Consulta el [estado del candidato](docs/RELEASE_CANDIDATE.md) antes de distribuir o adoptar un artefacto.
 
 [Inicio rápido](#inicio-rápido) · [Capacidades](#capacidades-disponibles) · [Semántica y límites](#semántica-y-límites) · [Documentación](#documentación)
 
@@ -39,7 +39,7 @@ La meta de cinco minutos y la aceptación humana siguen pendientes de observaci�
 
 ### Instalar desde el repositorio para desarrollo
 
-Necesitas acceso al repositorio y un entorno con Python 3.12. Para comparar datos locales basta el extra `arrow`; no hace falta instalar los tres motores.
+Necesitas acceso al repositorio y un entorno con Python 3.12 o 3.13. Para comparar datos locales basta el extra `arrow`; no hace falta instalar los tres motores.
 
 ```bash
 git clone https://github.com/htroya/equiframe.git
@@ -219,7 +219,9 @@ Los contratos, parámetros, capturas y diferencias pueden contener datos del con
 
 ## Compatibilidad y madurez
 
-- Python admitido por metadatos: **3.12**. Las versiones resueltas están fijadas en `uv.lock`; el lock no demuestra que se hayan probado. Cada validación corresponde al candidato y entorno identificados en su evidencia
+- Python admitido por metadatos: **3.12 y 3.13**. La [matriz STEP6](docs/STEP6_CANDIDATE.md) separa combinaciones ejecutadas de plataformas no verificadas; ni el rango ni el lock prueban todos sus cruces
+- [Política de estabilidad y deprecación](docs/COMPATIBILITY.md) y [capacidades de adaptadores](docs/ADAPTER_CAPABILITIES.md): clasificación explícita de API/CLI/formatos, plazos y condiciones por etapa; consultables sin cargar motores con `get_stability_register`, `get_compatibility_policy` y `get_adapter_capabilities`
+- El corpus histórico identifica commits privados y formatos 1.0, no versiones publicadas inventadas; las versiones desconocidas se rechazan aunque sus hashes coincidan. Las pruebas de conformidad se limitan al corpus propio y al wheel identificado
 - La [revisión integral](docs/COMPREHENSIVE_REVIEW_20261003.md) documenta controles de una revisión anterior en **Windows x64 / Python 3.12.4**. Los cambios posteriores requieren revalidación; esos resultados no se atribuyen automáticamente al HEAD actual
 - La CI es manual (`workflow_dispatch`) y exige activar la matriz de Windows x64, Linux x64/ARM64 y macOS Intel/Apple Silicon. No se encontraron ejecuciones de GitHub Actions para el candidato revisado `635e35b`; su configuración no acredita compatibilidad ejecutada. Consulta los resultados del commit correspondiente antes de anunciar una plataforma como probada
 - El núcleo puede trabajar con datos locales, sin OCI, SERCOP ni DW. `DataSource` permite proveedores externos explícitos; el servicio y la aceptación del DW real conservan entregas independientes

@@ -211,6 +211,8 @@ class PolarsAdapter:
                     if isinstance(loaded.native, pl.DataFrame)
                     else cast("pl.DataFrame", pl.from_arrow(loaded.table))
                 )
+                if tables[name].shape != loaded.table.shape:
+                    raise CapabilityError("Polars input conversion changed table dimensions")
         context.record_configuration(
             "polars_timezone_source",
             "chrono-tz compiled into locked polars runtime; IANA release not exposed by Python API",
@@ -223,6 +225,8 @@ class PolarsAdapter:
         with context.measure("materialization"):
             frame = output.collect() if isinstance(output, pl.LazyFrame) else output
             table = frame.to_arrow()
+            if table.shape != frame.shape:
+                raise CapabilityError("Polars output conversion changed table dimensions")
             check_arrow(table)
         return LoadedTable(table, native_types=tuple((n, str(t)) for n, t in frame.schema.items()))
 

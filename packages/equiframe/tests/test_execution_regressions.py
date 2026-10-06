@@ -455,6 +455,11 @@ def test_zero_column_tables_keep_cardinality_or_reject_explicitly(engine, rows, 
     if engine == "duckdb" or (engine == "pandas" and rows > 0):
         assert result.state == "invalid_input" and result.problem.code == "unsupported_capability"
         assert result.output is None
+    elif engine == "polars" and result.state == "invalid_input":
+        # Old native conversions cannot preserve N rows with zero columns.
+        # A safe refusal is permitted; successful execution may never lose N.
+        assert rows > 0 and result.problem.code == "unsupported_capability"
+        assert result.output is None and "dimensions" in result.problem.message
     else:
         assert data(result).num_rows == rows and data(result).num_columns == 0
     assert result.inputs[0].row_count == rows
@@ -489,3 +494,42 @@ def test_duckdb_zoned_timestamp_microsecond_boundaries(unit, factor, sign, overf
         output = data(result)
         assert output["v"].type == pa.timestamp("us", tz="UTC")
         assert output["v"].cast(pa.int64()).to_pylist() == [ticks * factor]
+
+
+@pytest.mark.parametrize("axis", ("rows", "columns"))
+def test_polars_lossy_input_conversion_never_runs_callback(axis, monkeypatch, tmp_path):
+    native = pl.from_arrow
+    table = pa.table({"id": ["001", "002"]})
+
+    def lossy(value, *args, **kwargs):
+        frame = native(value, *args, **kwargs)
+        return frame.head(0) if axis == "rows" else frame.drop("id")
+
+    def forbidden(tables, context):
+        raise AssertionError("lossy input reached the transformation")
+
+    monkeypatch.setattr(pl, "from_arrow", lossy)
+    result = identity("polars", table, tmp_path, callback=forbidden)
+    assert result.state == "invalid_input" and result.output is None
+    assert result.problem.code == "unsupported_capability"
+    assert "input conversion changed table dimensions" in result.problem.message
+
+
+@pytest.mark.parametrize("source_kind", ("arrow", "polars"))
+def test_polars_lossy_arrow_capture_is_explicit_failure(source_kind, monkeypatch, tmp_path):
+    table = pa.table({"id": ["001", "002"]})
+    native = pl.DataFrame.to_arrow
+
+    def lossy(frame, *args, **kwargs):
+        return native(frame, *args, **kwargs).slice(0, 0)
+
+    source = ef.LocalDataSource(
+        {"items": ef.PolarsInput(pl.from_arrow(table))}
+        if source_kind == "polars"
+        else {"items": ef.ArrowInput(table)}
+    )
+    monkeypatch.setattr(pl.DataFrame, "to_arrow", lossy)
+    result = identity("polars", table, tmp_path, source=source)
+    assert result.state == "invalid_input" and result.output is None
+    assert result.problem.code == "unsupported_capability"
+    assert "changed table dimensions" in result.problem.message

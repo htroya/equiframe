@@ -22,8 +22,9 @@ El benchmark fija exactamente el núcleo en base/extras; `uv` usa una fuente
 local sólo para desarrollo. Los metadatos publicados del wheel contienen la
 dependencia por nombre/version y ninguna obligación de ruta local.
 
-Python declarado **`>=3.12,<3.13`**. Esta entrega verifica Windows x64/Python
-3.12.4; no amplía versiones/plataformas. Hatchling 1.28.0, locks por paquete,
+Python declarado actual **`>=3.12,<3.14`**. La [matriz STEP6](STEP6_CANDIDATE.md)
+identifica evidencia del candidato actual y sus exclusiones. La verificación
+Windows x64/Python 3.12.4 de esta sección es histórica; no acredita este candidato. Hatchling 1.28.0, locks por paquete,
 Twine 6.2.0 resuelto desde `>=6.2,<7` y `py.typed`. El import base no carga Arrow,
 Pandas, Polars, DuckDB, NumPy o sklearn; cada extra se comprueba por separado.
 Los rangos anunciados conservan su metadata, pero la prueba ejecuta versiones
@@ -226,3 +227,25 @@ Esta verificación y la revisión técnica independiente del consumidor no son u
 observación de una persona nueva. El formulario de primer uso sigue pendiente y
 registra tiempo total, instalación, ayuda, errores, plataforma y comprensión.
 No se amplía soporte Python/plataformas ni se activa un workflow remoto.
+
+## Estabilidad y matriz STEP6
+
+La [política](COMPATIBILITY.md) clasifica API, CLI y formatos; el
+[registro de adaptadores](ADAPTER_CAPABILITIES.md) declara condiciones, pérdidas
+y mantenimiento individual no asignado. Los formatos permanecen independientes
+del número privado 0.11.1; el corpus histórico se conserva en el sdist y no se
+regenera durante tests. No es aceptación externa ni certificación de terceros.
+
+`tools/verify_compatibility.py` consume un único wheel/sdist ya construido,
+identifica sus bytes y crea consumidores fuera del checkout. Por perfil e
+intérprete, conserva resolución, versiones reales, comandos, logs y corpus;
+las dependencias de test se constriñen para no alterar silenciosamente las de
+runtime. Una celda fallida, omitida o bloqueada no da soporte. La resolución
+mínima de dependencias directas no es una prueba de toda dependencia transitiva
+histórica ni de cada combinación permitida por el metadata.
+
+No se reconstruye un wheel diferente para aparentar la misma matriz. Los recibos
+de cada celda se enlazan al commit final mediante inventarios de fuente y del
+payload instalado. Hashes e informes locales no autentican un ejecutor ni son
+CI remota. La guía de primer uso sigue enfocada en Python 3.12 y su meta humana
+de cinco minutos continúa pendiente.

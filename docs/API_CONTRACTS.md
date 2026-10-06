@@ -23,6 +23,13 @@ equivalencia; la notación O y los nombres existentes `oracle`, `OracleResult`,
 | `contract_json_schema() -> dict[str, object]` | JSON Schema generado desde `Contract` |
 
 La API explícita está en `equiframe.__all__`; `__version__` es `0.11.1`.
+Desde STEP6 cada export, comando y esquema tiene clasificación explícita en
+[compatibilidad](COMPATIBILITY.md), consultable con `get_stability_register()`.
+`get_compatibility_policy()` publica los avisos/plazos; `get_adapter_capabilities()`
+separa captura, comparación, ejecución y migración. Estas descripciones no admiten
+por sí solas una ejecución ni acreditan una plataforma; los registros de la
+[matriz ejecutada](STEP6_CANDIDATE.md) fijan su alcance observado.
+
 Los constructores usan Pydantic estricto/inmutable, rechazan extras y conservan
 colecciones como tuplas. La validación de JSON permite arrays sin introducir
 coerciones numéricas con pérdida. No se interpreta código en documentos.

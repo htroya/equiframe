@@ -6,9 +6,14 @@ y JSON Schema completos se incluyen en el **sdist**; el wheel contiene la API,
 CLI y recursos runtime. Hasta resolver licencia y acceso público, use artefactos
 identificados del equipo y `--no-index --find-links` para evitar paquetes ajenos.
 
-Distribución experimental `equiframe-benchmark 0.11.1`, Python 3.12. Catálogo,
+Distribución experimental `equiframe-benchmark 0.11.1`, Python 3.12 y 3.13. Catálogo,
 EquiFrame Verify (validación independiente de equivalencia), grupos transitivos,
 particiones y evaluación para `equiframe 0.11.1`. El núcleo no importa este paquete.
+
+Los metadatos de Python no prueban cada SO/arquitectura ni todo el rango de
+sus dependencias. La [matriz del candidato](../../docs/STEP6_CANDIDATE.md) identifica
+las combinaciones efectivamente verificadas con wheels concretos. El benchmark
+conserva su condición experimental; no se modifican R/M/B/H ni la metodología.
 
 La revisión 0.11.1 refuerza reproducción, inventarios de O y el puente Verify.
 Añade `evaluate_pairwise` y `PairwiseReport` para los seis contrastes descriptivos

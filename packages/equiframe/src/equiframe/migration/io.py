@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
-from html import escape
 from pathlib import Path
 
+from equiframe._report_format_v1 import (
+    migration_html_v1,
+    migration_legacy_summary_v1,
+    migration_summary_v1,
+)
 from equiframe.comparison import iter_differences, read_comparison
-from equiframe.comparison_types import ComparisonResult
 from equiframe.errors import ArtifactIntegrityError
 from equiframe.evidence import (
     describe_file,
@@ -24,110 +27,15 @@ from .runner_types import MigrationResult, MigrationSpec
 
 
 def _legacy_summary(result: MigrationResult) -> dict[str, object]:
-    result = MigrationResult.model_validate(result)
-    return {
-        "schema_version": "1.0",
-        "migration_id": result.migration_id,
-        "source_engine": result.spec.source_engine,
-        "target_engine": result.spec.target_engine,
-        "complete": result.complete,
-        "state": result.state,
-        "independent_verification": result.verification,
-        "expected_requested": result.expected_requested,
-        "detection_requested": result.detection_requested,
-        "rules_required": result.spec.require_rules,
-        "exit_code": result.exit_code,
-        "cancelled": result.cancelled,
-        "stages": [s.model_dump(mode="json") for s in result.stages],
-        "source_pipeline_id": result.source.pipeline_id if result.source else None,
-        "target_pipeline_id": result.target.pipeline_id if result.target else None,
-        "source_exit_code": result.source.exit_code if result.source else None,
-        "target_exit_code": result.target.exit_code if result.target else None,
-        "difference_records": result.comparison.counts.difference_records
-        if result.comparison is not None
-        else None,
-        "equivalence_is_independent_correctness": False,
-    }
-
-
-def _comparison_summary(result: ComparisonResult | None, *, requested: bool) -> dict[str, object]:
-    return {
-        "state": result.state
-        if result is not None
-        else "not_evaluable"
-        if requested
-        else "not_requested",
-        "complete": result.complete if result is not None else False,
-        "comparison_id": result.comparison_id if result is not None else None,
-        "difference_records": result.counts.difference_records if result is not None else None,
-    }
+    return migration_legacy_summary_v1(result)
 
 
 def migration_summary(result: MigrationResult) -> dict[str, object]:
-    """Keep each comparison visible without attributing human validation to C."""
-    result = MigrationResult.model_validate(result)
-    return {
-        **_legacy_summary(result),
-        "expected_output_comparison": result.verification,
-        "comparisons": {
-            "source_target": _comparison_summary(result.comparison, requested=True),
-            "source_expected": _comparison_summary(
-                result.verification_source, requested=result.expected_requested
-            ),
-            "target_expected": _comparison_summary(
-                result.verification_target, requested=result.expected_requested
-            ),
-        },
-        "equiframe_verify": {
-            "procedure": "EquiFrame Verify",
-            "identifier": "O",
-            "status": "not_established",
-            "reason": (
-                "Migration compares supplied expected content but does not establish "
-                "independent expected authorship or collect two independent human reviews."
-            ),
-        },
-    }
+    return migration_summary_v1(result)
 
 
 def _render_report(result: MigrationResult, *, legacy: bool = False) -> str:
-    summary = migration_summary(result)
-    rows = "".join(
-        "<tr><td>"
-        + escape(s.stage)
-        + "</td><td>"
-        + escape(s.state)
-        + "</td><td>"
-        + escape(s.code)
-        + "</td></tr>"
-        for s in result.stages
-    )
-    return (
-        '<!doctype html><html lang="en"><head><meta charset="utf-8">'
-        "<title>EquiFrame migration</title></head><body>"
-        "<h1>EquiFrame migration</h1><p>"
-        + escape(result.spec.source_engine)
-        + " to "
-        + escape(result.spec.target_engine)
-        + "</p><p>Observed equivalence: "
-        + escape(result.state)
-        + (". Independent verification: " if legacy else ". Supplied expected comparison: ")
-        + escape(result.verification)
-        + ". Complete: "
-        + str(summary["complete"])
-        + ".</p>"
-        "<p>Matching native outputs do not establish independent correctness.</p>"
-        + (
-            ""
-            if legacy
-            else "<p>EquiFrame Verify (O): not established. Comparing supplied expected "
-            "content does not establish independent expected authorship or collect "
-            "two independent human reviews.</p>"
-        )
-        + "<table><thead><tr><th>Stage</th><th>State</th><th>Code</th></tr></thead><tbody>"
-        + rows
-        + "</tbody></table></body></html>"
-    )
+    return migration_html_v1(result, legacy=legacy)
 
 
 def render_migration_report(result: MigrationResult) -> str:
@@ -265,10 +173,10 @@ def read_migration(path: Path, *, verify: bool = True) -> MigrationResult:
         if describe_file(ref_path, directory) != item:
             raise ArtifactIntegrityError("migration artifact changed")
     stored_summary = parse_json((directory / "report.json").read_bytes())
-    legacy = stored_summary == _legacy_summary(result)
-    if not legacy and stored_summary != migration_summary(result):
+    legacy = stored_summary == migration_legacy_summary_v1(result)
+    if not legacy and stored_summary != migration_summary_v1(result):
         raise ArtifactIntegrityError("migration report contradicts its manifest")
-    if (directory / "report.html").read_bytes() != _render_report(result, legacy=legacy).encode(
+    if (directory / "report.html").read_bytes() != migration_html_v1(result, legacy=legacy).encode(
         "utf-8"
     ):
         raise ArtifactIntegrityError("migration HTML contradicts its manifest")

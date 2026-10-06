@@ -1,0 +1,622 @@
+{
+  "schema_version": "1.0",
+  "comparison_id": "comparison-4c7e7552e4144ecab4a16e1a21c93941",
+  "spec_sha256": "6fc8077fd94294a6ca54bc79411b029dc2a9ac4f1e0b9fcf63c4b3d2cb782e01",
+  "declaration": {
+    "schema_version": "1.0",
+    "spec": {
+      "schema_version": "1.0",
+      "contract": {
+        "schema_version": "1.0",
+        "contract_id": "diff",
+        "revision": 1,
+        "family": "nulls_types",
+        "inputs": [
+          {
+            "name": "source",
+            "schema_spec": {
+              "columns": [
+                {
+                  "name": "id",
+                  "logical_type": {
+                    "kind": "integer",
+                    "bits": 64,
+                    "signed": true
+                  },
+                  "nullable": true,
+                  "null_policy": {
+                    "representations": [
+                      "null"
+                    ],
+                    "justification": null
+                  },
+                  "nan_policy": null,
+                  "numeric_policy": {
+                    "comparison": "exact",
+                    "unit": "unspecified",
+                    "rounding": null,
+                    "rounding_justification": null,
+                    "tolerance": null
+                  },
+                  "temporal_policy": null,
+                  "allowed_values": []
+                },
+                {
+                  "name": "value",
+                  "logical_type": {
+                    "kind": "integer",
+                    "bits": 64,
+                    "signed": true
+                  },
+                  "nullable": true,
+                  "null_policy": {
+                    "representations": [
+                      "null"
+                    ],
+                    "justification": null
+                  },
+                  "nan_policy": null,
+                  "numeric_policy": {
+                    "comparison": "exact",
+                    "unit": "unspecified",
+                    "rounding": null,
+                    "rounding_justification": null,
+                    "tolerance": null
+                  },
+                  "temporal_policy": null,
+                  "allowed_values": []
+                }
+              ],
+              "keys": [
+                {
+                  "name": "diff_key",
+                  "columns": [
+                    "id"
+                  ],
+                  "unique": true,
+                  "incomplete": "reject",
+                  "scope": {
+                    "kind": "table"
+                  }
+                }
+              ],
+              "multiplicity": "preserve",
+              "order": {
+                "kind": "ignored"
+              }
+            }
+          }
+        ],
+        "output": {
+          "name": "result",
+          "schema_spec": {
+            "columns": [
+              {
+                "name": "id",
+                "logical_type": {
+                  "kind": "integer",
+                  "bits": 64,
+                  "signed": true
+                },
+                "nullable": true,
+                "null_policy": {
+                  "representations": [
+                    "null"
+                  ],
+                  "justification": null
+                },
+                "nan_policy": null,
+                "numeric_policy": {
+                  "comparison": "exact",
+                  "unit": "unspecified",
+                  "rounding": null,
+                  "rounding_justification": null,
+                  "tolerance": null
+                },
+                "temporal_policy": null,
+                "allowed_values": []
+              },
+              {
+                "name": "value",
+                "logical_type": {
+                  "kind": "integer",
+                  "bits": 64,
+                  "signed": true
+                },
+                "nullable": true,
+                "null_policy": {
+                  "representations": [
+                    "null"
+                  ],
+                  "justification": null
+                },
+                "nan_policy": null,
+                "numeric_policy": {
+                  "comparison": "exact",
+                  "unit": "unspecified",
+                  "rounding": null,
+                  "rounding_justification": null,
+                  "tolerance": null
+                },
+                "temporal_policy": null,
+                "allowed_values": []
+              }
+            ],
+            "keys": [
+              {
+                "name": "diff_key",
+                "columns": [
+                  "id"
+                ],
+                "unique": true,
+                "incomplete": "reject",
+                "scope": {
+                  "kind": "table"
+                }
+              }
+            ],
+            "multiplicity": "preserve",
+            "order": {
+              "kind": "ignored"
+            }
+          }
+        },
+        "preconditions": [],
+        "rules": []
+      },
+      "policy": {
+        "column_order": "significant",
+        "physical_types": "exact",
+        "index": "reject",
+        "justification": null
+      }
+    },
+    "reference": "expected",
+    "provenance": [
+      {
+        "path": "/spec/schema_version",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/schema_version",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/contract_id",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/revision",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/family",
+        "origin": "default",
+        "detail": "Required contract bookkeeping family; no domain was inferred"
+      },
+      {
+        "path": "/spec/contract/inputs/0/name",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/name",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/logical_type/kind",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/logical_type/bits",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/logical_type/signed",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/nullable",
+        "origin": "default",
+        "detail": "Nullable domain retained; transported schema or absent observed NULLs do not prove nonnullability"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/null_policy/representations/0",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/null_policy/justification",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/nan_policy",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/numeric_policy/comparison",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/numeric_policy/unit",
+        "origin": "default",
+        "detail": "Unspecified exact scalar-equality label; no physical unit inferred or converted"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/numeric_policy/rounding",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/numeric_policy/rounding_justification",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/numeric_policy/tolerance",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/temporal_policy",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/0/allowed_values",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/name",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/logical_type/kind",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/logical_type/bits",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/logical_type/signed",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/nullable",
+        "origin": "default",
+        "detail": "Nullable domain retained; transported schema or absent observed NULLs do not prove nonnullability"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/null_policy/representations/0",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/null_policy/justification",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/nan_policy",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/numeric_policy/comparison",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/numeric_policy/unit",
+        "origin": "default",
+        "detail": "Unspecified exact scalar-equality label; no physical unit inferred or converted"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/numeric_policy/rounding",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/numeric_policy/rounding_justification",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/numeric_policy/tolerance",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/temporal_policy",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/columns/1/allowed_values",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/keys/0/name",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/keys/0/columns/0",
+        "origin": "user",
+        "detail": "Explicit caller selection"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/keys/0/unique",
+        "origin": "user",
+        "detail": "Selected keyed constructor; uniqueness must be verified by the kernel"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/keys/0/incomplete",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/keys/0/scope/kind",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/multiplicity",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/inputs/0/schema_spec/order/kind",
+        "origin": "user",
+        "detail": "Selected keyed constructor with unordered fallback"
+      },
+      {
+        "path": "/spec/contract/output/name",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/name",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/logical_type/kind",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/logical_type/bits",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/logical_type/signed",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/nullable",
+        "origin": "default",
+        "detail": "Nullable domain retained; transported schema or absent observed NULLs do not prove nonnullability"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/null_policy/representations/0",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/null_policy/justification",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/nan_policy",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/numeric_policy/comparison",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/numeric_policy/unit",
+        "origin": "default",
+        "detail": "Unspecified exact scalar-equality label; no physical unit inferred or converted"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/numeric_policy/rounding",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/numeric_policy/rounding_justification",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/numeric_policy/tolerance",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/temporal_policy",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/0/allowed_values",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/name",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/logical_type/kind",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/logical_type/bits",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/logical_type/signed",
+        "origin": "metadata",
+        "detail": "Declared Arrow reference field name or physical type"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/nullable",
+        "origin": "default",
+        "detail": "Nullable domain retained; transported schema or absent observed NULLs do not prove nonnullability"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/null_policy/representations/0",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/null_policy/justification",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/nan_policy",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/numeric_policy/comparison",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/numeric_policy/unit",
+        "origin": "default",
+        "detail": "Unspecified exact scalar-equality label; no physical unit inferred or converted"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/numeric_policy/rounding",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/numeric_policy/rounding_justification",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/numeric_policy/tolerance",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/temporal_policy",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/columns/1/allowed_values",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/keys/0/name",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/keys/0/columns/0",
+        "origin": "user",
+        "detail": "Explicit caller selection"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/keys/0/unique",
+        "origin": "user",
+        "detail": "Selected keyed constructor; uniqueness must be verified by the kernel"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/keys/0/incomplete",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/keys/0/scope/kind",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/multiplicity",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/output/schema_spec/order/kind",
+        "origin": "user",
+        "detail": "Selected keyed constructor with unordered fallback"
+      },
+      {
+        "path": "/spec/contract/preconditions",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/contract/rules",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/policy/column_order",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/policy/physical_types",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/policy/index",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/spec/policy/justification",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      },
+      {
+        "path": "/reference",
+        "origin": "default",
+        "detail": "Builder default; no observed values were used"
+      }
+    ]
+  },
+  "capture_options": {
+    "max_rows": 1000000,
+    "max_bytes": 268435456
+  }
+}

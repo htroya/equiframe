@@ -183,8 +183,38 @@ def test_float32_loss_of_variation_is_not_silent():
     assert fitted.b.state == "fitted"
 
 
-def test_native_tree_tolerance_without_any_split_is_not_estimable():
-    fitted = fit(vector(0, 10**9), vector(1, 10**9), vector(2, 10**9))
+def test_native_tiny_variation_matches_installed_sklearn_splits():
+    # Native sklearn thresholds changed across permitted versions. Do not
+    # promise identical fitted trees across them or suppress a real split.
+    profiles = (vector(0, 10**9), vector(1, 10**9), vector(2, 10**9))
+    fitted = fit(*profiles)
+    matrix = ef.transform_profiles(fitted.preprocessor, profiles)
+    native = IsolationForest(
+        random_state=7, n_estimators=17, max_samples=3, contamination="auto", n_jobs=1
+    ).fit(np.asarray(matrix.values, dtype=np.float32))
+    has_split = any(tree.tree_.node_count > 1 for tree in native.estimators_)
+    if has_split:
+        assert fitted.m.state == "fitted"
+        np.testing.assert_allclose(
+            ef.score_detectors(fitted, profiles).m.values,
+            -native.score_samples(np.asarray(matrix.values, dtype=np.float32)),
+            rtol=1e-14,
+        )
+    else:
+        assert fitted.m.state == "not_estimable" and fitted.m.reason == "no_isolation_splits"
+    assert fitted.b.state == "fitted"
+
+
+def test_degenerate_native_forest_is_not_estimable(monkeypatch):
+    # Fault-inject an actual fitted but unsplit native model. This guard must
+    # not depend on the installed sklearn version's tiny-value threshold.
+    native_fit = IsolationForest.fit
+
+    def without_splits(model, matrix, *args, **kwargs):
+        return native_fit(model, np.zeros_like(matrix), *args, **kwargs)
+
+    monkeypatch.setattr(IsolationForest, "fit", without_splits)
+    fitted = fit(vector(0, 16), vector(1, 16), vector(2, 16))
     assert fitted.m.state == "not_estimable" and fitted.m.reason == "no_isolation_splits"
     assert fitted.b.state == "fitted"
 

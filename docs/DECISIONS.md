@@ -434,3 +434,28 @@ protocolo experimental, detectores, etiquetas ni requisitos científicos.
 Son decisiones de documentación, consumo y verificación operativa. No alteran
 protocolo experimental, etiquetas, detectores, interfaces públicas, soporte
 Python, publicación ni responsabilidades del servicio/DW.
+
+
+## STEP6 — Compatibilidad observada y formatos (2026-10-05)
+
+Decisión de ingeniería, sin cambio metodológico de la tesis: distinguir la
+admisión por metadata de soporte observado del candidato y clasificar todas las
+superficies públicas. Las API estables requieren aviso durante dos minor releases
+y 90 días (ambos) antes de retirada incompatible, salvo rechazo inmediato para
+seguridad/integridad/falsa equivalencia. Los formatos no se reinterpretan ni se
+actualizan implícitamente; los productores experimentales conservan compromiso
+de lectura de versiones históricas según la política.
+
+La matriz de extremos inferiores directos encontró pérdida de cardinalidad en
+Arrow → Polars 1.30 para tablas con filas y cero columnas. Se verifican dimensiones
+antes del callback y al capturar la salida; una pérdida es CapabilityError, nunca
+salida completed. No se inventan filas ni se reconstruyen tipos perdidos.
+Un test de ML dependía del umbral interno de splitting de sklearn; se verifica
+paridad con el modelo nativo instalado y rechazo de un bosque real sin splits.
+Los algoritmos, preprocesamiento, calibración, reglas, H y O no se cambian.
+
+Se evalúa Python 3.13 mediante el mismo wheel, además de 3.12. La matriz STEP6
+registra pruebas efectivas y deja Windows/macOS/ARM64 y otras implementaciones
+sin verificar cuando no hay ejecutores. Los locks añaden artefactos para 3.13
+sin cambiar versiones resueltas. El corpus histórico identifica commits privados,
+no releases públicos ficticios. La hoja de ruta reforzada se conserva fuera de Git.

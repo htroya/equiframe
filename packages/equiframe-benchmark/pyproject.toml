@@ -7,9 +7,9 @@ name = "equiframe-benchmark"
 version = "0.11.1"
 description = "EquiFrame Verify, paired evaluation and reproducible experimental evidence"
 readme = "README.md"
-requires-python = ">=3.12,<3.13"
+requires-python = ">=3.12,<3.14"
 authors = [{ name = "Hernán Troya" }]
-classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3.12", "Typing :: Typed"]
+classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3.12", "Programming Language :: Python :: 3.13", "Typing :: Typed"]
 dependencies = ["equiframe[arrow]==0.11.1", "packaging>=26,<27"]
 
 [project.urls]
