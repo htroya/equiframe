@@ -44,8 +44,19 @@ entrega para revisión; no hay autorización de merge a main para esta fase.
   El verificador de payloads y la vinculación de dependencias locales incorporan
   esos bytes; el mismo número de versión no permite aceptar código viejo
 - La [capa rápida](../packages/equiframe/docs/fast-ci.md) usa acciones fijadas,
-  permisos de lectura y rutas pertinentes; matrices completas conservan ejecución
-  explícita. La configuración no demuestra que GitHub Actions haya corrido
+  permisos de lectura y ejecución local. Por petición posterior del dueño, todos
+  los workflows quedan bajo disparo manual; ningún push o PR inicia Actions.
+  La configuración no demuestra que una comprobación remota haya pasado
+
+### Decisión posterior sobre GitHub Actions
+
+El dueño autorizó retirar los disparadores automáticos de push/pull request para
+no consumir minutos de Actions durante este trabajo. `workflow_dispatch` permanece
+disponible; activarlo manualmente en GitHub sí consume sus minutos. La misma
+selección y las comprobaciones completas se ejecutan en la nube de trabajo.
+El primer run automático falló antes de ejecutar pasos y se conserva como fallo;
+su causa de arranque no está verificada y no se atribuye a falta de minutos.
+No se redujeron pruebas, permisos o condiciones de aprobación para ocultarlo.
 
 ## Resultados y evidencia de esta fase
 

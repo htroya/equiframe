@@ -1,32 +1,6 @@
 {
   "name": "EquiFrame quick source checks",
   "on": {
-    "pull_request": {
-      "paths": [
-        ".github/workflows/**",
-        "packages/equiframe/**",
-        "packages/equiframe-benchmark/**",
-        "tests/**",
-        "install_deps_alma9.sh",
-        "AGENTS.md",
-        "README.md",
-        "CONTRIBUTING.md",
-        "docs/**"
-      ]
-    },
-    "push": {
-      "paths": [
-        ".github/workflows/**",
-        "packages/equiframe/**",
-        "packages/equiframe-benchmark/**",
-        "tests/**",
-        "install_deps_alma9.sh",
-        "AGENTS.md",
-        "README.md",
-        "CONTRIBUTING.md",
-        "docs/**"
-      ]
-    },
     "workflow_dispatch": {}
   },
   "permissions": {

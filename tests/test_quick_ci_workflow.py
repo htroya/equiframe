@@ -13,22 +13,16 @@ class QuickWorkflowTests(unittest.TestCase):
     def setUp(self):
         self.workflow = json.loads(WORKFLOW.read_text(encoding="utf-8"))
 
-    def test_only_requested_events_and_relevant_paths(self):
-        self.assertEqual(
-            set(self.workflow["on"]), {"pull_request", "push", "workflow_dispatch"}
-        )
-        for event in ("push", "pull_request"):
-            self.assertEqual(
-                self.workflow["on"][event]["paths"],
-                self.workflow["on"]["push"]["paths"],
-            )
-            for path in (
-                "packages/equiframe/**",
-                "packages/equiframe-benchmark/**",
-                "tests/**",
-            ):
-                self.assertIn(path, self.workflow["on"][event]["paths"])
-        self.assertNotIn("pull_request_target", self.workflow["on"])
+    def test_only_explicit_manual_dispatch_can_start_the_workflow(self):
+        self.assertEqual(self.workflow["on"], {"workflow_dispatch": {}})
+        for event in (
+            "push",
+            "pull_request",
+            "pull_request_target",
+            "schedule",
+            "workflow_run",
+        ):
+            self.assertNotIn(event, self.workflow["on"])
 
     def test_minimal_permissions_and_existing_pinned_actions(self):
         self.assertEqual(self.workflow["permissions"], {"contents": "read"})
