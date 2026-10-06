@@ -9,7 +9,14 @@ from uuid import uuid4
 
 from pydantic import Field, model_validator
 
-from equiframe._base import FrozenModel, Identifier, NonNegativeInt, PositiveInt, Text
+from equiframe._base import (
+    FrozenModel,
+    Identifier,
+    NonNegativeInt,
+    PositiveInt,
+    Text,
+    _ExplicitOutcome,
+)
 from equiframe.evidence import (
     MAX_DOCUMENT_BYTES,
     EventJournal,
@@ -62,7 +69,9 @@ class ReducedTable(FrozenModel):
         return self
 
 
-class ReductionResult(FrozenModel):
+class ReductionResult(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = "inspect .status, .baseline_verified and .minimality explicitly"
+
     schema_version: Literal["1.0"] = "1.0"
     reduction_id: Identifier
     predicate_version: Text

@@ -4,7 +4,15 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
-from equiframe._base import FrozenModel, Identifier, NonNegativeInt, PositiveInt, Text, fail
+from equiframe._base import (
+    FrozenModel,
+    Identifier,
+    NonNegativeInt,
+    PositiveInt,
+    Text,
+    _ExplicitOutcome,
+    fail,
+)
 from equiframe.contracts import Contract
 from equiframe.types import ArtifactRef, ExecutionState, Sha256
 from equiframe.values import ScalarValue, TimeUnit, TimeZone
@@ -109,7 +117,11 @@ class ExecutionProblem(FrozenModel):
     message: Text
 
 
-class ExecutionResult(FrozenModel):
+class ExecutionResult(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = (
+        "inspect .state explicitly; completed execution does not establish correctness"
+    )
+
     schema_version: Literal["1.0"] = "1.0"
     run_id: Identifier
     execution_id: Identifier

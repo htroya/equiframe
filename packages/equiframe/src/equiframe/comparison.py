@@ -732,7 +732,7 @@ def _compare(
                 work.ingest(source, input_side)
             side = None
             lrun, rrun = work.sources["left"].execution, work.sources["right"].execution
-            if lrun and rrun:
+            if lrun is not None and rrun is not None:
 
                 def input_identity(t: TableArtifact) -> tuple[object, ...]:
                     return (

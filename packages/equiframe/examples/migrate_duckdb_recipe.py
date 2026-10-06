@@ -254,7 +254,11 @@ def show_synthetic_outputs(result: ef.MigrationResult) -> None:
         ("pandas reference", result.source),
         ("DuckDB candidate", result.target),
     ):
-        output = pipeline.execution.output if pipeline and pipeline.execution else None
+        output = (
+            pipeline.execution.output
+            if pipeline is not None and pipeline.execution is not None
+            else None
+        )
         references.append((label, output.data if output else None))
     for label, reference in references:
         if reference is None:

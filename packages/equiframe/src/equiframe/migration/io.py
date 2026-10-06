@@ -139,7 +139,7 @@ def read_migration(path: Path, *, verify: bool = True) -> MigrationResult:
     for p in (result.source, result.target):
         if p is not None and read_pipeline(directory / p.pipeline_id) != p:
             raise ArtifactIntegrityError("native pipeline contradicts migration manifest")
-        if p and p.execution:
+        if p is not None and p.execution is not None:
             for t in (*p.execution.inputs, *((p.execution.output,) if p.execution.output else ())):
                 bind(t.data)
                 if t.index:
@@ -188,7 +188,7 @@ def read_migration(path: Path, *, verify: bool = True) -> MigrationResult:
         bundle = load_json(DetectorBundle, directory / "detector-bundle.json")
         for p in (result.source, result.target):
             if (
-                p
+                p is not None
                 and load_json(DetectorBundle, directory / p.pipeline_id / "detector-bundle.json")
                 != bundle
             ):

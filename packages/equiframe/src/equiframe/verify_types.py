@@ -7,7 +7,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
-from equiframe._base import FrozenModel, Identifier, NonNegativeInt, Text
+from equiframe._base import FrozenModel, Identifier, NonNegativeInt, Text, _ExplicitOutcome
 from equiframe.comparison_types import ComparisonOptions, ComparisonPolicy, ComparisonResult
 from equiframe.contracts import Contract
 from equiframe.execution_types import ExecutionResult
@@ -19,7 +19,11 @@ from equiframe.types import ArtifactRef, Sha256
 VerificationState = Literal["passed", "failed", "not_evaluable", "not_requested", "pending_review"]
 
 
-class VerificationCheck(FrozenModel):
+class VerificationCheck(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = (
+        "inspect .state explicitly; not_requested and pending_review are not approval"
+    )
+
     state: VerificationState
     reason: Text
     output: Identifier | None = None
@@ -152,7 +156,12 @@ class VerificationCoverage(FrozenModel):
         return self
 
 
-class VerificationResult(FrozenModel):
+class VerificationResult(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = (
+        "inspect .operational_state, .publishable and the required verification "
+        "dimensions explicitly"
+    )
+
     schema_version: Literal["1.0"] = "1.0"
     verification_id: Identifier
     contract: Contract

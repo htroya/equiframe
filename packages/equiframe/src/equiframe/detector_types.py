@@ -6,7 +6,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
-from equiframe._base import FrozenModel, NonNegativeInt, PositiveInt, Text
+from equiframe._base import FrozenModel, NonNegativeInt, PositiveInt, Text, _ExplicitOutcome
 from equiframe.profile_types import PreprocessorBundle, ProfileVector, profile_digest
 from equiframe.types import DecisionState, Sha256
 
@@ -171,7 +171,9 @@ class DetectorFit(FrozenModel):
         return self
 
 
-class DetectorScores(FrozenModel):
+class DetectorScores(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = "inspect .state explicitly; scores are not an approval decision"
+
     state: Literal["scored", "not_estimable"]
     values: tuple[ScoreValue, ...] = ()
     reason: Text | None = None
@@ -185,7 +187,11 @@ class DetectorScores(FrozenModel):
         return self
 
 
-class DetectorScoreResult(FrozenModel):
+class DetectorScoreResult(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = (
+        "inspect .m.state, .b.state and .rows explicitly; scores are not approval"
+    )
+
     schema_version: Literal["1.0"] = "1.0"
     fit_sha256: Sha256
     matrix_sha256: Sha256 | None
@@ -264,7 +270,11 @@ class DetectorBundle(FrozenModel):
         return self
 
 
-class ComponentDecision(FrozenModel):
+class ComponentDecision(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = (
+        "inspect .decision and .complete explicitly; no_alert is not equivalence"
+    )
+
     decision: DecisionState
     complete: bool
     reason: Text | None = None
@@ -280,7 +290,11 @@ class ComponentDecision(FrozenModel):
         return self
 
 
-class DetectorDecision(FrozenModel):
+class DetectorDecision(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = (
+        "inspect .result.decision and .result.complete explicitly; no_alert is not equivalence"
+    )
+
     result: ComponentDecision
     score: ScoreValue | None
     threshold: Annotated[float, Field(ge=0)] | None
@@ -298,7 +312,11 @@ class DetectorDecision(FrozenModel):
         return self
 
 
-class DetectionResult(FrozenModel):
+class DetectionResult(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = (
+        "inspect .m and .b decisions and coverage explicitly; no_alert is not equivalence"
+    )
+
     schema_version: Literal["1.0"] = "1.0"
     bundle_sha256: Sha256
     scores: DetectorScoreResult
@@ -316,8 +334,12 @@ class DetectionResult(FrozenModel):
         return self
 
 
-class ComponentDetectionResult(FrozenModel):
+class ComponentDetectionResult(_ExplicitOutcome, FrozenModel):
     """Frozen inference for one method; the other detector is not scored."""
+
+    _truth_value_guidance = (
+        "inspect .decisions, .complete and .rows explicitly; no_alert is not equivalence"
+    )
 
     schema_version: Literal["1.0"] = "1.0"
     method: Literal["isolation_forest", "mad"]
@@ -350,7 +372,11 @@ class ComponentDetectionResult(FrozenModel):
         return all(decision.result.complete for decision in self.decisions)
 
 
-class HybridDecision(FrozenModel):
+class HybridDecision(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = (
+        "inspect .result.decision and .result.complete explicitly; no_alert is not equivalence"
+    )
+
     schema_version: Literal["1.0"] = "1.0"
     r: ComponentDecision
     m: ComponentDecision

@@ -183,7 +183,7 @@ def _verify_pipeline_artifacts(directory: Path, result: PipelineResult) -> None:
     root = directory.resolve()
     listed = {item.path: item for item in result.evidence}
     references: list[ArtifactRef] = []
-    if result.execution:
+    if result.execution is not None:
         for table in (
             *result.execution.inputs,
             *((result.execution.output,) if result.execution.output else ()),
@@ -191,13 +191,13 @@ def _verify_pipeline_artifacts(directory: Path, result: PipelineResult) -> None:
             references.append(table.data)
             if table.index:
                 references.append(table.index)
-    if result.rules:
+    if result.rules is not None:
         references.extend(
             check.findings
             for check in (*result.rules.preconditions, *result.rules.rules)
             if check.findings is not None
         )
-    if result.profile:
+    if result.profile is not None:
         references.extend(result.profile.metadata.artifacts)
     if result.comparison is not None:
         references.append(result.comparison.differences)
@@ -285,9 +285,12 @@ def read_pipeline(path: Path, *, verify: bool = True) -> PipelineResult:
             if "detector-bundle.json" not in listed:
                 raise ArtifactIntegrityError("requested detector bundle is missing")
             bundle = load_json(DetectorBundle, directory / "detector-bundle.json")
-            if result.detection and result.detection.bundle_sha256 != detector_fingerprint(bundle):
+            if (
+                result.detection is not None
+                and result.detection.bundle_sha256 != detector_fingerprint(bundle)
+            ):
                 raise ArtifactIntegrityError("detector bundle does not match the scored bundle")
-            if result.detection:
+            if result.detection is not None:
                 from equiframe.preprocessing import transform_profiles
                 from equiframe.profile_types import profile_digest
 

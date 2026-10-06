@@ -365,7 +365,11 @@ def run(snapshot: Path, expected_path: Path, output: Path) -> dict[str, object]:
     }
     publish = {"awards": award_ref}
     latest = migrations[-1]
-    assert latest.target and latest.target.execution and latest.target.execution.output
+    assert (
+        latest.target is not None
+        and latest.target.execution is not None
+        and latest.target.execution.output is not None
+    )
     publish["totals"] = latest.target.execution.output.data
     gates["totals"] = ef.verify_migration(
         output / "migrations" / latest.migration_id,

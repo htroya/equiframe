@@ -19,7 +19,7 @@ from uuid import uuid4
 
 from pydantic import Field, model_validator
 
-from equiframe._base import FrozenModel, NonNegativeInt, Text
+from equiframe._base import FrozenModel, NonNegativeInt, Text, _ExplicitOutcome
 from equiframe._decimal import exact_decimal_context
 from equiframe.contracts import (
     BooleanType,
@@ -126,7 +126,9 @@ class QuarantinedRecord(FrozenModel):
     code: Text
 
 
-class IngestionResult(FrozenModel):
+class IngestionResult(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = "inspect .state and the accepted/quarantined counts explicitly"
+
     schema_version: Literal["1.0"] = "1.0"
     ingestion_id: Text
     spec: IngestionSpec

@@ -6,7 +6,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
-from equiframe._base import FrozenModel, Identifier, Text
+from equiframe._base import FrozenModel, Identifier, Text, _ExplicitOutcome
 from equiframe.contracts import LogicalType
 from equiframe.values import ScalarValue
 
@@ -232,7 +232,11 @@ class CompilationDiagnostic(FrozenModel):
     node_id: Identifier | None = None
 
 
-class CompilationCheck(FrozenModel):
+class CompilationCheck(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = (
+        "inspect .supported explicitly; preflight support does not establish equivalence"
+    )
+
     engine: Text
     supported: bool
     diagnostics: tuple[CompilationDiagnostic, ...] = ()

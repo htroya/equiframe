@@ -57,7 +57,7 @@ def _binding_reason(
     pipeline: ef.PipelineResult | None,
     replay: ef.ComparisonResult | None,
 ) -> str | None:
-    execution = pipeline.execution if pipeline else None
+    execution = pipeline.execution if pipeline is not None else None
     if execution is None or execution.state != "completed" or execution.output is None:
         return "native_execution_unavailable"
     if execution.implementation_version != case.candidate.implementation:
@@ -105,15 +105,15 @@ def _record(
     if pipeline is not None and pipeline.detection_requested != (model.bundle is not None):
         raise ValueError("pipeline detector request must match the frozen family bundle")
     if (
-        pipeline
-        and pipeline.detection
+        pipeline is not None
+        and pipeline.detection is not None
         and (
             model.bundle is None
             or pipeline.detection.bundle_sha256 != ef.detector_fingerprint(model.bundle)
         )
     ):
         raise ValueError("pipeline detection must use the frozen family bundle")
-    execution = pipeline.execution if pipeline else None
+    execution = pipeline.execution if pipeline is not None else None
     valid_execution = execution is not None and execution.state == "completed"
     reason = _binding_reason(case, scenario, pipeline, replay)
     oracle = case.oracle
@@ -135,21 +135,25 @@ def _record(
     )
     r = (
         pipeline.hybrid.r
-        if valid_execution and pipeline
+        if valid_execution and pipeline is not None
         else _unavailable(failure or "pipeline_unavailable")
     )
     m = (
         pipeline.hybrid.m
-        if valid_execution and pipeline
+        if valid_execution and pipeline is not None
         else _unavailable(failure or "pipeline_unavailable")
     )
     h = (
         pipeline.hybrid.result
-        if valid_execution and pipeline
+        if valid_execution and pipeline is not None
         else _unavailable(failure or "pipeline_unavailable")
     )
-    detection = pipeline.detection if valid_execution and pipeline else None
-    b = detection.b[0].result if detection else _unavailable(model.reason or "detector_unavailable")
+    detection = pipeline.detection if valid_execution and pipeline is not None else None
+    b = (
+        detection.b[0].result
+        if detection is not None
+        else _unavailable(model.reason or "detector_unavailable")
+    )
     return EvaluationRecord(
         case_id=case.case_id,
         scenario_id=case.scenario_id,
@@ -158,7 +162,7 @@ def _record(
         migration=case.migration,
         engine=cast(Engine, case.pipeline.execution.engine),
         candidate_sha256=digest(case.candidate),
-        pipeline_sha256=digest(pipeline) if pipeline else None,
+        pipeline_sha256=digest(pipeline) if pipeline is not None else None,
         oracle_sha256=digest(oracle) if oracle is not None else None,
         oracle_state=oracle_state,
         oracle_label=label,
@@ -166,8 +170,8 @@ def _record(
         m=m,
         b=b,
         h=h,
-        m_score=cast(float | None, detection.m[0].score) if detection else None,
-        b_score=detection.b[0].score if detection else None,
+        m_score=cast(float | None, detection.m[0].score) if detection is not None else None,
+        b_score=detection.b[0].score if detection is not None else None,
         detector_bundle_sha256=ef.detector_fingerprint(model.bundle) if model.bundle else None,
         freeze_sha256=config.freeze_sha256,
         failure_reason=failure,
@@ -182,7 +186,7 @@ def _validate_replay(
 ) -> None:
     if replay is None:
         return
-    execution = pipeline.execution if pipeline else None
+    execution = pipeline.execution if pipeline is not None else None
     if execution is None or execution.output is None or execution.state != "completed":
         raise ValueError("output replay requires an actual completed captured output")
     if (
@@ -338,7 +342,7 @@ def run_study(
             )
         except Exception as exc:
             error = "pipeline_operation_failed:" + type(exc).__name__
-        execution = pipeline.execution if pipeline else None
+        execution = pipeline.execution if pipeline is not None else None
         if (
             execution is not None
             and execution.state == "completed"
@@ -377,7 +381,7 @@ def run_study(
         )
         case_result = StudyCaseResult(
             case_id=case.case_id,
-            pipeline_directory=pipeline.pipeline_id if pipeline else None,
+            pipeline_directory=pipeline.pipeline_id if pipeline is not None else None,
             pipeline=pipeline,
             output_replay=replay,
             error=error,
@@ -423,7 +427,7 @@ def _recheck_confirmed_replay(
     """Recheck captured rows that authorize reuse of a confirmed review label."""
     if case.record.oracle_state != "confirmed":
         return
-    execution = case.pipeline.execution if case.pipeline else None
+    execution = case.pipeline.execution if case.pipeline is not None else None
     replay = case.output_replay
     if (
         execution is None
@@ -487,7 +491,10 @@ def read_study(
         folder = directory / f"case-{position}"
         if load_document(StudyCaseResult, folder / "case.json") != case:
             raise ef.ArtifactIntegrityError("case receipt contradicts the final study")
-        if case.pipeline and ef.read_pipeline(folder / case.pipeline.pipeline_id) != case.pipeline:
+        if (
+            case.pipeline is not None
+            and ef.read_pipeline(folder / case.pipeline.pipeline_id) != case.pipeline
+        ):
             raise ef.ArtifactIntegrityError("pipeline evidence contradicts its study case")
         if case.output_replay is not None:
             replay = case.output_replay

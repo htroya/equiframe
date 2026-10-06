@@ -4,7 +4,15 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
-from equiframe._base import FrozenModel, Identifier, NonNegativeInt, PositiveInt, Text, fail
+from equiframe._base import (
+    FrozenModel,
+    Identifier,
+    NonNegativeInt,
+    PositiveInt,
+    Text,
+    _ExplicitOutcome,
+    fail,
+)
 from equiframe.comparison_types import ComparisonValue
 from equiframe.types import ArtifactRef, DecisionState, Sha256
 
@@ -32,7 +40,11 @@ class RuleFinding(FrozenModel):
     message: Text
 
 
-class CheckResult(FrozenModel):
+class CheckResult(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = (
+        "inspect .state and .complete explicitly; not_applicable is not approval"
+    )
+
     check_id: Identifier
     revision: PositiveInt | None = None
     kind: Literal["precondition", "rule"]
@@ -89,7 +101,11 @@ class RuleCoverage(FrozenModel):
     highest_alert_severity: Literal["info", "warning", "error"] | None = None
 
 
-class RuleEvaluation(FrozenModel):
+class RuleEvaluation(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = (
+        "inspect .decision, .complete and .coverage explicitly; no_alert is not equivalence"
+    )
+
     schema_version: Literal["1.0"] = "1.0"
     evaluation_id: Identifier
     run_id: Identifier

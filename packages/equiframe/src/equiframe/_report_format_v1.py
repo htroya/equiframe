@@ -31,7 +31,9 @@ def pipeline_summary_v1(result: PipelineResult) -> dict[str, object]:
     return {
         "schema_version": "1.0",
         "pipeline_id": result.pipeline_id,
-        "contract_sha256": result.execution.contract_sha256 if result.execution else None,
+        "contract_sha256": result.execution.contract_sha256
+        if result.execution is not None
+        else None,
         "spec_sha256": result.spec_sha256,
         "engine": result.spec.execution.engine,
         "family": result.spec.execution.contract.family,
@@ -39,7 +41,9 @@ def pipeline_summary_v1(result: PipelineResult) -> dict[str, object]:
         "cancelled": result.cancelled,
         "exit_code": result.exit_code,
         "elapsed_seconds": result.elapsed_seconds,
-        "execution_state": result.execution.state if result.execution else "unavailable",
+        "execution_state": result.execution.state
+        if result.execution is not None
+        else "unavailable",
         "stages": [stage.model_dump(mode="json") for stage in result.stages],
         "R": {"decision": result.hybrid.r.decision, "complete": result.hybrid.r.complete},
         "M": {"decision": result.hybrid.m.decision, "complete": result.hybrid.m.complete},
@@ -47,7 +51,7 @@ def pipeline_summary_v1(result: PipelineResult) -> dict[str, object]:
             "decision": result.detection.b[0].result.decision,
             "complete": result.detection.b[0].result.complete,
         }
-        if result.detection
+        if result.detection is not None
         else None,
         "H": {"decision": result.hybrid.result.decision, "complete": result.hybrid.result.complete},
         "comparison": {
@@ -57,7 +61,9 @@ def pipeline_summary_v1(result: PipelineResult) -> dict[str, object]:
         }
         if result.comparison is not None
         else None,
-        "detector_bundle_sha256": result.detection.bundle_sha256 if result.detection else None,
+        "detector_bundle_sha256": result.detection.bundle_sha256
+        if result.detection is not None
+        else None,
         "scientific_equivalence_confirmed": False,
         "scope": "Operational evidence only; no oracle review or scientific label.",
     }
@@ -133,10 +139,10 @@ def migration_legacy_summary_v1(result: MigrationResult) -> dict[str, object]:
         "exit_code": result.exit_code,
         "cancelled": result.cancelled,
         "stages": [s.model_dump(mode="json") for s in result.stages],
-        "source_pipeline_id": result.source.pipeline_id if result.source else None,
-        "target_pipeline_id": result.target.pipeline_id if result.target else None,
-        "source_exit_code": result.source.exit_code if result.source else None,
-        "target_exit_code": result.target.exit_code if result.target else None,
+        "source_pipeline_id": result.source.pipeline_id if result.source is not None else None,
+        "target_pipeline_id": result.target.pipeline_id if result.target is not None else None,
+        "source_exit_code": result.source.exit_code if result.source is not None else None,
+        "target_exit_code": result.target.exit_code if result.target is not None else None,
         "difference_records": result.comparison.counts.difference_records
         if result.comparison is not None
         else None,

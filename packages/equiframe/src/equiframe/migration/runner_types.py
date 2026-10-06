@@ -6,7 +6,14 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
-from equiframe._base import FrozenModel, Identifier, NonNegativeInt, PositiveInt, Text
+from equiframe._base import (
+    FrozenModel,
+    Identifier,
+    NonNegativeInt,
+    PositiveInt,
+    Text,
+    _ExplicitOutcome,
+)
 from equiframe.comparison_types import ComparisonOptions, ComparisonPolicy, ComparisonResult
 from equiframe.contracts import Contract
 from equiframe.execution_types import ExecutionOptions, TableArtifact
@@ -129,7 +136,9 @@ def _identity(t: TableArtifact) -> tuple[object, ...]:
     )
 
 
-class MigrationResult(FrozenModel):
+class MigrationResult(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = "inspect .state, .verification, .complete and .exit_code explicitly"
+
     schema_version: Literal["1.0"] = "1.0"
     migration_id: Identifier
     spec: MigrationSpec
@@ -243,7 +252,7 @@ class MigrationResult(FrozenModel):
                 raise ValueError("migration stage contradicts pipeline completion")
             if stage.state in ("skipped", "failed"):
                 raise ValueError("failed or skipped stage cannot claim a pipeline")
-            if p.execution:
+            if p.execution is not None:
                 if (
                     p.execution.implementation_version is not None
                     and p.execution.implementation_version != record.code_version
@@ -381,7 +390,7 @@ class MigrationResult(FrozenModel):
             self.state == "different"
             or self.verification == "divergent"
             or any(
-                p
+                p is not None
                 and (
                     p.hybrid.r.decision == "alert"
                     or p.hybrid.result.decision == "alert"

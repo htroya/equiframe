@@ -6,7 +6,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
-from equiframe._base import FrozenModel, NonNegativeInt, PositiveInt
+from equiframe._base import FrozenModel, NonNegativeInt, PositiveInt, _ExplicitOutcome
 from equiframe.comparison_types import ComparisonValue
 from equiframe.pipeline_types import EvidenceFile
 from equiframe.types import ComparisonState, Sha256
@@ -159,12 +159,16 @@ class ReportEvidenceManifest(FrozenModel):
         return self
 
 
-class ComparisonReport(FrozenModel):
+class ComparisonReport(_ExplicitOutcome, FrozenModel):
     """One sanitized source for JSON, console, standalone HTML and notebooks.
 
     Formatting this object performs no file IO, imports no notebook framework and
     never evaluates a source. JSON is a view, not a serialized ComparisonResult.
     """
+
+    _truth_value_guidance = (
+        "use assert_equivalent on the original ComparisonResult; a generated report is not approval"
+    )
 
     schema_version: Literal["1.0"] = "1.0"
     state: ComparisonState

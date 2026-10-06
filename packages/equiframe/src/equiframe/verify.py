@@ -263,7 +263,7 @@ def _validate_dimensions(result: VerificationResult) -> None:
         raise ValueError("technical dimension contradicts captured outcomes")
     for check in result.technical_outcomes:
         execution = executions.get(check.output or "")
-        if execution:
+        if execution is not None:
             observed = _check(
                 "passed" if execution.state == "completed" else "not_evaluable",
                 "Captured execution state: " + execution.state,
@@ -276,8 +276,8 @@ def _validate_dimensions(result: VerificationResult) -> None:
     evaluations = {r.execution_id: r for r in result.rule_evaluations}
     for check in result.rules:
         execution = executions.get(check.output or "")
-        evaluation = evaluations.get(execution.execution_id) if execution else None
-        if evaluation:
+        evaluation = evaluations.get(execution.execution_id) if execution is not None else None
+        if evaluation is not None:
             state = (
                 "failed"
                 if evaluation.decision == "alert"
@@ -296,7 +296,7 @@ def _validate_dimensions(result: VerificationResult) -> None:
                 else "No operational rules requested for this artifact",
                 check.output,
             )
-            if execution and result.contract.rules:
+            if execution is not None and result.contract.rules:
                 raise ValueError("captured execution requires its selected rule evaluations")
         if check != expected_rule:
             raise ValueError("rule dimension contradicts selected rule evaluations")
@@ -721,7 +721,11 @@ def verify_migration(
     from equiframe.migration.validation import ir_fingerprint
 
     result = read_migration(path)
-    outputs = {name: p for name, p in (("source", result.source), ("target", result.target)) if p}
+    outputs = {
+        name: p
+        for name, p in (("source", result.source), ("target", result.target))
+        if p is not None
+    }
     if len(outputs) != 2:
         raise ValueError("migration has no two captured pipelines to verify")
     return verify(

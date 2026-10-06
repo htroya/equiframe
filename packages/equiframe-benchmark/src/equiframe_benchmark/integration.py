@@ -73,7 +73,7 @@ class IntegrationRun(Document):
     def consistent(self) -> Self:
         if (self.code == "pipeline_recorded") != (self.result is not None):
             raise ValueError("recorded native run requires its pipeline result")
-        if self.result and self.result.spec.execution.engine != self.engine:
+        if self.result is not None and self.result.spec.execution.engine != self.engine:
             raise ValueError("native run engine contradicts its pipeline")
         return self
 
@@ -101,10 +101,10 @@ def _input_reason(snapshot: SnapshotManifest, runs: tuple[IntegrationRun, ...]) 
     available = {table.name: table for table in snapshot.tables}
     baseline: tuple[tuple[str, str, int], ...] | None = None
     for run in runs:
-        execution = run.result.execution if run.result else None
-        selected = (
+        execution = run.result.execution if run.result is not None else None
+        selected: set[str] = (
             {table.name for table in run.result.spec.execution.contract.inputs}
-            if run.result
+            if run.result is not None
             else set()
         )
         if not selected <= set(available):
@@ -177,7 +177,7 @@ class IntegrationResult(Document):
         if tuple(run.engine for run in self.runs) != ENGINES:
             raise ValueError("integration must record each native engine once")
         for run, pipeline in zip(self.runs, self.spec.pipelines, strict=True):
-            if run.result and run.result.spec != pipeline:
+            if run.result is not None and run.result.spec != pipeline:
                 raise ValueError("native pipeline contradicts its configured specification")
         reason = _input_reason(self.snapshot, self.runs)
         if self.input_reason not in (reason, "snapshot_changed") or self.inputs_verified != (
@@ -189,7 +189,10 @@ class IntegrationResult(Document):
             pairs += tuple((engine, "expected") for engine in ENGINES)
         if tuple((item.left_engine, item.right_engine) for item in self.comparisons) != pairs:
             raise ValueError("integration comparison pairs are missing or duplicated")
-        executions = {run.engine: run.result.execution if run.result else None for run in self.runs}
+        executions = {
+            run.engine: run.result.execution if run.result is not None else None
+            for run in self.runs
+        }
         native_runs = {run.engine: run for run in self.runs}
         for item in self.comparisons:
             compared = item.result
@@ -245,19 +248,19 @@ class IntegrationResult(Document):
     @property
     def exit_code(self) -> int:
         if any(
-            run.result
-            and run.result.execution
+            run.result is not None
+            and run.result.execution is not None
             and run.result.execution.problem
             and run.result.execution.problem.code == "artifact_integrity_error"
             for run in self.runs
         ):
             return 3
-        if any(run.result and run.result.exit_code == 2 for run in self.runs):
+        if any(run.result is not None and run.result.exit_code == 2 for run in self.runs):
             return 2
         if not self.complete:
             return 3
         return int(
-            any(run.result and run.result.exit_code == 1 for run in self.runs)
+            any(run.result is not None and run.result.exit_code == 1 for run in self.runs)
             or any(
                 item.result is not None and item.result.state == "different"
                 for item in self.comparisons
@@ -438,7 +441,10 @@ def run_integration(
         "snapshot_changed" if snapshot_changed else _input_reason(snapshot, recorded_runs)
     )
     inputs_verified = input_reason == "verified_same_snapshot"
-    executions = {run.engine: run.result.execution if run.result else None for run in recorded_runs}
+    executions = {
+        run.engine: run.result.execution if run.result is not None else None
+        for run in recorded_runs
+    }
     native_runs = {run.engine: run for run in recorded_runs}
     pairs: tuple[tuple[Engine, Literal["pandas", "polars", "duckdb", "expected"]], ...] = PEERS
     if expected is not None:
@@ -572,7 +578,10 @@ def read_integration(path: Path, *, verify: bool = True) -> IntegrationResult:
     if outcomes != expected_outcomes:
         raise ef.ArtifactIntegrityError("integration journal contradicts recorded components")
     for run in result.runs:
-        if run.result and ef.read_pipeline(directory / run.result.pipeline_id) != run.result:
+        if (
+            run.result is not None
+            and ef.read_pipeline(directory / run.result.pipeline_id) != run.result
+        ):
             raise ef.ArtifactIntegrityError("persisted native pipeline contradicts its integration")
     root = directory.resolve()
     if result.expected_artifact is not None:
@@ -606,7 +615,7 @@ def read_integration(path: Path, *, verify: bool = True) -> IntegrationResult:
                 continue
             references.append(source.data)
             tables = [source.table] if source.table else []
-            if source.execution:
+            if source.execution is not None:
                 tables.extend(source.execution.inputs)
                 if source.execution.output:
                     tables.append(source.execution.output)

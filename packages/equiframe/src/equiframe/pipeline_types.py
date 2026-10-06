@@ -5,7 +5,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
-from equiframe._base import FrozenModel, Identifier, NonNegativeInt, Text
+from equiframe._base import FrozenModel, Identifier, NonNegativeInt, Text, _ExplicitOutcome
 from equiframe.comparison_types import ComparisonOptions, ComparisonPolicy, ComparisonResult
 from equiframe.decision import combine_decisions
 from equiframe.detector_types import ComponentDecision, DetectionResult, HybridDecision
@@ -103,7 +103,11 @@ class EvidenceFile(FrozenModel):
         return self
 
 
-class PipelineResult(FrozenModel):
+class PipelineResult(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = (
+        "inspect .complete, .exit_code and the requested component decisions explicitly"
+    )
+
     schema_version: Literal["1.0"] = "1.0"
     pipeline_id: Identifier
     spec: PipelineSpec
@@ -133,10 +137,10 @@ class PipelineResult(FrozenModel):
             raise ValueError("pipeline must record each stage exactly once in order")
         if len({item.path for item in self.evidence}) != len(self.evidence):
             raise ValueError("duplicate evidence paths")
-        if self.execution and self.execution.plan != self.spec.execution:
+        if self.execution is not None and self.execution.plan != self.spec.execution:
             raise ValueError("execution does not belong to this pipeline plan")
-        if self.rules:
-            if not self.execution or (
+        if self.rules is not None:
+            if self.execution is None or (
                 self.rules.execution_id != self.execution.execution_id
                 or self.rules.contract_sha256 != self.execution.contract_sha256
                 or self.rules.run_id != self.execution.run_id
@@ -147,8 +151,8 @@ class PipelineResult(FrozenModel):
                 raise ValueError("hybrid must preserve the rule decision")
         elif self.hybrid.r.decision != "not_evaluable":
             raise ValueError("missing rules cannot produce a rule decision")
-        if self.profile and (
-            not self.execution
+        if self.profile is not None and (
+            self.execution is None
             or self.profile.vector.spec != self.spec.profile
             or self.profile.metadata.execution_id != self.execution.execution_id
             or self.profile.metadata.run_id != self.execution.run_id
@@ -167,8 +171,8 @@ class PipelineResult(FrozenModel):
             or self.profile.options != self.spec.profile_options
         ):
             raise ValueError("profile does not belong to the declared execution/features")
-        if self.detection:
-            if not self.detection_requested or not self.profile or not self.profile.complete:
+        if self.detection is not None:
+            if not self.detection_requested or self.profile is None or not self.profile.complete:
                 raise ValueError("detection requires a requested, complete profile")
             if len(self.detection.m) != 1 or self.hybrid.m != self.detection.m[0].result:
                 raise ValueError("detection and hybrid must describe one identical profile")
@@ -193,14 +197,14 @@ class PipelineResult(FrozenModel):
                 raise ValueError("completed stage requires its result")
             if stage.state in ("failed", "skipped") and value is not None:
                 raise ValueError("failed/skipped stage cannot claim a result")
-        if self.execution and (self.stages[0].state == "completed") != (
+        if self.execution is not None and (self.stages[0].state == "completed") != (
             self.execution.state == "completed"
         ):
             raise ValueError("execution stage contradicts its result")
         for stage, value in ((self.stages[1], self.rules), (self.stages[2], self.profile)):
-            if value and (stage.state == "completed") != value.complete:
+            if value is not None and (stage.state == "completed") != value.complete:
                 raise ValueError("stage completeness contradicts its result")
-        if self.detection and (self.stages[3].state == "completed") != all(
+        if self.detection is not None and (self.stages[3].state == "completed") != all(
             d.result.complete for d in (*self.detection.m, *self.detection.b)
         ):
             raise ValueError("detector stage completeness contradicts its result")
@@ -228,12 +232,12 @@ class PipelineResult(FrozenModel):
 
     @property
     def exit_code(self) -> int:
-        if self.execution and self.execution.state == "invalid_input":
+        if self.execution is not None and self.execution.state == "invalid_input":
             return 2
         if not self.complete:
             return 3
         alert = self.hybrid.r.decision == "alert" or self.hybrid.result.decision == "alert"
-        if self.detection:
+        if self.detection is not None:
             alert |= any(d.result.decision == "alert" for d in self.detection.b)
         return int(alert or (self.comparison is not None and self.comparison.state == "different"))
 

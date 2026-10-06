@@ -247,7 +247,7 @@ def run(output: Path) -> dict[str, object]:
             work_dir=output / "verify",
         )
         for checkpoint in workflow.checkpoints
-        if checkpoint.migration
+        if checkpoint.migration is not None
     }
     destination = ef.ParquetDestination(output / "published")
     receipt = destination.publish(

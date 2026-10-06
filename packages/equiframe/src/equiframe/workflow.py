@@ -11,7 +11,7 @@ from uuid import uuid4
 
 from pydantic import Field, model_validator
 
-from equiframe._base import FrozenModel, Identifier, Text
+from equiframe._base import FrozenModel, Identifier, Text, _ExplicitOutcome
 from equiframe.errors import ArtifactIntegrityError, ResourceLimitError
 from equiframe.evidence import inventory, load_json, publish_json, verify_files
 from equiframe.execution import CancellationToken, RunContext
@@ -74,7 +74,9 @@ class WorkflowSpec(FrozenModel):
         return self
 
 
-class WorkflowCheckpoint(FrozenModel):
+class WorkflowCheckpoint(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = "inspect .state and its migration decisions explicitly"
+
     stage_id: Identifier
     state: Literal["passed", "failed", "not_evaluable", "skipped"]
     code: Text
@@ -87,7 +89,7 @@ class WorkflowCheckpoint(FrozenModel):
             raise ValueError("passed checkpoint requires an approved native migration")
         if self.state == "skipped" and self.migration is not None:
             raise ValueError("skipped checkpoint cannot have a successful fabricated execution")
-        if self.migration:
+        if self.migration is not None:
             expected = (
                 "passed"
                 if self.migration.exit_code == 0
@@ -98,7 +100,9 @@ class WorkflowCheckpoint(FrozenModel):
         return self
 
 
-class WorkflowResult(FrozenModel):
+class WorkflowResult(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = "inspect .complete, .exit_code and the required checkpoints explicitly"
+
     schema_version: Literal["1.0"] = "1.0"
     run_id: Identifier
     spec: WorkflowSpec
@@ -120,7 +124,7 @@ class WorkflowResult(FrozenModel):
         prior: dict[str, WorkflowCheckpoint] = {}
         for stage, checkpoint in zip(self.spec.stages, self.checkpoints, strict=True):
             migration = checkpoint.migration
-            if migration:
+            if migration is not None:
                 declared_options = stage.migration.options
                 actual_options = migration.spec.options
                 options_match = actual_options == declared_options
@@ -163,7 +167,9 @@ class WorkflowResult(FrozenModel):
                         )
                         reference = (
                             pipeline.execution.output.data
-                            if pipeline and pipeline.execution and pipeline.execution.output
+                            if pipeline is not None
+                            and pipeline.execution is not None
+                            and pipeline.execution.output
                             else None
                         )
                     # A failed migration capture can retain only a prefix of
@@ -180,7 +186,7 @@ class WorkflowResult(FrozenModel):
             (
                 item.stage_id
                 for item in self.checkpoints
-                if item.migration
+                if item.migration is not None
                 and (
                     item.migration.state == "different"
                     or item.migration.verification == "divergent"
@@ -208,9 +214,9 @@ class WorkflowResult(FrozenModel):
             checkpoint.stage_id: checkpoint.migration.target.execution.output.data
             for checkpoint in self.checkpoints
             if checkpoint.state == "passed"
-            and checkpoint.migration
-            and checkpoint.migration.target
-            and checkpoint.migration.target.execution
+            and checkpoint.migration is not None
+            and checkpoint.migration.target is not None
+            and checkpoint.migration.target.execution is not None
             and checkpoint.migration.target.execution.output
         }
 
@@ -444,7 +450,7 @@ def run_workflow(
             (
                 c.stage_id
                 for c in checkpoints
-                if c.migration
+                if c.migration is not None
                 and (c.migration.state == "different" or c.migration.verification == "divergent")
             ),
             None,
@@ -486,7 +492,7 @@ def read_workflow(path: Path, *, verify: bool = True) -> WorkflowResult:
             ):
                 raise ArtifactIntegrityError("workflow input reference differs from captured bytes")
     for checkpoint in result.checkpoints:
-        if checkpoint.migration:
+        if checkpoint.migration is not None:
             manifest = (
                 directory
                 / checkpoint.stage_id

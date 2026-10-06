@@ -385,7 +385,7 @@ def _validate_outcome(
             or profile.metadata.artifacts != _execution_refs(spec.execution)
         ):
             raise ValueError("profile does not belong to the declared captured execution")
-        if profile_m.detection and (
+        if profile_m.detection is not None and (
             profile_m.detection.bundle_sha256 != spec.detector_bundle_sha256
             or profile_m.detection.profiles_sha256
             != profile_digest([profile.vector.model_dump(mode="json")])

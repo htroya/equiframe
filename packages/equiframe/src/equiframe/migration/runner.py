@@ -461,7 +461,7 @@ def migrate(
         )
 
     def has_output(p: PipelineResult | None) -> bool:
-        return bool(p and p.execution and p.execution.state == "completed")
+        return p is not None and p.execution is not None and p.execution.state == "completed"
 
     peer = steps.run(
         "comparison",

@@ -7,7 +7,15 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
-from equiframe._base import FrozenModel, Identifier, NonNegativeInt, PositiveInt, Text, unique
+from equiframe._base import (
+    FrozenModel,
+    Identifier,
+    NonNegativeInt,
+    PositiveInt,
+    Text,
+    _ExplicitOutcome,
+    unique,
+)
 from equiframe.contracts import ColumnSpec, Family
 from equiframe.types import ArtifactRef, Sha256
 
@@ -237,7 +245,11 @@ class ProfileMetadata(FrozenModel):
     implementation_version: Literal["equiframe-profiles-1.0"] = "equiframe-profiles-1.0"
 
 
-class ProfileResult(FrozenModel):
+class ProfileResult(_ExplicitOutcome, FrozenModel):
+    _truth_value_guidance = (
+        "inspect .complete and feature availability explicitly; a profile is not a decision"
+    )
+
     schema_version: Literal["1.0"] = "1.0"
     metadata: ProfileMetadata
     vector: ProfileVector

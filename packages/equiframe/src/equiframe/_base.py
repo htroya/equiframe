@@ -1,6 +1,6 @@
 """Shared strict configuration and validation helpers (not public API)."""
 
-from typing import Annotated, Never
+from typing import Annotated, ClassVar, Never
 
 from pydantic import (
     AfterValidator,
@@ -11,6 +11,20 @@ from pydantic import (
     ValidationError,
 )
 from pydantic_core import PydanticCustomError
+
+
+class _ExplicitOutcome:
+    """Field-free guard for the explicitly selected operational outcome models.
+
+    Object presence, technical completion and an approval decision are separate.
+    This mixin intentionally does not apply to every frozen model.
+    """
+
+    __slots__ = ()
+    _truth_value_guidance: ClassVar[str]
+
+    def __bool__(self) -> Never:
+        raise TypeError(f"{type(self).__name__} has no truth value; {self._truth_value_guidance}")
 
 
 class FrozenModel(BaseModel):
