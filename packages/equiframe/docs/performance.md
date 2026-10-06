@@ -175,3 +175,89 @@ Tests use bounded subprocesses, genuine SIGKILL and injected ENOSPC rather than
 filling a host disk or causing host OOM. No destructive whole-host stress result
 is claimed. The consumer must treat missing finalization, abnormal exit and
 insufficient evidence as failure or unavailable evaluation, never equivalence.
+
+## Bounded consolidation suite
+
+`tools/measure_bounded.py` adds a repeatable developer suite. It reuses
+`ScaleSpec`, `measure_scale`, `read_scale`, `summarize_scale` and their existing
+isolated-worker supervisor for final-row differences, dense differences,
+duplicate multiplicity, wide strings and ordinary disk/evidence costs. A separate
+small Decimal supplement measures exact cents through Arrow and pandas, including
+an explicitly timed Arrow-to-pandas conversion. It does not change historical
+scale schemas or introduce a core dependency on the benchmark.
+
+Use a benchmark environment containing the **matching installed** core and
+benchmark builds, including pandas, Arrow and the benchmark `resources` extra.
+From the checkout, after the identified artifacts have been installed:
+
+```bash
+packages/equiframe-benchmark/.venv/bin/python -I \
+  packages/equiframe/tools/measure_bounded.py \
+  --output /new/private/bounded-costs --rows 512 --repetitions 3
+```
+
+The scale supervisor deliberately ignores `PYTHONPATH`; pointing the parent at
+changed source while its isolated worker has an older installed wheel fails the
+producer-identity check. Install the matching artifacts instead of weakening the
+check. `suite.json` retains imported-source fingerprints, tool hash, versions,
+individual stage boundaries, raw supervision records and explicit completion.
+An older version string alone is not a matching artifact. Failed attempts remain
+separate; each run requires a new output directory.
+
+Defaults run sequentially at 512 rows/side (1,024 for the disk/evidence fixture),
+three repetitions, 128-row batches, a 512 MiB sampled RSS threshold, 64 MiB sampled
+disk threshold and 120 seconds per supervised case. Comparison budgets are 32 MiB
+disk, 8 MiB differences and 30 cooperative seconds. The suite admits only
+8–2,048 rows and 2–5 repetitions and requires at least 384 MiB initially free.
+These are conservative test boundaries, not hard quotas or workload sizing advice.
+The disk fixture writes complete snapshots and dense differences without trying
+to fill the host disk. The small tests simulate interruption and ENOSPC; they do
+not exhaust memory or storage.
+
+The Decimal supplement has its own developer-receipt format rather than claiming
+the historical `ScaleSpec` supports Decimal. It retains the independently expected
+one-cent final-record difference, all comparison records and a redacted report.
+`diff` includes its own conversion/capture, inference, complete comparison and
+publication. Additional conversion, capture, hashing, serialization and durable
+write timings describe additional work; they are not disjoint pieces extracted
+from the internal `diff` timing. A completed comparison followed by failed receipt
+publication is an incomplete measurement. Pre-contract cancellation can raise
+`ExecutionCancelled` before a final comparison exists.
+
+### Measured reference at the consolidation base
+
+On 2026-10-06, the installed core and benchmark Python sources were independently
+matched to commit `c4be1c5a29d9f58b2628882bd986de2bb5ca4184`. This **base reference**,
+not a final rebuilt-consolidation measurement, ran all six families with three
+repetitions and complete expected outcomes. Linux x86_64, CPython 3.12.14,
+PyArrow 25.0.1, pandas 3.0.6 and psutil 7.2.2; shared cloud host, uncontrolled OS
+caches and concurrent development work. Each case has one fresh worker trial and
+two warm-worker trials; medians below combine those three explicitly identified
+observations and do not imply cold-cache repeatability.
+
+| Case | Rows/side | Pipeline median (range), seconds | Sampled worker RSS, MiB | Sampled apparent disk, MiB |
+|---|---:|---:|---:|---:|
+| Final-row difference | 512 | 0.221 (0.207–0.485) | 147.8 | 1.74 |
+| Every-row difference | 512 | 0.243 (0.228–0.497) | 148.8 | 2.47 |
+| Eight distinct rows, duplicates | 512 | 0.131 (0.130–0.365) | 148.0 | 1.21 |
+| Eight columns, wider strings | 512 | 0.275 (0.271–0.530) | 158.8 | 15.90 |
+| Dense differences plus disk evidence | 1,024 | 0.755 (0.650–0.967) | 160.0 | 24.98 |
+| Exact Decimal final cent | 512 | 0.184 (0.181–0.186) | 149.2 | 1.31 |
+
+The public comparison stage dominates these small cases. For example, the
+Decimal median stages were 0.00051 s construction, 0.00087 s additional conversion,
+0.00027 s additional IPC capture, 0.00007 s hashing, 0.17618 s full `diff`,
+0.00007 s extra serialization, 0.00005 s extra durable write, 0.00314 s report and
+0.00146 s readback. Very short stages are below useful stable sizing resolution.
+No algorithm was optimized from these observations and no percentage improvement
+or comparison against a lower-guarantee service is claimed.
+
+All six resource receipts remain incomplete because the final I/O sampling
+reported `AccessDenied`. Missing final I/O totals are unknown, not zero. RSS and
+disk columns remain observed lower bounds over the supervised worker and retained
+evidence tree; disk is for the case's three repetitions, not one input file.
+Raw receipts also retain allocated-disk observations and sampling gaps. No new
+macOS/Windows/ARM64, large-volume, storage-saturation or human usability result is
+implied. Preserve the supplied private raw receipts when using this reference;
+source/tool fingerprints and actual environment take precedence over these
+rounded display values.
