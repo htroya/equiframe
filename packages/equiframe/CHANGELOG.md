@@ -1,5 +1,25 @@
 # Changelog
 
+## Candidato STEP7 (2026-10-06)
+
+- Nueva captura explícita `capture_duckdb` y `DuckDBCaptureOptions`: consulta
+  confiable, consumo único por lotes, snapshot Arrow desacoplado, presupuestos
+  cooperativos y propiedad/conservación de sesión documentadas
+- Rechazo fail-closed antes de Arrow de HUGEINT/UHUGEINT, UUID y tipos nativos
+  sin transporte fiel declarado, también en `DuckDBAdapter`. Antes podía
+  ocultarse una pérdida (UHUGEINT máximo pasa a -1 en DuckDB 1.5.6).
+  Use un cast SQL explícito solo si el rango y la semántica del caso lo permiten
+- Los parámetros Decimal se enlazan con tipo nativo y texto exacto en ambas
+  rutas: la inferencia DuckDB de `Decimal("1E-38")` podía degradar a DOUBLE.
+  Parámetros Decimal no representables o enteros fuera de 64 bits se rechazan;
+  para una conversión deliberada, pase texto y un cast SQL explícito
+- La nueva API es experimental. Formatos anteriores, comparación, política de
+  esquema, IR de migración y lectores históricos conservan sus contratos
+- Fallos nativos tardíos envueltos por Arrow como `OSError` conservan cancelación
+  o timeout, omiten SQL/valores del diagnóstico público y limpian staging.
+  Los errores de escritura/fsync siguen identificándose como I/O
+
+
 ## Sin publicar — revisión del candidato 0.11.1
 
 - STEP6: clasificación pública de estabilidad, política de deprecación y registro

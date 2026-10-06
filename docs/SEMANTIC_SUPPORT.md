@@ -7,7 +7,7 @@ de esta matriz ni convierte resultados históricos en ejecuciones nuevas.
 [SEMANTIC_SUPPORT.json](SEMANTIC_SUPPORT.json) es la matriz legible por máquina.
 Cada fila declara operación, tipo/fixture, motor, dirección, política, resultado
 esperado, estado y nodo pytest concreto. No expande combinaciones sin pruebas.
-La versión actual contiene **131 filas**. Las tres filas añadidas de categoría I
+La versión histórica de esta revisión contiene **131 filas**. Las tres filas añadidas de categoría I
 registran las dos ausencias parciales de relaciones SERCOP y la captura de bytes
 verificados: pruebas dirigidas de fuente ejecutadas el 2026-10-03,
 **3 passed en 6.46 s**. No atribuyen a esos tests una migración o publicación
@@ -63,3 +63,28 @@ Los casos `pending` registran capacidades fuera de implementación y no incluyen
 nodo de prueba ficticio. Un rechazo deliberado de formato o semántica tampoco es
 un defecto confirmado. Las garantías de staging/puntero, recursos y lectura
 portátil están detalladas en [ETL.md](ETL.md) y la documentación de Verify.
+
+
+## Ampliación STEP7: ruta DuckDB explícita
+
+La matriz actual añade **24 filas** de captura/admisión DuckDB a las 131
+históricas (**155 filas** total). Los registros nuevos distinguen etapa, tipo,
+política y límites; la presencia del nodo no sustituye el recibo de ejecución
+del candidato. [Ficha STEP7](STEP7_CANDIDATE.md) y
+[API/decisiones de transporte](DUCKDB_CAPTURE.md).
+
+| Tipo o capacidad | Captura explícita / ejecución | Comparación / migración |
+|---|---|---|
+| BOOLEAN, enteros signed/unsigned 8–64, FLOAT/DOUBLE, VARCHAR | Admitidos con representación Arrow exacta; NULL, NaN, infinito numérico y Unicode observados | Políticas existentes; ningún cast, relleno o deduplicación para obtener equivalencia |
+| Decimal hasta 38, escala no negativa | Valor/precisión/escala conservados; parámetros con enlace exacto tipado | Exactitud existente; división SQL es DOUBLE, operaciones Decimal IR pendientes conservan su estado |
+| DATE, timestamp naive s/ms/us/ns, TIMESTAMPTZ us | Unidades/instantes finitos y zona efectiva de sesión; promoción DATE sensible a sesión | No recupera ns o zonas por fila perdidos antes; no amplía timestamps en IR |
+| HUGEINT/UHUGEINT, UUID, ENUM, JSON, BLOB/BIT, TIME/TIMETZ, INTERVAL, nested/extension | Rechazo antes de Arrow aunque sus valores pudieran aparentar un escalar admitido | No se simula soporte comparando representaciones degradadas |
+| Relación/resultado/lector previo | No se consume implícitamente; se ejecuta SQL explícito con propietario y nuevo lector | Reportes/comparación leen únicamente el snapshot publicado |
+| Recursos/errores | Lotes, filas/bytes y tiempo cooperativo; publicación atómica o excepción | Sin cuotas RSS duras, promesa mayor-que-RAM, recuperación global ni snapshot distribuido |
+
+El paquete de conformidad está en `tests/test_duckdb_capture.py` y
+`tests/test_duckdb_native_fidelity.py`; incluye esperados literales y metamorfismos
+de tamaño de lote, multiplicidad y orden. Categorías, índices y extensiones
+conservan el rechazo/políticas de etapas previas; no se anuncian como nuevas
+capacidades DuckDB. La aceptación humana, DW real y mediciones de escala siguen
+siendo evidencias distintas.

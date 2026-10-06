@@ -628,3 +628,34 @@ el del consumidor; pérdida de escala/rango sigue siendo rechazo. La expansión
 JSON y el registro de errores de parser respetan max_records. No se añaden
 formatos de ejecución, tipos de dominio ni permisos del servicio/DW.
 [Pruebas completas y compatibilidad](COMPREHENSIVE_REVIEW_20261003.md).
+
+
+## Captura explícita DuckDB (STEP7)
+
+`capture_duckdb(sql, *, work_dir, name="result", connection=None,
+exclusive_connection=False, parameters=None, options=None, cancellation=None)`
+ejecuta una sola consulta SELECT/WITH confiable y entrega el `TableArtifact`
+existente, con tipo nativo observado y Arrow IPC desacoplado.
+`DuckDBCaptureOptions` fija lotes, filas, bytes por lote, bytes del archivo y
+tiempo cooperativo. Ambas superficies son experimentales; formatos previos 1.0
+permanecen intactos. [Uso, propiedad y límites](DUCKDB_CAPTURE.md).
+
+La conexión prestada requiere exclusividad explícita y autoload/autoinstall
+desactivados por el propietario; no se cierra, configura, registra ni termina
+su transacción. Su result slot se consume y un error puede requerir rollback
+del llamante. La conexión privada se cierra antes de publicar. Ni el reporte ni
+la comparación reejecutan SQL. Los límites no son cuotas duras de memoria, tiempo
+o consistencia entre sistemas externos. No se aceptan relaciones/resultados
+previos cuyo consumo y tipos nativos no puedan verificarse.
+
+La admisión nativa compartida cierra además una pérdida en ejecución existente:
+HUGEINT/UHUGEINT, UUID y otros tipos sin representación fiel declarada se rechazan
+antes de Arrow. El SQL del consumidor puede convertir explícitamente a un tipo
+admitido solo cuando la semántica/rango de su caso lo permita. No hay cast
+implícito, recuperación de información perdida ni ampliación del IR de migración.
+
+Los parámetros de ambas rutas DuckDB usan enlace Decimal exacto con precisión y
+escala comprobadas; `1E-38` no se infiere como DOUBLE. Decimal no finito, cero
+negativo, exponente positivo o >38 dígitos/escala e enteros fuera de signed/unsigned
+64 bits se rechazan antes del SQL del consumidor. Texto y casts SQL explícitos
+conservan disponibles conversiones deliberadas dentro del alcance de su contrato.

@@ -75,7 +75,9 @@ Los [constructores tipados y la procedencia](docs/DIFF.md) permiten inspeccionar
 o fijar todas las políticas. La fachada devuelve el `ComparisonResult` existente
 y preserva sus estados, diagnósticos y evidencia. Índices significativos y
 representaciones ambiguas no se ignoran silenciosamente. Relaciones DuckDB y
-planes lazy requieren materialización explícita; [límites de captura, errores
+planes lazy requieren materialización explícita. [capture_duckdb](docs/DUCKDB_CAPTURE.md) ejecuta una
+consulta confiable una vez y entrega un snapshot separado de la conexión;
+[límites de captura, errores
 y tipos admitidos](docs/DIFF.md#entradas-materialización-y-fidelidad).
 
 ### Leer un reporte común
@@ -155,6 +157,7 @@ El estado de ejecución `completed` solo indica que la transformación terminó 
 | Entrada directa | `diff`, `read_diff_contract`, constructores de contrato | pandas/Polars/Arrow eager; políticas y procedencia inspeccionables, referencia derecha y captura acotada |
 | Pruebas y pipelines | `assert_equivalent`, `equivalence_decision`, `EquivalencePolicy` | Aceptación explícita, errores tipados, diagnóstico redactado y persistencia verificada opcional |
 | Reporte común | `comparison_report`, `write_comparison_report`, `read_comparison_report` | JSON/texto/HTML/notebook sobre una vista filtrada, inspección acotada y exportación explícita de capturas |
+| Captura DuckDB explícita | `capture_duckdb`, `DuckDBCaptureOptions` | SELECT/WITH confiable, lotes y snapshot reutilizable; propiedad y sesión explícitas |
 | Ejecución nativa | `execute`, `TransformationRegistry` | Callbacks pandas, DataFrame/LazyFrame Polars y consultas DuckDB parametrizadas |
 | Migración declarativa | `check_migration`, `migrate`, `read_migration` | Plan relacional cerrado, implementaciones nativas y seis direcciones entre los tres motores, dentro de las capacidades admitidas |
 | Verificación | `verify`, `verify_migration` | Separa acuerdo entre salidas, comparación contra esperado, integridad, reglas, cobertura y revisión independiente |

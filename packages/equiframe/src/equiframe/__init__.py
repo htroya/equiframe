@@ -134,6 +134,7 @@ from equiframe.diff_contracts import (
     keyed_contract,
     sequence_contract,
 )
+from equiframe.duckdb_capture import DuckDBCaptureOptions, capture_duckdb
 from equiframe.errors import (
     ArtifactIntegrityError,
     ArtifactIOError,
@@ -467,6 +468,7 @@ __all__ = [
     "DiffContract",
     "DiffInput",
     "DuckDBAdapter",
+    "DuckDBCaptureOptions",
     "DuckDBTransformation",
     "EngineAdapter",
     "EngineCapabilities",
@@ -656,6 +658,7 @@ __all__ = [
     "bag_contract",
     "calibrate_detectors",
     "canonical_contract_bytes",
+    "capture_duckdb",
     "check_migration",
     "combine_decisions",
     "compare",

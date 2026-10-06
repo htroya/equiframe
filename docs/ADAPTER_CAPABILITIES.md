@@ -40,7 +40,7 @@ responsabilidades de José o Jhair ni se implementa su servicio/DW.
 | Arrow | Tabla eager admitida, aislada y validada | Captura materializada y contrato explícito/inferido | No existe adaptador Arrow incorporado | Puede alimentar entradas; no es motor destino |
 | Pandas | DataFrame eager real; índice aparte | Captura con política expresa de índice | Callback Pandas confiable sobre copias | Compilador Pandas independiente, IR acotado |
 | Polars | DataFrame eager real; LazyFrame se rechaza sin `collect` | Captura materializada | Callback Polars; salida DataFrame/LazyFrame materializada | Compilador Polars independiente, límites comunes y nativos |
-| DuckDB | Relación directa rechazada sin ejecutar consulta | Salida previamente capturada o artefacto | SELECT/WITH confiable, conexión propia `:memory:` | Compilador DuckDB independiente, sin fallback a otro motor |
+| DuckDB | Relación en `diff` rechazada; `capture_duckdb` explícito por lotes | Salida previamente capturada o artefacto | SELECT/WITH confiable, conexión propia `:memory:` | Compilador DuckDB independiente, sin fallback a otro motor |
 
 ### Captura y pérdidas
 
@@ -153,3 +153,21 @@ Los tests del registro cotejan runtime, compilers, dependencias, referencias y
 cada superficie de estabilidad. Son controles de correspondencia, no certifican
 por sí solos el motor. La [política de compatibilidad](COMPATIBILITY.md) define
 avisos, ventana de retirada y excepciones fail-closed.
+
+
+## Captura y admisión nativa STEP7
+
+La etapa `capture` DuckDB pasa a `supported_with_conditions` mediante la API
+explícita [capture_duckdb](DUCKDB_CAPTURE.md); no cambia la negativa de `diff` a
+ejecutar relaciones lazy. Requiere conexión privada o préstamo exclusivo sin
+lectores pendientes, extensiones automáticas desactivadas, consulta confiable y
+presupuestos cooperativos. Guarda tipos nativos, versión, ajustes de sesión
+seleccionados e intervalo; no declara snapshot distribuido o fuente inmutable.
+
+El resultado nativo se admite antes de convertir a Arrow tanto en captura como
+en ejecución. HUGEINT/UHUGEINT, UUID, ENUM, BLOB, TIME/TIMETZ, INTERVAL, nested y
+extensiones no tienen mapeo admitido. Decimal128 hasta precisión 38 conserva
+precisión/escala; la división SQL Decimal se observa como DOUBLE, sin convertirla
+de nuevo a exacta. DATE y timestamps finitos conservan unidad y zona efectiva
+cuando existe. TIMESTAMPTZ no conserva nombre de zona por fila ni ns perdidos al
+leer la fuente con DuckDB. No amplía la semántica del IR de migración.

@@ -459,3 +459,45 @@ registra pruebas efectivas y deja Windows/macOS/ARM64 y otras implementaciones
 sin verificar cuando no hay ejecutores. Los locks añaden artefactos para 3.13
 sin cambiar versiones resueltas. El corpus histórico identifica commits privados,
 no releases públicos ficticios. La hoja de ruta reforzada se conserva fuera de Git.
+
+
+## STEP7 — Captura DuckDB y fidelidad de transporte (2026-10-06)
+
+Decisión de ingeniería: priorizar un bloqueo reproducible de integración, la
+captura explícita de una consulta y su consumo una sola vez, en lugar de ampliar
+operadores del IR sin demanda ni ocultar pérdidas. La comparación sigue siendo
+independiente del motor. `capture_duckdb` crea un `TableArtifact` desprendido por
+lotes, con propiedad privada o prestada exclusiva, intervalo de captura, tipos
+nativos y lista cerrada de ajustes de sesión. No conserva SQL ni parámetros.
+La captura no acredita versión externa de datos ni transacción distribuida.
+
+DuckDB 1.5.6 convierte UHUGEINT máximo en Arrow decimal128 de valor -1, y la
+validación Arrow pasa. También UUID pierde su identidad en string. Se adopta
+admisión cerrada de tipos antes del transporte tanto en la nueva API como en
+`DuckDBAdapter`, con validación exacta de esquema posterior y rechazo de
+sentinels temporales. No comparar dos transportes corruptos como esperado.
+La revisión independiente detectó además que parámetros Python Decimal como
+`1E-38` o `0.01234567890123456789012345678901234567` se inferían como DOUBLE.
+Ambas rutas enlazan Decimal mediante `duckdb.Value` y `decimal_type` sobre texto
+exacto de valor/escala; no pasan por float ni modifican el SQL del consumidor.
+Se rechazan exponentes positivos, cero negativo, precisión/escala >38 y enteros
+fuera de 64 bits signed/unsigned antes de ejecutar la consulta del consumidor.
+HUGEINT/UHUGEINT quedan fuera aun si un valor individual cabría; recuperación
+mediante cast explícito del consumidor con rango/semántica justificados.
+
+La conexión prestada no se reconfigura ni se cierra y debe declarar exclusividad,
+sin lectores pendientes ni SQL concurrente. Las extensiones automáticas deben
+estar desactivadas antes de entrar. Los controles cooperativos pueden interrumpir
+la conexión y un fallo nativo puede abortar su transacción. No existe sandbox
+SQL, cuota RSS dura, captura global simultánea o admisión de tipos anidados.
+
+No hay cambios metodológicos, detectores, etiquetas, protocolos experimentales,
+servicio/DW de terceros, publicación PyPI ni interpretación de evidencia histórica.
+
+La revisión del candidato encontró un segundo límite: Arrow puede envolver
+fallos nativos tardíos como `OSError`, fuera de la jerarquía `duckdb.Error`.
+Se normalizan exclusivamente al consumir el lector, comprobando primero
+cancelación/deadline, sin exponer SQL/literales en el diagnóstico público.
+La causa encadenada se conserva para depuración privada. Un fallo de escritura
+o fsync sigue siendo I/O; no se atribuye al motor. El corpus incluye el cast
+nativo tardío real, las variantes envueltas y la limpieza atómica.

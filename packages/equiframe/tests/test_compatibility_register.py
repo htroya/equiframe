@@ -221,7 +221,9 @@ def test_capability_register_separates_every_stage_and_leaves_maintainers_unassi
         with pytest.raises(ValidationError):
             record.stages[0].scope = "expanded claim"
     duckdb = next(r for r in records if r.adapter == "duckdb")
-    assert duckdb.stages[0].status == "rejected"
+    assert duckdb.stages[0].status == "supported_with_conditions"
+    assert "capture_duckdb" in duckdb.stages[0].scope
+    assert "exclusive borrowed ownership" in " ".join(duckdb.stages[0].conditions)
     assert duckdb.stages[1].status == duckdb.stages[2].status == "supported_with_conditions"
 
 

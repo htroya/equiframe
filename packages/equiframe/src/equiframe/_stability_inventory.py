@@ -215,6 +215,8 @@ STABLE_API = (
 )
 
 EXPERIMENTAL_API = (
+    "DuckDBCaptureOptions",
+    "capture_duckdb",
     "Aggregate",
     "Arithmetic",
     "Boolean",

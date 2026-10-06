@@ -8,6 +8,12 @@ from collections.abc import Mapping
 from threading import Event, Thread
 from typing import TYPE_CHECKING, cast
 
+from equiframe._duckdb_transport import (
+    duckdb_arrow_schema,
+    duckdb_parameters,
+    duckdb_temporal_capabilities,
+    verify_duckdb_table,
+)
 from equiframe.errors import (
     CapabilityError,
     InvalidExecutionInput,
@@ -97,29 +103,6 @@ def _input_capabilities(loaded: LoadedTable, engine: str, context: RunContext) -
             if bounds["min"] is not None and (bounds["min"] < -limit or bounds["max"] > limit):
                 raise CapabilityError(
                     "DuckDB zoned timestamp transport requires finite int64 microseconds"
-                )
-
-
-def _duckdb_temporal_capabilities(table: pa.Table) -> None:
-    import pyarrow as pa
-    import pyarrow.compute as pc
-
-    for field in table.schema:
-        if pa.types.is_timestamp(field.type):
-            bounds = pc.min_max(table[field.name].cast(pa.int64())).as_py()
-            if bounds["min"] is not None and (
-                bounds["min"] <= -(2**63 - 1) or bounds["max"] >= 2**63 - 1
-            ):
-                raise CapabilityError(
-                    "DuckDB timestamp infinity/sentinel values cannot be represented "
-                    "faithfully in Arrow"
-                )
-        elif pa.types.is_date32(field.type):
-            values = table[field.name].cast(pa.int32())
-            sentinels = pa.array([-(2**31 - 1), 2**31 - 1], type=pa.int32())
-            if pc.any(pc.is_in(values, value_set=sentinels)).as_py():
-                raise CapabilityError(
-                    "DuckDB date infinity values cannot be represented faithfully in Arrow"
                 )
 
 
@@ -266,7 +249,7 @@ class DuckDBAdapter:
                         "DuckDB input identifiers allow ASCII letters, digits and underscores"
                     )
                 _input_capabilities(loaded, self.engine, context)
-                _duckdb_temporal_capabilities(loaded.table)
+                duckdb_temporal_capabilities(loaded.table)
         options = context.plan.options
         stopped = Event()
         connection: duckdb.DuckDBPyConnection | None = None
@@ -290,6 +273,7 @@ class DuckDBAdapter:
                         "threads": options.duckdb_threads,
                         "enable_external_access": False,
                         "autoinstall_known_extensions": False,
+                        "python_enable_replacements": False,
                         "max_temp_directory_size": "0B",
                     },
                 )
@@ -334,14 +318,14 @@ class DuckDBAdapter:
                     connection.register(name, loaded.table)
             watcher.start()
             with context.measure("transformation"):
-                connection.execute(transformation.sql, dict(context.parameters))
+                connection.execute(transformation.sql, duckdb_parameters(context.parameters))
                 native_types = tuple(
                     (str(item[0]), str(item[1])) for item in connection.description or ()
                 )
             with context.measure("materialization"):
+                duckdb_arrow_schema(native_types, options.duckdb_timezone)
                 table = cast("pa.Table", connection.to_arrow_table())
-                check_arrow(table)
-                _duckdb_temporal_capabilities(table)
+                verify_duckdb_table(table, native_types, options.duckdb_timezone)
             return LoadedTable(
                 table,
                 native_types=native_types,

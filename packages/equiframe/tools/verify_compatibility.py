@@ -491,6 +491,16 @@ def exercise_examples(runner: CellRunner, python: Path, source: Path, profile: s
             raise ValueError("CLI comparison evidence was not verified")
         if "Traceback" in completed.stdout + completed.stderr:
             raise ValueError("CLI comparison exposed traceback")
+    if profile in ("duckdb", "engines", "all"):
+        runner.run(
+            [
+                *base,
+                str(examples / "capture_duckdb.py"),
+                "--output",
+                str(runner.directory / "duckdb-capture-report"),
+            ],
+            stage="duckdb-detached-capture",
+        )
     engines = (
         ("pandas", "polars", "duckdb")
         if profile in ("engines", "all")

@@ -11,7 +11,8 @@ from typing import TYPE_CHECKING, Literal
 from uuid import uuid4
 
 from equiframe._comparison_io import snapshot
-from equiframe.adapters import _duckdb_temporal_capabilities, _input_capabilities, native_adapter
+from equiframe._duckdb_transport import duckdb_temporal_capabilities
+from equiframe.adapters import _input_capabilities, native_adapter
 from equiframe.comparison import compare
 from equiframe.comparison_types import ComparisonResult
 from equiframe.detector_types import DetectorBundle
@@ -344,7 +345,7 @@ def migrate(
                 if engine in ("pandas", "polars", "duckdb"):
                     _input_capabilities(value, engine, context)
                     if engine == "duckdb":
-                        _duckdb_temporal_capabilities(value.table)
+                        duckdb_temporal_capabilities(value.table)
             rows += value.table.num_rows
             total_bytes += value.table.nbytes
             if value.index is not None:

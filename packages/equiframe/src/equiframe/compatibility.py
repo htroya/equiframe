@@ -283,7 +283,8 @@ def _native_stage(engine: str) -> CapabilityStage:
             "One trusted SELECT/WITH in a fresh :memory: connection; no external SQL access",
             "decimal128 precision <=38 with nonnegative scale; zoned ns, mismatched session "
             "zone, temporal infinity sentinels, casefold column collisions and zero columns "
-            "are rejected; zoned s/ms must fit finite int64 microseconds",
+            "are rejected; zoned s/ms must fit finite int64 microseconds; native output "
+            "HUGEINT/UHUGEINT and unknown/extended types are rejected before Arrow export",
         ),
     }
     scope, restrictions = details[engine]
@@ -346,9 +347,11 @@ def get_adapter_capabilities() -> tuple[AdapterCapability, ...]:
             "test_polars_eager_preserves_null_nan_decimal_and_zones",
         ),
         "duckdb": (
-            "DuckDBPyRelation is not a direct diff input; explicit native execution captures Arrow",
-            "No implicit query execution; use DuckDBTransformation/execute or an explicitly "
-            "materialized faithful Arrow/artifact input",
+            "Explicit capture_duckdb executes one trusted SELECT/WITH "
+            "and detaches Arrow IPC batches",
+            "No implicit lazy relation/reader consumption in diff; capture requires native "
+            "type admission, exclusive borrowed ownership or a private session, disabled "
+            "extension autoload/install, finite temporal values and cooperative budgets",
             "test_duckdb_relation_is_rejected_without_running_query",
         ),
     }
@@ -362,7 +365,7 @@ def get_adapter_capabilities() -> tuple[AdapterCapability, ...]:
         scope, restrictions, test = captures[engine]
         capture = CapabilityStage(
             stage="capture",
-            status="rejected" if engine == "duckdb" else "supported_with_conditions",
+            status="supported_with_conditions",
             scope=scope,
             conditions=(
                 _SCALAR_TYPES,
@@ -373,13 +376,21 @@ def get_adapter_capabilities() -> tuple[AdapterCapability, ...]:
             ),
             losses=(_LOST_BEFORE_CAPTURE,),
             implementation=(
-                "equiframe._diff_capture.capture_native",
+                (
+                    "equiframe.duckdb_capture.capture_duckdb"
+                    if engine == "duckdb"
+                    else "equiframe._diff_capture.capture_native"
+                ),
                 "equiframe.tables.check_arrow",
             ),
             tests=("tests/test_diff_capture.py::" + test,)
             + (
                 ("tests/test_diff_capture.py::test_polars_direct_capture_rejects_lost_cardinality",)
                 if engine == "polars"
+                else (
+                    "tests/test_duckdb_capture.py::test_capture_survives_source_change_and_connection_close",
+                )
+                if engine == "duckdb"
                 else ()
             ),
         )

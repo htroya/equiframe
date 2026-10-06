@@ -103,6 +103,20 @@ print('Clean installed profile:',extra,'outside checkout; light import verified'
                 cwd=project,
                 env=profile_env,
             )
+        if extra in ("duckdb", "engines"):
+            capture_example = project / "capture_duckdb.py"
+            shutil.copyfile(ROOT / "examples" / "capture_duckdb.py", capture_example)
+            run(
+                [
+                    str(python),
+                    "-I",
+                    str(capture_example),
+                    "--output",
+                    str(project / "duckdb-capture-report"),
+                ],
+                cwd=project,
+                env=profile_env,
+            )
         report_example = project / "report_local.py"
         shutil.copyfile(ROOT / "examples" / "report_local.py", report_example)
         run(

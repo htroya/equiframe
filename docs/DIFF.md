@@ -108,7 +108,8 @@ importan motores al importar `equiframe`; cada ruta carga solo sus extras.
   se rechaza en la entrada directa. No se declara igualdad de esos metadatos
 - Polars `LazyFrame`, relaciones DuckDB y lectores consumibles no se ejecutan
   ni consumen implícitamente. Materialice deliberadamente usando su pipeline o
-  los adaptadores existentes; compare el snapshot resultante con contrato
+  [capture_duckdb](DUCKDB_CAPTURE.md) para un SELECT/WITH explícito con captura
+  por lotes, o los adaptadores existentes; compare el snapshot con contrato
 - `ArrowInput`, artefactos, `TableArtifact`, `ExecutionResult` y archivos locales
   Arrow IPC file/Parquet mantienen la ruta previa cuando se aporta contrato.
   Las garantías y límites de esos formatos no se amplían por envolverlos en

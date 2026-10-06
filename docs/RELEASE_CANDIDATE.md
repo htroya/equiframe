@@ -1,5 +1,9 @@
 # Candidatos Python 0.11.1
 
+La [ficha STEP7](STEP7_CANDIDATE.md) incorpora captura DuckDB explícita, admisión
+nativa de tipos y parámetros Decimal exactos; mantiene límites y evidencia por
+etapa, candidato y entorno, sin extender implícitamente la matriz histórica.
+
 La [ficha STEP5](STEP5_CANDIDATE.md) añade tres recetas y kit instalable
 autocontenido; mantiene separada su aceptación técnica de la observación humana.
 

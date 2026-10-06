@@ -210,6 +210,25 @@ La API admite `adapter`, `artifact_store`, `source`, `work_dir` y
 opcional, origen y notas. Un proveedor externo es responsable de materializar
 su snapshot explícito; la implementación local rechaza URI remotas.
 
+## Capturar una consulta DuckDB una vez
+
+`ef.capture_duckdb` ejecuta un SELECT/WITH confiable de forma explícita, verifica
+los tipos nativos antes de Arrow y guarda un `TableArtifact` desacoplado por
+lotes. Puede usar una conexión privada o una conexión del consumidor con
+propiedad exclusiva explícita, sin cambiarla ni cerrarla. El reporte y la
+comparación no necesitan mantener la conexión viva ni reejecutan la consulta.
+
+```bash
+python examples/capture_duckdb.py --output capture-report
+```
+
+El ejemplo sintético modifica el origen y cierra la conexión antes de comprobar
+Decimal exacto, NULL, Unicode y duplicados frente a un esperado independiente.
+No usa pandas ni descargas. [API, tipos, sesión y límites](../../docs/DUCKDB_CAPTURE.md).
+La captura registra la salida observada, no recupera distinciones perdidas antes
+por el SQL ni demuestra consistencia de dos sistemas. Presupuestos de filas,
+lote/archivo y tiempo son cooperativos; no prometen RSS o latencia máximos.
+
 ## Transporte fiel y capacidades comprobadas
 
 | Tipo/formato | Pandas | Polars | DuckDB local |
@@ -229,6 +248,14 @@ admite decimal 1–76: no se reduce para satisfacer un motor. Una capacidad
 incompatible produce diagnóstico explícito. La salida se captura sin usar el
 esquema esperado para hacer casts, ordenar, rellenar nulos, deduplicar o redondear.
 Se guardan tipos físicos nativos/Arrow, filas, máscaras NULL y conteos NaN.
+DuckDB rechaza tipos de salida HUGEINT/UHUGEINT antes de exportar: la conversión
+de UHUGEINT máximo de DuckDB 1.5.6 a decimal128 puede producir -1 aun pasando
+validación Arrow. UUID/ENUM y otros tipos sin mapeo fiel declarado también se
+rechazan. También se tipan parámetros Decimal a partir de texto exacto, para
+impedir que la inferencia Python los degrade a DOUBLE. Se rechazan parámetros
+Decimal no representables y enteros fuera de signed/unsigned 64 bits.
+Un cast explícito del consumidor requiere que rango y semántica lo
+permitan; nunca se aplica para hacer coincidir salidas.
 Un cambio de columnas/tipo que puede representarse permanece en la salida para
 validadores posteriores. Unidades/políticas declaradas permanecen en el contrato;
 no se infieren unidades observadas ni se propaga metadata arbitraria como si la
