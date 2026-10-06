@@ -1,4 +1,4 @@
-# EquiFrame 0.11.1
+# EquiFrame 0.12.0a1
 
 [Inicio en español](docs/inicio.md) · [Choose an API](docs/choosing-api.md) · [Eight journeys](docs/journeys.md)
 
@@ -12,7 +12,7 @@ APIs with explicit capabilities and failure states.
 
 ## Private Alpha status
 
-This is the **private Alpha candidate 0.11.1**, identified by its commit and
+This is the **private Alpha candidate 0.12.0a1**, identified by its commit and
 artifact hashes. The team's package is **not publicly released on PyPI**.
 Do not install an unrelated package with this name from an arbitrary index.
 License and name/ownership remain owner decisions; access is not permission to
@@ -27,38 +27,15 @@ successful build/install checks.
 consented real-project observations, repeat use, minimal incident reports and
 pending ownership decisions.
 
-## Install and try it outside a checkout
+## Install the private candidate
 
-Use the verified private first-use kit for exact hash-pinned Python 3.12
-installation and three complete recipes. It contains the wheel, dependency lock,
-verification script, recipe scripts and English guides. No checkout is needed.
-[Full instructions](docs/recipes.md).
-
-For a verified standalone wheel and a reviewed local dependency wheelhouse,
-create a fresh Python 3.12 environment outside the source tree:
-
-```bash
-python3.12 -m venv .venv
-. .venv/bin/activate
-WHEEL=/absolute/path/equiframe-0.11.1-py3-none-any.whl
-WHEELHOUSE=/absolute/path/reviewed-wheelhouse
-python -m pip install --no-index --find-links "$WHEELHOUSE" "${WHEEL}[arrow]"
-python -m pip check
-python -I -c "import equiframe; print(equiframe.__version__); print(equiframe.__file__)"
-```
-
-Replace the absolute-path placeholders with your verified files. Compare the
-wheel SHA-256 with the separately supplied trusted receipt **before** installation.
-This offline command cannot fetch absent dependency wheels. See
-[quick start](docs/quickstart.md) for full verification, Python/platform caveats
-and a runnable complete script. Do not use an editable/PYTHONPATH import as an
-installed-package check.
-
-Package metadata admits Python `>=3.12,<3.14`; the first-use lock is 3.12-only.
-Extras: `arrow`, `pandas`, `polars`, `duckdb`, `engines`, `ml`. Native-engine extras
-include PyArrow. Base import does not load engines, Arrow, NumPy or ML.
-[Compatibility](docs/compatibility.md) separates admitted ranges from tested
-artifact/platform combinations.
+Use the [private wheelhouse installation guide](docs/installed-private.md) with
+`equiframe[engines,ml]==0.12.0a1`, a fresh environment outside the checkout,
+normal pip dependency resolution and the separately supplied artifact hashes.
+It includes Linux and PowerShell commands and a separate hash-locked trial.
+This is private installation by name, not publication in PyPI or TestPyPI.
+Python metadata admits 3.12/3.13; only actual artifact-specific receipts establish
+platform results. The earlier 0.11.1 first-use kit remains historical.
 
 ## Compare and enforce explicitly
 

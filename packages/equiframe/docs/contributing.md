@@ -2,7 +2,7 @@
 
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Release process](releasing.md)
 
-The repository and 0.11.1 artifacts are private candidates. Contribute through
+The repository and 0.12.0a1 artifacts are private candidates. Contribute through
 your own authorized account and a reviewable branch. Access does not grant
 redistribution rights. License, public release and nominal security/release
 ownership remain decisions for the owner; do not invent or preempt them.

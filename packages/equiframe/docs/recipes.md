@@ -2,6 +2,9 @@
 
 [Handbook](index.md) · [Quick start](quickstart.md) · [Semantics](semantics.md)
 
+This historical first-use kit predates candidate 0.12.0a1. For current candidate
+installation use [the private wheelhouse guide](installed-private.md).
+
 These recipes use the private EquiFrame **0.11.1** first-use kit and **Python
 3.12 only**. The kit contains the exact wheel, three recipe scripts and their
 pytest fixture, pinned dependencies with hashes, an integrity verifier and

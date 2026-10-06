@@ -9,7 +9,7 @@ locate differences in values, types, keys, multiplicity and order. Use EquiFrame
 inside an existing pandas, Polars, Arrow or CI workflow, or use its separate
 native execution, verification and bounded migration APIs.
 
-**Status: private Alpha candidate 0.11.1.** Identify artifacts by commit and
+**Status: private Alpha candidate 0.12.0a1.** Identify artifacts by commit and
 wheel/sdist SHA-256, not the version string alone. The team's package is **not
 publicly released on PyPI**. License and name/ownership decisions remain pending.
 Public release requires STEP10, the global review and specific owner approval.
@@ -23,25 +23,15 @@ close those gates. [Release process](packages/equiframe/docs/releasing.md).
 [Extension ports](packages/equiframe/docs/extending.md) ·
 [Semantics and limits](packages/equiframe/docs/semantics.md)
 
-## Start from a verified artifact
+## Install the private candidate
 
-Use the private first-use kit received through the authorized channel. It carries
-the exact wheel, hash-pinned dependencies, integrity checks and three runnable
-recipes outside the checkout:
-
-1. Diagnose a one-cent pandas refactor regression by key, value, type and policy
-2. Run a bounded native pandas → DuckDB migration with a separately captured
-   Decimal/NULL expected output
-3. Keep a redacted verified report before failing an assertion in pytest or CI
-
-Follow the [complete installation and recipe commands](packages/equiframe/docs/recipes.md).
-The kit currently targets **Python 3.12**. The package admits **3.12 and 3.13**;
-that metadata is not universal platform validation. Do not obtain this candidate
-by installing an unrelated package called `equiframe` from an arbitrary index.
-The five-minute diagnosis target and independent human adoption remain pending.
-Use the [adoption protocol](packages/equiframe/docs/adoption.md) to record consented real use and
-the [maintenance process](packages/equiframe/docs/maintenance.md) for minimal reproductions,
-critical trust incidents and ownership decisions.
+Use the [private wheelhouse installation guide](packages/equiframe/docs/installed-private.md) with
+`equiframe[engines,ml]==0.12.0a1`, a fresh environment outside the checkout,
+normal pip dependency resolution and the separately supplied artifact hashes.
+It includes Linux and PowerShell commands and a separate hash-locked trial.
+This is private installation by name, not publication in PyPI or TestPyPI.
+Python metadata admits 3.12/3.13; only actual artifact-specific receipts establish
+platform results. The earlier 0.11.1 first-use kit remains historical.
 
 ## A small comparison
 

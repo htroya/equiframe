@@ -3,7 +3,7 @@
 ## Current state
 
 `equiframe` and `equiframe-benchmark` are private Alpha candidates, currently
-numbered `0.11.1` and distinguished by commit plus SHA-256. They are **not** a
+numbered `0.12.0a1` and distinguished by commit plus SHA-256. They are **not** a
 public PyPI release. No project distribution license has been selected or
 authorized. Technical installation tests do not grant redistribution permission.
 Do not run an unqualified `pip install equiframe` to obtain this candidate: a
@@ -16,6 +16,10 @@ the requested global review, resolve the security review, and expressly approve
 the exact release. Names/account ownership, documentation access, publisher
 configuration and protections must be checked then. No availability lookup
 reserves a package name. No owner has committed to a response SLA.
+
+The 0.12.0a1 task explicitly authorizes isolated installation and the private
+wheelhouse channel. Missing license/account decisions block external publication,
+not these local checks. [Private install commands](installed-private.md).
 
 ## Repeatable candidate checks
 
