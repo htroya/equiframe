@@ -237,3 +237,35 @@ def test_packaged_handbook_is_part_of_exact_wheel_binding(package: Path, mutatio
     else:
         with pytest.raises(ValueError, match=r"runtime (bytes|inventory)"):
             BUILD["verify_wheel_source"](wheel, package, "0.0.0")
+
+
+@pytest.mark.parametrize("mutation", ["none", "missing", "changed", "cache"])
+def test_packaged_journey_sources_are_exact_and_exclude_generated_cache(package, mutation):
+    project = package / "pyproject.toml"
+    project.write_text(
+        project.read_text()
+        + (
+            "\n[tool.hatch.build.targets.wheel.force-include]\n"
+            '"examples/journeys/demo.py" = "equiframe/examples/journeys/demo.py"\n'
+        )
+    )
+    example = package / "examples/journeys/demo.py"
+    example.parent.mkdir()
+    example.write_bytes(b'EXPECTED = "synthetic"\n')
+    wheel = next((package / "dist").glob("*.whl"))
+    with zipfile.ZipFile(wheel, "a") as archive:
+        if mutation != "missing":
+            archive.writestr(
+                "equiframe/examples/journeys/demo.py",
+                b"stale" if mutation == "changed" else example.read_bytes(),
+            )
+        if mutation == "cache":
+            archive.writestr("equiframe/examples/journeys/__pycache__/demo.pyc", b"stale")
+    if mutation == "none":
+        files = BUILD["verify_wheel_source"](wheel, package, "0.0.0")
+        assert files["equiframe/examples/journeys/demo.py"]["sha256"] == (
+            hashlib.sha256(example.read_bytes()).hexdigest()
+        )
+    else:
+        with pytest.raises(ValueError, match=r"runtime (inventory|bytes)"):
+            BUILD["verify_wheel_source"](wheel, package, "0.0.0")

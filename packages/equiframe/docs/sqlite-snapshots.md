@@ -134,10 +134,12 @@ client = capture_sqlite_snapshot(
             name="entries",
             sql="SELECT id, amount FROM entries WHERE cohort = ? ORDER BY id",
             parameters=("reviewed-cohort",),
-            schema=pa.schema([
-                pa.field("id", pa.string(), nullable=False),
-                pa.field("amount", pa.decimal128(10, 2)),
-            ]),
+            schema=pa.schema(
+                [
+                    pa.field("id", pa.string(), nullable=False),
+                    pa.field("amount", pa.decimal128(10, 2)),
+                ]
+            ),
         ),
     ),
     domain_schema_revision="ledger-schema.1",

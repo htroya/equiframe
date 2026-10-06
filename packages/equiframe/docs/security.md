@@ -73,3 +73,30 @@ reproducer, exact commit/artifact hash, dependency versions and impact. Do not
 post credentials, personal data or a sensitive exploit in a public issue.
 
 [Release and withdrawal process](releasing.md) · [Dependency evidence](dependencies.md)
+
+## Consolidation review boundary, 2026-10-06
+
+This consolidation does **not** resume the stopped source-security assessment,
+through a specialized scanner or through an equivalent manual audit. That is a
+real unresolved coverage boundary, distinct from a temporarily missing tool.
+The prior special-file observation and capture-budget contract question remain
+open; no new reproduction, severity confirmation or remediation is claimed for
+them. Ordinary functional tests, compatibility checks and documented resource
+measurements do not close the security assessment.
+
+A separate fresh reading of the official advisory for **CVE-2026-25087** on
+2026-10-06 confirms Apache's stated scope: Arrow C++ 15.0.0 through 23.0.0 is
+affected and 23.0.1 contains the fix; Python, Ruby and C GLib bindings are excluded
+because the affected IPC pre-buffering functionality is not exposed through them.
+This qualifies the historical minimum-profile package-version match. It does not
+turn an inventory into a clean scan or prove every bundled native component and
+EquiFrame usage safe. Sources: [Apache advisory](https://security.apache.org/projects/arrow/)
+and [Arrow 23.0.1 release notes](https://arrow.apache.org/blog/2026/02/16/23.0.1-release/).
+The dated source receipt is retained with this consolidation's evidence, separately
+from earlier advisory snapshots. No dependency version was changed on that basis.
+
+The final artifact-bound offline dependency inventories/SBOMs identify the new
+wheel/sdist bytes. Offline regeneration performs no new registry-wide advisory
+query and must not be presented as a current comprehensive vulnerability scan.
+Release and untrusted-input adoption remain blocked on the unresolved assessment
+and owner decisions; a private branch is not a security certification.

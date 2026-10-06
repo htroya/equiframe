@@ -141,3 +141,11 @@ consent, human independence or adoption. Keep the example registry empty and
 real observations outside Git. The [maintenance process](maintenance.md) requires
 minimal permitted reproductions and separate technical/consumer confirmation;
 nominal owners, backups and response commitments remain unapproved.
+
+## Fast source feedback
+
+Use the [quick CI layer](fast-ci.md) for bounded PR/change feedback and the
+`tools/check_architecture.py --check` from the source distribution.
+Its smoke receipt is separate from the full candidate/distribution/matrix checks.
+The installed [product journeys](journeys.md) make positive, different and
+unavailable outcomes reproducible without a source checkout.

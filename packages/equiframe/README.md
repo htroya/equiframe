@@ -1,5 +1,7 @@
 # EquiFrame 0.11.1
 
+[Inicio en español](docs/inicio.md) · [Choose an API](docs/choosing-api.md) · [Eight journeys](docs/journeys.md)
+
 **Semantic comparison and reviewable evidence for tabular results in Python.**
 
 EquiFrame compares captured outputs under explicit contracts for values, types,

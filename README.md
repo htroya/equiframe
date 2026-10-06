@@ -1,5 +1,7 @@
 # EquiFrame
 
+[Inicio en español](packages/equiframe/docs/inicio.md) · [Choose an API](packages/equiframe/docs/choosing-api.md) · [Eight journeys](packages/equiframe/docs/journeys.md)
+
 **Semantic comparison and reviewable evidence for tabular results in Python.**
 
 Declare what your data must preserve, compare complete captured outputs, and

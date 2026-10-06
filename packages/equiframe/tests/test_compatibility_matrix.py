@@ -618,3 +618,29 @@ def test_sdist_handbook_is_compared_with_exact_wheel_payload(runner, tmp_path, m
     else:
         with pytest.raises(ValueError, match=r"handbook|runtime payload"):
             runner["extract_sdist"](make_sdist(tmp_path, files), tmp_path / "out", wheel)
+
+
+@pytest.mark.parametrize("mutation", ["none", "missing", "changed"])
+def test_sdist_journey_binding_matches_exact_installed_wheel_bytes(runner, tmp_path, mutation):
+    project = (
+        b'[project]\nname="equiframe"\nversion="0.0.0"\n'
+        b"[tool.hatch.build.targets.wheel.force-include]\n"
+        b'"examples/journeys/demo.py" = "equiframe/examples/journeys/demo.py"\n'
+    )
+    payload = {
+        "equiframe-0.0.0/pyproject.toml": project,
+        "equiframe-0.0.0/tests/test_synthetic.py": b"def test_synthetic(): assert True\n",
+        **{"equiframe-0.0.0/src/" + name: raw for name, raw in RUNTIME.items()},
+    }
+    original = b'EXPECTED = "synthetic"\n'
+    if mutation != "missing":
+        payload["equiframe-0.0.0/examples/journeys/demo.py"] = (
+            b"stale" if mutation == "changed" else original
+        )
+    expected = records({**RUNTIME, "equiframe/examples/journeys/demo.py": original})
+    if mutation == "none":
+        source = runner["extract_sdist"](make_sdist(tmp_path, payload), tmp_path / "out", expected)
+        assert (source / "examples/journeys/demo.py").read_bytes() == original
+    else:
+        with pytest.raises(ValueError, match=r"source is absent|runtime payload"):
+            runner["extract_sdist"](make_sdist(tmp_path, payload), tmp_path / "out", expected)

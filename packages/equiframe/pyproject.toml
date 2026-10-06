@@ -45,6 +45,22 @@ packages = ["src/equiframe"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "docs" = "equiframe/docs"
+"examples/journeys/README.md" = "equiframe/examples/journeys/README.md"
+"examples/journeys/__init__.py" = "equiframe/examples/journeys/__init__.py"
+"examples/journeys/a_pandas_refactor.py" = "equiframe/examples/journeys/a_pandas_refactor.py"
+"examples/journeys/b_native_migration.py" = "equiframe/examples/journeys/b_native_migration.py"
+"examples/journeys/c_retail_etl.py" = "equiframe/examples/journeys/c_retail_etl.py"
+"examples/journeys/common.py" = "equiframe/examples/journeys/common.py"
+"examples/journeys/d_financial_reconciliation.py" = "equiframe/examples/journeys/d_financial_reconciliation.py"
+"examples/journeys/e_telemetry.py" = "equiframe/examples/journeys/e_telemetry.py"
+"examples/journeys/f_data_science_preparation.py" = "equiframe/examples/journeys/f_data_science_preparation.py"
+"examples/journeys/g_external_snapshots.py" = "equiframe/examples/journeys/g_external_snapshots.py"
+"examples/journeys/h_portable_ci.py" = "equiframe/examples/journeys/h_portable_ci.py"
+"examples/journeys/requirements.lock" = "equiframe/examples/journeys/requirements.lock"
+"examples/journeys/verify_journeys.py" = "equiframe/examples/journeys/verify_journeys.py"
+"examples/integrations/outcome_gates.py" = "equiframe/examples/integrations/outcome_gates.py"
+"examples/integrations/sqlite_snapshot.py" = "equiframe/examples/integrations/sqlite_snapshot.py"
+"examples/integrations/sqlite_snapshot_demo.py" = "equiframe/examples/integrations/sqlite_snapshot_demo.py"
 
 [tool.hatch.build.targets.sdist]
 include = ["/docs", "/src", "/tests", "/examples", "/schemas", "/tools", "/pyproject.toml", "/uv.lock", "/README.md", "/CHANGELOG.md"]

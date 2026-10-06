@@ -120,24 +120,36 @@ def verify_wheel_source(wheel: Path, package: Path, version: str) -> dict[str, d
         .get("wheel", {})
         .get("force-include", {})
     )
-    if mapping:
-        if mapping != {"docs": "equiframe/docs"}:
-            raise ValueError("unsupported wheel force-include mapping")
-        handbook = package / "docs"
-        if handbook.is_symlink() or not handbook.is_dir():
-            raise ValueError("packaged handbook source is absent or linked")
-        documents = {}
-        for path in sorted(handbook.rglob("*")):
-            if path.is_symlink():
+    for original, destination in mapping.items():
+        if (original, destination) == ("docs", "equiframe/docs"):
+            directory = package / "docs"
+            if directory.is_symlink() or not directory.is_dir():
+                raise ValueError("packaged handbook source is absent or linked")
+            paths = sorted(directory.rglob("*"))
+            if any(path.is_symlink() for path in paths):
                 raise ValueError("packaged handbook cannot contain symlinks")
-            if path.is_file():
-                key = "equiframe/docs/" + path.relative_to(handbook).as_posix()
-                if key in source:
-                    raise ValueError("packaged handbook shadows runtime payload")
-                documents[key] = file_record(path)
-        if not documents:
-            raise ValueError("packaged handbook is empty")
-        source.update(documents)
+            included = [
+                (path, "equiframe/docs/" + path.relative_to(directory).as_posix())
+                for path in paths
+                if path.is_file()
+            ]
+            if not included:
+                raise ValueError("packaged handbook is empty")
+        elif (
+            original.startswith(("examples/journeys/", "examples/integrations/"))
+            and destination == "equiframe/" + original
+            and Path(original).suffix in {".py", ".md", ".lock"}
+            and ".." not in Path(original).parts
+        ):
+            included = [(package / original, destination)]
+        else:
+            raise ValueError("unsupported wheel force-include mapping")
+        for path, key in included:
+            if path.is_symlink():
+                raise ValueError("packaged handbook/examples cannot contain symlinks")
+            if key in source:
+                raise ValueError("packaged handbook/examples shadow runtime payload")
+            source[key] = file_record(path)
     if not source:
         raise ValueError("runtime source payload is empty")
     file_record(wheel)

@@ -1,5 +1,7 @@
 # EquiFrame user handbook
 
+[Inicio en español](inicio.md) · [Choose an API](choosing-api.md) · [Eight journeys](journeys.md)
+
 **Semantic comparison and reviewable evidence for tabular results in Python.**
 
 EquiFrame lets you declare what a result must preserve, compare materialized
@@ -82,6 +84,9 @@ handbook; no private-repository document is required to follow the core guide.
 | Verify existing outputs against a reviewed reference | `verify` | Agreement, expected-output checks and review remain distinct |
 | Retain transportable finalized evidence | `export_bundle` | Only the supported closed inventories; hashes are not signatures |
 | Study anomalies or engineering costs | Separate `equiframe_benchmark` | Experimental protocol; synthetic checks are not scientific results |
+
+The [outcome-gate guide](outcome-gates.md) lists the result/decision models that
+reject implicit truth testing and the explicit field appropriate to each.
 
 ## The minimum safe interpretation
 

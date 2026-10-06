@@ -1,6 +1,6 @@
 # Public API reference
 
-[Handbook](index.md) · [Semantics](semantics.md) · [Compatibility](compatibility.md)
+[Handbook](index.md) · [Choose an API](choosing-api.md) · [Semantics](semantics.md) · [Compatibility](compatibility.md)
 
 Use `import equiframe as ef`. This reference describes the private 0.11.1
 candidate's implemented entry points. Signatures below use Python notation;
@@ -35,6 +35,14 @@ validation, artifact verification or declared compatibility rules. Models reject
 extra fields and lossy coercions; Python collections are generally explicit
 tuples where specified. Use `inspect.signature` for the complete installed
 signature and Python `help` for entry-point descriptions.
+
+## Explicit outcome objects
+
+Operational result/check/decision models reject implicit truth testing. Use the
+[exact inventory and migration guide](outcome-gates.md) to select each result's
+state, completeness and acceptance fields; use `is not None` only for optional
+presence. This is an intentional fail-closed Python behavior change. JSON fields,
+format versions and fingerprints are unchanged.
 
 ## 1. Contracts, policies and serialization
 

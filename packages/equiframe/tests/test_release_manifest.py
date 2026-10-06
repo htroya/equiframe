@@ -826,3 +826,39 @@ def test_probe_and_source_controls_share_sanitized_import_environment(
     subprocess.run(
         [str(python), "-c", "import candidate_dependency"], env=environment, cwd=package, check=True
     )
+
+
+@pytest.mark.parametrize("mapping_kind", ["file", "directory"])
+def test_installed_examples_are_part_of_exact_runtime_binding(
+    package, tmp_path, candidate_driver, local_runtime, mapping_kind
+):
+    python, source, installed = local_runtime
+    dependency = source.parents[1]
+    examples = dependency / "examples"
+    examples.mkdir()
+    script = examples / "journey.py"
+    script.write_text('EXPECTED = "synthetic"\n', encoding="utf-8")
+    origin = "examples/journey.py" if mapping_kind == "file" else "examples"
+    target = (
+        "candidate_dependency/examples/journey.py"
+        if mapping_kind == "file"
+        else ("candidate_dependency/examples")
+    )
+    project = dependency / "pyproject.toml"
+    project.write_text(
+        project.read_text()
+        + (f'\n[tool.hatch.build.targets.wheel.force-include]\n"{origin}" = "{target}"\n')
+    )
+    (installed / "examples").mkdir()
+    copied = installed / "examples" / "journey.py"
+    copied.write_bytes(script.read_bytes())
+    binding = candidate_driver["local_dependency_runtime_binding"](
+        package, [str(python)], tmp_path / "with-example"
+    )
+    assert binding["verified"] is True
+    assert MODULE["runtime_binding_matches"](binding, package)
+    copied.write_text('EXPECTED = "old"\n', encoding="utf-8")
+    stale = candidate_driver["local_dependency_runtime_binding"](
+        package, [str(python)], tmp_path / "stale-example"
+    )
+    assert stale["verified"] is False

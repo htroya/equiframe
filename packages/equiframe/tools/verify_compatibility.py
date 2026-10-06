@@ -238,24 +238,36 @@ def extract_sdist(sdist: Path, destination: Path, wheel_files: dict[str, dict[st
         .get("wheel", {})
         .get("force-include", {})
     )
-    if mapping:
-        if mapping != {"docs": "equiframe/docs"}:
-            raise ValueError("unsupported wheel force-include mapping")
-        handbook = source / "docs"
-        if handbook.is_symlink() or not handbook.is_dir():
-            raise ValueError("packaged handbook source is absent or linked")
-        documents = {}
-        for path in sorted(handbook.rglob("*")):
-            if path.is_symlink():
+    for original, destination_name in mapping.items():
+        if (original, destination_name) == ("docs", "equiframe/docs"):
+            directory = source / "docs"
+            if directory.is_symlink() or not directory.is_dir():
+                raise ValueError("packaged handbook source is absent or linked")
+            paths = sorted(directory.rglob("*"))
+            if any(path.is_symlink() for path in paths):
                 raise ValueError("packaged handbook cannot contain symlinks")
-            if path.is_file():
-                key = "equiframe/docs/" + path.relative_to(handbook).as_posix()
-                if key in found:
-                    raise ValueError("packaged handbook shadows runtime payload")
-                documents[key] = artifact_record(path)
-        if not documents:
-            raise ValueError("packaged handbook is empty")
-        found.update(documents)
+            included = [
+                (path, "equiframe/docs/" + path.relative_to(directory).as_posix())
+                for path in paths
+                if path.is_file()
+            ]
+            if not included:
+                raise ValueError("packaged handbook is empty")
+        elif (
+            original.startswith(("examples/journeys/", "examples/integrations/"))
+            and destination_name == "equiframe/" + original
+            and PurePosixPath(original).suffix in {".py", ".md", ".lock"}
+            and ".." not in PurePosixPath(original).parts
+        ):
+            included = [(source / original, destination_name)]
+        else:
+            raise ValueError("unsupported wheel force-include mapping")
+        for path, key in included:
+            if path.is_symlink() or not path.is_file():
+                raise ValueError("packaged handbook/example source is absent or linked")
+            if key in found:
+                raise ValueError("packaged handbook/examples shadow runtime payload")
+            found[key] = artifact_record(path)
     if found != wheel_files:
         raise ValueError("sdist runtime payload does not match the provided wheel")
     for required in ("pyproject.toml", "tests", "examples", "tools"):

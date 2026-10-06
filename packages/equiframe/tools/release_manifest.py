@@ -10,7 +10,7 @@ import subprocess
 import sys
 import tomllib
 from datetime import UTC, datetime
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -97,6 +97,63 @@ def local_dependency_names(package: Path) -> list[str]:
     return sorted(names)
 
 
+def included_runtime_sources(
+    repository: Path, dependency: Path, imports: set[str]
+) -> dict[str, dict[str, str]]:
+    """Bind explicitly packaged Python examples as strictly as src-layout modules.
+
+    Only Git-visible files and declarative in-package wheel mappings are supported.
+    No configuration callback or example code is executed to discover these bytes.
+    """
+    config = tomllib.loads((dependency / "pyproject.toml").read_text("utf-8"))
+    mappings = (
+        config.get("tool", {})
+        .get("hatch", {})
+        .get("build", {})
+        .get("targets", {})
+        .get("wheel", {})
+        .get("force-include", {})
+    )
+    result: dict[str, dict[str, str]] = {}
+    for source_name, destination_name in mappings.items():
+        destination = PurePosixPath(destination_name)
+        source_root = (dependency / source_name).resolve()
+        if (
+            not source_root.is_relative_to(dependency)
+            or destination.is_absolute()
+            or ".." in destination.parts
+            or not destination.parts
+            or destination.parts[0] not in imports
+        ):
+            raise SystemExit("local dependency wheel inclusion needs an in-package mapping")
+        relative = source_root.relative_to(repository).as_posix()
+        for name in git_output(
+            repository,
+            "ls-files",
+            "-z",
+            "--cached",
+            "--others",
+            "--exclude-standard",
+            "--",
+            ":(literal)" + relative,
+        ).split("\0"):
+            if not name:
+                continue
+            source = repository / name
+            if source.suffix not in {".py", ".pyi", ".so", ".pyd"}:
+                continue
+            installed = (
+                destination
+                if source_root.is_file()
+                else destination / source.relative_to(source_root)
+            )
+            key = PurePosixPath(*installed.parts[1:]).as_posix()
+            result.setdefault(installed.parts[0], {})[key] = hashlib.sha256(
+                source.read_bytes()
+            ).hexdigest()
+    return result
+
+
 def local_dependency_sources(package: Path) -> list[dict[str, Any]]:
     """Enumerate Git-visible runtime files, without executing configuration code.
 
@@ -137,6 +194,11 @@ def local_dependency_sources(package: Path) -> list[dict[str, Any]]:
             ).hexdigest()
         if not files:
             raise SystemExit("local dependency has no Git-visible src package files")
+        for name, included in included_runtime_sources(repository, dependency, set(files)).items():
+            for target, fingerprint in included.items():
+                if target in files[name] and files[name][target] != fingerprint:
+                    raise SystemExit("local dependency wheel mapping replaces src bytes")
+                files[name][target] = fingerprint
         dependencies.append(
             {
                 "distribution": re.sub(r"[-_.]+", "-", project["name"]).lower(),

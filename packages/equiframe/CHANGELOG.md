@@ -1,5 +1,29 @@
 # Post-roadmap review: correctness and reusable Python integrations
 
+## Private consolidation — 2026-10-06 (candidate still identified by commit/hash)
+
+- Reject implicit truth testing of operational outcomes/decisions/reports as
+  specified in `docs/outcome-gates.md`; replace optional-presence checks with
+  explicit `is not None` while preserving serialized fields and verdict rules
+- Move generic document byte I/O and captured physical metadata out of specialized
+  profile/migration modules, retaining identity aliases and historical encodings
+- Add a checked static dependency graph including relative imports and explicit
+  architectural ownership boundaries; retain documented lazy/type cycles
+- Add a progressive Spanish entry, small existing-API route and eight synthetic
+  installable journeys covering refactors, native migration, local ETL, finance,
+  telemetry, data science preparation, snapshots and portable review
+- Demonstrate a complete external SQLite producer through existing snapshot ports,
+  with one consistent owned read transaction and exact declared Arrow schemas
+- Add path-filtered automatic quick PR/push checks with existing fixed action
+  commits and read-only permissions; costly platform/candidate checks remain explicit
+- Add bounded engineering measurement tools; unchanged guarantees, no claimed
+  speedup, and missing resource observations remain visible
+
+No public publication, service deployment, license/visibility change, completed
+source-security assessment, human pilot or real service/DW acceptance is implied.
+Serialized formats, scientific methodology and private Alpha version remain intact.
+
+
 Private 0.11.1 candidate; identify this revision by commit and exact artifact
 hashes. Public release, licensing, platform qualification and adoption remain
 separate unresolved gates.

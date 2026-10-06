@@ -47,6 +47,16 @@ For absence checks use `result is not None`, and for a decision use
 `decision.accepted`. Do not use `result or fallback`, `any([result])`, or
 `if decision`. All three comparison states reject truth testing.
 
+### Operational outcomes also reject truth testing
+
+The [explicit outcome inventory](outcome-gates.md) extends this rule to operational
+results, checks, decisions and comparison reports. Replace optional-presence
+checks with `value is not None`; replace acceptance checks with the documented
+state/completeness/decision gate. Do not mechanically replace `if result` with
+`if result is not None` when the original intent was approval. Configuration,
+input data and bundle containers are not globally converted to boolean guards.
+Persisted fields, formats, readers and fingerprints remain unchanged.
+
 ### Complete does not mean accepted
 
 An invalid right-hand expected result may be `not_evaluable` with `complete=True`.
@@ -163,3 +173,18 @@ a later real change, including failures and assistance. Technical replays are
 not human acceptance. [Maintenance](maintenance.md) documents proposed priorities,
 minimal permitted reproductions, pending owners and critical false-equivalence
 containment, correction, safe recovery and consumer reconfirmation.
+
+## Shared primitives and installed learning routes
+
+The consolidation retains all current public names and their imports. Generic
+byte publication no longer depends on profile computation; physical captured-table
+validation no longer belongs to migration. Old private aliases remain identical.
+No serializer, schema version, newline or fingerprint was unified by this move.
+Existing historical fixtures remain immutable regression inputs.
+
+Start from [the Spanish introduction](inicio.md) or [API choice](choosing-api.md).
+The wheel now carries [A–H runnable journeys](journeys.md) and the complete
+[SQLite snapshot integration](sqlite-snapshots.md) as package resources, so their
+use need not depend on a checkout. These are synthetic engineering examples;
+they do not establish independent human adoption, domain/DW acceptance or a
+completed security assessment.

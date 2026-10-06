@@ -1,4 +1,20 @@
-"""Typed contracts and local native execution; import does not load engines/ML."""
+"""Semantic comparison and reviewable evidence, with optional native execution.
+
+Start small: ``diff(candidate, expected, keys=["id"])`` compares eager frames;
+``assert_equivalent(result)`` is the acceptance gate; ``comparison_report(result)``
+explains it with minimized data. Use ``compare`` for already captured artifacts
+and an explicit contract. Inspect ``read_diff_contract(result)`` for the policy.
+
+Advanced entry points remain separate: ``capture_duckdb`` captures trusted SQL;
+``execute`` runs registered native code; ``migrate`` compares supported native
+plans; ``verify`` checks outputs against a declared expected; ``ingest_file`` and
+``run_workflow`` compose local ETL. ``SnapshotDataSource`` accepts injected clients.
+
+An execution being completed, two outputs being equivalent, and matching an
+independent expected are distinct claims. Never use ``bool(result)`` for approval.
+The installed handbook starts at ``equiframe/docs/inicio.md`` (Spanish) or
+``equiframe/docs/index.md`` (English). Import does not load optional engines/ML.
+"""
 
 from equiframe._diff_capture import DiffCaptureOptions
 from equiframe.adapters import DuckDBAdapter, PandasAdapter, PolarsAdapter

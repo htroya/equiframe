@@ -52,6 +52,15 @@ The snapshot manifest retains its historical ASCII-escaped canonical JSON and
 fingerprint algorithm. Do not substitute contract canonicalization, rename fields,
 normalize strings or rewrite older evidence to make an integration fit.
 
+## A complete external SQLite producer
+
+The [SQLite snapshot integration](sqlite-snapshots.md) implements this same port
+outside core with a native owned read transaction, explicit Arrow schemas and
+immutable detached bytes. Its executable examples and tests demonstrate a fixed
+multi-table snapshot during a committed WAL update, exact Decimal/NULL, explicit
+differences and failed byte/schema validation. It is a local reference adapter,
+not a claim of portable isolation semantics across arbitrary DB-API drivers.
+
 ## Choose an extension port
 
 | Boundary | Implement or register | Responsibility |
