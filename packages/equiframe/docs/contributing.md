@@ -119,3 +119,12 @@ local wheel does not publish, reserve a project name or approve licensing.
 Do not upload to PyPI, deploy a service, grant sharing access or activate a remote
 release flow without the specific authorization and completed gates in
 [releasing.md](releasing.md).
+
+## Adoption and maintenance evidence
+
+The [adoption record checker](adoption.md#check-the-structured-record-locally)
+is a developer-only sdist tool. Its exit 0 establishes input consistency, never
+consent, human independence or adoption. Keep the example registry empty and
+real observations outside Git. The [maintenance process](maintenance.md) requires
+minimal permitted reproductions and separate technical/consumer confirmation;
+nominal owners, backups and response commitments remain unapproved.

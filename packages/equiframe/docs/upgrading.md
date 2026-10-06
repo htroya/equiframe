@@ -127,3 +127,11 @@ safe reader/environment is available, retain the evidence and suspend acceptance
 Only the owner can authorize public release/withdrawal decisions; see
 [release procedure](releasing.md). Public release remains pending STEP10, global
 review, license/name decisions and explicit approval.
+
+## Retained use and incident follow-through
+
+Use the [adoption protocol](adoption.md) to record whether an integration survives
+a later real change, including failures and assistance. Technical replays are
+not human acceptance. [Maintenance](maintenance.md) documents proposed priorities,
+minimal permitted reproductions, pending owners and critical false-equivalence
+containment, correction, safe recovery and consumer reconfirmation.

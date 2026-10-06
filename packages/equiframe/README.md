@@ -21,6 +21,9 @@ production certification or accepted real-DW integration is claimed.
 See [release/rollback](docs/releasing.md), [security](docs/security.md) and
 [dependency inventory](docs/dependencies.md). Those gates are separate from
 successful build/install checks.
+[Adoption](docs/adoption.md) and [maintenance](docs/maintenance.md) explain
+consented real-project observations, repeat use, minimal incident reports and
+pending ownership decisions.
 
 ## Install and try it outside a checkout
 

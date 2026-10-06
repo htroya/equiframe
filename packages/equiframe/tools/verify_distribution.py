@@ -1,6 +1,8 @@
 """Verify built wheel/sdist using a clean runtime-only locked environment."""
 
 import argparse
+import hashlib
+import json
 import os
 import shutil
 import subprocess
@@ -439,7 +441,8 @@ assert Path(equiframe.__file__).with_name('py.typed').is_file()
 from importlib.resources import files
 handbook = files('equiframe').joinpath('docs')
 for title in ('index','quickstart','recipes','api','semantics','compatibility',
-              'performance','upgrading','contributing','security','releasing','dependencies'):
+              'performance','upgrading','contributing','security','releasing','dependencies',
+              'adoption','maintenance'):
     assert handbook.joinpath(title + '.md').read_text(encoding='utf-8').strip()
 assert equiframe.__version__ == importlib.metadata.version('equiframe') == sys.argv[1]
 for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy', 'pyarrow',
@@ -572,6 +575,13 @@ print('Installed wheel API roundtrips all five fixtures exactly')
             "docs/security.md",
             "docs/releasing.md",
             "docs/dependencies.md",
+            "docs/adoption.md",
+            "docs/maintenance.md",
+            "tools/check_adoption.py",
+            "examples/adoption/empty-registry.json",
+            "examples/adoption_replay.py",
+            "tests/test_adoption_records.py",
+            "tests/test_adoption_replay.py",
             "tools/build_first_use_kit.py",
             "tools/verify_first_use.py",
             "examples/first_use/README.md",
@@ -632,6 +642,53 @@ assert Path(equiframe.__file__).resolve().is_relative_to(Path(sys.prefix).resolv
             env=source_env,
         )
         run([str(source_python), "-I", "-m", "pytest", "-q"], cwd=source, env=source_env)
+        checker = source / "tools" / "check_adoption.py"
+        adoption = subprocess.run(
+            [
+                str(python),
+                "-I",
+                str(checker),
+                str(source / "examples/adoption/empty-registry.json"),
+            ],
+            cwd=work,
+            env=env,
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+        empty_summary = json.loads(adoption.stdout)
+        if (
+            empty_summary["human_attempts"] != 0
+            or empty_summary["human_adoption_verified"] is not False
+            or empty_summary["integration_seconds_total"] is not None
+        ):
+            raise RuntimeError("empty adoption registry must not fabricate human evidence")
+        replay_output = work / "adoption-replay"
+        run(
+            [
+                str(source_python),
+                "-I",
+                str(source / "examples/adoption_replay.py"),
+                "--output",
+                str(replay_output),
+                "--wheel-sha256",
+                hashlib.sha256(wheel.read_bytes()).hexdigest(),
+            ],
+            cwd=work,
+            env=source_env,
+        )
+        replay = json.loads((replay_output / "receipt.json").read_text("utf-8"))
+        if (
+            replay["technical_pass"] is not True
+            or len(replay["observations"]) != 24
+            or replay["human_adoption"] is not False
+            or replay["production_ci_job"] is not False
+        ):
+            raise RuntimeError(
+                "installed repeat replay did not establish the scoped technical checks"
+            )
+        print("Installed adoption tools: empty human record; 24 synthetic repeat checks")
+
         consumer = work / "typed_consumer.py"
         consumer.write_text(
             "from pathlib import Path\n"

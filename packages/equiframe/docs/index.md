@@ -43,6 +43,8 @@ redistribution rights. See [release and rollback](releasing.md) and
 9. [Dependency inventory](dependencies.md), [security](security.md) and
    [release process](releasing.md): artifact identity, supply-chain evidence,
    disclosure and unresolved owner decisions
+10. [Adoption](adoption.md) and [maintenance](maintenance.md): consented real-project
+    observations, later-change retention, useful issue reports and critical trust incidents
 
 ## Reading this handbook without the repository
 

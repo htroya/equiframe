@@ -1,3 +1,23 @@
+# STEP10 candidate: adoption records and sustainable maintenance
+
+Private 0.11.1 candidate, identified by exact commit and artifact hashes.
+
+- Add a strict local developer-only pilot-record checker and honest empty
+  registry. Distinguish synthetic replays, consented human attestations,
+  later-change retention, unknown effort and critical incident evidence
+- Add a standalone synthetic repeat-use replay for Python refactor,
+  SQL/DuckDB and CI-style assertions, with exact contracts and independent
+  literal expectations. Technical repetition does not establish human adoption
+- Package adoption and maintenance guidance; provide minimal issue templates,
+  pending owner/backup roles, proposed priorities and false-equivalence response
+- Keep runtime APIs, comparison semantics, historical schemas and dependency
+  ranges unchanged. First-use kit v1 retains its closed inventory
+
+No real pilots, human five-minute result, nominal maintenance assignment, SLA,
+new engine, completed security assessment or public publication is claimed.
+The source-security assessment and retained advisory triage remain unresolved;
+public release stays closed pending owner decisions and the global review.
+
 # STEP9 candidate: distribution, English handbook and release controls
 
 Private 0.11.1 candidate, identified by source commit and artifact hashes.

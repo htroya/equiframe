@@ -36,6 +36,9 @@ The kit currently targets **Python 3.12**. The package admits **3.12 and 3.13**;
 that metadata is not universal platform validation. Do not obtain this candidate
 by installing an unrelated package called `equiframe` from an arbitrary index.
 The five-minute diagnosis target and independent human adoption remain pending.
+Use the [adoption protocol](packages/equiframe/docs/adoption.md) to record consented real use and
+the [maintenance process](packages/equiframe/docs/maintenance.md) for minimal reproductions,
+critical trust incidents and ownership decisions.
 
 ## A small comparison
 
