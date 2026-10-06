@@ -8,6 +8,7 @@ until an external case receipt supplies a matching, artifact-bound observation.
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import importlib
 import importlib.metadata
@@ -54,8 +55,53 @@ def encoded(value: Any) -> Any:
     return {"repr": re.sub(r" at 0x[0-9a-fA-F]+", "", repr(value))}
 
 
+def syntactic_values(annotation: str) -> list[Any]:
+    """Read finite alternatives from an unresolved annotation without importing engines."""
+    try:
+        expression = ast.parse(annotation, mode="eval").body
+    except SyntaxError:
+        return []
+
+    def walk(node: ast.AST) -> list[Any]:
+        if isinstance(node, ast.Name) and node.id == "bool":
+            return [False, True]
+        if isinstance(node, ast.Constant) and node.value is None:
+            return [None]
+        if isinstance(node, ast.BinOp) and isinstance(node.op, ast.BitOr):
+            return walk(node.left) + walk(node.right)
+        if isinstance(node, ast.Subscript):
+            name = (
+                node.value.id
+                if isinstance(node.value, ast.Name)
+                else (node.value.attr if isinstance(node.value, ast.Attribute) else "")
+            )
+            parts = node.slice.elts if isinstance(node.slice, ast.Tuple) else [node.slice]
+            if name == "Literal":
+                return [
+                    part.value
+                    for part in parts
+                    if isinstance(part, ast.Constant)
+                    and (part.value is None or isinstance(part.value, str | int | bool))
+                ]
+            if name == "Annotated":
+                return walk(parts[0])
+            if name == "Optional":
+                return [*walk(parts[0]), None]
+            if name == "Union":
+                return [value for part in parts for value in walk(part)]
+        return []
+
+    values: list[Any] = []
+    for value in walk(expression):
+        if not any(type(value) is type(old) and value == old for old in values):
+            values.append(value)
+    return values
+
+
 def finite_values(annotation: Any) -> list[Any]:
     """Direct Literal/Enum/bool/None alternatives, not collection-member values."""
+    if isinstance(annotation, str):
+        return syntactic_values(annotation)
     if annotation is bool:
         return [False, True]
     if annotation is type(None):
@@ -195,22 +241,40 @@ def _signature(value: Any, name: str) -> list[dict[str, Any]]:
         signature = inspect.signature(value)
     except (TypeError, ValueError):
         return []
-    try:
-        from typing import get_type_hints
+    from typing import get_type_hints
 
-        annotations = get_type_hints(value)
-    except (TypeError, NameError):
-        annotations = {}
-    return [
-        option_record(
-            "parameter:" + name + ":" + parameter.name,
-            annotations.get(parameter.name, parameter.annotation),
-            parameter.default,
-            parameter_kind=parameter.kind.name,
+    module = sys.modules.get(getattr(value, "__module__", ""))
+    namespace = dict(vars(module)) if module is not None else {}
+    # TYPE_CHECKING-only references to owned public ports are still inspectable
+    # without importing optional engines. Do not replace the defining globals.
+    for package_name in ("equiframe", "equiframe_benchmark"):
+        package = sys.modules.get(package_name)
+        if package is not None:
+            for public_name in getattr(package, "__all__", ()):
+                namespace.setdefault(public_name, getattr(package, public_name))
+    records = []
+    for parameter in signature.parameters.values():
+        if parameter.name in {"self", "cls"}:
+            continue
+        annotation = parameter.annotation
+        resolution_error = None
+        if annotation is not inspect.Parameter.empty:
+            holder = type("_OwnedAnnotation", (), {"__annotations__": {"value": annotation}})
+            try:
+                annotation = get_type_hints(holder, globalns=namespace)["value"]
+            except (TypeError, NameError) as error:
+                resolution_error = type(error).__name__
+        records.append(
+            option_record(
+                "parameter:" + name + ":" + parameter.name,
+                annotation,
+                parameter.default,
+                parameter_kind=parameter.kind.name,
+                annotation_resolution="unresolved" if resolution_error else "resolved",
+                annotation_resolution_error=resolution_error,
+            )
         )
-        for parameter in signature.parameters.values()
-        if parameter.name not in {"self", "cls"}
-    ]
+    return records
 
 
 def inspect_exports(module: ModuleType, known: dict[int, str]) -> list[dict[str, Any]]:
@@ -244,7 +308,11 @@ def inspect_exports(module: ModuleType, known: dict[int, str]) -> list[dict[str,
             "alias_of": alias,
             "implementation_module": getattr(value, "__module__", None),
             "qualname": getattr(value, "__qualname__", None),
-            "parameters": _signature(value, name) if callable(value) else [],
+            "parameters": (
+                _signature(value, name)
+                if kind in {"function", "class", "model", "exception"}
+                else []
+            ),
             "finite_values": [encoded(item) for item in finite_values(value)],
         }
         try:
@@ -306,7 +374,10 @@ def inspect_exports(module: ModuleType, known: dict[int, str]) -> list[dict[str,
                         "return_annotation": _annotation(output_type),
                         "finite_values": finite_values(output_type),
                         "output_classes": (
-                            ["valid declared output", "incomplete or unavailable output"]
+                            [
+                                "valid declared output",
+                                "incomplete or unavailable output",
+                            ]
                             if open_domain(output_type)
                             else []
                         ),
@@ -481,11 +552,17 @@ def obligations(inventory: dict[str, Any]) -> list[dict[str, Any]]:
                 {"surface_kind": "computed_property", "read_only_output": True},
             )
             for value in property_record["finite_values"]:
-                add(property_record["id"] + ":value:" + _key(value), {"observed_output": value})
+                add(
+                    property_record["id"] + ":value:" + _key(value),
+                    {"observed_output": value},
+                )
             for index, output_class in enumerate(property_record["output_classes"]):
                 add(property_record["id"] + ":class:" + str(index), output_class)
         for method in record.get("methods", []):
-            add("method:" + record["name"] + "." + method["name"], "declared public method")
+            add(
+                "method:" + record["name"] + "." + method["name"],
+                "declared public method",
+            )
             for option in method["parameters"]:
                 add_option(option)
     for command in inventory["cli"]:
@@ -601,7 +678,12 @@ def main() -> int:
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("x", encoding="utf-8") as stream:
             json.dump(
-                document, stream, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False
+                document,
+                stream,
+                ensure_ascii=False,
+                sort_keys=True,
+                indent=2,
+                allow_nan=False,
             )
             stream.write("\n")
     print(json.dumps(inventory["denominators"], sort_keys=True))

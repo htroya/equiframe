@@ -4,7 +4,7 @@ import importlib.util
 import inspect
 from pathlib import Path
 from types import ModuleType
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Protocol
 
 import pytest
 from pydantic import BaseModel, Field
@@ -166,3 +166,66 @@ def test_computed_outcome_properties_are_outputs_without_invented_defaults():
     assert not any(
         identifier.startswith("property:") and identifier.endswith(":default") for identifier in ids
     )
+
+
+def test_one_unresolved_annotation_does_not_hide_other_parameter_options():
+    def sample(context=None, flag: bool = False, mode: Literal["a", "b"] = "a"):
+        return context, flag, mode
+
+    sample.__annotations__["context"] = "MissingPort | None"
+    rows = {p["id"].split(":")[-1]: p for p in inventory._signature(sample, "sample")}
+    assert rows["context"]["annotation_resolution"] == "unresolved"
+    assert rows["context"]["finite_values"] == [None]
+    assert rows["flag"]["finite_values"] == [False, True]
+    assert rows["mode"]["finite_values"] == ["a", "b"]
+
+
+def test_owned_type_checking_port_resolves_without_optional_engine_imports():
+    import equiframe as ef
+
+    rows = {
+        p["id"].split(":")[-1]: p
+        for p in inventory._signature(ef.ingest_file, "equiframe.ingest_file")
+    }
+    assert rows["context"]["finite_values"] == [None]
+    assert rows["context"]["annotation_resolution"] == "resolved"
+    assert rows["batch_rows"]["annotation"] == "<class 'int'>"
+    assert rows["batch_rows"]["default"] == 4096
+
+
+@pytest.mark.parametrize(
+    "annotation,expected",
+    [
+        ("pa.Table | None", [None]),
+        ("bool | MissingPort", [False, True]),
+        ("Literal['a','b'] | MissingPort | None", ["a", "b", None]),
+        ("tuple[Literal['a','b'], ...]", []),
+    ],
+)
+def test_unresolved_native_types_keep_syntactic_finite_alternatives(annotation, expected):
+    assert inventory.finite_values(annotation) == expected
+
+
+def test_declarative_aliases_and_protocols_do_not_invent_constructor_options():
+    class Port(Protocol):
+        def read(self, name: str) -> str: ...
+
+    exported = ModuleType("fixture")
+    exported.__all__ = ["State", "Port"]
+    exported.State = Literal["good", "bad"]
+    exported.Port = Port
+    records = inventory.inspect_exports(exported, {})
+    assert all(record["parameters"] == [] for record in records)
+    assert next(record for record in records if record["name"] == "fixture.Port")["methods"]
+    rows = inventory.obligations(
+        {
+            "environment": {},
+            "commit": "a" * 40,
+            "wheel_sha256": "b" * 64,
+            "exports": records,
+            "cli": [],
+            "distributions": [],
+        }
+    )
+    assert not any(":args:" in row["id"] or ":kwargs:" in row["id"] for row in rows)
+    assert any(row["id"] == 'api:fixture.State:value:"good"' for row in rows)
