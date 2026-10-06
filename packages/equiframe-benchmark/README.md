@@ -1,4 +1,4 @@
-# EquiFrame Benchmark 0.12.0a1
+# EquiFrame Benchmark 0.12.0a2
 
 **Experimental evaluation, reproducible evidence and bounded engineering costs.**
 
@@ -10,8 +10,8 @@ detector features.
 
 ## Candidate and release status
 
-This is the **private Alpha candidate 0.12.0a1**, requiring exactly
-`equiframe[arrow]==0.12.0a1`, with Python `>=3.12,<3.14`. Version strings alone do
+This is the **private Alpha candidate 0.12.0a2**, requiring exactly
+`equiframe[arrow]==0.12.0a2`, with Python `>=3.12,<3.14`. Version strings alone do
 not identify private builds: verify the commit and SHA-256 of both wheels/sdists
 against their separate trusted receipt. The team's packages are **not publicly
 released on PyPI**; do not resolve an unrelated project by name from an arbitrary
@@ -46,8 +46,8 @@ In a fresh directory outside the repository, using a POSIX shell:
 ```bash
 python3.12 -m venv .venv
 . .venv/bin/activate
-CORE=/absolute/path/equiframe-0.12.0a1-py3-none-any.whl
-BENCH=/absolute/path/equiframe_benchmark-0.12.0a1-py3-none-any.whl
+CORE=/absolute/path/equiframe-0.12.0a2-py3-none-any.whl
+BENCH=/absolute/path/equiframe_benchmark-0.12.0a2-py3-none-any.whl
 WHEELHOUSE=/absolute/path/reviewed-wheelhouse
 python -m pip install --no-index --find-links "$WHEELHOUSE" "${CORE}[engines]" "${BENCH}[resources]"
 python -m pip check

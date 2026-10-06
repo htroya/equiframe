@@ -8,7 +8,8 @@ from collections import Counter
 from decimal import Decimal
 from typing import TYPE_CHECKING, Annotated, Literal, Self
 
-from pydantic import Field, model_validator
+from equiframe._base import strict_bool_literal
+from pydantic import BeforeValidator, Field, model_validator
 
 from equiframe_benchmark.models import Document, Text
 
@@ -78,7 +79,9 @@ class AwardReconciliationResult(Document):
     expected_rows: Annotated[int, Field(ge=0)]
     observed_rows: Annotated[int, Field(ge=0)]
     observed_missing_currencies: Annotated[int, Field(ge=0)] | None = None
-    scientific_label_confirmed: Literal[False] = False
+    scientific_label_confirmed: Annotated[Literal[False], BeforeValidator(strict_bool_literal)] = (
+        False
+    )
 
     @property
     def complete(self) -> bool:

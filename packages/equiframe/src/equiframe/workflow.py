@@ -6,12 +6,12 @@ import time
 from collections.abc import Mapping
 from dataclasses import replace
 from pathlib import Path
-from typing import Literal, Self
+from typing import Annotated, Literal, Self
 from uuid import uuid4
 
-from pydantic import Field, model_validator
+from pydantic import BeforeValidator, Field, model_validator
 
-from equiframe._base import FrozenModel, Identifier, Text, _ExplicitOutcome
+from equiframe._base import FrozenModel, Identifier, Text, _ExplicitOutcome, strict_bool_literal
 from equiframe.errors import ArtifactIntegrityError, ResourceLimitError
 from equiframe.evidence import inventory, load_json, publish_json, verify_files
 from equiframe.execution import CancellationToken, RunContext
@@ -53,7 +53,7 @@ class WorkflowSpec(FrozenModel):
     workflow_id: Identifier
     stages: tuple[WorkflowStage, ...] = Field(min_length=1, max_length=128)
     failure_policy: Literal["skip_dependents"] = "skip_dependents"
-    resume: Literal[False] = False
+    resume: Annotated[Literal[False], BeforeValidator(strict_bool_literal)] = False
     timeout_seconds: float | None = Field(default=None, gt=0)
 
     @model_validator(mode="after")

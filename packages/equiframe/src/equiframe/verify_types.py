@@ -5,9 +5,16 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal, Self
 
-from pydantic import Field, model_validator
+from pydantic import BeforeValidator, Field, model_validator
 
-from equiframe._base import FrozenModel, Identifier, NonNegativeInt, Text, _ExplicitOutcome
+from equiframe._base import (
+    FrozenModel,
+    Identifier,
+    NonNegativeInt,
+    Text,
+    _ExplicitOutcome,
+    strict_bool_literal,
+)
 from equiframe.comparison_types import ComparisonOptions, ComparisonPolicy, ComparisonResult
 from equiframe.contracts import Contract
 from equiframe.execution_types import ExecutionResult
@@ -76,7 +83,7 @@ class VerificationReview(FrozenModel):
     label: Literal["normal", "divergent", "not_evaluable"]
     reason: Text
     recorded_at: Text
-    blind_attestation: Literal[True]
+    blind_attestation: Annotated[Literal[True], BeforeValidator(strict_bool_literal)]
 
     @model_validator(mode="after")
     def date(self) -> Self:

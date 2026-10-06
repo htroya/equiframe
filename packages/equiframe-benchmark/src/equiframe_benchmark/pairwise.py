@@ -12,7 +12,8 @@ from itertools import combinations
 from typing import Annotated, Literal, Self
 
 from equiframe import Family
-from pydantic import Field, model_validator
+from equiframe._base import strict_bool_literal
+from pydantic import BeforeValidator, Field, model_validator
 
 from equiframe_benchmark.evaluation import (
     METHODS,
@@ -104,7 +105,7 @@ class PairwiseReport(Document):
     """Self-contained supplementary report recalculated on JSON/model validation."""
 
     analysis_role: Literal["supplementary_descriptive"] = "supplementary_descriptive"
-    scientific: Literal[False] = False
+    scientific: Annotated[Literal[False], BeforeValidator(strict_bool_literal)] = False
     evaluation_sha256: Digest
     protocol_sha256: Digest
     analysis_policy_sha256: Digest

@@ -7,9 +7,11 @@ Use runtime validation and a measured conformity receipt for those questions.
 
 from __future__ import annotations
 
-from typing import Literal, cast
+from typing import Annotated, Literal, cast
 
-from equiframe._base import FrozenModel, Text
+from pydantic import BeforeValidator
+
+from equiframe._base import FrozenModel, Text, strict_bool_literal, strict_int_literal
 from equiframe._stability_inventory import (
     CLI_INVENTORY,
     EXPERIMENTAL_API,
@@ -24,10 +26,10 @@ class CompatibilityPolicy(FrozenModel):
     """Prospective policy, effective at the STEP6 candidate; not release history."""
 
     policy_version: Literal["1.0"] = "1.0"
-    stable_notice_minor_releases: Literal[2] = 2
-    stable_notice_days: Literal[90] = 90
+    stable_notice_minor_releases: Annotated[Literal[2], BeforeValidator(strict_int_literal)] = 2
+    stable_notice_days: Annotated[Literal[90], BeforeValidator(strict_int_literal)] = 90
     notice_threshold: Literal["both"] = "both"
-    applies_during_zero_major: Literal[True] = True
+    applies_during_zero_major: Annotated[Literal[True], BeforeValidator(strict_bool_literal)] = True
     notices: tuple[Text, ...] = (
         "CHANGELOG entry with affected surfaces, replacement and migration example",
         "DeprecationWarning at the deprecated Python entry point, when callable",

@@ -14,8 +14,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Literal, Protocol, Self
 from uuid import uuid4
 
-from pydantic import Field, StringConstraints, TypeAdapter, model_validator
+from pydantic import BeforeValidator, Field, StringConstraints, TypeAdapter, model_validator
 
+from equiframe._base import strict_bool_literal
 from equiframe._documents import (
     Document,
     Evidence,
@@ -74,7 +75,7 @@ class SnapshotManifest(Document):
     provenance: Annotated[tuple[Text, ...], Field(min_length=1)]
     tables: Annotated[tuple[SnapshotTable, ...], Field(min_length=1)]
     state: Literal["published"] = "published"
-    immutable: Literal[True] = True
+    immutable: Annotated[Literal[True], BeforeValidator(strict_bool_literal)] = True
 
     @model_validator(mode="after")
     def pinned_identity(self) -> Self:

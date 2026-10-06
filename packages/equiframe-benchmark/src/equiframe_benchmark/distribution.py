@@ -18,7 +18,8 @@ from typing import Annotated, Literal, Self
 from urllib.parse import urlsplit
 from zipfile import ZipFile, ZipInfo
 
-from pydantic import Field, model_validator
+from equiframe._base import strict_bool_literal
+from pydantic import BeforeValidator, Field, model_validator
 
 from equiframe_benchmark.models import Digest, Document, Text
 
@@ -231,11 +232,11 @@ class DistributionReadiness(Document):
     wheel: WheelDistributionMetadata | None
     name_check: NameCheck
     pending_conditions: tuple[Text, ...]
-    source_available: Literal[True] = True
+    source_available: Annotated[Literal[True], BeforeValidator(strict_bool_literal)] = True
     wheel_metadata_verified: bool
     technical_inventory_complete: bool
-    build_install_verified: Literal[False] = False
-    publication_ready: Literal[False] = False
+    build_install_verified: Annotated[Literal[False], BeforeValidator(strict_bool_literal)] = False
+    publication_ready: Annotated[Literal[False], BeforeValidator(strict_bool_literal)] = False
 
     @model_validator(mode="after")
     def evidence(self) -> Self:

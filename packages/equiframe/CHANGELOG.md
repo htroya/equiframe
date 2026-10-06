@@ -1,3 +1,16 @@
+# Private installed-product alpha 0.12.0a2 — 2026-10-06
+
+- Reject numerically equal values of the wrong type in integer and boolean
+  `Literal` metadata, including Python/JSON input and revalidated copied or
+  constructed models. Field-local guards preserve valid JSON tuple decoding
+- Keep valid historical encodings and admitted producer identities, while using
+  a distinct candidate for corrected artifacts and installed validation
+- Preserve a1 receipts, including the independent probes that exposed the
+  coercion; passing older suites did not cover these wrong-type boundaries
+
+No scientific method, detector independence, data format or valid value changes.
+See `docs/upgrading.md` for the stricter rejection boundary.
+
 # Private installed-product alpha 0.12.0a1 — 2026-10-06
 
 - Give the new candidate a distinct version; retain exact prior 0.11.1 artifacts

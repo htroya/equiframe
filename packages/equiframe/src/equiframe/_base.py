@@ -67,3 +67,17 @@ def unique(values: tuple[str, ...], field: str) -> None:
         if value in seen:
             fail("duplicate_reference", "repeated reference: " + value, field, index)
         seen.add(value)
+
+
+def strict_int_literal(value: object) -> int:
+    """Preserve strict integer metadata before Literal's numeric equality lookup."""
+    if type(value) is not int:
+        raise PydanticCustomError("literal_type", "integer literals require an exact integer type")
+    return value
+
+
+def strict_bool_literal(value: object) -> bool:
+    """Do not normalize numeric 0/1 to a declared boolean literal."""
+    if type(value) is not bool:
+        raise PydanticCustomError("literal_type", "boolean literals require an exact boolean type")
+    return value

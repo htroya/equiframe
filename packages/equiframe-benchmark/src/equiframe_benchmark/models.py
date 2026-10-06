@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Annotated, Literal, Self
 
 from equiframe import ArtifactRef, ComparisonResult, ComparisonSpec, Family
+from equiframe._base import strict_bool_literal
 from equiframe._documents import (
     Digest as Digest,
 )
@@ -31,6 +32,7 @@ from equiframe.verify_types import (
     VerificationBinding,
 )
 from pydantic import (
+    BeforeValidator,
     Field,
     StringConstraints,
     model_validator,
@@ -139,7 +141,7 @@ class Review(Document):
     label: Label
     reason: Text
     recorded_at: Annotated[str, StringConstraints(pattern=r"^\d{4}-\d{2}-\d{2}T.*(?:Z|\+00:00)$")]
-    blind_attestation: Literal[True]
+    blind_attestation: Annotated[Literal[True], BeforeValidator(strict_bool_literal)]
 
     @model_validator(mode="after")
     def valid_date(self) -> Self:

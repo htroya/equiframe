@@ -8,6 +8,7 @@ from typing import Annotated, Literal, Self
 from uuid import uuid4
 
 import equiframe as ef
+from equiframe._base import strict_bool_literal
 from equiframe._comparison_io import snapshot as capture_snapshot
 from equiframe.comparison import ComparisonInput
 from equiframe.errors import ExecutionCancelled, ExecutionTimeout, ResourceLimitError
@@ -20,7 +21,7 @@ from equiframe.evidence import (
     verify_files,
 )
 from equiframe.local import local_path
-from pydantic import Field, model_validator
+from pydantic import BeforeValidator, Field, model_validator
 
 from equiframe_benchmark.models import Digest, Document, Text, digest
 from equiframe_benchmark.snapshot import (
@@ -160,7 +161,9 @@ class IntegrationResult(Document):
     input_reason: Text
     runs: tuple[IntegrationRun, ...]
     comparisons: tuple[IntegrationComparison, ...]
-    scientific_equivalence_confirmed: Literal[False] = False
+    scientific_equivalence_confirmed: Annotated[
+        Literal[False], BeforeValidator(strict_bool_literal)
+    ] = False
     evidence: tuple[ef.EvidenceFile, ...]
     event_count: Annotated[int, Field(ge=2)]
     event_head_sha256: Digest

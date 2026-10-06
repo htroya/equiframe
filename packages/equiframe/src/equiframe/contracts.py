@@ -4,9 +4,18 @@ import struct
 from datetime import UTC, date, datetime
 from typing import Annotated, Literal, Self
 
-from pydantic import Field, ValidationError, model_validator
+from pydantic import BeforeValidator, Field, ValidationError, model_validator
 
-from equiframe._base import FrozenModel, Identifier, NonNegativeInt, PositiveInt, Text, fail, unique
+from equiframe._base import (
+    FrozenModel,
+    Identifier,
+    NonNegativeInt,
+    PositiveInt,
+    Text,
+    fail,
+    strict_int_literal,
+    unique,
+)
 from equiframe._timezones import timezone
 from equiframe.values import (
     DateValue,
@@ -28,7 +37,7 @@ class BooleanType(FrozenModel):
 
 class IntegerType(FrozenModel):
     kind: Literal["integer"] = "integer"
-    bits: Literal[8, 16, 32, 64]
+    bits: Annotated[Literal[8, 16, 32, 64], BeforeValidator(strict_int_literal)]
     signed: bool
 
 
@@ -50,7 +59,7 @@ class DecimalType(FrozenModel):
 
 class FloatType(FrozenModel):
     kind: Literal["float"] = "float"
-    bits: Literal[32, 64]
+    bits: Annotated[Literal[32, 64], BeforeValidator(strict_int_literal)]
 
 
 class DateType(FrozenModel):

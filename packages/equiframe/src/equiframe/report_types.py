@@ -4,9 +4,15 @@ from __future__ import annotations
 
 from typing import Annotated, Literal, Self
 
-from pydantic import Field, model_validator
+from pydantic import BeforeValidator, Field, model_validator
 
-from equiframe._base import FrozenModel, NonNegativeInt, PositiveInt, _ExplicitOutcome
+from equiframe._base import (
+    FrozenModel,
+    NonNegativeInt,
+    PositiveInt,
+    _ExplicitOutcome,
+    strict_bool_literal,
+)
 from equiframe.comparison_types import ComparisonValue
 from equiframe.pipeline_types import EvidenceFile
 from equiframe.types import ComparisonState, Sha256
@@ -271,7 +277,7 @@ class ReportPublicationManifest(FrozenModel):
     """Last-written success receipt for a closed report export inventory."""
 
     schema_version: Literal["1.0"] = "1.0"
-    publication_complete: Literal[True] = True
+    publication_complete: Annotated[Literal[True], BeforeValidator(strict_bool_literal)] = True
     report_evidence: ReportEvidenceManifest
     files: tuple[EvidenceFile, ...]
 

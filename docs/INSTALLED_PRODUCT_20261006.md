@@ -6,7 +6,7 @@ This work starts from the freshly verified main commit
 `f288cc353e36c33c89c04e6dd132eb1d200510b4`, tree
 `7982eecdc6a3ab92436d3ed812c191a3429d878b`. The isolated work branch is
 `product/installed-consumer-20261006`. Both distributions use the new private
-alpha identity `0.12.0a1`; final receipts identify exact source and artifact bytes.
+alpha identity `0.12.0a2`; final receipts identify exact source and artifact bytes.
 The former 3,083 core / 561 benchmark / 16 root tests and twelve Linux cells are
 historical evidence, not results for this candidate.
 

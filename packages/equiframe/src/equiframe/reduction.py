@@ -7,7 +7,7 @@ from types import MappingProxyType
 from typing import Annotated, Literal, Self
 from uuid import uuid4
 
-from pydantic import Field, model_validator
+from pydantic import BeforeValidator, Field, model_validator
 
 from equiframe._base import (
     FrozenModel,
@@ -16,6 +16,7 @@ from equiframe._base import (
     PositiveInt,
     Text,
     _ExplicitOutcome,
+    strict_bool_literal,
 )
 from equiframe.evidence import (
     MAX_DOCUMENT_BYTES,
@@ -90,7 +91,7 @@ class ReductionResult(_ExplicitOutcome, FrozenModel):
     accepted_candidates: NonNegativeInt
     elapsed_seconds: Annotated[float, Field(ge=0)]
     minimality: Literal["one_minimal", "not_established"]
-    global_minimum_claimed: Literal[False] = False
+    global_minimum_claimed: Annotated[Literal[False], BeforeValidator(strict_bool_literal)] = False
     tables: tuple[ReducedTable, ...]
     evidence: tuple[EvidenceFile, ...]
 

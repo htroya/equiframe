@@ -205,3 +205,18 @@ Do not infer division/localization support from capture support: DuckDB rejects
 both native paths, and Polars rejects Decimal division and timestamp seconds.
 Check both compilers before migrating; a source test is not installed-wheel
 validation. These additions do not alter thesis families, partitions or R/M/B/H/O.
+
+
+## 0.12.0a2 strict numeric and boolean metadata literals
+
+Numeric/boolean `Literal` fields now require the exact declared Python value type.
+For example, `64.0` is rejected for an integer bit-width literal and `1` is rejected
+for a `Literal[True]` confirmation. This closes a reproduced coercion in both core
+and benchmark metadata, rather than changing valid value encodings or the
+scientific method. String-only literals retain their existing behavior.
+
+Use candidate 0.12.0a2 for new validation. The package producer register retains
+0.12.0a1 and older admitted identities for valid historical evidence; retaining
+an identity does not certify the correctness of every earlier input. Preserve
+a1 receipts separately and rerun affected cases against the new wheel. The new
+benchmark requires exactly `equiframe[arrow]==0.12.0a2`.

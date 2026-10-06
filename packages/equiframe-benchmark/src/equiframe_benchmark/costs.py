@@ -23,10 +23,11 @@ from typing import Annotated, Literal, Protocol, Self, cast
 from uuid import uuid4
 
 import equiframe as ef
+from equiframe._base import strict_int_literal
 from equiframe.evidence import inventory, verify_files
 from equiframe.local import local_path
 from equiframe.profile_types import profile_digest
-from pydantic import Field, model_validator
+from pydantic import BeforeValidator, Field, model_validator
 
 from equiframe_benchmark.io import load_document, save_document
 from equiframe_benchmark.models import Digest, Document, Text, digest
@@ -40,8 +41,8 @@ OperationState = Literal[
 
 
 class CostProtocol(Document):
-    warmups: Literal[1] = 1
-    repetitions: Literal[5] = 5
+    warmups: Annotated[Literal[1], BeforeValidator(strict_int_literal)] = 1
+    repetitions: Annotated[Literal[5], BeforeValidator(strict_int_literal)] = 5
     seed: Annotated[int, Field(ge=0, le=2**32 - 1)]
     sample_interval_seconds: Annotated[float, Field(ge=0.001, le=1)] = 0.01
     cache_policy: Text
@@ -216,7 +217,7 @@ class ArtifactVerification(Document):
 class CostObservation(Document):
     phase: Literal["warmup", "measurement"]
     repetition: Annotated[int, Field(ge=0, le=5)]
-    position: Literal[0, 1]
+    position: Annotated[Literal[0, 1], BeforeValidator(strict_int_literal)]
     method: Method
     state: OperationState
     profile_m: ProfileMCostResult | None

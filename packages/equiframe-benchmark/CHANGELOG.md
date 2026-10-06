@@ -1,3 +1,13 @@
+# Private installed-product alpha 0.12.0a2 — 2026-10-06
+
+- Require exactly `equiframe[arrow]==0.12.0a2` and retain admitted historical
+  producer identities in detector-bearing schemas
+- Reject wrong numeric types in fixed integer/boolean document metadata,
+  including cost repetitions and scientific-label confirmation; validation
+  does not convert numeric zero into an explicit false confirmation
+- Preserve valid historical bytes and scientific protocols; rerun installed
+  tests against distinct a2 artifacts rather than relabel a1 evidence
+
 # Private installed-product alpha 0.12.0a1 — 2026-10-06
 
 - Pin the exact matching `equiframe[arrow]==0.12.0a1` core and align engine/ML extras

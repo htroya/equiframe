@@ -2108,7 +2108,7 @@
       "additionalProperties": false,
       "properties": {
         "equiframe": {
-          "default": "0.12.0a1",
+          "default": "0.12.0a2",
           "enum": [
             "0.7.0",
             "0.8.0",
@@ -2117,7 +2117,8 @@
             "0.10.0",
             "0.11.0",
             "0.11.1",
-            "0.12.0a1"
+            "0.12.0a1",
+            "0.12.0a2"
           ],
           "title": "Equiframe",
           "type": "string"
