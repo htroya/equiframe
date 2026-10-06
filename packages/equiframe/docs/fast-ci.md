@@ -2,9 +2,11 @@
 
 [Handbook](index.md) · [Contributing](contributing.md) · [Performance](performance.md)
 
-The private repository has an automatic quick layer for relevant pull requests
-and pushes. It runs one Linux x86_64/Python 3.12 job. The existing platform matrix
-and identified release-candidate workflow remain manually requested operations.
+The quick selection runs locally without consuming GitHub Actions minutes.
+At the owner's request, its GitHub workflow now has only `workflow_dispatch`:
+pushes and pull requests do not start it. Explicitly dispatching it in GitHub
+still consumes Actions minutes and runs one Linux x86_64/Python 3.12 job.
+The existing platform matrix and release-candidate workflows remain manual.
 A workflow file is configuration, not evidence that a GitHub job has run. A quick
 pass does not establish full-suite, wheel/sdist, platform or release readiness.
 
@@ -55,22 +57,28 @@ workflow, ingestion, evidence, ML or experimental evaluation tests. Extend it wh
 a cheap regression guards a high-impact invariant, rather than duplicating tests
 or silently dropping failures. There is no claimed fixed wall-time guarantee.
 
-## Automatic workflow boundaries
+## Manual workflow boundaries
 
-`equiframe-quick.yml` filters changes to the two distributable packages, workflows,
-root tests/setup helper and project guidance/documentation. It has only
+`equiframe-quick.yml` has only an explicit `workflow_dispatch` event. There are no
+push, pull-request, scheduled or chained-workflow triggers. It has only
 `contents: read`, disables persisted checkout credentials, reuses the full commit
 pins already used by the manual workflows, and installs the locked environments.
-It uses `pull_request`, never `pull_request_target`. It does not reference secrets,
+It does not reference secrets,
 accept command inputs, upload private artifacts, build releases, deploy or publish.
 Concurrent runs for the same workflow/ref are cancelled in favor of the newer run;
 a cancelled run is not a successful check.
 
 The `.yml` file uses JSON syntax, which is valid YAML, so stdlib tests can parse
 its event/permission/step structure without adding a runtime or development YAML
-dependency. The root workflow contract tests also guard the manual-only expensive
-workflows. GitHub branch-protection settings are external and are not configured
+dependency. The root workflow contract tests guard the manual-only quick and expensive
+workflows, and verify that both packages' selected source tests exist. GitHub branch-protection settings are external and are not configured
 or claimed by this change.
+
+An earlier automatic run failed before any step executed; its failure remains
+visible and its startup cause is unverified. The manual-only policy does not
+turn that failure into a pass, disable tests or alter account/billing settings.
+No rerun or manual dispatch is implied by this guide. Local receipts identify
+what actually ran separately from the failed remote attempt.
 
 Before approving an identified candidate, run the complete checks in
 [Contributing](contributing.md): full tests, build, strict Twine, clean wheel/sdist

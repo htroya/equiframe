@@ -15,15 +15,20 @@ def driver():
 
 @pytest.mark.parametrize("package", ["core", "benchmark"])
 def test_fixed_selection_is_real_and_nonempty(driver, tmp_path, package):
-    root = Path(__file__).resolve().parents[3]
-    if not (root / ".github").is_dir():
-        pytest.skip("repository workflow contract is checked from the checkout")
+    # Planning is a pure operation and must also be testable from an sdist.
+    # Cross-package file existence is checked by root workflow contract tests.
+    root = tmp_path / "synthetic-repository"
     checks = driver["plan"](root, package, tmp_path)
     assert {"ruff", "format", "mypy", "generated", "semantic-smoke"} <= {x.name for x in checks}
     smoke = next(check for check in checks if check.name == "semantic-smoke")
     selected = [argument for argument in smoke.command if argument.startswith("tests/")]
     assert selected and len(selected) == len(set(selected))
-    assert all((smoke.directory / test).is_file() for test in selected)
+    expected_package = "equiframe" if package == "core" else "equiframe-benchmark"
+    assert smoke.directory == root / "packages" / expected_package
+    assert all(test.endswith(".py") for test in selected)
+    if package == "core":
+        package_root = Path(__file__).resolve().parents[1]
+        assert all((package_root / test).is_file() for test in selected)
     assert all("--basetemp=" + str(tmp_path / "pytest") in check.command for check in (smoke,))
     assert all("publish" not in argument for check in checks for argument in check.command)
 

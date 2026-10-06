@@ -2,6 +2,7 @@
 
 import json
 import re
+import runpy
 import unittest
 from pathlib import Path
 
@@ -72,6 +73,17 @@ class QuickWorkflowTests(unittest.TestCase):
         self.assertNotIn("secrets.", raw)
         self.assertNotIn("id-token", raw)
         self.assertNotIn("upload-artifact", raw)
+        driver = runpy.run_path(str(ROOT / "packages/equiframe/tools/quick_check.py"))
+        for package, selection in (
+            ("equiframe", driver["CORE_TESTS"]),
+            ("equiframe-benchmark", driver["BENCHMARK_TESTS"]),
+        ):
+            self.assertTrue(selection)
+            self.assertEqual(len(selection), len(set(selection)))
+            for filename in selection:
+                self.assertTrue(
+                    (ROOT / "packages" / package / "tests" / filename).is_file()
+                )
 
     def test_costly_workflows_remain_manual(self):
         for name in ("equiframe.yml", "release-candidate.yml"):

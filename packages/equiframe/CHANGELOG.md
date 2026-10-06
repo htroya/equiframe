@@ -14,8 +14,9 @@
   telemetry, data science preparation, snapshots and portable review
 - Demonstrate a complete external SQLite producer through existing snapshot ports,
   with one consistent owned read transaction and exact declared Arrow schemas
-- Add path-filtered automatic quick PR/push checks with existing fixed action
-  commits and read-only permissions; costly platform/candidate checks remain explicit
+- Add reusable local quick checks with fixed-action, read-only GitHub tooling;
+  the owner subsequently requested manual-only GitHub execution to avoid Actions
+  minutes. Quick, platform and candidate workflows require explicit dispatch
 - Add bounded engineering measurement tools; unchanged guarantees, no claimed
   speedup, and missing resource observations remain visible
 
