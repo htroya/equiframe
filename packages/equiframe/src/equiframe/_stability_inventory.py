@@ -415,12 +415,12 @@ SCHEMA_INVENTORY = (
     (
         "detector-bundle-1.0.schema.json",
         "experimental",
-        "b69af1ba24bdda2b1be7e7c29d7a0e8e100a71884b03f95b8703e30217ccda98",
+        "fa60cc17afe2da6899644bb4336573ec956be939d7dfb5d70899b985827fdae5",
     ),
     (
         "detector-fit-1.0.schema.json",
         "experimental",
-        "1493b6df943a0a77577199db7c918d0ef384e7d6fa579c4f35dc80e22bf16011",
+        "025134980f4338b8c3acd7b8c625fab5445d5f786c2dbe072bcc15e18d51bcf6",
     ),
     (
         "detector-score-result-1.0.schema.json",
@@ -625,7 +625,7 @@ SCHEMA_INVENTORY = (
     (
         "verification-result-1.0.schema.json",
         "stable",
-        "3b29c78a725ec7d5a94715d82b3137f9998512d5bbf0bcb19625722f8fe47839",
+        "65b5457c5feea88190016e843b780f2382edef7af1f3c8d100fb84de5f01d4b6",
     ),
     (
         "workflow-request-1.0.schema.json",
@@ -1039,9 +1039,9 @@ MODEL_SHAPES = {
     "Tolerance": "ba93db177a420d3f0c3bb6686d4a36c81f5990e1f5d2a4e30fd51b6b659065e3",
     "VerificationBinding": "849f8b77ca6eb9712143e164caf452a277809db6f51940cc636acf66ff449e4a",
     "VerificationCheck": "fa8d551a04706db4f402d866a112725f825567fedf31a3557181be2018e923cd",
-    "VerificationCoverage": "bf57ab0e878cdbe3383e3801af8e2d8f33266b27edb6eb1c25c87f017deee74c",
+    "VerificationCoverage": "362b3aef6c3cd874b9ac8e996a482b951895a247eeeeeeeaf50d7e94aef773b0",
     "VerificationRequest": "eb0fa1998062944180db55db805c993340736923ceaba5bbb630d2595e047180",
-    "VerificationResult": "3b29c78a725ec7d5a94715d82b3137f9998512d5bbf0bcb19625722f8fe47839",
+    "VerificationResult": "65b5457c5feea88190016e843b780f2382edef7af1f3c8d100fb84de5f01d4b6",
     "VerificationReview": "b4ef6bbf2ad01c67e7fcdf6af0ab8f97c27e9bd67c26645d924c0487c33a41a5",
     "VersionInfo": "d535207c7d621e9cd03ae8aefa82e3900d593bc02a36d91cd9413e8279e812d4",
 }

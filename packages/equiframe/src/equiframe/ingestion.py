@@ -484,7 +484,15 @@ def ingest_file(
             column_values.clear()
         buffered = 0
 
-    def accept(raw: object, root: object, ancestors: tuple[object, ...], location: str) -> bool:
+    def accept(
+        raw: object,
+        root: object,
+        ancestors: tuple[object, ...],
+        location: str,
+        *,
+        has_extra_fields: bool = False,
+        diagnostic: object = _MISSING,
+    ) -> bool:
         nonlocal count, accepted, buffered
         if context:
             context.check()
@@ -499,7 +507,7 @@ def ingest_file(
                 raise ValueError("record_object_required")
             if spec.extra_fields == "reject":
                 permitted = {f.path[0] for f in spec.fields if f.scope == "record"}
-                if set(raw) - permitted:
+                if has_extra_fields or set(raw) - permitted:
                     raise ValueError("new_or_extra_field")
             for field in spec.fields:
                 scope = raw if field.scope == "record" else root
@@ -525,7 +533,10 @@ def ingest_file(
         except (ValueError, TypeError, OverflowError) as error:
             quarantine.append(
                 QuarantinedRecord(
-                    record=index, path=location, original_text=_text(raw), code=str(error)
+                    record=index,
+                    path=location,
+                    original_text=_text(raw if diagnostic is _MISSING else diagnostic),
+                    code=str(error),
                 )
             )
             return spec.invalid_records == "quarantine"
@@ -571,15 +582,31 @@ def ingest_file(
                     if spec.extra_fields == "reject" and set(names) - permitted:
                         raise ValueError("new_or_extra_csv_header_field")
                     for csv_record in reader:
-                        if None in csv_record:
-                            csv_record = {**csv_record, "<surplus_fields>": csv_record[None]}
-                        else:
-                            csv_record = {
-                                name: value
-                                for name, value in csv_record.items()
-                                if value is not None
-                            }
-                        if not accept(csv_record, csv_record, (), f"$[{count}]"):
+                        surplus = csv_record.pop(None, _MISSING)
+                        diagnostic = _MISSING
+                        if surplus is not _MISSING:
+                            # Separate conversion values from diagnostic labels.
+                            # Retain legacy text where its labels cannot collide;
+                            # otherwise put real fields in their own namespace.
+                            if {"null", "<surplus_fields>"} & (set(csv_record) | permitted):
+                                diagnostic = {"fields": dict(csv_record), "surplus_fields": surplus}
+                            else:
+                                diagnostic = {
+                                    **csv_record,
+                                    None: surplus,
+                                    "<surplus_fields>": surplus,
+                                }
+                        csv_record = {
+                            name: value for name, value in csv_record.items() if value is not None
+                        }
+                        if not accept(
+                            csv_record,
+                            csv_record,
+                            (),
+                            f"$[{count}]",
+                            has_extra_fields=surplus is not _MISSING,
+                            diagnostic=diagnostic,
+                        ):
                             rejected = True
                             break
                 else:

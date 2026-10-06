@@ -1,3 +1,22 @@
+# Private installed-product alpha 0.12.0a3 — 2026-10-06
+
+- Reject zero-requested-output verification evidence at public model/read boundaries
+- Preserve failed captures with requested outputs but no inspected output as
+  non-publishable and incomplete; reject contradictory execution/snapshot, expected-output
+  and integrity claims instead of computing publication eligibility from them
+- Require passed integrity for complete verification and bound comparisons for
+  expected pass/fail decisions; reconstruct requested comparison counts and
+  coverage completeness from the retained result dimensions
+- Preserve original CSV values when diagnostic field names collide with input
+  headers; use a separate diagnostic wrapper only for colliding overflow records
+- Make public-option signature and CLI type displays reproducible across
+  processes by excluding process-local object addresses from audit descriptions
+- Keep a1/a2 artifacts and receipts historical; use a distinct candidate identity
+  and retain valid older producer identities without certifying malformed evidence
+
+No thesis method, detector independence or scientific protocol changes.
+See `docs/upgrading.md` for the stricter reader boundary and revalidation guidance.
+
 # Private installed-product alpha 0.12.0a2 — 2026-10-06
 
 - Reject numerically equal values of the wrong type in integer and boolean

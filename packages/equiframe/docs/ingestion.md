@@ -99,6 +99,27 @@ Existing calls and historical receipts need no migration.
   streaming. Existing file-based comparison readers have their own batch/spill
   support; see the [extension boundary](extending.md#arrowparquet-partitions-and-external-source-boundaries)
 
+## CSV headers and surplus cells
+
+Any unique, nonempty declared CSV header is legitimate, including names such as
+`<surplus_fields>` or `null`. Diagnostic labels never replace named source cells.
+Rows with additional cells follow `extra_fields`: `ignore` discards only the
+undeclared surplus cells before scalar conversion; `reject` records
+`new_or_extra_field` and follows the declared `invalid_records` policy.
+
+Scalar conversion and diagnostics use separate records. For non-colliding names,
+overflow diagnostics retain their historical `original_text` bytes, including
+the existing `null` and `<surplus_fields>` labels. If either label is an actual
+header or declared field path, the diagnostic instead uses the unambiguous
+`{"fields": {named source cells}, "surplus_fields": [extra cells]}` shape inside
+`original_text`. This wrapper is a narrow diagnostic difference for collision
+cases, not a new ingestion schema version; historical 1.0 receipts stay readable.
+No diagnostic labels can become the value of a declared missing field.
+
+Original source bytes, SHA-256, source size, logical record positions and
+conversion receipts for named fields are retained. Missing cells still follow
+their declared `missing` policy and never become surplus values.
+
 ## Rejection, quarantine and interruption
 
 `rejected` has no output reference, even if valid rows had already been flushed

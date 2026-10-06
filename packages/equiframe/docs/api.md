@@ -2,7 +2,7 @@
 
 [Handbook](index.md) · [Choose an API](choosing-api.md) · [Semantics](semantics.md) · [Compatibility](compatibility.md)
 
-Use `import equiframe as ef`. This reference describes the private 0.12.0a2
+Use `import equiframe as ef`. This reference describes the private 0.12.0a3
 candidate's implemented entry points. Signatures below use Python notation;
 `...` in a signature means the other documented optional arguments, not an
 executable example. The exhaustive exported namespace is `ef.__all__` and its
@@ -404,7 +404,7 @@ its helpers raise `UnsupportedBenchmarkError`; CLI exits 2 except help. Use the
 separate experimental package only within its documented scope.
 
 
-## Native IR additions in 0.12.0a2
+## Native IR additions in 0.12.0a3
 
 See the [executable contract reference](migration-ir.md) for `EquiJoin.cardinality`,
 right/full joins, `Deduplicate.keep="first"` and its deterministic `by`,

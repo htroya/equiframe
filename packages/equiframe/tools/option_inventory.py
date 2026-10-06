@@ -316,7 +316,7 @@ def inspect_exports(module: ModuleType, known: dict[int, str]) -> list[dict[str,
             "finite_values": [encoded(item) for item in finite_values(value)],
         }
         try:
-            record["signature"] = str(inspect.signature(value)) if callable(value) else None
+            record["signature"] = _annotation(inspect.signature(value)) if callable(value) else None
         except (TypeError, ValueError):
             record["signature"] = None
         try:
@@ -423,7 +423,7 @@ def inspect_cli(module_name: str, command_name: str) -> list[dict[str, Any]]:
                     "is_flag": getattr(parameter, "is_flag", False),
                     "multiple": parameter.multiple,
                     "nargs": parameter.nargs,
-                    "type": str(parameter.type),
+                    "type": _annotation(parameter.type),
                     "finite_values": [encoded(v) for v in values],
                     "min": getattr(parameter.type, "min", None),
                     "max": getattr(parameter.type, "max", None),

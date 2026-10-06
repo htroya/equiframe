@@ -215,8 +215,31 @@ for a `Literal[True]` confirmation. This closes a reproduced coercion in both co
 and benchmark metadata, rather than changing valid value encodings or the
 scientific method. String-only literals retain their existing behavior.
 
-Use candidate 0.12.0a2 for new validation. The package producer register retains
+Candidate 0.12.0a2 introduced these guards. Its producer register retained
 0.12.0a1 and older admitted identities for valid historical evidence; retaining
 an identity does not certify the correctness of every earlier input. Preserve
-a1 receipts separately and rerun affected cases against the new wheel. The new
-benchmark requires exactly `equiframe[arrow]==0.12.0a2`.
+a1 receipts separately and rerun affected cases against the new wheel. Its matching
+benchmark required exactly `equiframe[arrow]==0.12.0a2`.
+
+
+## 0.12.0a3 verification reader consistency
+
+Use 0.12.0a3 for new validation, with the benchmark pinned to the same core
+candidate. A verification must request at least one output. A failed capture
+may still have one requested output and zero inspected outputs; that remains
+non-publishable and incomplete rather than becoming a publishable empty result.
+
+Retained execution/snapshot mismatches must remain failed and incomplete. Readers
+reject expected pass/fail claims without a bound comparison and invalid integrity
+states.
+Complete verification requires passed integrity; requested comparison counts and
+coverage completeness must agree with the retained dimensions. These checks strengthen
+the existing acceptance boundary without changing scientific protocols or admitting
+partial, missing or contradictory evidence as success. They check consistency,
+not producer authentication.
+
+Valid historical producer identities, including 0.12.0a1 and 0.12.0a2, remain
+admitted. Admission is not a certification of malformed earlier documents.
+Preserve the original evidence and failed probes; do not rewrite old results or
+infer acceptance from old passing totals. Revalidate affected cases against the
+identified 0.12.0a3 wheel and preserve the new artifact-specific receipts.

@@ -3811,7 +3811,7 @@
           "type": "integer"
         },
         "outputs_requested": {
-          "minimum": 0,
+          "exclusiveMinimum": 0,
           "title": "Outputs Requested",
           "type": "integer"
         },

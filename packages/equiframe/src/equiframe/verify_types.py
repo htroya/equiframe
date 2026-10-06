@@ -11,6 +11,7 @@ from equiframe._base import (
     FrozenModel,
     Identifier,
     NonNegativeInt,
+    PositiveInt,
     Text,
     _ExplicitOutcome,
     strict_bool_literal,
@@ -142,7 +143,7 @@ class IndependentReviewEvidence(FrozenModel):
 
 class VerificationCoverage(FrozenModel):
     scope: Literal["complete_output_artifacts"] = "complete_output_artifacts"
-    outputs_requested: NonNegativeInt
+    outputs_requested: PositiveInt
     outputs_inspected: NonNegativeInt
     comparisons_requested: NonNegativeInt
     comparisons_completed: NonNegativeInt

@@ -129,6 +129,8 @@ def _review(
 
 def _validate_dimensions(result: VerificationResult) -> None:
     """Reconstruct decisions from bound component records, including pending O."""
+    if result.integrity.state not in ("passed", "failed", "not_evaluable"):
+        raise ValueError("verification integrity cannot be skipped or pending review")
     by_id = {c.comparison_id: c for c in result.comparisons}
     if len(by_id) != len(result.comparisons):
         raise ValueError("verification comparison identities must be unique")
@@ -144,6 +146,18 @@ def _validate_dimensions(result: VerificationResult) -> None:
             and (name not in refs or captured_execution.output.data.sha256 != refs[name].sha256)
         ):
             raise ValueError("captured execution contradicts verified contract or output")
+    snapshot_identity = sorted((name, ref.sha256) for name, ref in result.input_artifacts)
+    input_identity_mismatch = any(
+        sorted((table.name, table.data.sha256) for table in execution.inputs) != snapshot_identity
+        for execution in executions.values()
+    )
+    if input_identity_mismatch and (result.integrity.state != "failed" or result.coverage.complete):
+        raise ValueError(
+            "execution inputs differ from bound snapshots; failed integrity and "
+            "incomplete coverage must remain recorded"
+        )
+    if result.coverage.complete and result.integrity.state != "passed":
+        raise ValueError("complete verification requires passed integrity")
     for component in (*result.comparisons, *result.input_comparisons):
         if (
             component.spec.policy != result.comparison_policy
@@ -191,11 +205,13 @@ def _validate_dimensions(result: VerificationResult) -> None:
             ):
                 raise ValueError("expected comparison content identities differ")
             bound(c, check.output or "", None)
-        elif (
-            (result.expected_artifact is not None and check.output in refs)
-            or result.expected_required
-        ) and check.state != "not_evaluable":
-            raise ValueError("requested expected comparison cannot be skipped")
+        else:
+            if check.state not in ("not_requested", "not_evaluable"):
+                raise ValueError("expected outcome requires a bound comparison")
+            if (
+                result.expected_artifact is not None or result.expected_required
+            ) and check.state != "not_evaluable":
+                raise ValueError("requested expected comparison cannot be skipped")
     inspected = len(result.outputs)
     self_comparisons = result.comparisons[:inspected]
     if len(self_comparisons) != inspected:
@@ -310,11 +326,33 @@ def _validate_dimensions(result: VerificationResult) -> None:
     if result.independent_review != expected_review:
         raise ValueError("independent-review dimension contradicts declared evidence")
     completed = sum(c.complete for c in (*result.comparisons, *result.input_comparisons))
+    requested_outputs = result.coverage.outputs_requested
+    expected_requested = (
+        result.expected_artifact is not None
+        or result.expected_required
+        or any(check.state != "not_requested" for check in result.expected)
+    )
+    requested_comparisons = (
+        requested_outputs
+        + requested_outputs * (requested_outputs - 1) // 2
+        + len(result.input_artifacts)
+        + (requested_outputs if expected_requested else 0)
+    )
+    if result.coverage.comparisons_requested != requested_comparisons:
+        raise ValueError("coverage contradicts requested comparison dimensions")
     if (
         result.coverage.comparisons_completed != completed
         or result.coverage.outputs_inspected != inspected
     ):
         raise ValueError("coverage contradicts inspected component records")
+    complete = (
+        inspected == requested_outputs
+        and result.integrity.state == "passed"
+        and len(result.comparisons) + len(result.input_comparisons) == requested_comparisons
+        and all(c.complete for c in (*result.comparisons, *result.input_comparisons))
+    )
+    if result.coverage.complete != complete:
+        raise ValueError("coverage completeness contradicts retained verification evidence")
     if result.coverage.input_execution_evidence_available != (
         len(executions) == result.coverage.outputs_requested
     ):

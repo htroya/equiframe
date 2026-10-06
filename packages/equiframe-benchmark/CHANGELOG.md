@@ -1,3 +1,13 @@
+# Private installed-product alpha 0.12.0a3 — 2026-10-06
+
+- Require exactly `equiframe[arrow]==0.12.0a3`, including matching engine/ML extras
+- Carry the corrected core verification reader boundary and updated current
+  producer schemas while retaining admitted historical producer identities
+- Preserve prior a1/a2 artifacts and receipts; validate the new package pair
+  independently without relabelling earlier installation or scientific evidence
+
+No benchmark detector, label, partition or scientific protocol changes.
+
 # Private installed-product alpha 0.12.0a2 — 2026-10-06
 
 - Require exactly `equiframe[arrow]==0.12.0a2` and retain admitted historical

@@ -229,3 +229,29 @@ def test_declarative_aliases_and_protocols_do_not_invent_constructor_options():
     )
     assert not any(":args:" in row["id"] or ":kwargs:" in row["id"] for row in rows)
     assert any(row["id"] == 'api:fixture.State:value:"good"' for row in rows)
+
+
+def test_generated_signatures_omit_process_local_object_addresses():
+    from pydantic import AfterValidator
+
+    def keep(value):
+        return value
+
+    class WithValidator(BaseModel):
+        value: Annotated[str, AfterValidator(keep)]
+
+    module = ModuleType("fixture")
+    module.__all__ = ["WithValidator"]
+    module.WithValidator = WithValidator
+    record = inventory.inspect_exports(module, {})[0]
+    assert "AfterValidator" in record["signature"]
+    assert "keep" in record["signature"]
+    assert " at 0x" not in record["signature"]
+
+
+def test_repeated_cli_discovery_has_stable_type_displays():
+    first = inventory.inspect_cli("equiframe.cli", "equiframe")
+    second = inventory.inspect_cli("equiframe.cli", "equiframe")
+    assert first == second
+    assert any(p["type"] for c in first for p in c["parameters"])
+    assert all(" at 0x" not in p["type"] for c in first for p in c["parameters"])
