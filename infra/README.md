@@ -16,7 +16,7 @@ El núcleo de EquiFrame debe poder desarrollarse y probarse localmente sin esta 
 | Nombre | maestria-vnic |
 | Sistema operativo | Ubuntu 22.04.5 LTS |
 | Arquitectura | aarch64 (ARM) |
-| Python | 3.10.12 |
+| Python | 3.10.12 (sistema) / 3.12.15 (entorno venv312) |
 | RAM total | 11 GB |
 | RAM disponible | ~11 GB |
 | Disco total | 45 GB |
@@ -25,9 +25,9 @@ El núcleo de EquiFrame debe poder desarrollarse y probarse localmente sin esta 
 
 ### Entorno Python
 
-- Ruta del entorno virtual: `/home/ubuntu/venv`
-- Activar: `source ~/venv/bin/activate`
-- Paquetes instalados: `polars 1.44.2`, `duckdb 1.5.6`
+- Entorno Python 3.10: `/home/ubuntu/venv` — `source ~/venv/bin/activate`
+- Entorno Python 3.12: `/home/ubuntu/venv312` — `source ~/venv312/bin/activate` (recomendado)
+- Paquetes instalados en venv312: `polars 2.0.0`, `duckdb 1.5.6`
 
 ### Estructura de carpetas
 
@@ -61,6 +61,6 @@ el historial completo de intentos.
 
 ### Pendiente
 
-- Instalar Python 3.12 (actualmente 3.10.12)
+- ~~Instalar Python 3.12~~ ✓ instalado (3.12.15, entorno venv312)
 - Construir el archivo DuckDB del DW (`dw.duckdb`) en `/home/ubuntu/resultados/`
 - Configurar respaldo automático a `/home/ubuntu/respaldos/`
