@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import ast
 import json
+from importlib.util import resolve_name
 from pathlib import Path
 from typing import TypedDict
 
@@ -89,22 +90,35 @@ def cycles(nodes: set[str], edges: list[Edge], *, eager: bool) -> list[list[str]
 
 
 def inspect(root: Path) -> Report:
-    nodes: set[str] = set()
-    edges: list[Edge] = []
-    violations: list[str] = []
+    modules: dict[Path, str] = {}
     for path in sorted(root.rglob("*.py")):
         parts = path.relative_to(root).with_suffix("").parts
-        source = ".".join(("equiframe", *parts))
-        if source.endswith(".__init__"):
-            source = source.removesuffix(".__init__")
-        nodes.add(source)
+        module = ".".join(("equiframe", *parts)).removesuffix(".__init__")
+        modules[path] = module
+    nodes = set(modules.values())
+    edges: list[Edge] = []
+    violations: list[str] = []
+    for path, source in modules.items():
+        package = source if path.name == "__init__.py" else source.rpartition(".")[0]
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
             if not isinstance(node, (ast.Import, ast.ImportFrom)):
                 continue
             targets: list[tuple[str, list[str]]] = []
-            if isinstance(node, ast.ImportFrom) and node.module and not node.level:
-                targets = [(node.module, [alias.name for alias in node.names])]
+            if isinstance(node, ast.ImportFrom):
+                target = node.module or ""
+                if node.level:
+                    try:
+                        target = resolve_name("." * node.level + target, package)
+                    except ImportError:
+                        violations.append(f"{source}:{node.lineno}: unresolved relative import")
+                        continue
+                grouped: dict[str, list[str]] = {}
+                for alias in node.names:
+                    child = target + "." + alias.name
+                    resolved = child if child in nodes else target
+                    grouped.setdefault(resolved, []).append(alias.name)
+                targets = list(grouped.items())
             elif isinstance(node, ast.Import):
                 targets = [(alias.name, []) for alias in node.names]
             for target, names in targets:

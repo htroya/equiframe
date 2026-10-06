@@ -97,3 +97,27 @@ def test_architecture_gate_reports_cycles_and_stable_sorted_edges(tmp_path):
     assert report["eager_cycles"] == [["equiframe.a", "equiframe.b"]]
     assert report == architecture_tool().inspect(tmp_path)
     assert report["violations"]
+
+
+def test_relative_imports_preserve_cycles_and_neutral_boundaries(tmp_path):
+    (tmp_path / "a.py").write_text("from .b import value\n")
+    (tmp_path / "b.py").write_text("from . import a\n")
+    (tmp_path / "_document_io.py").write_text("from .profiles import _write_document\n")
+    report = architecture_tool().inspect(tmp_path)
+    assert report["eager_cycles"] == [["equiframe.a", "equiframe.b"]]
+    assert any("profile-owned generic I/O" in item for item in report["violations"])
+    assert any("non-neutral dependency" in item for item in report["violations"])
+
+
+def test_relative_parent_and_package_initializers_resolve_to_actual_modules(tmp_path):
+    package = tmp_path / "sub"
+    package.mkdir()
+    (package / "__init__.py").write_text("from . import child\n")
+    (package / "child.py").write_text("from ..errors import Problem\n")
+    (tmp_path / "errors.py").write_text("class Problem(Exception): pass\n")
+    report = architecture_tool().inspect(tmp_path)
+    assert {(item["source"], item["target"]) for item in report["edges"]} == {
+        ("equiframe.sub", "equiframe.sub.child"),
+        ("equiframe.sub.child", "equiframe.errors"),
+    }
+    assert report["violations"] == []

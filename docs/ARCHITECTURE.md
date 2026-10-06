@@ -340,3 +340,30 @@ La publicación local no implementa el gateway/DW. Ingestión materializa JSON y
 recibos; los presupuestos siguen siendo cooperativos y por etapas. El IR común
 no acepta cualquier ETL; la [matriz](SEMANTIC_SUPPORT.md) identifica condiciones,
 rechazos y huecos sin extrapolar todos los cruces posibles.
+
+## Consolidación privada: fronteras compartidas y descubrimiento
+
+El candidato posterior a `c4be1c5a` conserva la fachada pública y los formatos.
+La ruta pequeña de uso está en el [inicio español](../packages/equiframe/docs/inicio.md)
+y la [selección de API](../packages/equiframe/docs/choosing-api.md), sin otra capa
+que duplique comparación, ejecución, migración o Verify.
+
+`_document_io` reúne únicamente publicación exclusiva de bytes y lectura JSON
+con el mismo contrato que tenían los helpers de perfiles. Cada consumidor sigue
+siendo dueño de su serialización, newline, huella y versión. No se fusionan la
+codificación ASCII de snapshots/benchmark, los contratos ni JSON históricos.
+Los aliases anteriores de `profiles` conservan identidad. `_physical` reúne la
+observación de tablas capturadas y sus metadatos; Verify ya no depende del módulo
+privado del migrador para esa tarea. Los aliases de `migration._physical` siguen
+apuntando a las mismas funciones.
+
+`tools/check_architecture.py --check` comprueba estas fronteras por AST y puede
+escribir el grafo estático observado con `--output archivo-nuevo.json`. En el diagnóstico de
+`c4be1c5a` se identificaron siete dependencias entre responsabilidades distintas y dos
+consumos internos del migrador que esta extracción redirige al primitivo común. El grafo pasó de 72 a 74 módulos y de 520 a 526
+importaciones registradas: se conserva la compatibilidad de aliases, no se
+reivindica reducir líneas ni todas las aristas. No había ciclos de imports
+sintácticamente directos antes y no se introducen. Persisten seis componentes
+cíclicos al incluir imports locales/de tipos; se muestran en el informe en vez
+de afirmar que el grafo completo es acíclico. Análisis estático no demuestra
+todo comportamiento dinámico. No se dividieron archivos solo por tamaño.
