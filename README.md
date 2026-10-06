@@ -202,6 +202,7 @@ Usa una carpeta de destino nueva cuando el ejemplo la exija. Son ejemplos sinté
 - **Dinero y precisión.** Decimal se compara de forma exacta, sin conversión intermedia a float. Precisión, escala, unidades y límites de cada motor siguen siendo parte del contrato y sus capacidades
 - **Tolerancias.** Se fijan antes de comparar; no se estiman para hacer coincidir resultados. La comparación aproximada no es transitiva. El matching de multiconjuntos conserva ocurrencias y tiene presupuestos explícitos
 - **Fechas e índices.** Se distinguen días, instantes, unidades y zonas. Los índices pandas necesitan una política explícita; no se convierten automáticamente en claves
+- **Medir costes.** La [suite acotada STEP8](docs/SCALING.md) registra etapas, recursos del proceso, repeticiones y fallos, con baselines de alcance explícito; no promete cuotas duras ni escala universal
 - **Recursos.** El comparador usa lotes e índices SQLite privados en disco. Tiempo, trabajo, filas y evidencia tienen presupuestos cooperativos; no son cuotas duras de RSS ni una garantía de tamaño máximo o latencia
 
 El resumen limita ejemplos; el recorrido y `differences.jsonl` conservan su alcance declarado. Los fallos controlados y presupuestos agotados producen `not_evaluable`. Una configuración inválida o la imposibilidad de crear o publicar evidencia pueden lanzar una excepción al llamante; la ausencia de finalización nunca debe interpretarse como éxito.

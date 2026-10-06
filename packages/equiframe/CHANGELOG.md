@@ -1,5 +1,14 @@
 # Changelog
 
+## Candidato STEP8 (2026-10-06)
+
+- Reduce llamadas redundantes al sistema de archivos en cada control de disco
+  del comparador mediante scandir. Conserva frecuencia, errores, cancelación,
+  trabajo, tiempos y umbrales; no cambia normalización, alineamiento, contenido
+  exacto ni evidencia. Casos medidos y límites en docs/SCALING.md.
+- Añade regresiones de contabilidad, enlaces, cierres y fallos de recursos.
+  No cambia API pública, formatos históricos ni límites declarados por defecto.
+
 ## Candidato STEP7 (2026-10-06)
 
 - Nueva captura explícita `capture_duckdb` y `DuckDBCaptureOptions`: consulta

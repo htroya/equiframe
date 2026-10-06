@@ -659,3 +659,14 @@ escala comprobadas; `1E-38` no se infiere como DOUBLE. Decimal no finito, cero
 negativo, exponente positivo o >38 dígitos/escala e enteros fuera de signed/unsigned
 64 bits se rechazan antes del SQL del consumidor. Texto y casts SQL explícitos
 conservan disponibles conversiones deliberadas dentro del alcance de su contrato.
+
+## Engineering scale measurements (STEP8)
+
+The separate `equiframe_benchmark` package exposes experimental `ScaleSpec`,
+`ScaleTrial`, `ScaleRun`, `measure_scale(spec, *, work_dir)`,
+`read_scale(directory)` and `summarize_scale(result)`. This bounded synthetic
+protocol does not replace the scientific cost experiment. `complete` means
+expected workload/verdict completion, while `resource_measurement_complete`
+separately records monitoring coverage. `scale` and `verify-scale` return 3 for
+missing/invalid finalization or unsuccessful measurement. Native comparison
+acceptance remains a separate core assertion. [Full scope and limits](SCALING.md).

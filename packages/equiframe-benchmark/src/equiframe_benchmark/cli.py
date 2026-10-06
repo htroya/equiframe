@@ -10,6 +10,7 @@ from uuid import uuid4
 import typer
 
 from equiframe_benchmark.commands import register as _register_delivery
+from equiframe_benchmark.commands_scale import register as _register_scale
 from equiframe_benchmark.commands_step10 import register as _register_step10
 from equiframe_benchmark.io import load_document, save_document
 from equiframe_benchmark.models import Catalog, SplitManifest
@@ -179,6 +180,7 @@ def verify_integration_command(directory: Path) -> None:
     )
 
 
+_register_scale(app)
 _register_step10(app)
 _register_delivery(app)
 

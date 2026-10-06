@@ -501,3 +501,23 @@ cancelación/deadline, sin exponer SQL/literales en el diagnóstico público.
 La causa encadenada se conserva para depuración privada. Un fallo de escritura
 o fsync sigue siendo I/O; no se atribuye al motor. El corpus incluye el cast
 nativo tardío real, las variantes envueltas y la limpieza atómica.
+
+## STEP8 engineering decision (2026-10-06): bounded costs without semantic weakening
+
+The engineering adoption roadmap's resource step is implemented by extending the
+existing benchmark distribution with a separate exact-comparison scale protocol.
+The scientific paired `CostProtocol`, R/M/B/H, oracle, frozen studies and thesis
+methodology remain unchanged. New synthetic fixtures are engineering evidence.
+
+The optimization selected after a baseline replaces redundant Path/stat work
+with same-frequency scandir disk accounting, retaining exceptional filesystem
+semantics. Deferred representative decoding was measured diagnostically but not
+adopted in this candidate. Exact grouping and every checkpoint remain intact.
+
+Stage boundaries explicitly retain the inclusive public comparison cost. RSS and
+directory budgets are sampled reactive termination, not hard quotas; unsupported
+child processes and incomplete finalization fail closed. A separate monitoring
+quality field prevents successful verdicts from concealing absent measurements.
+No unsupported platform, public release, human adoption or external-service load
+is implied. [Protocol](SCALING.md); measured candidate results are reported with
+exact artifact identities and their known limitations.

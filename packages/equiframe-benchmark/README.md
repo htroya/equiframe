@@ -271,3 +271,35 @@ el driver reinstala dependencias locales y comprueba sus rutas de import y hashe
 runtime frente a la fuente antes de cada etapa. La suite instalada sigue
 consumiendo los wheels exactos fuera del checkout. Son pruebas de ingeniería,
 no ejecución independiente del protocolo científico.
+
+
+## Engineering scale and resource measurements (STEP8)
+
+`ScaleSpec`, `ScaleTrial`, `ScaleRun`, `measure_scale`, `read_scale` and
+`summarize_scale` are experimental engineering APIs. The `scale` and
+`verify-scale` commands use the same implementation. They extend this package's
+cost infrastructure without changing its scientific paired `CostProtocol` or
+any stored study, label, detector, oracle or historical reader.
+
+[Protocol, actual timing boundaries, resources, baselines and crash interpretation](../../docs/SCALING.md).
+One isolated trusted worker records all raw repetitions, separate fresh/warm
+process conditions (OS caches uncontrolled), nine stages, worker RSS/CPU/I/O,
+sampled disk and evidence bytes. Completion requires valid child finalization,
+expected complete verdicts and verified artifacts. Resource quality is separate:
+`resource_measurement_complete` remains false for incomplete monitoring, even
+when the operation and expected verdict completed successfully.
+
+```bash
+python examples/scale_local.py --output scale-runs
+# Larger, explicit admission only after reviewing machine/disk/work budgets:
+python examples/scale_local.py --rows 100000 --output scale-100k
+```
+
+The example defaults to 1k rows; `--rows 1000000` is separately available and
+uses a larger declared timeout/work budget. It is not a scale promise. RSS/disk
+thresholds are reactive sampled termination, not hard quotas. No network or
+external service is loaded. Native pandas/DuckDB baselines are restricted to
+matching exact integer/text/NULL semantics and explicitly provide less evidence.
+DataComPy remains unpinned/unavailable, with no invented measurement. Full raw
+failures, missing completion and partial sampling stay visible. These local
+receipts are location-bound; reproduce using the specification and exact wheels.

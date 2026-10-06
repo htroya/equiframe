@@ -150,6 +150,13 @@ assert importlib.metadata.version('equiframe') == sys.argv[3]
             work,
             env,
         )
+        scaling = work / "scale_local.py"
+        shutil.copy2(ROOT / "examples" / "scale_local.py", scaling)
+        run(
+            [str(python), "-I", str(scaling), "--output", str(work / "scale-example")],
+            work,
+            env,
+        )
         extracted = work / "sdist"
         with tarfile.open(sdist) as archive:
             archive.extractall(extracted, filter="data")
@@ -163,7 +170,7 @@ assert importlib.metadata.version('equiframe') == sys.argv[3]
             raise RuntimeError("sdist did not reproduce the same wheel bytes")
         print(
             "pip installation, installed tests, native pilot, integration/evaluation examples "
-            "and identical sdist rebuild verified"
+            "scale example and identical sdist rebuild verified"
         )
 
 

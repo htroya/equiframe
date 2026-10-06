@@ -37,6 +37,9 @@ from equiframe_benchmark import (
     Review,
     ReviewAssignment,
     ReviewPacket,
+    ScaleRun,
+    ScaleSpec,
+    ScaleTrial,
     Scenario,
     SnapshotManifest,
     SplitManifest,
@@ -45,9 +48,15 @@ from equiframe_benchmark import (
     TrainingManifest,
     TrainingSelection,
 )
+from equiframe_benchmark.scale_process import ProcessObservation
+from equiframe_benchmark.scale_types import ScaleWorkerCompletion
+from equiframe_benchmark.scaling import ScaleFinalization
 
 ROOT = Path(__file__).resolve().parents[1]
 MODELS = (
+    ProcessObservation,
+    ScaleWorkerCompletion,
+    ScaleFinalization,
     StudyResult,
     BootstrapPlan,
     BundleLimits,
@@ -83,6 +92,9 @@ MODELS = (
     Review,
     ReviewAssignment,
     ReviewPacket,
+    ScaleRun,
+    ScaleSpec,
+    ScaleTrial,
     Scenario,
     SplitManifest,
     TrainingManifest,

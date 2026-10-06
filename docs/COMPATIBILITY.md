@@ -172,3 +172,15 @@ modelos, CLI y esquemas con el inventario; comprueban referencias ejecutables y 
 la introspección no importe motores. Esos controles detectan deriva, pero no
 reemplazan las regresiones semánticas ni una revisión de cambios. No actualizar
 las huellas automáticamente para silenciar un fallo de compatibilidad.
+
+## Extensión de costes STEP8 del paquete separado
+
+`equiframe_benchmark.ScaleSpec`, `ScaleTrial`, `ScaleRun`, `measure_scale`,
+`read_scale` y `summarize_scale`, y sus comandos `scale`/`verify-scale`, son
+**experimentales**. Nuevos documentos de ingeniería `ScaleSpec-1.0`,
+`ScaleTrial-1.0` y `ScaleRun-1.0` tienen esquemas propios; no reutilizan ni
+reinterpretan los formatos científicos `CostSpec`/`CostProtocol`. Sus lectores
+validan finalización e inventario, no autentican la ejecución. La lectura es
+local y las rutas originales no son un bundle portátil. [Contrato](SCALING.md).
+El inventario del núcleo sigue sin incluir la API del paquete separado; sus
+firmas, formatos y registro de adaptadores no se modifican por medir costes.

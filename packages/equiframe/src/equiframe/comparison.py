@@ -151,7 +151,17 @@ class _Work:
             raise ExecutionTimeout("cooperative comparison timeout")
         if self.work > self.options.max_work:
             raise ResourceLimitError("max_work")
-        disk = sum(path.stat().st_size for path in self.directory.iterdir() if path.is_file())
+        disk = 0
+        with os.scandir(self.directory) as entries:
+            for entry in entries:
+                try:
+                    is_file = entry.is_file()
+                except OSError:
+                    # Preserve Path.is_file's platform-specific handling of
+                    # missing/invalid targets (including symlink loops).
+                    is_file = Path(entry.path).is_file()
+                if is_file:
+                    disk += entry.stat().st_size
         self.peak_disk = max(self.peak_disk, disk)
         if disk > self.options.max_disk_bytes:
             raise ResourceLimitError("max_disk_bytes")

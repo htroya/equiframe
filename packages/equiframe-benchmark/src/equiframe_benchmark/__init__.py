@@ -88,6 +88,8 @@ from equiframe_benchmark.reproduction import (
     read_bundle,
     reproduce_bundle,
 )
+from equiframe_benchmark.scale_types import ScaleSpec, ScaleTrial
+from equiframe_benchmark.scaling import ScaleRun, measure_scale, read_scale, summarize_scale
 from equiframe_benchmark.selection import select_normal_calibration, select_normal_training
 from equiframe_benchmark.snapshot import (
     SnapshotClient,
@@ -153,6 +155,9 @@ __all__ = [
     "Review",
     "ReviewAssignment",
     "ReviewPacket",
+    "ScaleRun",
+    "ScaleSpec",
+    "ScaleTrial",
     "Scenario",
     "SelectionEvidence",
     "SnapshotClient",
@@ -186,11 +191,13 @@ __all__ = [
     "make_reproduction_record",
     "make_splits",
     "measure_costs",
+    "measure_scale",
     "oracle_verification_bridge",
     "read_bundle",
     "read_costs",
     "read_freeze",
     "read_integration",
+    "read_scale",
     "read_study",
     "read_tables",
     "reconcile_awards",
@@ -205,6 +212,7 @@ __all__ = [
     "select_normal_training",
     "snapshot_fingerprint",
     "split_counts",
+    "summarize_scale",
     "table_payloads",
     "validate_splits",
     "write_cost_table",

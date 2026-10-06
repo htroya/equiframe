@@ -1,5 +1,18 @@
 # Changelog
 
+## STEP8 candidate (2026-10-06)
+
+- Add experimental bounded engineering scale API/CLI, separate from the frozen
+  scientific paired cost protocol. Deterministic batched workloads, explicit
+  stage boundaries, cold/warm labels, native restricted baselines and raw trials.
+- Supervise worker wall time, sampled RSS/disk and CPU/I/O; retain missing metrics
+  and crashes, verify atomic completion, and clean only owned SQLite temporaries.
+  Reactive resource thresholds are not hard quotas or an untrusted-code sandbox.
+- Record actual isolated-worker producer hashes/versions; differing parent
+  imports fail closed, and missing worker provenance remains explicitly unknown.
+- Installed-distribution verifier also consumes the small scale example.
+  No scientific methodology, dependency, historical format or public release change.
+
 ## Sin publicar — compatibilidad STEP6
 
 - Metadatos y lock permiten Python 3.12/3.13; soporte medido solo para las celdas
