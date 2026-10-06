@@ -1,3 +1,17 @@
+# Private benchmark alpha 0.12.0a4 — 2026-10-06
+
+- Enforce the declared boolean type of integrity-verification controls rather
+  than treating numerically equal values such as `verify=0` as an explicit opt-out
+- Preserve explicit supported boolean choices and reject wrong-type controls
+  before they can bypass verification of corrupted retained evidence
+- Require exactly `equiframe[arrow]==0.12.0a4` and matching core engine/ML extras;
+  the coordinated core correction also rejects invalid integrity-reader controls
+- Preserve the prior benchmark artifacts and failing probes, and revalidate the
+  changed distribution separately instead of relabelling earlier benchmark tests
+
+No scientific protocol, detector independence or core artifact format changes.
+The current identified pair is core 0.12.0a4 / benchmark 0.12.0a4.
+
 # Private installed-product alpha 0.12.0a3 — 2026-10-06
 
 - Require exactly `equiframe[arrow]==0.12.0a3`, including matching engine/ML extras

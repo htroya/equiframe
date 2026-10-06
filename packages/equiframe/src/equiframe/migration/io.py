@@ -43,7 +43,9 @@ def render_migration_report(result: MigrationResult) -> str:
 
 
 def read_migration(path: Path, *, verify: bool = True) -> MigrationResult:
-    """Check a closed bundle. Integrity is distinct from semantic correctness."""
+    """Check a closed bundle; explicit False reads metadata without byte verification."""
+    if type(verify) is not bool:
+        raise TypeError("verify must be a bool; only explicit False skips integrity checks")
     path = path / "migration.json" if path.is_dir() else path
     result = load_json(MigrationResult, path)
     if not verify:

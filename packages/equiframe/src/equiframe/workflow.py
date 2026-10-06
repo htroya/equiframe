@@ -463,7 +463,9 @@ def run_workflow(
 
 
 def read_workflow(path: Path, *, verify: bool = True) -> WorkflowResult:
-    """Read checkpoints and closed inventories without executing any ETL."""
+    """Read without running ETL; only explicit False skips inventory verification."""
+    if type(verify) is not bool:
+        raise TypeError("verify must be a bool; only explicit False skips integrity checks")
     path = path / "workflow.json" if path.is_dir() else path
     result = load_json(WorkflowResult, path)
     if not verify:

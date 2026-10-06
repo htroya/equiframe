@@ -221,7 +221,9 @@ def _verify_pipeline_artifacts(directory: Path, result: PipelineResult) -> None:
 
 
 def read_pipeline(path: Path, *, verify: bool = True) -> PipelineResult:
-    """Validate a final manifest and optionally every inventoried byte and journal event."""
+    """Read a manifest; only explicit False skips byte and journal verification."""
+    if type(verify) is not bool:
+        raise TypeError("verify must be a bool; only explicit False skips integrity checks")
     path = path / "manifest.json" if path.is_dir() else path
     result = load_json(PipelineResult, path)
     if verify:

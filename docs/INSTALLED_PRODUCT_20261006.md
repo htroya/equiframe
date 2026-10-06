@@ -5,8 +5,11 @@
 This work starts from the freshly verified main commit
 `f288cc353e36c33c89c04e6dd132eb1d200510b4`, tree
 `7982eecdc6a3ab92436d3ed812c191a3429d878b`. The isolated work branch is
-`product/installed-consumer-20261006`. Both distributions use the new private
-alpha identity `0.12.0a3`; final receipts identify exact source and artifact bytes.
+`product/installed-consumer-20261006`. The current private alpha pair is core `0.12.0a4` and benchmark `0.12.0a4`;
+the benchmark retains an exact dependency on that core. Both distributions
+correct reproduced integrity-reader control boundaries. Earlier artifacts,
+consumer runs and source/installed suites are retained as historical evidence;
+current receipts identify the new source and artifact bytes independently.
 The former 3,083 core / 561 benchmark / 16 root tests and twelve Linux cells are
 historical evidence, not results for this candidate.
 

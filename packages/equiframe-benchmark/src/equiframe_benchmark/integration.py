@@ -528,7 +528,13 @@ def run_integration(
 
 
 def read_integration(path: Path, *, verify: bool = True) -> IntegrationResult:
-    """Verify final consumer-side evidence and the manifests of every recorded run."""
+    """Verify final evidence; only explicit False selects a metadata-only read.
+
+    Metadata-only reads preserve recorded outcomes but do not establish current
+    file integrity. Other Python truthy/falsey values are invalid options.
+    """
+    if type(verify) is not bool:
+        raise TypeError("verify must be a bool; only explicit False skips integrity checks")
     path = path / "integration.json" if path.is_dir() else path
     result = load_json(IntegrationResult, path)
     if not verify:

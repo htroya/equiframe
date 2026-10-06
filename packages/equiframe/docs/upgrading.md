@@ -243,3 +243,26 @@ admitted. Admission is not a certification of malformed earlier documents.
 Preserve the original evidence and failed probes; do not rewrite old results or
 infer acceptance from old passing totals. Revalidate affected cases against the
 identified 0.12.0a3 wheel and preserve the new artifact-specific receipts.
+
+
+## 0.12.0a4 explicit integrity-reader controls
+
+`read_pipeline`, `read_migration`, `read_workflow`, and the benchmark's
+`read_integration` require an actual Python `bool` for `verify`. The default and
+explicit `True` verify retained evidence. Explicit `False` is a deliberate
+metadata-only read: returned producer decisions such as `complete` or `exit_code`
+are not proof that retained bytes are intact.
+
+Other values, including `0`, `1`, `None`, strings and empty collections, raise
+`TypeError` before evidence I/O. Convert external configuration to a validated
+boolean explicitly; do not use truthiness to interpret text such as `"false"`.
+This closes reproduced cases where invalid falsey values silently skipped
+corrupted-evidence checks. Valid boolean behavior and evidence formats are
+unchanged. Preserve earlier artifacts and failed probes, and rerun acceptance
+against the identified 0.12.0a4 package pair.
+
+For portable bundles, only `expected_sha256=None` omits the optional trusted
+manifest pin. Empty strings or other falsey supplied values no longer disable
+pin checking; they fail the exact SHA-256 comparison. This also applies to
+`inspect_bundle` and `import_bundle`; a rejected import does not create its
+destination. Bundle member checks remain mandatory even when the pin is omitted.

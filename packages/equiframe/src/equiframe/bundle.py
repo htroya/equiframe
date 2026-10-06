@@ -161,11 +161,14 @@ def export_bundle(source: Path, destination: Path) -> EvidenceBundle:
 
 
 def read_bundle(path: Path, *, expected_sha256: str | None = None) -> EvidenceBundle:
-    """Verify closed membership and original operation; never execute its ETL."""
+    """Verify membership and operation; only None omits the optional manifest pin."""
     root = path if path.is_dir() else path.parent
     root = root.resolve()
     manifest = root / "bundle.json"
-    if expected_sha256 and hashlib.sha256(manifest.read_bytes()).hexdigest() != expected_sha256:
+    if (
+        expected_sha256 is not None
+        and hashlib.sha256(manifest.read_bytes()).hexdigest() != expected_sha256
+    ):
         raise ArtifactIntegrityError("portable manifest differs from trusted SHA-256")
     bundle = load_json(EvidenceBundle, manifest)
     members = _members(root)

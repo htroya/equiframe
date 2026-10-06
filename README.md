@@ -9,7 +9,7 @@ locate differences in values, types, keys, multiplicity and order. Use EquiFrame
 inside an existing pandas, Polars, Arrow or CI workflow, or use its separate
 native execution, verification and bounded migration APIs.
 
-**Status: private Alpha candidate 0.12.0a3.** Identify artifacts by commit and
+**Status: private Alpha pair: core 0.12.0a4 / benchmark 0.12.0a4.** Identify artifacts by commit and
 wheel/sdist SHA-256, not the version string alone. The team's package is **not
 publicly released on PyPI**. License and name/ownership decisions remain pending.
 Public release requires STEP10, the global review and specific owner approval.
@@ -26,10 +26,13 @@ close those gates. [Release process](packages/equiframe/docs/releasing.md).
 ## Install the private candidate
 
 Use the [private wheelhouse installation guide](packages/equiframe/docs/installed-private.md) with
-`equiframe[engines,ml]==0.12.0a3`, a fresh environment outside the checkout,
+`equiframe[engines,ml]==0.12.0a4`, a fresh environment outside the checkout,
 normal pip dependency resolution and the separately supplied artifact hashes.
 It includes Linux and PowerShell commands and a separate hash-locked trial.
 This is private installation by name, not publication in PyPI or TestPyPI.
+The separate benchmark is `equiframe-benchmark[engines,ml,resources]==0.12.0a4`
+and requires exactly core `0.12.0a4`. The prior a3 package artifacts and
+observations remain historical; current receipts identify the corrected readers.
 Python metadata admits 3.12/3.13; only actual artifact-specific receipts establish
 platform results. The earlier 0.11.1 first-use kit remains historical.
 

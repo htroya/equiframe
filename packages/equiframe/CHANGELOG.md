@@ -1,3 +1,18 @@
+# Private installed-product alpha 0.12.0a4 — 2026-10-06
+
+- Require actual boolean controls in pipeline, migration and workflow readers;
+  reject wrong-type values before evidence I/O instead of silently treating
+  falsey values as an intentional integrity-verification opt-out
+- Preserve default/explicit True verification and explicit False metadata-only
+  reads; producer decisions returned without verification do not prove byte integrity
+- Treat only None as an omitted portable-bundle manifest pin; supplied falsey
+  pins fail exact digest comparison in read, inspect and import operations
+- Retain valid historical producer identities and preserve A3 artifacts and
+  failed probes; rebuild and revalidate the corrected package pair as A4
+
+No scientific method, detector independence or evidence format changes.
+See `docs/upgrading.md` for caller migration and explicit metadata-only semantics.
+
 # Private installed-product alpha 0.12.0a3 — 2026-10-06
 
 - Reject zero-requested-output verification evidence at public model/read boundaries

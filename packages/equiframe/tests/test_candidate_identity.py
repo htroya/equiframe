@@ -11,7 +11,18 @@ import equiframe as ef
 
 @pytest.mark.parametrize(
     "version",
-    ["0.7.0", "0.8.0", "0.8.1", "0.9.0", "0.10.0", "0.11.0", "0.11.1", "0.12.0a1", "0.12.0a2"],
+    [
+        "0.7.0",
+        "0.8.0",
+        "0.8.1",
+        "0.9.0",
+        "0.10.0",
+        "0.11.0",
+        "0.11.1",
+        "0.12.0a1",
+        "0.12.0a2",
+        "0.12.0a3",
+    ],
 )
 def test_detector_producer_history_remains_readable(version: str) -> None:
     record = ef.DetectorVersions(equiframe=version, python="3.12.14")
@@ -22,7 +33,7 @@ def test_detector_producer_history_remains_readable(version: str) -> None:
 def test_current_detector_producer_matches_candidate_metadata() -> None:
     config = tomllib.loads((Path(__file__).parents[1] / "pyproject.toml").read_text("utf-8"))
     assert ef.DetectorVersions(python="3.12.14").equiframe == ef.__version__
-    assert config["project"]["version"] == ef.__version__ == "0.12.0a3"
+    assert config["project"]["version"] == ef.__version__ == "0.12.0a4"
 
 
 def test_unknown_detector_producer_is_not_silently_accepted() -> None:
