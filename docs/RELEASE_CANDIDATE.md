@@ -1,5 +1,11 @@
 # Candidatos Python 0.11.1
 
+**Current STEP9 guidance:** [English distribution handbook](../packages/equiframe/docs/releasing.md),
+[security boundaries and incomplete assessment](../packages/equiframe/docs/security.md),
+[dependency evidence](../packages/equiframe/docs/dependencies.md).
+The dated receipts below are historical; only the STEP9 candidate report binds
+the new artifact hashes. Public release remains blocked.
+
 La [ficha STEP7](STEP7_CANDIDATE.md) incorpora captura DuckDB explícita, admisión
 nativa de tipos y parámetros Decimal exactos; mantiene límites y evidencia por
 etapa, candidato y entorno, sin extender implícitamente la matriz histórica.
@@ -159,14 +165,14 @@ artefactos `equiframe-candidate-SHA`; exige `run_build=true`, desactivado por
 defecto. Sus acciones oficiales están fijadas a SHA. No se activó ningún job,
 amplió cuota ni cambió facturación; configuración no acredita ejecución.
 
-`.github/publish-prepared.yml.example` está deliberadamente fuera de `workflows`.
-Prepara un trabajo separado con environment, descarga del run identificado,
-verificación de commit, fuente limpia, nueve controles, inventario exacto de
-ambas distribuciones/hashes y OIDC `id-token: write`, siguiendo
-[Trusted Publishing](https://docs.pypi.org/trusted-publishers/using-a-publisher/).
-No recompila durante publicación y rechaza manifiestos con decisiones pendientes.
-Su activación requiere una tarea expresa posterior y adecuar las decisiones
-del manifiesto; actualmente no puede publicar.
+`.github/publish-prepared.yml.example` remains deliberately outside workflows.
+STEP9 replaces the old publishing template with inspection only: a tested gate
+checks both manifests, four exact artifact hashes and the benchmark's core-wheel
+binding, then exits 3 because the checked-in policy is closed. It contains no
+upload step, OIDC permission or publication bypass. A future owner-approved
+release needs a separately reviewed workflow, build-run provenance, protected
+publisher access, current dependency/source reviews and exact artifact approval.
+No remote job was run merely by changing these files.
 
 ## Decisiones externas pendientes
 

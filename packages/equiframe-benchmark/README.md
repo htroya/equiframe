@@ -1,112 +1,250 @@
-# EquiFrame Benchmark
+# EquiFrame Benchmark 0.11.1
 
-El README forma parte de los metadatos del wheel/sdist. Los enlaces al monorepo
-pueden requerir acceso al repositorio privado. Los ejemplos, tests, herramientas
-y JSON Schema completos se incluyen en el **sdist**; el wheel contiene la API,
-CLI y recursos runtime. Hasta resolver licencia y acceso público, use artefactos
-identificados del equipo y `--no-index --find-links` para evitar paquetes ajenos.
+**Experimental evaluation, reproducible evidence and bounded engineering costs.**
 
-Distribución experimental `equiframe-benchmark 0.11.1`, Python 3.12 y 3.13. Catálogo,
-EquiFrame Verify (validación independiente de equivalencia), grupos transitivos,
-particiones y evaluación para `equiframe 0.11.1`. El núcleo no importa este paquete.
+`equiframe-benchmark` is separate from the core `equiframe` package. It provides
+scenario catalogs, independent-review records, grouped splits, reviewed normal
+selection, frozen studies, paired evaluation, reproducible tables/bundles and
+resource measurements. The core never imports it or receives oracle labels as
+detector features.
 
-Los metadatos de Python no prueban cada SO/arquitectura ni todo el rango de
-sus dependencias. La [matriz del candidato](../../docs/STEP6_CANDIDATE.md) identifica
-las combinaciones efectivamente verificadas con wheels concretos. El benchmark
-conserva su condición experimental; no se modifican R/M/B/H ni la metodología.
+## Candidate and release status
 
-La revisión 0.11.1 refuerza reproducción, inventarios de O y el puente Verify.
-Añade `evaluate_pairwise` y `PairwiseReport` para los seis contrastes descriptivos
-R/M/B/H con soportes y denominadores propios. [Uso y ejemplo](../../docs/PAIRWISE_EVALUATION.md).
-El reporte complementario conserva el protocolo y las seis tablas históricas;
-su uso como análisis científico principal necesita una nueva congelación.
+This is the **private Alpha candidate 0.11.1**, requiring exactly
+`equiframe[arrow]==0.11.1`, with Python `>=3.12,<3.14`. Version strings alone do
+not identify private builds: verify the commit and SHA-256 of both wheels/sdists
+against their separate trusted receipt. The team's packages are **not publicly
+released on PyPI**; do not resolve an unrelated project by name from an arbitrary
+index. License, name/ownership and public release remain owner decisions.
+Publication requires STEP10, global review and specific owner approval.
 
-El paso 8 incorpora `equiframe-benchmark validate`, `split` y `pilot`, y usa
-la orquestación operacional en las quince ejecuciones nativas del piloto.
-[Comandos y límites](../../docs/ORCHESTRATION.md#benchmark-separado).
+Scientific corpus/labels, independent human review, trained/calibrated real-data
+support, external reproduction/adoption and real service/DW acceptance remain
+separate pending criteria. Synthetic software tests do not satisfy them. No
+nominal public security/release roster or response-time SLA is invented here.
 
-El paso 9 añade snapshots verificados, `run_integration`/`read_integration`,
-conciliación exacta de adjudicaciones y CLI `integrate`/`verify-integration`.
-La conexión al cliente/DW reales permanece pendiente. [Diseño y límites](../../docs/STEP_09_DESIGN.md).
+The core wheel includes the self-contained English handbook with API, semantics,
+compatibility, contribution, security, dependency/SBOM and release procedures:
 
-## Instalar y ejecutar
+```python
+from importlib.resources import files
 
-Desde la raíz del repositorio, con acceso al código:
-
-```bash
-python -m pip install "./packages/equiframe[engines]" ./packages/equiframe-benchmark
-python -m equiframe_benchmark.pilot --output ./tmp/pilot-step6
+print(files("equiframe").joinpath("docs/index.md").read_text(encoding="utf-8"))
 ```
 
-El destino debe ser nuevo. También se instala el comando
-`equiframe-benchmark-pilot --output ./tmp/otro-piloto`.
-La base requiere Arrow; el extra `engines` agrega Pandas, Polars y DuckDB.
-No está publicado en PyPI. Con los dos wheels construidos y dependencias
-disponibles se puede instalar por nombre:
+From an authorized monorepo checkout the same guide is at
+[core handbook](../equiframe/docs/index.md); installed consumers do not need
+repository access. This README is included in distribution metadata. Benchmark
+sdists also include examples, tests, tools and JSON schemas.
+
+## Install exact artifacts, then run outside the checkout
+
+Obtain both identified wheels and a reviewed dependency wheelhouse for your
+interpreter/platform/profile. Verify supplied SHA-256 values before installation.
+In a fresh directory outside the repository, using a POSIX shell:
 
 ```bash
-python -m pip install packages/equiframe/dist/equiframe-0.11.1-py3-none-any.whl packages/equiframe-benchmark/dist/equiframe_benchmark-0.11.1-py3-none-any.whl
+python3.12 -m venv .venv
+. .venv/bin/activate
+CORE=/absolute/path/equiframe-0.11.1-py3-none-any.whl
+BENCH=/absolute/path/equiframe_benchmark-0.11.1-py3-none-any.whl
+WHEELHOUSE=/absolute/path/reviewed-wheelhouse
+python -m pip install --no-index --find-links "$WHEELHOUSE" "${CORE}[engines]" "${BENCH}[resources]"
+python -m pip check
+python -I -c "import equiframe, equiframe_benchmark; print(equiframe.__file__); print(equiframe_benchmark.__file__)"
+python -I -m equiframe_benchmark.pilot --output pilot-synthetic
 ```
 
-El piloto genera 5 escenarios, 35 candidatos, 15 perfiles y 4 grupos. Las
-35 revisiones permanecen pendientes. Las 15 mutaciones son inyecciones sobre
-artefactos; las 15 transformaciones de control sí son ejecuciones nativas.
-Son pruebas técnicas sintéticas, no los 60 escenarios/300 perfiles de la tesis.
+Absolute paths are placeholders for verified local files. Missing compatible
+binary dependencies are a blocker; do not drop hashes or switch to an unrelated
+index package. Avoid editable installs/PYTHONPATH as artifact validation. Windows
+can use `py -3.12 -m venv .venv` and `.venv\Scripts\python.exe` directly without
+changing activation security policy. Command conventions are not platform tests.
 
-## API de revisión
+The benchmark base requires Arrow through core and `packaging>=26,<27`.
+`engines` adds pandas/Polars/DuckDB; `ml` adds the core ML extra;
+`resources` adds `psutil==7.2.2`. Choose reviewed dependency pins for the required
+profiles. Metadata admission does not prove all platforms or range combinations.
+Historical measured cells are Linux x86_64/Python 3.12.14 and 3.13.5; a current
+candidate needs its own exact-artifact receipt. Manual CI configuration is not a
+remote job result, and Windows/macOS/ARM64 are not newly claimed as verified.
+
+The pilot destination must be new. `equiframe-benchmark-pilot --output DIR` is an
+installed equivalent entry point. The synthetic pilot produces 5 scenarios,
+35 candidates, 15 profiles and 4 dependency groups. **All 35 reviews remain
+pending**. Its 15 mutations are artifact injections; its 15 control
+transformations execute natively. These are not a completed thesis sample or
+trained scientific model.
+
+## Review, grouping and normal selection
+
+Public models include `Scenario`, `Catalog`, `Candidate`, `ReviewPacket`,
+`ReviewAssignment`, `Review`, `OracleResult`, `SplitManifest`, `TrainingSelection`
+and `CalibrationSelection`. `load_document`, `save_document` and `digest` use
+strict canonical JSON and explicit evidence identity.
+
+This snippet continues from the synthetic pilot above:
 
 ```python
 from pathlib import Path
 import equiframe_benchmark as eb
 
-catalog = eb.load_document(eb.Catalog, Path("tmp/pilot-step6/catalog.json"))
-splits = eb.load_document(eb.SplitManifest, Path("tmp/pilot-step6/splits.json"))
+root = Path("pilot-synthetic")
+catalog = eb.load_document(eb.Catalog, root / "catalog.json")
+splits = eb.load_document(eb.SplitManifest, root / "splits.json")
 eb.validate_splits(catalog, splits)
 print(eb.split_counts(catalog, splits))
-
 scenario = catalog.scenarios[0]
-candidate = eb.load_document(
-    eb.Candidate, Path("tmp/pilot-step6/nulls_types/pandas-candidate.json")
-)
-packet = eb.review_packet(scenario, candidate, directory=Path("tmp/revision"))
-pending = eb.evaluate_oracle(scenario, candidate, packet=packet, work_dir=Path("tmp/oracle"))
+candidate = eb.load_document(eb.Candidate, root / "nulls_types" / "pandas-candidate.json")
+packet = eb.review_packet(scenario, candidate, directory=Path("review-packet"))
+pending = eb.evaluate_oracle(scenario, candidate, packet=packet, work_dir=Path("oracle-evidence"))
 assert pending.status == "pending" and pending.label is None
 ```
 
-Entregar al revisor solo la carpeta del paquete ciego. Conservar aparte catálogo,
-candidatos, alertas y decisiones de los otros revisores. Registrar previamente
-`ReviewAssignment` con dos revisores y un árbitro independientes y `assigned_at`
-UTC. Después guardar cada `Review` como documento nuevo, con hash del paquete,
-persona, decisión, razón, `recorded_at` UTC y `blind_attestation=True`.
-Pasar esos documentos a `evaluate_oracle(..., assignment=..., reviews=(a, b))`;
-`resolution=...` se permite solo ante desacuerdo y con el árbitro asignado.
-No autogenerar decisiones humanas a partir del resultado del comparador.
+Only the blinded packet goes to the reviewer. Keep catalog/candidate metadata,
+alerts and other reviewers' decisions separate. Record two independent reviewers
+and an arbiter in an assignment before review, with UTC timestamps. Reviews
+require packet hash, identity declaration, decision, rationale, timestamp and
+blind attestation. Resolution is permitted for disagreement by the assigned
+arbiter. Do not generate human approvals from comparator output. Hashes and JSON
+names do not authenticate a human or establish true independence.
 
-## Entrenamiento del paso 7
+`dependency_groups` closes transitive declared/artifact dependencies before
+`make_splits`; `validate_splits` and `split_counts` retain group/partition scope.
+`select_normal_training` and `select_normal_calibration` require candidate,
+oracle, execution and profile maps with exact linked identities, one family and
+feature definition, confirmed normal O, and the appropriate disjoint partition.
+The pending pilot is not eligible normal training evidence.
 
-```python
-selection = eb.select_normal_training(
-    catalog,
-    splits,
-    candidates=candidates_by_id,
-    oracles=oracles_by_id,
-    executions=executions_by_id,
-    profiles=profiles_by_id,
-)
-eb.save_document(selection, Path("training-selection.json"))
-import equiframe as ef
+`audit_detector_selections` checks shared catalog/split, compatible features,
+independent groups and no reused scenarios/executions/profiles. Respect
+`eligible`/`not_estimable`, preserve counts and justify minimum support before
+freeze. Core `fit_detectors`, `score_detectors`, `calibrate_detectors`, `detect`
+and `detect_component` separate fitting, scoring, calibration and inference.
+No anomaly/no-alert state is a comparison oracle; test never fits the model.
 
-bundle = ef.fit_preprocessor(selection.training, spec=selection.training.profiles[0].spec)
+## Public workflow reference
+
+The exhaustive experimental export namespace is `equiframe_benchmark.__all__`.
+Use `inspect.signature(eb.function)` and each model's `model_json_schema()` for
+installed signatures/defaults. These are distinct families:
+
+| Family | Entry points |
+|---|---|
+| Blinded review | `review_packet`, `evaluate_oracle`, `oracle_verification_bridge` |
+| Dependency splits | `dependency_groups`, `make_splits`, `validate_splits`, `split_counts` |
+| Reviewed selections | `select_normal_training`, `select_normal_calibration`, `audit_detector_selections` |
+| Snapshot consumer | `SnapshotClient`, `SnapshotDataSource`, `snapshot_fingerprint` |
+| Three-engine integration | `run_integration`, `read_integration` |
+| Domain-configurable reconciliation | `reconcile_awards`, `AwardReconciliationSpec` |
+| Freeze/study | `audit_freeze`, `create_freeze`, `read_freeze`, `run_study`, `read_study` |
+| Evaluation | `evaluate_records`, `evaluate_pairwise`, `evaluation_protocol_sha256` |
+| Tables | `table_payloads`, `write_tables`, `read_tables` |
+| Scientific cost protocol | `measure_costs`, `read_costs`, `write_cost_table` |
+| Record reproduction | `make_reproduction_record`, `compare_reproductions` |
+| Generic bundles | `create_bundle`, `read_bundle`, `bundle_artifact`, `reproduce_bundle` |
+| Study bundles | `bundle_study`, `regenerate_study_record`, `reproduce_study_bundle` |
+| Engineering scale | `measure_scale`, `read_scale`, `summarize_scale` |
+| Distribution inventory | `inspect_distribution`, `DistributionReadiness`, `NameCheck` |
+
+Snapshot consumers pin a declared publication and verify artifacts from an
+explicit trusted client. `run_integration` executes each of three registered
+native implementations once, then compares three pairs. A separate optional
+expected output is fixed before execution. Shared captures do not become
+additional independent observations when reused in several pair comparisons.
+Client/DW authentication, service writer coordination and production acceptance
+are not implemented by the consumer interface.
+
+## Freeze, study and reproduction
+
+`FreezeDefinition` records catalog, grouped splits, cases, family model slots,
+reviewed selections, prior decisions, files/hashes, environment and evaluation/cost
+protocols. Pilot freeze verifies technical readiness while retaining scientific
+blockers. Final freeze requires those blockers resolved; it does not manufacture
+reviews or fit on test data.
+
+The following are command **templates** using your own reviewed files and trusted
+registry factory; they are not a complete runnable scientific experiment:
+
+```text
+equiframe-benchmark freeze definition.json --output freeze.json
+equiframe-benchmark verify-freeze freeze.json
+equiframe-benchmark run-study freeze.json --registry my_etl:create_registry --output studies
+equiframe-benchmark verify-study studies/study_ID
+equiframe-benchmark evaluate studies/study_ID --output evaluation.json
+equiframe-benchmark tables studies/study_ID --output regenerated-tables
+equiframe-benchmark bundle-study studies/study_ID --output portable-study
+equiframe-benchmark reproduce-study portable-study --expected-sha256 TRUSTED_BUNDLE_MANIFEST_SHA256
 ```
 
-Los cuatro mapas deben contener los mismos IDs de candidato, una sola familia
-y definición de features, y exclusivamente casos normales confirmados de
-entrenamiento. El piloto pendiente no es admisible. Los hashes aseguran
-integridad/trazabilidad, no identidad humana ni veracidad de un productor hostil.
+Factory references import and execute trusted code explicitly. JSON requests do
+not authorize arbitrary plugins or contain credentials. The frozen historical
+main comparison uses confirmed O and common complete R/M/B/H support, retaining
+individual support, partial alerts, failures and exclusions. `evaluate_pairwise`
+adds six descriptive pairwise supports with their own denominators; it preserves
+the original report/protocol/six CSV and remains `scientific=False`. Using that
+analysis as a new scientific primary protocol requires a new freeze.
 
-## Desarrollo y verificación
+Undefined precision, recall, F1 and FPR remain absent with reasons. Average
+precision requires two classes and a common family/model. Bootstrap samples
+whole groups and requires a prior independence rationale. CSVs regenerate from
+verified records; editing a CSV and recomputing its hash does not create valid
+changed evidence.
 
-Desde `packages/equiframe-benchmark`, con `uv` en PATH:
+Study bundles preserve original captures/manifests and regenerate configuration,
+splits, labels, decisions and tables without rerunning ETL. They do not certify a
+colleague independently repeated the experiment. Raw costs are retained without
+requiring identical timings on reproduction. The distribution inventory does not
+reserve a name, resolve licensing, install a package or authorize publication.
+
+## Cost protocols and engineering scale
+
+`measure_costs` uses a frozen scientific `CostProtocol`: isolated profile+M versus
+full comparison over already captured outputs, one warmup and five alternating
+repetitions per method. Initial ETL/capture is excluded. `cost-table` retains all
+twelve raw observations, warmups, failures and reasons. Repetitions do not increase
+the independent detection sample. Missing monitoring is never imputed as zero.
+
+The separate engineering protocol `ScaleSpec`/`ScaleTrial`/`ScaleRun` measures
+bounded synthetic integer/text/NULL workloads. See the installed core handbook's
+`docs/performance.md` for a complete small script, stage boundaries and budgets.
+Source distributions also contain `examples/scale_local.py`, which defaults to
+1k rows; 100k/1M require explicit `--rows` and larger recorded budgets.
+
+One isolated trusted worker records fresh/warm process groups with uncontrolled
+OS caches, nine stages, sampled RSS/CPU/I/O, disk and evidence bytes. RSS/disk
+thresholds are reactive and can overshoot; they are not hard quotas. A valid
+completion marker, expected verdict and verified inventory are required.
+`complete` and `resource_measurement_complete` are separate: a successful
+operation can have incomplete observations.
+
+Restricted native pandas/DuckDB baselines provide less evidence; time ratios
+are not equivalent-service speed rankings. DataComPy is unpinned/unavailable,
+with no invented timing. Kill, missing finalization, failed/partial measurement,
+ENOSPC and last-batch differences stay visible. Receipts are location-bound;
+reproduction uses the specification and exact wheels, not an implied portable run.
+
+## CLI exits and safe interpretation
+
+`equiframe-benchmark --help` lists the installed commands, including catalog
+`validate`, `split`, `pilot`, integration, freeze/study, evaluation, costs and scale.
+
+- Study/integration operations distinguish complete without alert (0), complete
+  with alert/difference (1), invalid input/freeze (2) and partial/unavailable (3)
+- Integrity `verify-*` commands can return 0 for intact evidence of a historical
+  incomplete run; read the stored semantic state. They do not turn it into success
+- Reproduction disagreement uses 1; invalid evidence uses a failure code
+- `costs` uses 3 for incomplete measurement
+- `scale` and `verify-scale` use 3 for unsuccessful/incomplete measurement or
+  invalid finalization. Their zero is expected-workload completion, not equivalence
+
+The historical core `equiframe.benchmark` placeholder is quarantined and not a
+compatible shortcut into this package. Do not reenable its removed metrics or
+infer scientific results from synthetic demonstrations.
+
+## Development and contribution
+
+From `packages/equiframe-benchmark`, with the matching core wheel already built:
 
 ```bash
 uv sync --locked --all-extras --reinstall-package equiframe
@@ -116,190 +254,15 @@ uv run --locked --all-extras mypy
 uv run --locked --all-extras python tools/generate_assets.py --check
 uv run --locked --all-extras pytest -q
 uv run --locked --all-extras python -m build --no-isolation
+uv run --locked --all-extras twine check --strict dist/*.whl dist/*.tar.gz
 uv run --locked --all-extras python tools/verify_distribution.py
 ```
 
-La última comprobación requiere el wheel de `equiframe 0.11.1` construido en
-`../equiframe/dist`. Instala ambos paquetes por nombre con pip fuera del checkout,
-comprueba imports ligeros, ejecuta la suite y piloto instalados, y reconstruye
-el wheel desde sdist. La matriz de cinco plataformas está disponible solo mediante
-despacho manual autorizado; permanece desactivada por la cuota de Actions.
-
-Arquitectura, límites y decisiones: `docs/STEP_06_DESIGN.md` en el repositorio.
-IF/MAD/H están disponibles desde el núcleo 0.7.0. No hay métricas científicas finales, integración productiva SERCOP/DW
-ni aprobaciones científicas en esta distribución. La licencia y publicación pública permanecen pendientes.
-
-## Selección normal de calibración y soporte por grupos
-
-`select_normal_calibration` recibe los mismos argumentos nombrados que
-`select_normal_training`, pero exige la partición de calibración. Conserva
-las comprobaciones de O normal confirmado, captura exacta, artefactos íntegros
-y una sola familia. Entrega `CalibrationSelection.calibration` al núcleo.
-
-Antes de ajustar, audite ambas selecciones:
-
-```python
-audit = eb.audit_detector_selections(
-    training_selection,
-    calibration_selection,
-    min_training_groups=3,
-    min_calibration_groups=2,
-    rationale="Mínimos del ejemplo; deben justificarse antes de congelar",
-)
-if audit.state != "eligible":
-    raise ValueError("Grupos insuficientes: ampliar el piloto antes de ajustar")
-fit = ef.fit_detectors(
-    training_selection.training,
-    spec=training_selection.training.profiles[0].spec,
-    config=ef.IsolationForestConfig(random_state=7),
-    support=ef.DetectorSupport(
-        min_training_rows=20,
-        min_calibration_rows=10,
-        rationale="Mínimos técnicos del ejemplo, sin garantía inferencial",
-    ),
-)
-bundle = ef.calibrate_detectors(fit, calibration_selection.calibration, alpha="0.05")
-```
-
-La auditoría exige igual catálogo/split, features compatibles y ausencia de
-escenarios, grupos, ejecuciones o perfiles compartidos. Devuelve cantidades de
-grupos y `eligible`/`not_estimable`; el llamador debe conservarla y respetarla.
-La biblioteca general no puede autenticar declaraciones de normalidad o grupos.
-Ningún umbral de ejemplo es aprobación del protocolo científico. El piloto
-original conserva sus 35 revisiones pendientes; no se usa para producir un
-modelo científico ni se amplía con revisiones automáticas.
-
-## Integración del paso 9
-
-`SnapshotDataSource` recibe un ID de publicación y un cliente confiable inyectado.
-`run_integration` ejecuta las tres implementaciones registradas, verifica sus
-entradas y compara las tres parejas. Un esperado opcional se fija antes de las
-corridas; conservar un `ExecutionResult` conserva también sus precondiciones.
-
-```bash
-equiframe-benchmark integrate integration.json --snapshot-id snapshot-2026-01 \
-  --client mi_cliente:create_client --registry mis_etl:create_registry \
-  --output integration-runs --expected expected.arrow
-equiframe-benchmark verify-integration integration-runs/integration_ID
-```
-
-Los factories se importan y ejecutan por solicitud explícita: deben ser código
-confiable. El JSON no define callbacks ni contiene credenciales. Los códigos
-0/1/2/3 siguen la completitud y alertas del resultado; verificar correctamente
-un expediente incompleto devuelve 0 y conserva `complete=false` en el resumen.
-
-El ejemplo `examples/integration_local.py` usa datos sintéticos, tres motores
-reales y decimales por moneda. Comprueba resultados esperados e inventarios;
-conserva una alerta parcial de Pandas por su precisión decimal nativa. La
-comparación lossless no desactiva esa regla de contrato. `reconcile_awards`
-comprueba grano e importes exactos con columnas configuradas y no genera O.
-Cliente productivo, snapshots representativos del DW, DDL/mapeos y aceptación OCI
-siguen pendientes. El consumidor público acotado actual está en
-[caso SERCOP](https://github.com/htroya/equiframe/blob/main/docs/SERCOP_EXAMPLE.md).
-
-## Evaluación y reproducción del paso 10
-
-`FreezeDefinition` fija catálogo, particiones por grupos, casos de prueba, cinco
-familias, selecciones/modelos previos, doce decisiones metodológicas, archivos
-con SHA/tamaño, versiones y protocolos de evaluación/coste. Un sello de piloto
-verifica integridad y conserva los bloqueos científicos. Un sello final exige
-resolverlos; no genera revisiones ni ajusta modelos con prueba.
-
-```bash
-equiframe-benchmark freeze definition.json --output freeze.json
-equiframe-benchmark verify-freeze freeze.json
-equiframe-benchmark run-study freeze.json --registry mis_etl:create_registry --output studies
-equiframe-benchmark verify-study studies/study_ID
-equiframe-benchmark evaluate studies/study_ID --output evaluation.json
-equiframe-benchmark tables studies/study_ID --output regenerated-tables
-equiframe-benchmark bundle-study studies/study_ID --output portable-study
-equiframe-benchmark reproduce-study portable-study --expected-sha256 SHA_DEL_BUNDLE_JSON
-```
-
-La comparación principal exige O confirmado y R/M/B/H completos sobre los mismos
-casos. Se conservan soporte propio, alertas parciales, fallos y exclusiones.
-Precisión, recall, F1 y FPR indefinidos quedan vacíos con un motivo explícito.
-AP requiere dos clases y una misma familia/modelo. El bootstrap remuestrea grupos
-enteros, conserva réplicas indefinidas y requiere una justificación previa de
-independencia. Los seis CSV contienen los denominadores y se regeneran desde
-registros íntegros; editar un CSV y recalcular su hash no altera la evidencia válida.
-
-`costs spec.json --bundle detector.json --output costs-runs` compara perfil+M
-aislado con comparación exhaustiva sobre capturas existentes. Hace un calentamiento
-y cinco repeticiones por método, alterna el orden y registra tiempo, CPU y RSS.
-No incluye ETL inicial ni llama al detector MAD al medir M. Instalar el extra
-`resources` habilita psutil; un monitor fallido conserva medidas ausentes y motivos.
-RSS es máximo absoluto muestreado, no asignación neta ni límite duro de memoria.
-`cost-table costs-runs/cost_ID --output costs.csv` conserva las doce observaciones
-crudas, sus unidades y motivos; no las suma ni las convierte en réplicas independientes.
-
-`run-study` devuelve 1 ante alertas de un estudio completo y 3 si queda incompleto;
-`costs` devuelve 3 si la medición queda incompleta. Los lectores `verify-*` devuelven
-0 al verificar correctamente un expediente incompleto y conservan sus estados.
-
-Los bundles copian bytes originales, capturas y fuentes congeladas sin reescribir
-sus manifiestos. `reproduce-study` verifica el inventario y regenera tablas desde
-decisiones capturadas. La repetición de ETL por un compañero es un criterio externo
-pendiente; este comando no inventa su ejecución ni su aprobación. No hay todavía
-corpus científico cerrado, métricas finales ni resultados para capítulos 4/5.
-
-El paso 10 inventaría licencia, nombre, metadatos, dependencias y tipado; no reserva
-un nombre ni publica en PyPI. Ver [diseño](../../docs/STEP_10_DESIGN.md),
-[evaluación](../../docs/STEP_10_EVALUATION.md) e
-[inventario de distribución](../../docs/STEP_10_DISTRIBUTION.md).
-
-## Puente de Verify 0.11.1
-
-`OracleVerificationBridge` y `oracle_verification_bridge` vinculan los tipos
-históricos `Scenario`, `Candidate`, `OracleResult` con `VerificationBinding`,
-procedencia del esperado y revisiones del núcleo. `evaluate_oracle` conserva su
-API. El plan y la dependencia del esperado se suministran explícitamente; no se
-infieren revisores reales ni se autentican nombres JSON. El núcleo puede usar
-Verify sin instalar este paquete.
-
-Se fijó `equiframe==0.11.1`; extras y locks reflejan esa pareja. Twine se incorpora
-al entorno de desarrollo. La CI es manual y la matriz remota del candidato no fue
-ejecutada. [Candidato, controles y pendientes](https://github.com/htroya/equiframe/blob/main/docs/RELEASE_CANDIDATE.md).
-
-### Núcleo local usado por las pruebas
-
-Durante cambios del mismo candidato, `uv` puede reutilizar una instalación en
-caché de la dependencia local. Reinstale `equiframe` con el comando anterior
-antes de controles manuales del benchmark. Para un candidato identificado use
-`python ../equiframe/tools/check_candidate.py --package . --output /ruta/checks.json`:
-el driver reinstala dependencias locales y comprueba sus rutas de import y hashes
-runtime frente a la fuente antes de cada etapa. La suite instalada sigue
-consumiendo los wheels exactos fuera del checkout. Son pruebas de ingeniería,
-no ejecución independiente del protocolo científico.
-
-
-## Engineering scale and resource measurements (STEP8)
-
-`ScaleSpec`, `ScaleTrial`, `ScaleRun`, `measure_scale`, `read_scale` and
-`summarize_scale` are experimental engineering APIs. The `scale` and
-`verify-scale` commands use the same implementation. They extend this package's
-cost infrastructure without changing its scientific paired `CostProtocol` or
-any stored study, label, detector, oracle or historical reader.
-
-[Protocol, actual timing boundaries, resources, baselines and crash interpretation](../../docs/SCALING.md).
-One isolated trusted worker records all raw repetitions, separate fresh/warm
-process conditions (OS caches uncontrolled), nine stages, worker RSS/CPU/I/O,
-sampled disk and evidence bytes. Completion requires valid child finalization,
-expected complete verdicts and verified artifacts. Resource quality is separate:
-`resource_measurement_complete` remains false for incomplete monitoring, even
-when the operation and expected verdict completed successfully.
-
-```bash
-python examples/scale_local.py --output scale-runs
-# Larger, explicit admission only after reviewing machine/disk/work budgets:
-python examples/scale_local.py --rows 100000 --output scale-100k
-```
-
-The example defaults to 1k rows; `--rows 1000000` is separately available and
-uses a larger declared timeout/work budget. It is not a scale promise. RSS/disk
-thresholds are reactive sampled termination, not hard quotas. No network or
-external service is loaded. Native pandas/DuckDB baselines are restricted to
-matching exact integer/text/NULL semantics and explicitly provide less evidence.
-DataComPy remains unpinned/unavailable, with no invented measurement. Full raw
-failures, missing completion and partial sampling stay visible. These local
-receipts are location-bound; reproduce using the specification and exact wheels.
+`--reinstall-package equiframe` prevents stale local dependency caching while a
+private version is unchanged. The byte-bound candidate driver is
+`python ../equiframe/tools/check_candidate.py --package . --output /absolute/path/new-checks.json`.
+These are checks to execute, not claims they already passed this artifact.
+Source tests, exact installed tests and remote CI are distinct evidence. Preserve
+historical fixtures, safe failures and methodological boundaries. Follow the core
+handbook's contribution, upgrade, security and release procedures. No public
+publication or production deployment is authorized by building these artifacts.

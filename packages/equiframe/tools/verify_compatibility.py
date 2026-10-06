@@ -229,6 +229,33 @@ def extract_sdist(sdist: Path, destination: Path, wheel_files: dict[str, dict[st
         for path in package.rglob("*")
         if path.is_file()
     }
+    config = tomllib.loads((source / "pyproject.toml").read_text("utf-8"))
+    mapping = (
+        config.get("tool", {})
+        .get("hatch", {})
+        .get("build", {})
+        .get("targets", {})
+        .get("wheel", {})
+        .get("force-include", {})
+    )
+    if mapping:
+        if mapping != {"docs": "equiframe/docs"}:
+            raise ValueError("unsupported wheel force-include mapping")
+        handbook = source / "docs"
+        if handbook.is_symlink() or not handbook.is_dir():
+            raise ValueError("packaged handbook source is absent or linked")
+        documents = {}
+        for path in sorted(handbook.rglob("*")):
+            if path.is_symlink():
+                raise ValueError("packaged handbook cannot contain symlinks")
+            if path.is_file():
+                key = "equiframe/docs/" + path.relative_to(handbook).as_posix()
+                if key in found:
+                    raise ValueError("packaged handbook shadows runtime payload")
+                documents[key] = artifact_record(path)
+        if not documents:
+            raise ValueError("packaged handbook is empty")
+        found.update(documents)
     if found != wheel_files:
         raise ValueError("sdist runtime payload does not match the provided wheel")
     for required in ("pyproject.toml", "tests", "examples", "tools"):

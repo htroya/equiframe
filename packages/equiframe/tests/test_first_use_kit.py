@@ -210,3 +210,30 @@ def test_lock_export_rejects_ambiguous_versions(tmp_path: Path) -> None:
     lock.write_text('[[package]]\nname="pandas"\n[[package]]\nname="pandas"\n', "utf-8")
     with pytest.raises(ValueError, match="multiple locked resolutions"):
         BUILD["locked_requirements"](lock)
+
+
+@pytest.mark.parametrize("mutation", ["none", "changed", "missing", "extra"])
+def test_packaged_handbook_is_part_of_exact_wheel_binding(package: Path, mutation: str) -> None:
+    project = package / "pyproject.toml"
+    project.write_text(
+        project.read_text()
+        + '\n[tool.hatch.build.targets.wheel.force-include]\n"docs" = "equiframe/docs"\n'
+    )
+    docs = package / "docs"
+    docs.mkdir()
+    (docs / "index.md").write_text("Synthetic English handbook")
+    wheel = package / "dist" / "equiframe-0.0.0-py3-none-any.whl"
+    with zipfile.ZipFile(wheel, "a") as archive:
+        if mutation != "missing":
+            archive.writestr(
+                "equiframe/docs/index.md",
+                "Changed" if mutation == "changed" else "Synthetic English handbook",
+            )
+        if mutation == "extra":
+            archive.writestr("equiframe/docs/undeclared.md", "Unexpected")
+    if mutation == "none":
+        payload = BUILD["verify_wheel_source"](wheel, package, "0.0.0")
+        assert "equiframe/docs/index.md" in payload
+    else:
+        with pytest.raises(ValueError, match=r"runtime (bytes|inventory)"):
+            BUILD["verify_wheel_source"](wheel, package, "0.0.0")

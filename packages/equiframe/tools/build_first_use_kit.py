@@ -111,6 +111,33 @@ def verify_wheel_source(wheel: Path, package: Path, version: str) -> dict[str, d
             raise ValueError("runtime source cannot contain symlinks")
         if path.is_file():
             source[relative] = file_record(path)
+    config = tomllib.loads((package / "pyproject.toml").read_text("utf-8"))
+    mapping = (
+        config.get("tool", {})
+        .get("hatch", {})
+        .get("build", {})
+        .get("targets", {})
+        .get("wheel", {})
+        .get("force-include", {})
+    )
+    if mapping:
+        if mapping != {"docs": "equiframe/docs"}:
+            raise ValueError("unsupported wheel force-include mapping")
+        handbook = package / "docs"
+        if handbook.is_symlink() or not handbook.is_dir():
+            raise ValueError("packaged handbook source is absent or linked")
+        documents = {}
+        for path in sorted(handbook.rglob("*")):
+            if path.is_symlink():
+                raise ValueError("packaged handbook cannot contain symlinks")
+            if path.is_file():
+                key = "equiframe/docs/" + path.relative_to(handbook).as_posix()
+                if key in source:
+                    raise ValueError("packaged handbook shadows runtime payload")
+                documents[key] = file_record(path)
+        if not documents:
+            raise ValueError("packaged handbook is empty")
+        source.update(documents)
     if not source:
         raise ValueError("runtime source payload is empty")
     file_record(wheel)

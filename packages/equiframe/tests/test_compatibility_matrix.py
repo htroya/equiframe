@@ -594,3 +594,27 @@ def test_successful_subprocess_cannot_hide_artifact_change_during_its_execution(
     (entry,) = receipt["commands"]
     assert entry["exit_code"] == 0
     assert Path(entry["stdout"]).read_text() == "command completed\n"
+
+
+@pytest.mark.parametrize("mutation", ["none", "changed", "missing", "extra"])
+def test_sdist_handbook_is_compared_with_exact_wheel_payload(runner, tmp_path, mutation):
+    config = (
+        b'[project]\nname="equiframe"\n'
+        b'[tool.hatch.build.targets.wheel.force-include]\n"docs"="equiframe/docs"\n'
+    )
+    files = {"equiframe-0.0.0/src/" + name: raw for name, raw in RUNTIME.items()}
+    files["equiframe-0.0.0/pyproject.toml"] = config
+    files["equiframe-0.0.0/tests/test_synthetic.py"] = b"def test_ok(): assert True\n"
+    if mutation != "missing":
+        files["equiframe-0.0.0/docs/index.md"] = (
+            b"Changed" if mutation == "changed" else b"Handbook"
+        )
+    if mutation == "extra":
+        files["equiframe-0.0.0/docs/extra.md"] = b"Unexpected"
+    wheel = records({**RUNTIME, "equiframe/docs/index.md": b"Handbook"})
+    if mutation == "none":
+        source = runner["extract_sdist"](make_sdist(tmp_path, files), tmp_path / "out", wheel)
+        assert (source / "docs/index.md").read_bytes() == b"Handbook"
+    else:
+        with pytest.raises(ValueError, match=r"handbook|runtime payload"):
+            runner["extract_sdist"](make_sdist(tmp_path, files), tmp_path / "out", wheel)

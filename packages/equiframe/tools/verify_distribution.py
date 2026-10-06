@@ -436,6 +436,11 @@ import equiframe
 root = Path(sys.prefix).resolve()
 assert Path(equiframe.__file__).resolve().is_relative_to(root), equiframe.__file__
 assert Path(equiframe.__file__).with_name('py.typed').is_file()
+from importlib.resources import files
+handbook = files('equiframe').joinpath('docs')
+for title in ('index','quickstart','recipes','api','semantics','compatibility',
+              'performance','upgrading','contributing','security','releasing','dependencies'):
+    assert handbook.joinpath(title + '.md').read_text(encoding='utf-8').strip()
 assert equiframe.__version__ == importlib.metadata.version('equiframe') == sys.argv[1]
 for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy', 'pyarrow',
              'pytest', 'hypothesis', 'IPython', 'jupyter'):
@@ -555,6 +560,18 @@ print('Installed wheel API roundtrips all five fixtures exactly')
             "schemas/ingestion-spec-1.0.schema.json",
             "schemas/load-receipt-1.0.schema.json",
             "tools/release_manifest.py",
+            "docs/index.md",
+            "docs/quickstart.md",
+            "docs/recipes.md",
+            "docs/api.md",
+            "docs/semantics.md",
+            "docs/compatibility.md",
+            "docs/performance.md",
+            "docs/upgrading.md",
+            "docs/contributing.md",
+            "docs/security.md",
+            "docs/releasing.md",
+            "docs/dependencies.md",
             "tools/build_first_use_kit.py",
             "tools/verify_first_use.py",
             "examples/first_use/README.md",
@@ -567,7 +584,7 @@ print('Installed wheel API roundtrips all five fixtures exactly')
         ):
             if not (source / path).is_file():
                 raise RuntimeError("sdist is missing " + path)
-        # Rebuild from the sdist with the same locked backend and compare all wheel bytes.
+        # Rebuild both archives with the locked backend; compare every byte.
         source_env = dict(env, UV_PROJECT_ENVIRONMENT=str(work / "source-build"))
         run(
             [
@@ -586,13 +603,16 @@ print('Installed wheel API roundtrips all five fixtures exactly')
             work / "source-build" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
         )
         run(
-            [str(source_python), "-m", "build", "--wheel", "--no-isolation"],
+            [str(source_python), "-m", "build", "--no-isolation"],
             cwd=source,
             env=source_env,
         )
         rebuilt = next((source / "dist").glob("*.whl"))
         if rebuilt.read_bytes() != wheel.read_bytes():
             raise RuntimeError("wheel rebuilt from sdist is not byte reproducible")
+        rebuilt_sdist = next((source / "dist").glob("*.tar.gz"))
+        if rebuilt_sdist.read_bytes() != sdist.read_bytes():
+            raise RuntimeError("sdist rebuilt from sdist is not byte reproducible")
         run(
             [uv, "pip", "install", "--python", str(source_python), "--no-deps", str(rebuilt)],
             cwd=work,
@@ -699,7 +719,7 @@ assert Path(equiframe.__file__).resolve().is_relative_to(Path(sys.prefix).resolv
         )
     print(
         "Verified base/extras outside checkout, API/CLI, typed consumer, "
-        "sdist tests and byte-identical wheel rebuild"
+        "sdist tests and byte-identical wheel/sdist rebuild"
     )
 
 

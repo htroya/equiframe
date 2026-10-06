@@ -8,6 +8,11 @@ on:
         type: boolean
         required: true
         default: false
+      run_advisories:
+        description: 'Query PyPI/OSV for exact dependency versions; unknown/findings fail this job'
+        type: boolean
+        required: true
+        default: false
 
 permissions:
   contents: read
@@ -40,7 +45,59 @@ jobs:
         run: |
           uv run --locked --all-extras python tools/release_manifest.py --checks dist/checks.json --commit "$GITHUB_SHA" --output dist/core-manifest.json
           uv run --locked --all-extras python tools/release_manifest.py --package ../equiframe-benchmark --checks ../equiframe-benchmark/dist/checks.json --commit "$GITHUB_SHA" --output ../equiframe-benchmark/dist/benchmark-manifest.json
+      - name: Generate artifact-bound dependency and license inventories (offline)
+        run: |
+          PY=packages/equiframe/.venv/bin/python
+          TOOL=packages/equiframe/tools/dependency_inventory.py
+          "$PY" "$TOOL" generate --package packages/equiframe \
+            --artifact packages/equiframe/dist/equiframe-0.11.1-py3-none-any.whl \
+            --artifact packages/equiframe/dist/equiframe-0.11.1.tar.gz \
+            --output packages/equiframe/dist/dependencies
+          "$PY" "$TOOL" generate --package packages/equiframe-benchmark \
+            --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.11.1-py3-none-any.whl \
+            --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.11.1.tar.gz \
+            --environment-python packages/equiframe-benchmark/.venv/bin/python \
+            --local-artifact packages/equiframe/dist/equiframe-0.11.1-py3-none-any.whl \
+            --output packages/equiframe-benchmark/dist/dependencies
+          "$PY" "$TOOL" verify --package packages/equiframe \
+            --artifact packages/equiframe/dist/equiframe-0.11.1-py3-none-any.whl \
+            --artifact packages/equiframe/dist/equiframe-0.11.1.tar.gz \
+            --inventory packages/equiframe/dist/dependencies/inventory.json
+          "$PY" "$TOOL" verify --package packages/equiframe-benchmark \
+            --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.11.1-py3-none-any.whl \
+            --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.11.1.tar.gz \
+            --environment-python packages/equiframe-benchmark/.venv/bin/python \
+            --local-artifact packages/equiframe/dist/equiframe-0.11.1-py3-none-any.whl \
+            --inventory packages/equiframe-benchmark/dist/dependencies/inventory.json
+      - name: Query current dependency advisories (explicit networked check)
+        if: inputs.run_advisories
+        run: |
+          PY=packages/equiframe/.venv/bin/python
+          TOOL=packages/equiframe/tools/dependency_inventory.py
+          status=0
+          "$PY" "$TOOL" scan --inventory packages/equiframe/dist/dependencies/inventory.json \
+            --output packages/equiframe/dist/advisories || status=$?
+          "$PY" "$TOOL" scan --inventory packages/equiframe-benchmark/dist/dependencies/inventory.json \
+            --output packages/equiframe-benchmark/dist/advisories || status=$?
+          if [ "$status" -eq 0 ]; then
+            "$PY" "$TOOL" verify --package packages/equiframe \
+              --artifact packages/equiframe/dist/equiframe-0.11.1-py3-none-any.whl \
+              --artifact packages/equiframe/dist/equiframe-0.11.1.tar.gz \
+              --inventory packages/equiframe/dist/dependencies/inventory.json \
+              --advisories packages/equiframe/dist/advisories/advisories.json \
+              --max-age-hours 24 --require-clean
+            "$PY" "$TOOL" verify --package packages/equiframe-benchmark \
+              --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.11.1-py3-none-any.whl \
+              --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.11.1.tar.gz \
+              --environment-python packages/equiframe-benchmark/.venv/bin/python \
+              --local-artifact packages/equiframe/dist/equiframe-0.11.1-py3-none-any.whl \
+              --inventory packages/equiframe-benchmark/dist/dependencies/inventory.json \
+              --advisories packages/equiframe-benchmark/dist/advisories/advisories.json \
+              --max-age-hours 24 --require-clean
+          fi
+          exit "$status"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && !cancelled()
         with:
           name: equiframe-candidate-${{ github.sha }}
           path: |

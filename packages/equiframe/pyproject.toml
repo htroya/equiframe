@@ -14,7 +14,7 @@ dependencies = ["pydantic>=2.12,<3", "typer>=0.20,<1", "tzdata>=2025.2"]
 
 [project.urls]
 Repository = "https://github.com/htroya/equiframe"
-Documentation = "https://github.com/htroya/equiframe/blob/main/packages/equiframe/README.md"
+Documentation = "https://github.com/htroya/equiframe/blob/main/packages/equiframe/docs/index.md"
 
 [project.optional-dependencies]
 ml = ["scikit-learn>=1.7,<1.10", "numpy>=2,<3"]
@@ -43,8 +43,11 @@ dev = [
 [tool.hatch.build.targets.wheel]
 packages = ["src/equiframe"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"docs" = "equiframe/docs"
+
 [tool.hatch.build.targets.sdist]
-include = ["/src", "/tests", "/examples", "/schemas", "/tools", "/pyproject.toml", "/uv.lock", "/README.md", "/CHANGELOG.md"]
+include = ["/docs", "/src", "/tests", "/examples", "/schemas", "/tools", "/pyproject.toml", "/uv.lock", "/README.md", "/CHANGELOG.md"]
 
 # Historical synthetic evidence is intentionally shipped despite the repository's
 # global data-file ignores; the closed fixture inventory validates every byte.

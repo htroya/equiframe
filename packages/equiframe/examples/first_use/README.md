@@ -1,24 +1,28 @@
-# Primer uso: tres recetas reproducibles
+# Three reproducible installed recipes
 
-Candidato privado EquiFrame 0.11.1, **Python 3.12 únicamente**. No instale el
-nombre desde PyPI: el paquete del equipo no está publicado allí. Este kit
-contiene el wheel exacto, cuatro scripts (tres recetas y su fixture pytest),
-dependencias fijadas con hashes y estas guías. No necesita el checkout.
-Los datos son sintéticos, pequeños y definidos en los scripts. No hay descargas
-de datos, SQL remoto, credenciales, servicios, notebooks ni cambios al sistema.
+This standalone guide accompanies the verified private kit. The installed
+wheel also includes an English handbook, available through
+`importlib.resources.files("equiframe").joinpath("docs/index.md")`.
 
-**Meta por validar:** un primer diagnóstico útil en cinco minutos. La ejecución
-automatizada por un consumidor técnico independiente no demuestra usabilidad
-humana. Registre el primer uso real en `OBSERVATION.md`; no invente una medición.
+These recipes use the private EquiFrame **0.11.1** first-use kit and **Python
+3.12 only**. The kit contains the exact wheel, three recipe scripts and their
+pytest fixture, pinned dependencies with hashes, an integrity verifier and
+English guides. No checkout, real dataset, credential, remote SQL, notebook or
+service is required. Inputs are small synthetic fixtures defined in the scripts.
 
-## 1. Obtener y verificar el kit
+The target of a first useful diagnosis within five minutes is **not yet validated
+by human observation**. Automated independent artifact checks are technical
+evidence, not a substitute for that observation. Preserve the kit's unfilled
+`OBSERVATION.md` and record a real attempt separately if you participate.
 
-Use el kit privado preparado del candidato, recibido por el canal autorizado.
-Descomprímalo en una carpeta nueva llamada `kit`, fuera del repositorio, y abra
-una terminal allí. Mantenga esa carpeta intacta: entorno, resultados y registro
-de observación se guardan en carpetas hermanas. Necesita Python 3.12 instalado. Compare el SHA-256 del ZIP con el recibo
-recibido por separado antes de extraerlo si necesita comprobar su procedencia.
-El manifiesto interno detecta cambios de archivos, no autentica al remitente.
+## 1. Obtain, verify and install the kit
+
+Obtain the candidate kit through the authorized private channel. Compare its
+archive SHA-256 with the separately supplied trusted receipt **before extraction**.
+Extract it into a new directory named `kit`, outside the repository, and open a
+terminal there. Keep the kit unchanged: environments, outputs and completed
+observation records belong in sibling directories. The internal manifest detects
+byte changes; it does not authenticate the sender.
 
 ```bash
 python3.12 --version
@@ -26,94 +30,92 @@ python3.12 verify_kit.py
 python3.12 -m venv ../first-use-env
 ```
 
-En Windows use `py -3.12` en lugar de `python3.12`. Active el entorno:
+On Windows use `py -3.12` in place of `python3.12`. Activate the environment:
 
-- Linux/macOS: `source ../first-use-env/bin/activate`
-- PowerShell: `..\first-use-env\Scripts\Activate.ps1` (si la política local lo impide,
-  use directamente `..\first-use-env\Scripts\python.exe`; no cambie políticas de seguridad)
+- Linux/macOS shell: `source ../first-use-env/bin/activate`
+- PowerShell: `..\first-use-env\Scripts\Activate.ps1`. If local policy prevents
+  activation, use `..\first-use-env\Scripts\python.exe` directly; do not change
+  security policy
 
-Instale en ese entorno limpio:
+These are platform command conventions, not new platform acceptance results.
+Install into the new environment:
 
 ```bash
 python -m pip install --require-hashes --only-binary=:all: -r requirements.lock
 python -m pip install --no-index --no-deps --force-reinstall wheels/equiframe-0.11.1-py3-none-any.whl
 python -m pip check
-python -c "import equiframe, sys; print(sys.version); print(equiframe.__file__)"
+python -I -c "import equiframe, sys; print(sys.version); print(equiframe.__file__)"
 ```
 
-La primera instalación **descarga explícitamente dependencias de su índice pip
-configurado**; no descarga datasets. Los pins/hashes proceden del `uv.lock` del
-candidato. La segunda usa únicamente el wheel verificado. Para una instalación
-sin red, prepare antes un wheelhouse de esos mismos pins y añada
-`--no-index --find-links /ruta/wheelhouse` al primer comando. No se incluyen
-binaries de dependencias en el kit. No retire hashes ni fuerce otras versiones
-para superar un error. Si no hay wheel para su plataforma, registre el bloqueo;
-esta entrega no certifica una matriz de plataformas nueva.
+The **first command deliberately downloads dependencies from your configured pip
+index**; it does not download datasets. Pins and hashes come from the candidate's
+`uv.lock`. The second command installs only the verified local EquiFrame wheel.
+The import must resolve to the environment, not the source checkout. Do not add
+`PYTHONPATH` or use an editable install.
 
-Si solo dispone del código fuente y de un wheel construido, el mantenedor puede
-preparar el mismo kit con `python tools/build_first_use_kit.py --output /ruta/nueva`
-desde `packages/equiframe`. Sus controles de distribución prueban la instalación
-copiada fuera del checkout. Para el primer uso siga desde aquí solo el kit.
+For offline installation, first obtain a reviewed wheelhouse containing those
+same pinned dependency wheels and add
+`--no-index --find-links /absolute/path/wheelhouse` to the first install command.
+Dependency binaries are not inside the kit. Do not remove hashes or force other
+versions to bypass a failure. If your platform has no compatible wheel, record
+the blocker; this guide does not certify a new platform matrix.
 
-## 2. Diagnosticar un refactor pandas
+A maintainer with the source distribution and built wheel can prepare a kit with
+`python tools/build_first_use_kit.py --output /absolute/path/new-kit` from the
+core package directory. That builder does not resolve new dependencies or
+publish a package. Consumers continue using only the resulting kit.
 
-Después de instalar, cree una carpeta hermana nueva para todos los resultados:
+## 2. Diagnose a pandas refactor
+
+Create a sibling working directory and run all commands below from there:
 
 ```bash
 python -c "from pathlib import Path; Path('../first-use-work').mkdir()"
 cd ../first-use-work
-```
-
-Los comandos siguientes se ejecutan desde `first-use-work`. `../kit` permanece
-inalterado y se puede verificar otra vez con `python ../kit/verify_kit.py`.
-Guarde el formulario de observación completado en esta carpeta de trabajo,
-no dentro del kit original.
-
-```bash
 python -I ../kit/refactor_comparison.py --output refactor-different
 ```
 
-**Salida esperada: código 1**, deliberado. El reporte muestra:
+**Expected process exit: 1**, a deliberate regression. The report identifies:
 
-- `different`, evaluación y cobertura completas, estrategia `key`
-- Clave `id="B"`, columna `total_cents`
-- Candidato `integer(2001)` frente a esperado `integer(2000)`; ambos `int64`
-- Política numérica `exact`, unidad declarada `USD_cent`; una fila modificada
+- `different`, complete evaluation and coverage, strategy `key`
+- Key `id="B"`, column `total_cents`
+- Candidate `integer(2001)` versus expected `integer(2000)`, both `int64`
+- Exact numeric policy, declared unit `USD_cent`, one modified row
 
-Abra `refactor-different/report/report.html` o lea `report.txt`. El contrato
-inspeccionable queda en `refactor-different/contract.json`. El refactor vectorizado
-introdujo un centavo; las filas reordenadas no son el fallo porque su orden se
-ignora y la clave única se valida. La referencia conserva la implementación
-anterior y se contrasta además con los tres valores literales de esta fixture.
-Esto no convierte pandas ni una referencia histórica en un oráculo universal.
+Open `refactor-different/report/report.html` or read `report.txt`. The inspectable
+contract is `refactor-different/contract.json`. The vectorized refactor added one
+cent. Reordered rows are allowed because the contract ignores order and verifies
+a unique key. The reference preserves the earlier implementation and is also
+checked against three literal fixture values. This does not make pandas or a
+historical output a universal oracle.
 
-Ejecute el caso corregido sin cambiar la política:
+Run the correction **without changing the policy**:
 
 ```bash
 python -I ../kit/refactor_comparison.py --case equivalent --output refactor-equivalent
 ```
 
-Código 0, `equivalent`. Extensión sin clave:
+Expected exit 0, `equivalent`. Try the no-key extension:
 
 ```bash
 python -I ../kit/refactor_comparison.py --without-key --output refactor-bag
 python -I ../kit/refactor_comparison.py --without-key --case equivalent --output refactor-bag-ok
 ```
 
-Códigos 1 y 0. Sin identidad se comparan multiconjuntos: se conservan ocurrencias,
-no se inventan filas modificadas. La primera diferencia se expresa como excesos
-de filas por lado. No deduplicar para hacer pasar. Los tres enteros de la fixture
-son pequeños; esta receta no promete aritmética int64 sin overflow para entradas
-arbitrarias. No representa montos fraccionarios ni conversiones de moneda.
+Expected exits 1 and 0. Without row identity, EquiFrame compares multisets and
+preserves occurrences; it reports excess rows on each side rather than claiming
+which business row changed. Do not deduplicate to make it pass. This fixture's
+integers are small: it does not promise overflow-free int64 arithmetic for
+arbitrary inputs, fractional currency handling or currency conversion.
 
-**Evidencia:** este script muestra únicamente sus valores sintéticos conocidos.
-Use `--redacted` para ocultar valores y metadatos del reporte. Los originales
-se eliminan al salir salvo que añada `--work-dir private-refactor` (fuera del
-reporte). Esa opción conserva capturas privadas y diferencias completas; no las
-suba automáticamente. El contrato adjunto contiene nombres/unidades sintéticos,
-incluso en modo redactado; comparta solo `report/` si quiere la vista mínima.
+This script displays only its known synthetic values. `--redacted` hides values
+and metadata in the report. Raw captures are temporary unless you supply
+`--work-dir private-refactor`, which retains private snapshots and full differences.
+Keep that directory separate from reports and do not upload it automatically.
+The attached contract still contains synthetic names/units in redacted mode;
+share only `report/` for the minimized view.
 
-## 3. Validar una migración acotada pandas → DuckDB
+## 3. Validate a bounded pandas → DuckDB migration
 
 ```bash
 python -I ../kit/migrate_duckdb_recipe.py --case equivalent --output migration-ok
@@ -121,41 +123,43 @@ python -I ../kit/migrate_duckdb_recipe.py --case different --output migration-re
 python -I ../kit/migrate_duckdb_recipe.py --case not_evaluable --output migration-limited
 ```
 
-Códigos 0, 1 y 3. Usa **`ef.migrate` real**, con un IR `Scan` + `Aggregate`,
-no traduce programas Python ni SQL arbitrarios. Ambos motores ejecutan su propia
-implementación sobre la misma captura; el esperado es literal y separado.
-Tipos Decimal/escala, moneda, importes NULL, suma vacía y conteo se declaran antes
-de ejecutar. El caso negativo cambia deliberadamente la semántica de suma vacía:
-ambos motores pueden estar `equivalent` entre sí y aun así `verification=divergent`
-frente al esperado conservado. No es una divergencia de motores inventada.
+Expected exits **0, 1 and 3**. The script uses the real `ef.migrate` API with a
+`Scan` + `Aggregate` relational plan. It does not translate arbitrary Python or
+SQL. Both engines execute their native implementation over the same snapshot;
+the literal expected output is captured separately. Decimal type/scale, currency,
+NULL amounts, empty-sum behavior and counts are declared before execution.
 
-Cada salida contiene `source-target/`, `source-expected/` y `target-expected/`;
-cada carpeta conserva `report.json`, `report.txt`, `report.html` y
-`evidence-manifest.json`, verificados antes de anunciar la publicación.
-`not_evaluable` limita cada comparación a una fila; sus conteos parciales no son
-totales finales. No cambie el esperado para resolverlo.
+The negative case deliberately changes empty-sum semantics. The engines may
+therefore be `equivalent` to each other while `verification="divergent"` against
+the unchanged expected output. This is a shared error, not a fabricated
+cross-engine discrepancy.
 
-`--show-synthetic-values` permite inspeccionar el esperado literal y ambas
-salidas materializadas. Se esperan EUR: total NULL/2 filas, JPY: 0.00/1 fila y
-USD: Decimal exacto 1000000000000000.03/3 filas. El negativo cambia únicamente
-el total EUR a 0.00 en ambos motores; cada comparación contra el esperado
-conserva una diferencia. Por defecto no se imprimen valores y los reportes
-están redactados. Las capturas originales son temporales;
-`--work-dir private-migration` conserva los inputs, esperado, ambas salidas,
-configuración y evidencia. Nunca mezcle ese directorio con la salida compartible.
+Each output contains `source-target/`, `source-expected/` and `target-expected/`.
+Each directory retains `report.json`, `report.txt`, `report.html` and
+`evidence-manifest.json`, verified before publication is announced. The limited
+case permits one row per comparison; partial counts are not final totals. Do not
+change the expected output to resolve an evaluation limit.
 
-El adaptador DuckDB administra una conexión propia `:memory:` por ejecución,
-con un hilo, límite DuckDB de 128 MB y zona de sesión UTC explícitos. Materializa
-la salida y cierra la conexión antes de devolverla; la receta relee y verifica
-`read_migration` después de esa devolución. No abre un fichero DuckDB compartido,
-SQL externo ni descarga extensiones. El plan no usa valores temporales: fijar
-UTC no prueba operaciones de fechas fuera del IR admitido. Se conservan los
-tipos/políticas y versiones del entorno. Los presupuestos del runner son
-cooperativos, no una cuota dura de RSS para el proceso. No se pasa una relación
-DuckDB a `ef.diff`: esa entrada no es admitida. No se amplían operaciones IR ni
-se prueba validez para todos los inputs.
+Use `--show-synthetic-values` to inspect the literal expected output and both
+captured results. Expected values are EUR: NULL total/2 rows, JPY: 0.00/1 row and
+USD: exact Decimal 1000000000000000.03/3 rows. The negative case changes only EUR
+to 0.00 in both engines. Each comparison against the expected output retains one
+difference. Values are not printed by default and reports are redacted.
 
-## 4. Detectar una regresión en pytest y CI
+`--work-dir private-migration` retains inputs, expected output, native outputs,
+configuration and evidence instead of deleting temporary originals. Never mix
+it with the shareable report directory. The DuckDB adapter owns an in-memory
+connection per execution, uses one thread, an explicit 128 MB engine memory
+limit and UTC session setting, then materializes and closes before returning.
+The script rereads and verifies `read_migration` after that return.
+
+The recipe does not open a shared DuckDB file, download extensions or execute
+external SQL. The plan has no temporal values: UTC does not prove unsupported
+date operations. Budgets remain cooperative, not a hard process-RSS quota.
+DuckDB relations cannot be passed directly to `diff`; use explicit capture or an
+adapter. The example does not expand the IR or prove all possible inputs valid.
+
+## 4. Keep evidence before failing pytest or CI
 
 ```bash
 python -I ../kit/assertion_ci.py --case equivalent --output ci-ok
@@ -163,12 +167,12 @@ python -I ../kit/assertion_ci.py --case different --output ci-different
 python -I ../kit/assertion_ci.py --case not_evaluable --output ci-limited
 ```
 
-Códigos 0, 1 y 3. Se exporta y verifica el reporte **antes** de
-`ef.assert_equivalent`. Los fallos conservan diagnóstico JSON/texto/HTML y
-`evidence-manifest.json`. No use `assert result` ni `if result`: el truth testing
-lanza `TypeError` en los tres estados.
+Expected exits **0, 1 and 3**. The script exports and verifies a report **before**
+calling `ef.assert_equivalent`. Failures retain JSON/text/HTML diagnostics and
+`evidence-manifest.json`. `assert result` and `if result` raise `TypeError` in all
+three comparison states.
 
-Para ejecutar la fixture pytest real, cada comando utiliza una carpeta nueva:
+Run the real pytest fixture with a new output location for each selected case:
 
 ```bash
 python -I -B -m pytest -q -o addopts= -p no:cacheprovider ../kit/test_assertion_recipe.py -k equivalent
@@ -176,55 +180,57 @@ python -I -B -m pytest -q -o addopts= -p no:cacheprovider ../kit/test_assertion_
 python -I -B -m pytest -q -o addopts= -p no:cacheprovider ../kit/test_assertion_recipe.py -k not_evaluable
 ```
 
-Pytest sale 0/1/1 respectivamente: los dos últimos son tests deliberadamente
-fallidos, no `xfail`. Encuentre los reportes en `ci-reports/<caso>/`. Para repetir,
-use otro directorio de trabajo limpio que siga apuntando a los scripts del kit;
-no sobrescriba evidencia. Añada `-B` a Python para no crear bytecode junto a la
-fixture; los comandos anteriores ya lo usan.
-En su pipeline real el fixture debe devolver candidato/esperado propios, no
-seleccionar un caso sintético para simular validación.
+Pytest exits **0, 1 and 1** respectively. The final two are deliberately failing
+tests, not `xfail`. Reports are under `ci-reports/<case>/`. Repeat from another
+clean working directory that still points to the kit; never overwrite evidence.
+`-B` prevents bytecode being created alongside the fixture. In your real pipeline,
+provide your actual candidate/reference pair rather than a synthetic case
+selector masquerading as validation.
 
-Antes de publicar, verifique la lista cerrada con la función del script:
+Before uploading a report directory, verify the closed inventory with the
+provided script:
 
 ```bash
 python -I -c "import runpy; from pathlib import Path; recipe = runpy.run_path('../kit/assertion_ci.py'); recipe['verify_upload_directory'](Path('ci-different'))"
 ```
 
-Ejecute esa verificación aunque el test falle (`always()` o equivalente de su
-sistema CI); suba solo `report.json`, `report.txt`, `report.html` y
-`evidence-manifest.json` de ese directorio **si se verifica**. Conserve el código
-de fallo del test. Una publicación/manifest fallidos nunca significan éxito.
-No suba `--work-dir`, entornos, checkout, snapshots o JSONL crudos. El ejemplo
-produce un artefacto local real; no afirma haber ejecutado un job remoto.
+Run this check even if the test fails (`always()` or your CI equivalent). Upload
+only the four verified report files, and preserve the test's nonzero exit status.
+If publication or manifest verification fails, do not publish a success artifact.
+Do not upload `--work-dir`, environments, snapshots, checkout files or raw JSONL.
+This recipe produces a real local artifact; it does not claim a remote CI job ran.
 
-## 5. Revisar una referencia o contrato deliberadamente
+## 5. Change a baseline or contract deliberately
 
-No existe un botón «aceptar todo» ni actualización automática del esperado.
-Ante un fallo, inspeccione tipos, valores, claves, cobertura y política, y
-corrija el candidato cuando sea un error. Si cambió el requisito de negocio:
+There is no automatic "accept all" or reference-update operation. Inspect types,
+values, keys, coverage and policy; fix an erroneous candidate. If a business
+requirement genuinely changed:
 
-1. Conserve el reporte fallido, referencia anterior y sus hashes
-2. Documente el cambio concreto, justificación, responsable y revisión
-3. Cree una nueva revisión del contrato antes de comparar; modifique solamente
-   la política aprobada. Para cambiar el baseline, genere/revise el esperado por
-   una vía independiente, nunca copiando ciegamente el candidato fallido
-4. Pruebe caso positivo, diferencia real, esperado inválido e interrupción
-5. Versione el baseline autorizado y el contrato; revise el diff en un PR
+1. Preserve the failed report, prior reference and their hashes
+2. Record the precise change, rationale, responsible person and review
+3. Create a new contract revision before comparison, changing only the approved
+   policy. Generate/review a new expected output independently; never blindly
+   copy the failed candidate
+4. Test success, a real difference, an invalid expected result and interruption
+5. Version the approved baseline and contract; review the change in a PR
 
-`ef.read_diff_contract(result)` permite inspeccionar/persistir la declaración;
-`ef.DiffContract.model_validate_json(...)` permite releerla, y
-`ef.diff(candidate, expected, contract=declaration)` reutiliza exactamente esa
-política. No mezcle este cambio revisado con un ajuste automático de tolerancias.
-La receta no modifica ninguno de sus baselines externos.
+`ef.read_diff_contract(result)` returns the inspectable declaration.
+`DiffContract.model_validate_json(...)` rereads a saved declaration, and
+`ef.diff(candidate, expected, contract=declaration)` reuses it exactly. Neither a
+baseline change nor a new tolerance should be silently learned from a failure.
+The recipes do not modify your external baselines.
 
-## Si algo falla
+## Troubleshooting and recording the attempt
 
-Use Python 3.12, un entorno nuevo y los pins íntegros. Revise `pip check` y la
-ruta de import; no añada `PYTHONPATH` ni use una instalación editable. El código 1
-es esperado en las demostraciones negativas; 3 significa que no se estableció
-el juicio necesario; 2 indica configuración/ejecución/publicación inválida.
-Use directorios nuevos. Falta de permisos o disco y un reporte ausente no son
-equivalencia. No publique tracebacks con datos/variables de entorno. Registre
-bloqueos, ayuda y tiempo real en `OBSERVATION.md`.
+Use Python 3.12, a clean environment, unchanged pins and fresh directories. Check
+`pip check` and the import location. Exit 1 is expected in deliberate negative
+examples; exit 3 means the requested judgment was not established; exit 2 denotes
+invalid configuration/execution/publication in these scripts. Missing permissions,
+disk space or a finalized report never mean equivalence. Do not publish tracebacks
+containing environment variables or real data.
 
-Siga con `INTERPRETATION.md` para explicar los tres estados y los límites.
+Keep `kit` intact and recheck it with `python ../kit/verify_kit.py`. Save a completed
+copy of `OBSERVATION.md` in the work directory. Record installation time separately,
+include failed attempts and help received, and distinguish engine agreement from
+correctness against a reference. [Interpretation](INTERPRETATION.md) explains the guarantees and failures;
+[observation record](OBSERVATION.md) remains pending until a real person completes it.

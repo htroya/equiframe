@@ -1,3 +1,22 @@
+# STEP9 candidate: distribution, English handbook and release controls
+
+Private 0.11.1 candidate, identified by source commit and artifact hashes.
+
+- Package the standalone English handbook in wheel and sdist; translate the
+  first-use kit documentation without changing recipe behavior
+- Verify byte-identical wheel and sdist rebuilds, outside-checkout consumption,
+  separate optional profiles and historical reader tests
+- Add artifact-bound CycloneDX dependency inventories, license observations and
+  explicit dated vulnerability-query evidence with unavailable states preserved
+- Add a tested fail-closed publication-readiness gate; the dormant workflow
+  contains no upload step, credential or OIDC permission
+- Document threat boundaries, incomplete security assessment, incident response,
+  immutable releases, withdrawal and isolated rollback
+
+No project license, public publication, new maintainer/SLA or completed source
+security scan is claimed. Existing runtime APIs and protected historic formats
+are unchanged by this engineering stage. See `docs/index.md`.
+
 # Changelog
 
 ## Candidato STEP8 (2026-10-06)

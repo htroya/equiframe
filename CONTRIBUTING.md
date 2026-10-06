@@ -1,66 +1,55 @@
-# Contribuir a EquiFrame
+# Contributing to EquiFrame
 
-El repositorio es privado. Cada colaborador utiliza su propia cuenta de GitHub y
-un clon local; el propietario administra el acceso en **Settings → Collaborators**.
+EquiFrame is a private Alpha candidate. Use your own authorized repository account,
+a focused branch and a reviewable change. Read `AGENTS.md` and the required
+architecture/API/integration/roadmap documents before implementation.
 
-## Preparar el entorno
+The complete, distribution-carried [contribution guide](packages/equiframe/docs/contributing.md)
+covers environment setup, final-byte checks, review, semantic boundaries and
+publishing permissions. [Compatibility](packages/equiframe/docs/compatibility.md)
+and [upgrading](packages/equiframe/docs/upgrading.md) describe the public contract.
 
-Instale Git, Python 3.12 o 3.13 y un editor. Autentíquese en GitHub con su propia cuenta,
-clone el repositorio y abra la carpeta que contiene `.git`.
-Las instrucciones de entorno y los controles del paquete están en su
-[README](packages/equiframe/README.md#instalación-reproducible).
+## Core checks
 
-La rama principal `main` contiene la API disponible. Cree las ramas de trabajo
-desde su versión actualizada; indique en el PR cualquier dependencia de otro cambio
-aún no integrado.
+From `packages/equiframe`, with Python 3.12 and `uv` available:
 
-## Proponer un cambio
+```bash
+uv sync --locked --all-extras --python 3.12
+uv run --locked --all-extras ruff check .
+uv run --locked --all-extras ruff format --check .
+uv run --locked --all-extras mypy
+uv run --locked --all-extras python tools/generate_assets.py --check
+uv run --locked --all-extras pytest -q
+uv run --locked --all-extras python -m build --no-isolation
+uv run --locked --all-extras twine check --strict dist/*.whl dist/*.tar.gz
+uv run --locked --all-extras python tools/verify_distribution.py
+```
 
-1. Describa el problema y el alcance en un issue o PR.
-2. Actualice la rama base y cree una rama por cambio, por ejemplo
-   `feat/snapshot-reader` o `fix/decimal-transport`.
-3. Implemente comportamiento real, documentación y las pruebas apropiadas.
-4. Ejecute los controles del componente afectado. Para el núcleo: Ruff, mypy,
-   assets, pytest, build y verificación del wheel/sdist.
-5. Suba la rama y abra un PR con el problema, el resultado del cambio, la
-   validación y los límites relevantes. Solicite revisión antes de integrar.
+For the benchmark, first build the matching core wheel, then use its package
+directory and `uv sync --locked --all-extras --reinstall-package equiframe` before
+the same check sequence. Installed tests run outside the checkout; a successful
+source test or editable import does not establish distribution correctness.
 
-Los cambios de interfaces compartidas se acuerdan con los responsables de ambos
-componentes. La [distribución de componentes](docs/TEAM_INTEGRATION.md) evita
-implementar infraestructura o reglas de dominio dentro del núcleo.
+These commands are instructions, not claims of a passed candidate. Preserve the
+aggregate byte-bound receipt from `tools/check_candidate.py`; repeat affected
+compatibility cells after dependency changes. Do not erase skips, failed attempts
+or missing platform results. Manual CI configuration is not evidence that a
+remote job ran, and a push/PR does not automatically run the platform matrix.
 
-La CI vigente se inicia manualmente con `workflow_dispatch` y requiere activar
-`run_platform_matrix` de forma explícita. Una subida de rama o un PR no ejecuta
-la matriz. Los recibos de controles locales identifican los bytes comprobados;
-no sustituyen un job remoto ni la revisión de otro integrante. Las pruebas
-del servicio/DW real necesitan el entorno compartido y sus entregas.
+## Review expectations
 
-## Documentación y archivos
+- Preserve contract semantics, typed states, safe failure and historical evidence
+- Keep R/M/B/H/O independent; execute each engine natively
+- Add independently expected positive, different, invalid and incomplete fixtures
+- Keep current public documentation in English and runnable from exact artifacts
+- Review lock, schema, stability, changelog and migration effects explicitly
+- Honor [component ownership](docs/TEAM_INTEGRATION.md); no infrastructure or DW
+  redesign inside a core-only change
+- Exclude credentials, real datasets, databases, binary models and private outputs
+- Request review; do not assert unverified branch-protection or approval status
 
-Versione código, configuración no secreta, esquemas, documentación técnica y casos
-sintéticos pequeños. Mantenga bases, datos reales, modelos binarios, resultados
-privados, entornos y credenciales fuera de Git. `.env.example` puede contener
-nombres y valores ficticios; nunca credenciales válidas.
-
-Describa las APIs previstas como especificaciones hasta que estén implementadas y
-comprobadas. Registre decisiones técnicas en `docs/DECISIONS.md`. Los cambios
-metodológicos requieren también actualizar `docs/THESIS_TRACEABILITY.md`.
-
-Cada cambio de dependencias exige actualizar el lock y repetir sus controles.
-La [política STEP6](docs/COMPATIBILITY.md) exige clasificar nuevas superficies,
-conservar fixtures históricos y verificar el mismo wheel fuera del checkout.
-`tools/verify_compatibility.py` ejecuta perfiles por intérprete y extremos de
-dependencias sin convertir skips, xfails, celdas bloqueadas o planes de CI en
-soporte. Un registro de capacidades no reemplaza un recibo del corpus ejecutado.
-No publique paquetes ni redistribuya datos sin la decisión correspondiente de los autores.
-
-## Revisión y permisos
-
-El flujo de PR es una convención del equipo. A la fecha de esta revisión, el
-repositorio privado utiliza GitHub Free y no tiene protección técnica de ramas:
-GitHub exige Pro o Team para proteger ramas de repositorios privados.
-[Disponibilidad de protección](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
-
-La administración completa corresponde al propietario en un repositorio personal;
-los colaboradores tienen acceso según los permisos concedidos.
-[Permisos de repositorios personales](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/repository-access-and-collaboration/permission-levels-for-a-personal-account-repository).
+License, name/ownership, security/release responsibilities and public distribution
+remain owner decisions. No PyPI publication before STEP10, global review and
+specific owner approval. See [security](packages/equiframe/docs/security.md),
+[dependency evidence](packages/equiframe/docs/dependencies.md) and
+[release/rollback](packages/equiframe/docs/releasing.md).

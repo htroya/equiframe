@@ -161,13 +161,15 @@ assert importlib.metadata.version('equiframe') == sys.argv[3]
         with tarfile.open(sdist) as archive:
             archive.extractall(extracted, filter="data")
         project = next(extracted.iterdir())
-        run([sys.executable, "-m", "build", "--no-isolation", "--wheel"], project, env)
+        run([sys.executable, "-m", "build", "--no-isolation"], project, env)
         rebuilt = project / "dist" / wheel.name
         if (
             hashlib.sha256(rebuilt.read_bytes()).digest()
             != hashlib.sha256(wheel.read_bytes()).digest()
         ):
             raise RuntimeError("sdist did not reproduce the same wheel bytes")
+        if (project / "dist" / sdist.name).read_bytes() != sdist.read_bytes():
+            raise RuntimeError("sdist did not reproduce the same sdist bytes")
         print(
             "pip installation, installed tests, native pilot, integration/evaluation examples "
             "scale example and identical sdist rebuild verified"

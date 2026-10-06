@@ -1,3 +1,11 @@
+# STEP9 candidate: distribution evidence
+
+The private 0.11.1 candidate now has English entrypoint documentation, an
+artifact-bound dependency inventory/advisory workflow and byte-identical wheel
+and sdist rebuild checks. Runtime APIs and scientific formats are unchanged.
+Public release, project licensing and a completed security assessment remain
+blocked; exact artifact hashes identify the candidate.
+
 # Changelog
 
 ## STEP8 candidate (2026-10-06)
