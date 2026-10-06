@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from equiframe._physical import physical_size, verify_table_metadata
 from equiframe._report_format_v1 import (
     migration_html_v1,
     migration_legacy_summary_v1,
@@ -22,7 +23,6 @@ from equiframe.evidence import (
 from equiframe.local import local_path
 from equiframe.types import ArtifactRef
 
-from ._physical import physical_size, verify_table_metadata
 from .runner_types import MigrationResult, MigrationSpec
 
 

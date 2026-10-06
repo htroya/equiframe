@@ -10,6 +10,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from equiframe._comparison_io import snapshot
+from equiframe._physical import verify_table_metadata
 from equiframe._report_format_v1 import verification_html_v1, verification_summary_v1
 from equiframe.comparison import compare, iter_differences, read_comparison
 from equiframe.comparison_types import ComparisonOptions, ComparisonPolicy, ComparisonResult
@@ -18,7 +19,6 @@ from equiframe.errors import ArtifactIntegrityError
 from equiframe.evidence import inventory, load_json, parse_json, publish_json, verify_files
 from equiframe.execution_types import ExecutionResult, TableArtifact
 from equiframe.local import local_path
-from equiframe.migration._physical import verify_table_metadata
 from equiframe.pipeline_types import PipelineResult
 from equiframe.rule_types import RuleEvaluation
 from equiframe.rules import evaluate_rules, iter_rule_findings, read_rule_evaluation

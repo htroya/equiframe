@@ -2,10 +2,10 @@
 
 from pathlib import Path
 
+from equiframe._document_io import write_document as _write_document
 from equiframe._report_format_v1 import pipeline_html_v1, pipeline_summary_v1
 from equiframe.evidence import publish_json
 from equiframe.pipeline_types import PipelineResult
-from equiframe.profiles import _write_document
 
 
 def pipeline_summary(result: PipelineResult) -> dict[str, object]:

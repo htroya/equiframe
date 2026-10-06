@@ -11,6 +11,7 @@ from uuid import uuid4
 
 from pydantic import BaseModel
 
+from equiframe._document_io import write_document as _write_document
 from equiframe.comparison import ComparisonInput, compare
 from equiframe.decision import combine_decisions
 from equiframe.detector_types import DetectorBundle
@@ -27,7 +28,7 @@ from equiframe.pipeline_types import (
 )
 from equiframe.ports import DataSource, EngineAdapter
 from equiframe.profile_types import ConversionReceipt, profile_digest
-from equiframe.profiles import _write_document, profile_execution
+from equiframe.profiles import profile_execution
 from equiframe.registry import TransformationRegistry
 from equiframe.reporting import pipeline_summary, render_report
 from equiframe.rules import RuleRegistry, evaluate_rules

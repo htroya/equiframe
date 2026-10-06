@@ -10,10 +10,10 @@ from typing import Literal
 from pydantic import BaseModel
 
 from equiframe._base import FrozenModel, Identifier, NonNegativeInt, Text
+from equiframe._document_io import write_document as _write_document
 from equiframe.errors import ArtifactIntegrityError, ResourceLimitError
 from equiframe.local import local_path
 from equiframe.pipeline_types import EvidenceFile, PipelineResult
-from equiframe.profiles import _write_document
 from equiframe.types import ArtifactRef, Sha256
 
 MAX_DOCUMENT_BYTES = 64 * 1024 * 1024

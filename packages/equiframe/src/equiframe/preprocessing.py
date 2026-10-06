@@ -4,6 +4,8 @@ from pathlib import Path
 from statistics import median
 from typing import Literal
 
+from equiframe._document_io import read_document as _read_document
+from equiframe._document_io import write_document as _write_document
 from equiframe.profile_types import (
     FeatureFit,
     FeatureMatrix,
@@ -14,7 +16,6 @@ from equiframe.profile_types import (
     profile_digest,
     profile_spec_fingerprint,
 )
-from equiframe.profiles import _read_document, _write_document
 
 
 def _compatible(profile: ProfileVector, spec: ProfileSpec) -> ProfileVector:

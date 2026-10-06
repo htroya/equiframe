@@ -12,6 +12,7 @@ from uuid import uuid4
 
 from equiframe._comparison_io import snapshot
 from equiframe._duckdb_transport import duckdb_temporal_capabilities
+from equiframe._physical import physical_size
 from equiframe.adapters import _input_capabilities, native_adapter
 from equiframe.comparison import compare
 from equiframe.comparison_types import ComparisonResult
@@ -46,7 +47,6 @@ from equiframe.tables import (
 )
 from equiframe.types import ArtifactRef
 
-from ._physical import physical_size
 from .ports import CompiledPlan, CompilerRegistry, native_compiler_registry
 from .runner_types import (
     CompilerRecord,
@@ -516,7 +516,7 @@ def migrate(
     from .io import migration_summary, render_migration_report
 
     publish_json(migration_summary(result), directory / "report.json")
-    from equiframe.profiles import _write_document
+    from equiframe._document_io import write_document as _write_document
 
     _write_document(directory / "report.html", render_migration_report(result).encode("utf-8"))
     result = MigrationResult.model_validate(

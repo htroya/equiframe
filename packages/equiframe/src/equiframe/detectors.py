@@ -8,6 +8,7 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Literal
 
+from equiframe._document_io import write_document as _write_document
 from equiframe.detector_types import (
     ComponentDecision,
     ComponentDetectionResult,
@@ -39,7 +40,6 @@ from equiframe.profile_types import (
     ProfileVector,
     profile_digest,
 )
-from equiframe.profiles import _write_document
 from equiframe.serialization import _constant, _JsonObject, _unique_objects
 
 

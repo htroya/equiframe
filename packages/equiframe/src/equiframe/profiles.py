@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import json
 import math
-import os
 import time
 from collections.abc import Iterator
 from datetime import date
@@ -12,6 +10,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
+from equiframe._document_io import read_document as _read_document
+from equiframe._document_io import write_document as _write_document
 from equiframe.comparison_types import ComparisonValue
 from equiframe.contracts import ColumnSpec, Family, TimestampPolicy
 from equiframe.errors import (
@@ -39,7 +39,6 @@ from equiframe.profile_types import (
     profile_digest,
     profile_spec_fingerprint,
 )
-from equiframe.serialization import _constant, _JsonObject, _unique_objects
 from equiframe.tables import read_table
 from equiframe.values import DateValue, TimestampValue
 
@@ -357,27 +356,6 @@ def _measure(feature: ProfileFeature, context: _ProfileContext) -> FeatureObserv
     if metric == "cardinalidad_rel":
         return _ratio(feature, len(distinct), count - missing - nan, support)
     return _ratio(feature, failed, present, support)
-
-
-def _write_document(path: Path, payload: bytes) -> None:
-    """Publish exclusively. A previous profile or bundle is never overwritten."""
-    temporary = path.with_name(path.name + "." + uuid4().hex + ".part")
-    try:
-        with temporary.open("xb") as output:
-            output.write(payload)
-            output.flush()
-            os.fsync(output.fileno())
-        os.link(temporary, path)
-    finally:
-        temporary.unlink(missing_ok=True)
-
-
-def _read_document(path: Path) -> bytes:
-    raw = path.read_bytes()
-    _unique_objects(
-        json.loads(raw.decode("utf-8"), object_pairs_hook=_JsonObject, parse_constant=_constant)
-    )
-    return raw
 
 
 def profile_execution(
