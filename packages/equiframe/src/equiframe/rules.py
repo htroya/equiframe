@@ -655,7 +655,7 @@ def evaluate_rules(
     contract = execution.plan.contract
     if execution.contract_sha256 != contract_fingerprint(contract):
         raise ValueError("execution contract fingerprint mismatch")
-    options = RuleOptions.model_validate(options or RuleOptions())
+    options = RuleOptions.model_validate(RuleOptions() if options is None else options)
     registry = registry or default_rule_registry()
     cancellation = cancellation or CancellationToken()
     identifier = "rules_" + uuid4().hex

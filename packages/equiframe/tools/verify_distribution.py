@@ -89,6 +89,14 @@ print('Clean installed profile:',extra,'outside checkout; light import verified'
                 env=profile_env,
             )
             continue
+        if extra in ("duckdb", "engines"):
+            snapshot_example = project / "snapshot_source.py"
+            shutil.copyfile(ROOT / "examples" / "snapshot_source.py", snapshot_example)
+            run(
+                [str(python), "-I", str(snapshot_example), "--output", str(project / "snapshot")],
+                cwd=project,
+                env=profile_env,
+            )
         comparison_example = project / "compare_local.py"
         shutil.copyfile(ROOT / "examples" / "compare_local.py", comparison_example)
         run([str(python), "-I", str(comparison_example)], cwd=project, env=profile_env)
@@ -442,11 +450,11 @@ from importlib.resources import files
 handbook = files('equiframe').joinpath('docs')
 for title in ('index','quickstart','recipes','api','semantics','compatibility',
               'performance','upgrading','contributing','security','releasing','dependencies',
-              'adoption','maintenance'):
+              'adoption','maintenance','extending'):
     assert handbook.joinpath(title + '.md').read_text(encoding='utf-8').strip()
 assert equiframe.__version__ == importlib.metadata.version('equiframe') == sys.argv[1]
 for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy', 'pyarrow',
-             'pytest', 'hypothesis', 'IPython', 'jupyter'):
+             'pytest', 'hypothesis', 'IPython', 'jupyter', 'equiframe_benchmark'):
     assert importlib.util.find_spec(name) is None, name
 print('Installed wheel imports from clean site-packages without engines/ML/dev tools')
 assert equiframe.ComparisonOptions().batch_rows > 0
@@ -465,6 +473,8 @@ assert callable(equiframe.read_verification) and callable(equiframe.export_bundl
 assert callable(equiframe.read_bundle) and callable(equiframe.import_bundle)
 assert callable(equiframe.ingest_file) and callable(equiframe.run_workflow)
 assert callable(equiframe.read_workflow) and callable(equiframe.ParquetDestination)
+assert equiframe.SnapshotManifest.model_json_schema()
+assert callable(equiframe.SnapshotDataSource) and callable(equiframe.snapshot_fingerprint)
 """
         run([str(python), "-I", "-c", check, package_version], cwd=work, env=env)
         api_check = """
@@ -552,6 +562,9 @@ print('Installed wheel API roundtrips all five fixtures exactly')
             "schemas/reduction-result-1.0.schema.json",
             "examples/pipeline_local.py",
             "examples/verify_generic.py",
+            "examples/snapshot_source.py",
+            "schemas/snapshot-manifest-1.0.schema.json",
+            "docs/extending.md",
             "examples/retail_etl.py",
             "examples/sercop_etl.py",
             "examples/sercop_offline/snapshot.json",

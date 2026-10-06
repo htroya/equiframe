@@ -85,8 +85,12 @@ def diff(
     failures do not guarantee a persisted final report. Configured comparisons
     retain the core's equivalent/different/not_evaluable states and diagnostics.
     """
-    capture = DiffCaptureOptions.model_validate(capture_options or DiffCaptureOptions())
-    checked_options = ComparisonOptions.model_validate(options or ComparisonOptions())
+    capture = DiffCaptureOptions.model_validate(
+        DiffCaptureOptions() if capture_options is None else capture_options
+    )
+    checked_options = ComparisonOptions.model_validate(
+        ComparisonOptions() if options is None else options
+    )
     if reference not in (None, "peer", "expected"):
         raise ValueError("reference must be peer or expected")
     if contract is not None and keys is not None:

@@ -95,5 +95,5 @@ def test_corrupt_persisted_manifest_is_evidence_failure(tmp_path, command, conte
     )
     response = CliRunner().invoke(app, arguments)
     assert response.exit_code == 3
-    assert response.output.strip() == "operation_failed"
+    assert response.output.splitlines()[0] == "operation_failed"
     assert not (tmp_path / "report").exists()

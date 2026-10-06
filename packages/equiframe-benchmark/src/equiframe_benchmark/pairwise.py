@@ -113,9 +113,10 @@ class PairwiseReport(Document):
 
     @model_validator(mode="after")
     def recalculate(self) -> Self:
-        # EvaluationReport validates records, protocol and every original stratum.
-        # Document revalidates existing instances, including model_copy bypasses.
-        checked = EvaluationReport.model_validate(self.evaluation)
+        # Pydantic has already validated this nested field before the after-validator.
+        # Document revalidates existing instances, including model_copy bypasses,
+        # so validating again here only repeats the same full bootstrap.
+        checked = self.evaluation
         if (
             self.evaluation_sha256 != digest(checked)
             or self.protocol_sha256 != checked.protocol_sha256

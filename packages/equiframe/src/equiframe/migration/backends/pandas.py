@@ -36,6 +36,7 @@ from ..types import (
     EquiJoin,
     Expression,
     Filter,
+    IRColumn,
     IsNaN,
     IsNull,
     LiteralExpression,
@@ -57,6 +58,8 @@ if TYPE_CHECKING:
     import pandas as pd
 
     from equiframe.execution import RunContext
+
+_COMPILER_VERSION = "migration-native-ir1.0/pandas/arithmetic-checks-v1"
 
 
 def _dtype(dtype: LogicalType) -> Any:
@@ -101,7 +104,10 @@ def _expression(expression: Expression, frame: pd.DataFrame, columns: Any) -> pd
         right = _expression(expression.right, frame, columns).astype(object)
         operation = {"add": "add", "subtract": "sub", "multiply": "mul"}[expression.operation]
         with localcontext(exact_decimal_context()):
-            return cast("pd.Series[Any]", getattr(left, operation)(right))
+            result = cast("pd.Series[Any]", getattr(left, operation)(right))
+        # Every expression has its own declared range. Checking only the final
+        # projected column lets a later subtraction or predicate conceal overflow.
+        return _checked_series(result, expression_type(expression, columns))
     if isinstance(expression, Coalesce):
         result = _expression(expression.arguments[0], frame, columns)
         for item in expression.arguments[1:]:
@@ -144,28 +150,33 @@ def _expression(expression: Expression, frame: pd.DataFrame, columns: Any) -> pd
     raise CapabilityError("unknown Pandas expression")
 
 
-def _coerce(frame: pd.DataFrame, validated: ValidatedIR, node_id: str) -> pd.DataFrame:
+def _checked_series(series: pd.Series[Any], column: IRColumn) -> pd.Series[Any]:
     import pandas as pd
 
+    dtype = column.logical_type
+    if isinstance(dtype, (IntegerType, DecimalType)) and len(series):
+        values = series.dropna()
+        if len(values):
+            lower, upper = (
+                integer_bounds(dtype)
+                if isinstance(dtype, IntegerType)
+                else (decimal_limit(dtype).copy_negate(), decimal_limit(dtype))
+            )
+            if values.min() < lower or values.max() > upper:
+                raise CapabilityError("IR output exceeds declared numeric range: " + column.name)
+    if not column.nullable and series.isna().any():
+        raise CapabilityError("IR output contains forbidden NULL: " + column.name)
+    if series.dtype != _dtype(dtype):
+        return pd.Series(pd.array(series, dtype=_dtype(dtype)), index=series.index)
+    return series
+
+
+def _coerce(frame: pd.DataFrame, validated: ValidatedIR, node_id: str) -> pd.DataFrame:
     for column in validated.schema(node_id):
-        series = frame[column.name]
-        dtype = column.logical_type
-        if isinstance(dtype, (IntegerType, DecimalType)) and len(series):
-            values = series.dropna()
-            if len(values):
-                lower, upper = (
-                    integer_bounds(dtype)
-                    if isinstance(dtype, IntegerType)
-                    else (decimal_limit(dtype).copy_negate(), decimal_limit(dtype))
-                )
-                if values.min() < lower or values.max() > upper:
-                    raise CapabilityError(
-                        "IR output exceeds declared numeric range: " + column.name
-                    )
-        if not column.nullable and series.isna().any():
-            raise CapabilityError("IR output contains forbidden NULL: " + column.name)
-        if series.dtype != _dtype(dtype):
-            frame[column.name] = pd.Series(pd.array(series, dtype=_dtype(dtype)), index=frame.index)
+        original = frame[column.name]
+        checked = _checked_series(original, column)
+        if checked is not original:
+            frame[column.name] = checked
     return frame.reset_index(drop=True)
 
 
@@ -240,7 +251,9 @@ class PandasCompiler:
 
     def compile(self, plan: RelationalPlan, contract: Contract) -> CompiledPlan:
         validated = require_supported(self.engine, plan, contract)
-        identifier, ir_sha, contract_sha = compilation_identity(validated, self.engine)
+        identifier, ir_sha, contract_sha = compilation_identity(
+            validated, self.engine, implementation_version=_COMPILER_VERSION
+        )
 
         def transform(tables: Mapping[str, pd.DataFrame], context: RunContext) -> pd.DataFrame:
             import pandas as pd
@@ -328,9 +341,7 @@ class PandasCompiler:
                 frames[node.node_id] = _coerce(frame, validated, node.node_id)
             return frames[plan.output]
 
-        transformation = PandasTransformation(
-            identifier, transform, "migration-native-ir1.0/pandas"
-        )
+        transformation = PandasTransformation(identifier, transform, _COMPILER_VERSION)
         return CompiledPlan(
             self.engine, transformation, ir_sha, contract_sha, self.check(plan, contract)
         )

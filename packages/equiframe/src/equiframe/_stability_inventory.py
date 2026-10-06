@@ -215,6 +215,12 @@ STABLE_API = (
 )
 
 EXPERIMENTAL_API = (
+    "SnapshotClient",
+    "SnapshotColumn",
+    "SnapshotDataSource",
+    "SnapshotManifest",
+    "SnapshotTable",
+    "snapshot_fingerprint",
     "DuckDBCaptureOptions",
     "capture_duckdb",
     "Aggregate",
@@ -354,6 +360,11 @@ EXPERIMENTAL_API = (
 # Every shipped core schema, including experimental producer formats.
 # Tuple: file name, classification, canonical schema SHA-256.
 SCHEMA_INVENTORY = (
+    (
+        "snapshot-manifest-1.0.schema.json",
+        "experimental",
+        "ed83a8b275f5357b75731da1f34a30f98a61fa3342adcfcdc72adaf8f740778c",
+    ),
     (
         "artifact-ref-1.0.schema.json",
         "stable",

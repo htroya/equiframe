@@ -512,12 +512,13 @@ def validate_ir(plan: RelationalPlan, contract: Contract) -> ValidatedIR:
     )
 
 
-def compilation_identity(validated: ValidatedIR, engine: str) -> tuple[str, str, str]:
+def compilation_identity(
+    validated: ValidatedIR, engine: str, *, implementation_version: str | None = None
+) -> tuple[str, str, str]:
     ir_sha256 = ir_fingerprint(validated.plan)
     contract_sha256 = contract_fingerprint(validated.contract)
-    fingerprint = hashlib.sha256(
-        f"migration-native-ir1.0:{engine}:{ir_sha256}:{contract_sha256}".encode()
-    ).hexdigest()
+    identity = implementation_version or f"migration-native-ir1.0:{engine}"
+    fingerprint = hashlib.sha256(f"{identity}:{ir_sha256}:{contract_sha256}".encode()).hexdigest()
     return "migration_" + fingerprint, ir_sha256, contract_sha256
 
 

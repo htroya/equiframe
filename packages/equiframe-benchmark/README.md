@@ -134,7 +134,7 @@ installed signatures/defaults. These are distinct families:
 | Blinded review | `review_packet`, `evaluate_oracle`, `oracle_verification_bridge` |
 | Dependency splits | `dependency_groups`, `make_splits`, `validate_splits`, `split_counts` |
 | Reviewed selections | `select_normal_training`, `select_normal_calibration`, `audit_detector_selections` |
-| Snapshot consumer | `SnapshotClient`, `SnapshotDataSource`, `snapshot_fingerprint` |
+| Snapshot consumer | Compatibility aliases of core `SnapshotClient`, `SnapshotDataSource`, `snapshot_fingerprint` |
 | Three-engine integration | `run_integration`, `read_integration` |
 | Domain-configurable reconciliation | `reconcile_awards`, `AwardReconciliationSpec` |
 | Freeze/study | `audit_freeze`, `create_freeze`, `read_freeze`, `run_study`, `read_study` |
@@ -243,6 +243,16 @@ compatible shortcut into this package. Do not reenable its removed metrics or
 infer scientific results from synthetic demonstrations.
 
 ## Development and contribution
+
+Operational errors retain their original first stderr line and exit status,
+then add one fixed-text `hint[category]: ...` line. For example, an existing
+output recommends a new path instead of overwriting evidence; a missing file
+recommends checking the input and parent directory. Hints omit raw exception
+messages, data and paths. Automation should read the exit status and first
+line, not compare the complete stderr text. `scale` retains exit 3 for its
+failed operation, including invalid specifications.
+The standalone `equiframe-benchmark-pilot` entrypoint also uses fixed hints;
+its operation failures retain exit 1 and print `pilot_operation_failed`.
 
 From `packages/equiframe-benchmark`, with the matching core wheel already built:
 

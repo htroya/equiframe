@@ -934,6 +934,35 @@ def test_invalid_capture_options_and_unwritable_evidence_raise_without_false_res
     assert blocked.read_bytes() == b"existing content"
 
 
+@pytest.mark.parametrize("argument", ["options", "capture_options"])
+@pytest.mark.parametrize("invalid", [False, 0, [], ()])
+def test_falsey_invalid_options_are_rejected_before_capture(tmp_path, argument, invalid):
+    with pytest.raises(ValidationError):
+        ef.diff(values([1]), values([1]), **{argument: invalid}, work_dir=tmp_path)
+    assert not list(tmp_path.iterdir())
+
+
+@pytest.mark.parametrize("argument", ["options", "capture_options"])
+@pytest.mark.parametrize("selected", [None, {}])
+def test_none_and_valid_empty_option_mappings_preserve_defaults(tmp_path, argument, selected):
+    # Pydantic's existing strict mapping route remains valid. Unlike a false
+    # scalar/list, an empty mapping is a complete all-default options document.
+    result = ef.diff(values([1]), values([1]), **{argument: selected}, work_dir=tmp_path)
+    assert result.state == "equivalent"
+    assert result.options == ef.ComparisonOptions()
+    receipt = json.loads((tmp_path / result.comparison_id / "diff-contract.json").read_text())
+    assert receipt["capture_options"] == ef.DiffCaptureOptions().model_dump(mode="json")
+
+
+@pytest.mark.parametrize(
+    "argument,invalid", [("options", {"max_work": "1"}), ("capture_options", {"max_rows": "1"})]
+)
+def test_option_mappings_do_not_coerce_numeric_text(tmp_path, argument, invalid):
+    with pytest.raises(ValidationError):
+        ef.diff(values([1]), values([1]), **{argument: invalid}, work_dir=tmp_path)
+    assert not list(tmp_path.iterdir())
+
+
 @pytest.mark.parametrize("field", ["comparison_id", "spec_sha256"])
 def test_sidecar_is_bound_to_exact_comparison_result(tmp_path, field):
     result = ef.diff(values([1]), values([1]), work_dir=tmp_path)

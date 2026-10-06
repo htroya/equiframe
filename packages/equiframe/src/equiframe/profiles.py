@@ -392,7 +392,7 @@ def profile_execution(
     """Materialize the section 3.6 formulas with exact counts and explicit unavailable states."""
     execution = ExecutionResult.model_validate(execution)
     spec = ProfileSpec.model_validate(spec)
-    options = ProfileOptions.model_validate(options or ProfileOptions())
+    options = ProfileOptions.model_validate(ProfileOptions() if options is None else options)
     _validate_references(execution, spec)
     conversions = tuple(ConversionReceipt.model_validate(c) for c in conversions)
     if len({c.feature for c in conversions}) != len(conversions) or not {

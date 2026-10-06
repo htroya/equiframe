@@ -1,31 +1,11 @@
 """Canonical strict JSON and exclusive append-only document publication."""
 
 import json
-import os
 from pathlib import Path
-from uuid import uuid4
+
+from equiframe._documents import save_document as save_document
 
 from equiframe_benchmark.models import Document
-
-
-def save_document(document: Document, path: Path) -> None:
-    document = type(document).model_validate(document)
-    data = json.dumps(
-        document.model_dump(mode="json"),
-        sort_keys=True,
-        separators=(",", ":"),
-        ensure_ascii=True,
-        allow_nan=False,
-    ).encode()
-    temporary = path.with_name(path.name + "." + uuid4().hex + ".part")
-    try:
-        with temporary.open("xb") as stream:
-            stream.write(data + b"\n")
-            stream.flush()
-            os.fsync(stream.fileno())
-        os.link(temporary, path)
-    finally:
-        temporary.unlink(missing_ok=True)
 
 
 def _pairs(pairs: list[tuple[str, object]]) -> dict[str, object]:

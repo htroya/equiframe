@@ -1,71 +1,43 @@
 """Strict experimental metadata; never features or detector inputs."""
 
-import hashlib
-import json
 from datetime import datetime
 from typing import Annotated, Literal, Self
 
 from equiframe import ArtifactRef, ComparisonResult, ComparisonSpec, Family
+from equiframe._documents import (
+    Digest as Digest,
+)
+from equiframe._documents import (
+    Document as Document,
+)
+from equiframe._documents import (
+    Evidence as Evidence,
+)
+from equiframe._documents import (
+    Text as Text,
+)
+from equiframe._documents import (
+    canonical_text as canonical_text,
+)
+from equiframe._documents import (
+    checked_artifact as checked_artifact,
+)
+from equiframe._documents import (
+    digest as digest,
+)
 from equiframe.verify_types import (
     ExpectedProvenance,
     IndependentReviewEvidence,
     VerificationBinding,
 )
 from pydantic import (
-    AfterValidator,
-    BaseModel,
-    ConfigDict,
     Field,
     StringConstraints,
     model_validator,
 )
 
-
-def canonical_text(value: str) -> str:
-    if not value.strip() or value != value.strip():
-        raise ValueError("text and identities must be canonical, without surrounding whitespace")
-    if any(0xD800 <= ord(c) <= 0xDFFF for c in value):
-        raise ValueError("invalid Unicode scalar")
-    return value
-
-
-Text = Annotated[str, StringConstraints(min_length=1), AfterValidator(canonical_text)]
-Digest = Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
 Label = Literal["normal", "divergent", "not_evaluable"]
 Partition = Literal["training", "calibration", "test"]
-
-
-class Document(BaseModel):
-    model_config = ConfigDict(
-        strict=True,
-        frozen=True,
-        extra="forbid",
-        allow_inf_nan=False,
-        revalidate_instances="always",
-        validate_default=True,
-    )
-    schema_version: Literal["1.0"] = "1.0"
-
-
-def digest(document: BaseModel) -> str:
-    return hashlib.sha256(
-        json.dumps(
-            document.model_dump(mode="json"),
-            sort_keys=True,
-            separators=(",", ":"),
-            ensure_ascii=True,
-            allow_nan=False,
-        ).encode()
-    ).hexdigest()
-
-
-def checked_artifact(ref: ArtifactRef) -> ArtifactRef:
-    if not ref.sha256 or ref.size_bytes is None or ref.format not in ("arrow", "parquet"):
-        raise ValueError("tabular evidence requires SHA-256, size and Arrow/Parquet format")
-    return ref
-
-
-Evidence = Annotated[ArtifactRef, AfterValidator(checked_artifact)]
 
 
 class InputBinding(Document):

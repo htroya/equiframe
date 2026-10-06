@@ -233,6 +233,12 @@ and per-instance; `.register(...)` does not replace an existing identical key.
 `code_version` is the caller's declaration, not an automatically computed hash
 of callback behavior. Callbacks/plugins and dependencies may have external effects.
 
+`SnapshotDataSource` consumes an explicitly pinned `SnapshotManifest` through
+an injected `SnapshotClient`; both are now available from core alone. The
+historical benchmark imports remain exact aliases. Metadata needs only base;
+resolving data needs Arrow. See [extension ports](extending.md) for the complete
+boundary, preservation rules and a runnable core-only example.
+
 `DataSource` exposes `table_names` and `resolve(name, *, context) -> LoadedTable`.
 `LocalDataSource` uses named `ArrowInput`, `PandasInput`, `PolarsInput` or local
 artifact inputs. `EngineAdapter` exposes `engine`, `capabilities()` and native
@@ -370,6 +376,15 @@ untrusted modules. `report` is the pipeline reporter, not a comparison report CL
 | `contract validate` | 0 valid metadata; 2 invalid arguments/JSON/contract/version; 3 I/O failure |
 | `ingestion run` | 0 complete; 1 quarantined/rejected records; 2 invalid input; 3 technical failure |
 | `reduce` | 0 reduced/unchanged; 2 invalid input; 3 failure/limit, not a global-minimum claim |
+
+Operational failures write the original machine-readable code on the first
+stderr line, followed by one fixed-text `hint[category]: ...` line. Categories
+distinguish missing paths, existing outputs, permissions, invalid documents,
+optional dependencies, unsupported capabilities and resource limits. Scripts
+should use the exit code and first line, rather than match the whole message.
+Hints do not include exception text, input values or local paths. The existing
+`contract validate` command retains its structured validation locations and
+codes; completed commands retain their existing stdout format.
 
 Never treat every command's zero as data equivalence. Never suppress nonzero exit
 codes in CI without preserving the underlying failure. `--help` normally exits 0.

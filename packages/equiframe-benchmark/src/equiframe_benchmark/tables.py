@@ -61,7 +61,15 @@ def _value(metric: MetricValue) -> list[object]:
 
 def table_payloads(report: EvaluationReport) -> dict[str, tuple[bytes, int]]:
     """Return deterministic bytes and data-row counts, including undefined/empty strata."""
-    report = EvaluationReport.model_validate(report)
+    return _validated_payloads(EvaluationReport.model_validate(report))
+
+
+def _validated_payloads(report: EvaluationReport) -> dict[str, tuple[bytes, int]]:
+    """Format a report already revalidated at the caller's public boundary.
+
+    Keeping formatting separate avoids a second full deterministic bootstrap
+    during write/read, without caching or trusting a caller-supplied instance.
+    """
     coverage: list[list[object]] = []
     metrics: list[list[object]] = []
     ap: list[list[object]] = []
@@ -282,7 +290,7 @@ def table_payloads(report: EvaluationReport) -> dict[str, tuple[bytes, int]]:
 def write_tables(report: EvaluationReport, directory: Path) -> TableExport:
     """Publish in a new directory; an interruption cannot leave a valid final receipt."""
     report = EvaluationReport.model_validate(report)
-    payloads = table_payloads(report)
+    payloads = _validated_payloads(report)
     directory = directory.resolve()
     directory.mkdir(parents=True, exist_ok=False)
     tables: list[EvaluationTable] = []
@@ -314,7 +322,7 @@ def read_tables(directory: Path, *, report: EvaluationReport) -> TableExport:
     if manifest.is_symlink() or not manifest.is_file() or manifest.stat().st_size > 65536:
         raise ValueError("table receipt must be a bounded regular file")
     result = load_document(TableExport, manifest)
-    expected = table_payloads(report)
+    expected = _validated_payloads(report)
     if result.evaluation_sha256 != digest(report) or result.scientific != report.scientific:
         raise ValueError("tables belong to a different evaluation")
     if {p.name for p in directory.iterdir()} != {*expected, "tables.json"}:

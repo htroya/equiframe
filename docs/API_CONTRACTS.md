@@ -670,3 +670,20 @@ expected workload/verdict completion, while `resource_measurement_complete`
 separately records monitoring coverage. `scale` and `verify-scale` return 3 for
 missing/invalid finalization or unsuccessful measurement. Native comparison
 acceptance remains a separate core assertion. [Full scope and limits](SCALING.md).
+
+## Post-roadmap core integration refactor (2026-10-06)
+
+The generic pinned-snapshot types and consumer are now exported by core:
+`SnapshotClient`, `SnapshotColumn`, `SnapshotTable`, `SnapshotManifest`,
+`SnapshotDataSource` and `snapshot_fingerprint`. Existing benchmark imports are
+identity-preserving aliases. The manifest schema, canonical ASCII JSON and
+fingerprints are unchanged; the new core producer surface is experimental.
+No transport, service/DW implementation or core-to-benchmark dependency is added.
+The packaged [extension guide](../packages/equiframe/docs/extending.md) describes
+core-only use and lower-level compiler input preconditions.
+
+Workflow captures preserve index/provenance and isolate independent source
+failures/consumer budgets. Native arithmetic corrections and strict optional
+configuration validation are described in the current packaged changelog and
+upgrading guide. These are ordinary functional/architectural changes; historical
+scientific evidence is not rewritten or reinterpreted.

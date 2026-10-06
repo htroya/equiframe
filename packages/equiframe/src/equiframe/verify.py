@@ -359,13 +359,13 @@ def verify(
     contract = Contract.model_validate(contract)
     if not outputs:
         raise ValueError("verify requires at least one named result")
+    opts = ComparisonOptions.model_validate(ComparisonOptions() if options is None else options)
+    policy = ComparisonPolicy.model_validate(ComparisonPolicy() if policy is None else policy)
     identifier = "verify_" + uuid4().hex
     directory = (work_dir or Path.cwd() / "equiframe-runs").resolve() / identifier
     directory.mkdir(parents=True, exist_ok=False)
     started = datetime.now(UTC).isoformat()
     start = time.perf_counter()
-    opts = options or ComparisonOptions()
-    policy = policy or ComparisonPolicy()
     captured: dict[str, ArtifactRef] = {}
     executions: dict[str, ExecutionResult] = {}
     errors: list[VerificationCheck] = []

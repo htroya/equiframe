@@ -49,9 +49,10 @@ def get_or_create_dimension(con, table_name, natural_key_col, natural_key_value,
             SELECT COALESCE(MAX({surrogate_key_col}), 0) + 1 FROM {table_name}
         """).fetchone()[0]
         cols = [surrogate_key_col, natural_key_col] + attribute_cols
+        columns_sql = ", ".join(cols)
         placeholders = ", ".join(["?"] * len(cols))
         con.execute(f"""
-            INSERT INTO {table_name} ({cols})
+            INSERT INTO {table_name} ({columns_sql})
             VALUES ({placeholders})
         """, [new_sk, natural_key_value] + attribute_values)
         return new_sk
@@ -217,7 +218,7 @@ def load_ocds_award(con, award_data, snapshot_id):
             item_surrogate_key, fecha_surrogate_key
         ) VALUES (
             (SELECT COALESCE(MAX(fact_id), 0) + 1 FROM fact_adjudicacion),
-            ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?,
             ?, ?,
             ?, ?, ?, ?
         )
@@ -343,7 +344,11 @@ def main():
     print(f"  Total awards: {len(awards)}")
     
     con.close()
+    if errores:
+        print(f"\nETL incompleto: {errores} award(s) con errores. Revise la carga parcial.")
+        return 1
     print(f"\nETL completado. Base DuckDB disponible en: {db_path.resolve()}")
+    return 0
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

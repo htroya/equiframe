@@ -2,7 +2,7 @@
 
 Este documento define entregas técnicas propuestas. Las tareas ya asignadas por el equipo son: José crea la VM y el acceso Python compartido; Jhair construye el DW; Hernán desarrolla y evalúa EquiFrame. Los detalles de sus componentes se acuerdan con sus responsables.
 
-Estado actual: candidatos `equiframe 0.11.1` y `equiframe-benchmark 0.11.0`,
+Estado actual: candidatos `equiframe 0.11.1` y `equiframe-benchmark 0.11.1`,
 con Verify, ETL, migración y destino local. Las herramientas locales y las interfaces consumidoras están
 implementadas; el servicio/DW real, el corpus y la aceptación científica siguen
 pendientes. Las propuestas de despliegue de este documento no acreditan entregas
@@ -39,7 +39,8 @@ La API de transporte puede cambiar internamente, pero debe ofrecer estas operaci
 | `cancel_job` | `job_id` | Resultado de cancelación; distingue petición aceptada de trabajo ya confirmado |
 | `publish_snapshot` | Resultado validado y versión base esperada | Nueva versión inmutable; actualización atómica del catálogo o conflicto explícito |
 
-El consumidor implementado `SnapshotDataSource` usa sólo `get_snapshot` y
+El consumidor implementado `SnapshotDataSource`, disponible en el núcleo con
+aliases compatibles desde el benchmark, usa sólo `get_snapshot` y
 `download_artifact` del `SnapshotClient` inyectado. Fija un ID explícito y consulta
 su manifiesto una vez al construir; puede seleccionar un subconjunto de tablas
 sin cambiar la huella del manifiesto completo. Comprueba formato, SHA/tamaño,

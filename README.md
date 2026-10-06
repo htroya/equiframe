@@ -18,6 +18,7 @@ close those gates. [Release process](packages/equiframe/docs/releasing.md).
 [Three installed recipes](packages/equiframe/docs/recipes.md) ·
 [English handbook](packages/equiframe/docs/index.md) ·
 [API](packages/equiframe/docs/api.md) ·
+[Extension ports](packages/equiframe/docs/extending.md) ·
 [Semantics and limits](packages/equiframe/docs/semantics.md)
 
 ## Start from a verified artifact
@@ -84,6 +85,7 @@ acceptance, and `assert result` / `if result` raise `TypeError` in every state.
 | Enforce equivalence in tests | `assert_equivalent` | Explicit guarantee and optional persisted-evidence requirements |
 | Explain a result | `comparison_report` | Common redacted JSON/text/HTML/notebook view |
 | Capture trusted DuckDB SQL | `capture_duckdb` | Explicit one-query execution and detached snapshot |
+| Consume a pinned external snapshot | `SnapshotDataSource` | Injected client; no benchmark dependency or implicit transport |
 | Execute native transformations | `execute` | pandas/Polars callbacks or registered DuckDB SQL; completion is not correctness |
 | Migrate a bounded relational plan | `migrate` | Genuine native implementations; no arbitrary Python/SQL translation |
 | Verify existing outputs | `verify` | Agreement, expected output, rules, coverage and review are separate |
@@ -122,6 +124,8 @@ The [English handbook](packages/equiframe/docs/index.md) is self-contained and
 carried in wheel and sdist. Installed copies are readable at
 `importlib.resources.files("equiframe").joinpath("docs/index.md")`.
 [CONTRIBUTING.md](CONTRIBUTING.md) contains development commands and review rules.
+The [post-roadmap review](docs/GLOBAL_REVIEW_REFACTOR_20261006.md) records concrete
+correctness/refactoring changes and their remaining release boundaries.
 [Benchmark README](packages/equiframe-benchmark/README.md) explains its separate
 experimental package and installation.
 

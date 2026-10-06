@@ -89,6 +89,7 @@ from equiframe import (
     RuleSpec,
     SchemaCheck,
     SignificantOrder,
+    SnapshotManifest,
     SortSpec,
     StringType,
     StringValue,
@@ -515,6 +516,7 @@ def main() -> None:
         ExecutionResult.model_json_schema()
     )
     for name, model in (
+        ("snapshot-manifest", SnapshotManifest),
         ("comparison-spec", ComparisonSpec),
         ("comparison-options", ComparisonOptions),
         ("comparison-result", ComparisonResult),

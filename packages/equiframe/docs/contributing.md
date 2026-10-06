@@ -60,6 +60,19 @@ The candidate driver provides a byte-bound aggregate receipt:
 python tools/check_candidate.py --package . --output /absolute/path/new-checks.json
 ```
 
+Every invocation needs a fresh receipt name and matching log/pytest paths. The
+driver refuses existing output evidence before starting checks and reserves its
+receipt exclusively. After a failed or interrupted attempt, keep that output
+and choose another `--output` name for the retry.
+
+The aggregate candidate driver and `release_manifest.py` require a Git checkout
+to bind the complete source tree to a commit. An extracted sdist can run the
+package's lint, types, assets, tests and build checks, but it cannot create that
+Git-bound release receipt by itself. Keep the original source revision and
+artifact receipt from the provider. The benchmark distribution verifier also
+expects the monorepo layout, including the adjacent matching core source and
+built wheel; an isolated benchmark sdist does not supply those inputs.
+
 For the benchmark, work from `packages/equiframe-benchmark`, build the matching
 core wheel first, and run the same lint/type/assets/test/build/Twine/distribution
 sequence after:

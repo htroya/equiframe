@@ -15,6 +15,15 @@ from .validation import ValidatedIR, validate_ir
 
 @dataclass(frozen=True)
 class CompiledPlan:
+    """Lower-level native implementation for already validated physical inputs.
+
+    Compilation checks IR/contract metadata, not data. The caller must establish
+    exact input types and value constraints before executing this transformation;
+    ``migrate`` performs that admission automatically. Passing the transformation
+    directly to ``execute`` uses native conversion behavior and records it, but
+    completion does not establish input conformance or semantic equivalence.
+    """
+
     engine: str
     transformation: Transformation
     ir_sha256: str
@@ -23,6 +32,13 @@ class CompiledPlan:
 
 
 class PlanCompiler(Protocol):
+    """Compile trusted IR metadata; actual input admission belongs to the caller.
+
+    ``check`` and ``compile`` do not load or validate tables. Use ``migrate`` for
+    checked input capture, or independently validate exact physical input types
+    and constraints before using a returned ``CompiledPlan`` with ``execute``.
+    """
+
     @property
     def engine(self) -> str: ...
 

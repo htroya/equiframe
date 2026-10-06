@@ -1,3 +1,21 @@
+# Post-roadmap review: shared integration and bounded repeated work
+
+Private 0.11.1 candidate, identified by commit and artifact hashes.
+
+- Keep snapshot public imports as exact aliases to the generic core implementation;
+  preserve existing manifest schema, strict types and canonical JSON/fingerprints
+- Reuse core fixed-text CLI hints without changing existing machine codes or exit
+  meanings; the standalone pilot retains failure exit 1 with a concise diagnostic
+- Avoid redundant bootstrap recomputation after a report is already validated in
+  the same public operation: table read/write require one evaluation validation
+  instead of two; pairwise construction requires two instead of three
+- Keep revalidation at every public boundary, including altered model instances
+  and JSON; preserve historical report, pairwise and all six CSV bytes
+
+This computation-count reduction is not a performance SLA or scientific result.
+No scientific protocol, detector, split, bootstrap seed, interval definition,
+dependency range or historical schema is changed by this refactoring.
+
 # STEP9 candidate: distribution evidence
 
 The private 0.11.1 candidate now has English entrypoint documentation, an

@@ -358,7 +358,7 @@ def comparison_report(
     requirements without changing the comparison verdict.
     """
     result = ComparisonResult.model_validate(result)
-    options = ReportOptions.model_validate(options or ReportOptions())
+    options = ReportOptions.model_validate(ReportOptions() if options is None else options)
     names = {column.name for column in result.spec.contract.output.schema_spec.columns}
     if not set(options.redact_columns) <= names:
         raise ValueError("redacted columns must exist in the declared output schema")
@@ -582,7 +582,7 @@ def write_comparison_report(
     caller cleanup. Originals are never deleted. Reproduction exports contain
     sensitive raw captures and require explicit values/metadata opt-ins.
     """
-    options = ReportOptions.model_validate(options or ReportOptions())
+    options = ReportOptions.model_validate(ReportOptions() if options is None else options)
     report = comparison_report(
         result, options=options, evidence_root=evidence_root, declaration=declaration
     )

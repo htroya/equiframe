@@ -62,3 +62,10 @@ entrenamiento normal sigue siendo responsabilidad del consumidor/benchmark.
 `execute_native.py` también perfila sus ejecuciones con los tres motores y verifica
 la igualdad de los vectores calculados independientemente. Ningún profiler recibe
 otra salida. Todo esto es demostración de ingeniería, no entrenamiento científico.
+
+## Pinned core-only snapshot
+
+`snapshot_source.py --output FRESH_DIRECTORY` uses the `duckdb` extra and an
+injected local synthetic client to preserve Decimal/NULL/multiplicity, execute a
+native transformation and assert the expected output. It requires no benchmark
+or external service. See the packaged `docs/extending.md` guide.

@@ -8,6 +8,7 @@ from typing import Literal
 
 import equiframe as ef
 import pyarrow as pa
+from equiframe._cli_support import write_failure
 
 from equiframe_benchmark.fixtures import COMPARISON_POLICY, cases, expected_table, registry
 from equiframe_benchmark.io import save_document
@@ -241,7 +242,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    print(json.dumps(run_pilot(args.output), sort_keys=True))
+    try:
+        result = run_pilot(args.output)
+    except Exception as error:
+        write_failure(error, code="pilot_operation_failed")
+        raise SystemExit(1) from None
+    print(json.dumps(result, sort_keys=True))
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import typer
+from equiframe._cli_support import exit_with_failure
 
 from equiframe_benchmark.commands import register as _register_delivery
 from equiframe_benchmark.commands_scale import register as _register_scale
@@ -21,8 +22,12 @@ app = typer.Typer(no_args_is_help=True, add_completion=False, pretty_exceptions_
 
 def _failure(error: Exception, *, input_validation: bool = True) -> None:
     invalid = input_validation and isinstance(error, ValueError)
-    typer.echo("invalid_input" if invalid else "operation_failed", err=True)
-    raise typer.Exit(code=2 if invalid else 3) from None
+    exit_with_failure(
+        error,
+        code="invalid_input" if invalid else "operation_failed",
+        exit_code=2 if invalid else 3,
+        input_validation=input_validation,
+    )
 
 
 @app.command("validate")

@@ -106,6 +106,7 @@ assert importlib.metadata.version('equiframe') == sys.argv[3]
         shutil.copytree(
             ROOT / "examples", work / "examples", ignore=shutil.ignore_patterns("__pycache__")
         )
+        shutil.copytree(ROOT / "schemas", work / "schemas")
         sources = work / "declared-source-packages"
         for project in (CORE, ROOT):
             target = sources / project.name

@@ -133,7 +133,9 @@ def capture_duckdb(
     """
     if type(sql) is not str or not sql.strip():
         raise InvalidExecutionInput("capture requires a nonempty trusted SQL string")
-    checked = DuckDBCaptureOptions.model_validate(options or DuckDBCaptureOptions())
+    checked = DuckDBCaptureOptions.model_validate(
+        DuckDBCaptureOptions() if options is None else options
+    )
     name = TypeAdapter(Text).validate_python(name)
     if type(exclusive_connection) is not bool:
         raise InvalidExecutionInput("exclusive_connection must be a boolean")

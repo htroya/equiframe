@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import time
 from collections.abc import Mapping
+from dataclasses import replace
 from pathlib import Path
 from typing import Literal, Self
 from uuid import uuid4
@@ -11,7 +12,7 @@ from uuid import uuid4
 from pydantic import Field, model_validator
 
 from equiframe._base import FrozenModel, Identifier, Text
-from equiframe.errors import ArtifactIntegrityError
+from equiframe.errors import ArtifactIntegrityError, ResourceLimitError
 from equiframe.evidence import inventory, load_json, publish_json, verify_files
 from equiframe.execution import CancellationToken, RunContext
 from equiframe.execution_types import ExecutionPlan, TableArtifact
@@ -21,7 +22,7 @@ from equiframe.migration.runner import migrate
 from equiframe.migration.runner_types import MigrationResult, MigrationSpec
 from equiframe.pipeline_types import EvidenceFile
 from equiframe.ports import DataSource
-from equiframe.tables import LocalDataSource, capture_artifact
+from equiframe.tables import ArtifactInput, LoadedTable, capture_artifact
 from equiframe.types import ArtifactRef
 
 
@@ -165,7 +166,12 @@ class WorkflowResult(FrozenModel):
                             if pipeline and pipeline.execution and pipeline.execution.output
                             else None
                         )
-                    if reference is None or actual.get(binding.name) != reference.sha256:
+                    # A failed migration capture can retain only a prefix of
+                    # inputs. MigrationResult already requires every input for
+                    # a completed capture; bind all bytes actually retained.
+                    if reference is None or (
+                        binding.name in actual and actual[binding.name] != reference.sha256
+                    ):
                         raise ValueError(
                             "workflow checkpoint input differs from fixed dependency capture"
                         )
@@ -209,6 +215,59 @@ class WorkflowResult(FrozenModel):
         }
 
 
+class _CapturedSource:
+    """Replay fixed tables without discarding their separate index or provenance."""
+
+    def __init__(self, inputs: Mapping[str, tuple[TableArtifact, bool]]) -> None:
+        self._inputs = dict(inputs)
+
+    @property
+    def table_names(self) -> tuple[str, ...]:
+        return tuple(self._inputs)
+
+    def resolve(self, name: str, *, context: RunContext) -> LoadedTable:
+        artifact, meaningful_index = self._inputs[name]
+        loaded = ArtifactInput(artifact.data).load(context)
+        index = ArtifactInput(artifact.index).load(context).table if artifact.index else None
+        return LoadedTable(
+            loaded.table,
+            native_types=tuple((column.name, column.engine_type) for column in artifact.columns),
+            index=index,
+            meaningful_index=meaningful_index,
+            origin=artifact.data,
+            notes=artifact.notes,
+        )
+
+
+def _capture_context(context: RunContext, consumers: tuple[WorkflowStage, ...]) -> RunContext:
+    """Capture once up to the largest consumer budget; each stage enforces its own."""
+    first = consumers[0].migration
+    rows = []
+    sizes = []
+    for stage in consumers:
+        execution = stage.migration.execution_options
+        capture = stage.migration.options
+        rows.append(
+            min(execution.max_input_rows, capture.max_capture_rows)
+            if execution.max_input_rows is not None
+            else capture.max_capture_rows
+        )
+        sizes.append(execution.max_transport_bytes)
+    # Transport limits can apply to serialized files as well as decoded tables.
+    # A decoded migration capture limit must not become an IPC file-size limit.
+    transport_bytes = None if None in sizes else max(size for size in sizes if size is not None)
+    plan = ExecutionPlan(
+        contract=first.contract,
+        engine=first.source_engine,
+        transformation_id="workflow_capture",
+        options=first.execution_options.model_copy(
+            update={"max_input_rows": max(rows), "max_transport_bytes": transport_bytes}
+        ),
+    )
+    # Keep the workflow deadline, cancellation and captured-input inventory.
+    return replace(context, plan=plan)
+
+
 def run_workflow(
     spec: WorkflowSpec,
     *,
@@ -222,9 +281,13 @@ def run_workflow(
     Stage correspondences are explicit: each MigrationSpec compares one semantic
     output in two engines. Different internal relational DAGs may use registered
     compilers through migrate; arbitrary untrusted callbacks are not loaded here.
+    Shared input capture uses the largest consuming stage's row/byte allowance;
+    every migration subsequently enforces its own unchanged per-stage limits.
     """
     spec = WorkflowSpec.model_validate(spec)
-    expected = dict(expected or {})
+    if expected is not None and not isinstance(expected, Mapping):
+        raise TypeError("expected must be a mapping of stage identifiers to artifact references")
+    expected = dict({} if expected is None else expected)
     unknown = set(expected) - {s.stage_id for s in spec.stages}
     if unknown:
         raise ValueError("expected references contain undeclared stage identifiers")
@@ -253,27 +316,54 @@ def run_workflow(
     external = sorted({b.source for s in spec.stages for b in s.inputs if b.stage is None})
     if not set(external) <= set(source.table_names):
         raise ValueError("workflow external bindings contain unavailable tables")
-    captured: dict[str, ArtifactRef] = {}
-    capture_problem: str | None = None
-    try:
-        for name in external:
-            context.check()
-            loaded = source.resolve(name, context=context)
-            context.check_table(loaded.table, output=False)
-            captured[name] = capture_artifact(name, loaded, context).data
-        for expected_stage, reference in expected.items():
+    captured: dict[str, tuple[TableArtifact, bool]] = {}
+    capture_problems: dict[str, str] = {}
+    expected_problems: dict[str, str] = {}
+    for name in external:
+        try:
+            consumers = tuple(
+                stage
+                for stage in spec.stages
+                if any(binding.stage is None and binding.source == name for binding in stage.inputs)
+            )
+            capture_context = _capture_context(context, consumers)
+            capture_context.check()
+            loaded = source.resolve(name, context=capture_context)
+            capture_context.check_table(loaded.table, output=False)
+            decoded_bytes = loaded.table.nbytes + (
+                loaded.index.nbytes if loaded.index is not None else 0
+            )
+            if decoded_bytes > max(
+                stage.migration.options.max_capture_bytes for stage in consumers
+            ):
+                raise ResourceLimitError("workflow input exceeds every consumer's capture budget")
+            captured[name] = (
+                capture_artifact(name, loaded, capture_context),
+                loaded.meaningful_index,
+            )
+        except Exception as error:
+            capture_problems[name] = type(error).__name__
+    for expected_stage, reference in expected.items():
+        try:
             context.check()
             temporary = directory / ("expected-" + expected_stage + "." + reference.format)
             store.get(reference, temporary)
             expected[expected_stage] = store.put(temporary, media_type=reference.media_type)
             temporary.unlink()
-    except Exception as error:
-        capture_problem = type(error).__name__
+        except Exception as error:
+            expected_problems[expected_stage] = type(error).__name__
     checkpoints: list[WorkflowCheckpoint] = []
     prior: dict[str, WorkflowCheckpoint] = {}
     for stage in spec.stages:
         stage_start = time.perf_counter()
-        code = capture_problem
+        code = expected_problems.get(stage.stage_id) or next(
+            (
+                capture_problems[binding.source]
+                for binding in stage.inputs
+                if binding.stage is None and binding.source in capture_problems
+            ),
+            None,
+        )
         if code is None:
             try:
                 context.check()
@@ -301,7 +391,10 @@ def run_workflow(
                         and pipeline.execution is not None
                         and pipeline.execution.output is not None
                     )
-                    inputs[binding.name] = pipeline.execution.output.data
+                    # Native migration checkpoints retain separate generated
+                    # indexes. The next migration still enforces its own index
+                    # policy rather than silently receiving only data bytes.
+                    inputs[binding.name] = (pipeline.execution.output, False)
             try:
                 migration_spec = stage.migration
                 if deadline is not None:
@@ -316,7 +409,7 @@ def run_workflow(
                     migration_spec = migration_spec.model_copy(update={"options": options})
                 result = migrate(
                     migration_spec,
-                    source=LocalDataSource(inputs),
+                    source=_CapturedSource(inputs),
                     work_dir=directory / stage.stage_id,
                     expected=expected.get(stage.stage_id),
                     cancellation=token,

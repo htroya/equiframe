@@ -39,11 +39,13 @@ redistribution rights. See [release and rollback](releasing.md) and
    measurement, missing finalization and practical budget choices
 7. [Upgrading and troubleshooting](upgrading.md): safe acceptance, historical
    evidence, deprecations and actionable failure diagnosis
-8. [Contributing](contributing.md): reproducible checks, review and ownership
-9. [Dependency inventory](dependencies.md), [security](security.md) and
+8. [Extension ports and pinned snapshots](extending.md): reuse your own data client
+   without the benchmark, preserve metadata and understand resource ownership
+9. [Contributing](contributing.md): reproducible checks, review and ownership
+10. [Dependency inventory](dependencies.md), [security](security.md) and
    [release process](releasing.md): artifact identity, supply-chain evidence,
    disclosure and unresolved owner decisions
-10. [Adoption](adoption.md) and [maintenance](maintenance.md): consented real-project
+11. [Adoption](adoption.md) and [maintenance](maintenance.md): consented real-project
     observations, later-change retention, useful issue reports and critical trust incidents
 
 ## Reading this handbook without the repository

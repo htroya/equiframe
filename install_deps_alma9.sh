@@ -1,70 +1,70 @@
 #!/usr/bin/env bash
-# ------------------------------------------------------------
-# install_deps_alma9.sh
-#   Installs system and Python dependencies required to run
-#   the Jhair benchmark (EquiFrame) on AlmaLinux 9.
-# ------------------------------------------------------------
+# Compatibility entry point for an isolated, locked source-development setup.
+# Despite the historical filename, this does not qualify AlmaLinux support.
 set -euo pipefail
 
-# ---- 1. Update the system and install basic build tools ----
-echo "==> Updating system packages..."
-sudo dnf check-update || true   # ignore if no updates are available
-sudo dnf upgrade -y
+usage() {
+    cat <<'EOF'
+Usage: bash install_deps_alma9.sh [--python EXECUTABLE] [--dry-run]
 
-echo "==> Installing development tools and Python..."
-sudo dnf groupinstall -y "Development Tools"
-sudo dnf install -y \
-    python3 \
-    python3-pip \
-    python3-devel \
-    gcc \
-    gcc-c++ \
-    make \
-    openssl-devel \
-    bzip2-devel \
-    libffi-devel \
-    zlib-devel \
-    wget \
-    which
+Install the core development environment with all extras from its committed lock.
+Run from any directory. Requires Bash, uv and an existing Python 3.12 or 3.13.
+The environment belongs to packages/equiframe/.venv; it is not a PyPI release.
+This script does not use sudo, upgrade the OS, or install the benchmark/DW.
 
-# ---- 2. Install optional system libraries used by the engines ----
-#   Arrow/Parquet (used by pandas, polars, duckdb via pyarrow)
-#   DuckDB native libraries (optional but recommended)
-echo "==> Installing engine‑specific system libraries..."
-sudo dnf install -y \
-    arrow-devel \
-    pyarrow-devel \
-    libduckdb-devel
+Options:
+  --python EXECUTABLE  Python to use (default: python3.12)
+  --dry-run            Check prerequisites and show the command without installing
+  -h, --help           Show this help
+EOF
+}
 
-# ---- 3. Create and activate a virtual environment ----
-PROJECT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)   # repo root
-VENV_DIR="${PROJECT_ROOT}/.venv"
+python_executable=python3.12
+dry_run=false
+while (($#)); do
+    case "$1" in
+        --python)
+            if (($# < 2)) || [[ -z "$2" ]]; then
+                echo 'error: --python requires an executable' >&2
+                exit 2
+            fi
+            python_executable=$2
+            shift 2
+            ;;
+        --dry-run) dry_run=true; shift ;;
+        -h|--help) usage; exit 0 ;;
+        *) echo "error: unknown option: $1" >&2; usage >&2; exit 2 ;;
+    esac
+done
 
-echo "==> Creating Python virtual environment at ${VENV_DIR}..."
-python3 -m venv "${VENV_DIR}"
-# Activate the venv for the rest of the script
-# shellcheck source=/dev/null
-source "${VENV_DIR}/bin/activate"
+repository=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+package="$repository/packages/equiframe"
+if [[ ! -f "$package/pyproject.toml" || ! -f "$package/uv.lock" ]]; then
+    echo 'error: run the installer from an intact authorized EquiFrame checkout' >&2
+    exit 2
+fi
+if ! command -v -- "$python_executable" >/dev/null 2>&1; then
+    echo "error: Python executable not found: $python_executable (use --python)" >&2
+    exit 2
+fi
+if ! "$python_executable" -c 'import sys; sys.exit(0 if (3, 12) <= sys.version_info[:2] < (3, 14) else 2)'; then
+    echo 'error: EquiFrame requires Python 3.12 or 3.13; no installation was attempted' >&2
+    exit 2
+fi
+if ! command -v uv >/dev/null 2>&1; then
+    echo 'error: uv is required; see CONTRIBUTING.md for the reviewed setup instructions' >&2
+    exit 2
+fi
 
-# ---- 4. Upgrade pip, setuptools, wheel ----
-echo "==> Upgrading pip and build tools..."
-pip install --upgrade pip setuptools wheel
-
-# ---- 5. Install EquiFrame with the required extras ----
-#   The pyproject.toml defines:
-#       - core: pydantic, typer, tzdata
-#       - engines extra: pandas, polars, duckdb, pyarrow
-#       - ml extra: scikit-learn, numpy   (needed for IsolationForest)
-echo "==> Installing EquiFrame (core + engines + ml)..."
-pip install -e "${PROJECT_ROOT}"[engines,ml]
-
-# ---- 6. Verify installation ----
-echo "==> Verifying that equiframe can be imported..."
-python -c "import equiframe as ef; print('EquiFrame version:', ef.__version__)"
-
-echo "==> Installation completed successfully."
-echo "To use the environment, run:"
-echo "    source ${VENV_DIR}/bin/activate"
-echo "The auxiliary equiframe.benchmark and benchmark_local.py are quarantined."
-echo "For the separate benchmark package, follow packages/equiframe-benchmark/README.md."
-echo "This installer does not install or validate that separate package."
+command=(uv sync --locked --all-extras --python "$python_executable" --project "$package")
+echo "Environment: $package/.venv"
+printf 'Command:'
+printf ' %q' "${command[@]}"
+printf '\n'
+if "$dry_run"; then
+    exit 0
+fi
+# Do not inherit a caller's unrelated project environment as the sync target.
+UV_PROJECT_ENVIRONMENT="$package/.venv" "${command[@]}"
+echo 'Core development environment ready. Follow CONTRIBUTING.md for checks.'
+echo 'This local setup does not establish AlmaLinux support or public availability.'

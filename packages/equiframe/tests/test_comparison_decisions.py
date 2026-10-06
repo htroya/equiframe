@@ -200,7 +200,7 @@ def test_cli_invalid_spec_exits_2_without_success_json(tmp_path: Path, payload: 
     )
     assert response.exit_code == 2
     assert response.stdout == ""
-    assert response.stderr.strip() == "invalid_input"
+    assert response.stderr.splitlines()[0] == "invalid_input"
     assert not (tmp_path / "evidence").exists()
 
 
@@ -217,5 +217,5 @@ def test_cli_unwritable_evidence_exits_3_without_success_json(tmp_path: Path) ->
     )
     assert response.exit_code == 3
     assert response.stdout == ""
-    assert response.stderr.strip() == "operation_failed"
+    assert response.stderr.splitlines()[0] == "operation_failed"
     assert output.read_bytes() == b"existing file must be preserved"

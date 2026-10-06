@@ -694,8 +694,10 @@ def _compare(
     cancellation: CancellationToken | None = None,
 ) -> ComparisonResult:
     """One comparison kernel; the facade only adds capture and contract construction."""
-    spec = ComparisonSpec(contract=contract, policy=policy or ComparisonPolicy())
-    options = ComparisonOptions.model_validate(options or ComparisonOptions())
+    spec = ComparisonSpec(
+        contract=contract, policy=ComparisonPolicy() if policy is None else policy
+    )
+    options = ComparisonOptions.model_validate(ComparisonOptions() if options is None else options)
     if reference not in ("peer", "expected"):
         raise ValueError("reference must be peer or expected")
     identifier = "comparison-" + uuid4().hex

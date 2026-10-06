@@ -1,3 +1,37 @@
+# Post-roadmap review: correctness and reusable Python integrations
+
+Private 0.11.1 candidate; identify this revision by commit and exact artifact
+hashes. Public release, licensing, platform qualification and adoption remain
+separate unresolved gates.
+
+- Preserve workflow indexes and native provenance across captured inputs; isolate
+  unrelated source failures and consumer-specific resource budgets
+- Reject every out-of-range pandas arithmetic intermediate. DuckDB refuses
+  nested arithmetic/predicates whose eager errors SQL optimization can omit;
+  corrected compiler identities include `/arithmetic-checks-v1`
+- Retain native dtype observations and provider notes through migration detachment
+  and child captures. Document direct compiler/execute input preconditions
+- Expose generic pinned snapshots from core, with exact historical benchmark
+  aliases, manifest format/fingerprint preservation and no new base dependency
+- Remove source-owned completed-run bookkeeping; verify per-run manifest reuse
+  across contexts with different budgets. Add a core-only installed
+  snapshot example and an extension guide for source, adapter and compiler ports
+- Use defaults only for `None` configuration arguments; reject invalid falsey
+  values before work while retaining valid strict mappings and model instances
+- Preserve operational CLI exit statuses and first-line codes; add shared
+  fixed-text recovery hints without rendering raw exception payloads
+- Regenerate only the current synthetic rule catalog because its fingerprint
+  binds the edited rules.py implementation bytes; rule formulas and all historical
+  fixtures remain unchanged
+- Preserve candidate-check receipts/logs against accidental reuse of an output
+  destination; earlier failed attempts remain reviewable
+
+Historical JSON formats, comparison truth-testing rejection, exact value
+semantics and independent R/M/B/H/O boundaries remain intact. The workflow and
+arithmetic corrections can reject previously accepted defective cases; preserve
+old evidence and rerun affected plans before using them for acceptance. This is
+ordinary functional/architectural review, not a completed security assessment.
+
 # STEP10 candidate: adoption records and sustainable maintenance
 
 Private 0.11.1 candidate, identified by exact commit and artifact hashes.

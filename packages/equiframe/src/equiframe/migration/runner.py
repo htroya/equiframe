@@ -193,9 +193,13 @@ class _PinnedSource:
         index = ArtifactInput(ref.index).load(context).table if ref.index else None
         return LoadedTable(
             value.table,
+            native_types=tuple((column.name, column.engine_type) for column in ref.columns),
             index=index,
             origin=ref.data,
-            notes=("Fixed migration snapshot; original provider is not called again.",),
+            notes=(
+                *ref.notes,
+                "Fixed migration snapshot; original provider is not called again.",
+            ),
         )
 
 
@@ -336,6 +340,7 @@ def migrate(
                 )
             value = LoadedTable(
                 detached_arrow(value.table),
+                native_types=value.native_types,
                 index=detached_arrow(value.index) if value.index is not None else None,
                 origin=value.origin,
                 notes=value.notes,

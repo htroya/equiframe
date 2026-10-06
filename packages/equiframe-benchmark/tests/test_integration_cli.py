@@ -58,7 +58,7 @@ def test_cli_invalid_configuration_is_two_without_loading_factories(tmp_path, mo
     arguments, output, path, _, client, counters = request(tmp_path, monkeypatch)
     path.write_text('{"schema_version":"1.0","schema_version":"1.0"}', encoding="utf8")
     response = CliRunner().invoke(app, arguments)
-    assert response.exit_code == 2 and response.output.strip() == "invalid_input"
+    assert response.exit_code == 2 and response.output.splitlines()[0] == "invalid_input"
     assert client.downloads == 0 and not counters and not output.exists()
 
 
@@ -69,7 +69,7 @@ def test_cli_corrupt_receipt_is_three(tmp_path, monkeypatch):
     directory = output / json.loads(response.stdout)["integration_id"]
     (directory / "integration.json").write_text('{"truncated":', encoding="utf8")
     verified = CliRunner().invoke(app, ["verify-integration", str(directory)])
-    assert verified.exit_code == 3 and verified.output.strip() == "operation_failed"
+    assert verified.exit_code == 3 and verified.output.splitlines()[0] == "operation_failed"
 
 
 def test_cli_client_hash_failure_is_three_with_verified_failure_evidence(tmp_path, monkeypatch):
@@ -99,5 +99,5 @@ def test_cli_invalid_factory_result_is_two(tmp_path, monkeypatch, factory):
     arguments, output, _, module, client, counters = request(tmp_path, monkeypatch)
     setattr(module, factory, lambda: object())
     response = CliRunner().invoke(app, arguments)
-    assert response.exit_code == 2 and response.output.strip() == "invalid_input"
+    assert response.exit_code == 2 and response.output.splitlines()[0] == "invalid_input"
     assert client.downloads == 0 and not counters and not output.exists()

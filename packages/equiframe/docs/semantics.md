@@ -202,6 +202,14 @@ float join/group/order keys and float SUM/min/max remain outside this IR.
 `count_valid` can admit float. Native admission can reject a mathematically safe
 case conservatively, for example a Polars sum with cancelling large terms.
 
+Arithmetic `overflow="reject"` applies to every intermediate expression, even
+when a later expression would cancel its value or produce a boolean or NULL.
+Pandas and Polars evaluate those checks eagerly. DuckDB admits one direct
+projected arithmetic operation, followed only by optional Sort nodes. It rejects
+nested arithmetic and arithmetic within predicates before capture: its optimizer
+can simplify comparisons or propagate a NULL without evaluating an intermediate
+overflow. This is an explicit capability limit, with no fallback or lossy cast.
+
 `check_migration` checks both compilers without reading inputs or loading engines.
 `migrate` captures the same inputs once and executes two native pipelines. The
 optional expected output is separate and never feeds the transformations,

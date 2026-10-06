@@ -136,6 +136,35 @@ def candidate_environment(bytecode_directory: Path) -> dict[str, str]:
     return environment
 
 
+def require_fresh_output(output: Path) -> None:
+    """A retry gets a new receipt, logs and pytest directory; retain earlier attempts."""
+    temporary = output.parent / (output.stem + "-pytest-tmp")
+    if output.exists() or output.is_symlink():
+        raise SystemExit("candidate receipt already exists; choose a new --output path")
+    if temporary.exists() or temporary.is_symlink():
+        raise SystemExit("candidate pytest directory already exists; choose a new --output path")
+    if output.parent.exists() and any(
+        path.name.startswith(output.stem + "-")
+        and path.name.endswith(".log")
+        and path.name.removeprefix(output.stem + "-").removesuffix(".log").isdigit()
+        for path in output.parent.iterdir()
+    ):
+        raise SystemExit("candidate logs already exist; choose a new --output path")
+
+
+def reserve_output(output: Path) -> None:
+    """Reserve the receipt exclusively before starting any candidate command."""
+    output.parent.mkdir(parents=True, exist_ok=True)
+    require_fresh_output(output)
+    try:
+        with output.open("x", encoding="utf-8") as stream:
+            # An interruption before the first command remains an incomplete
+            # ordinary receipt, never a successful run or an overwritten attempt.
+            stream.write('{"environment": {}, "results": []}\n')
+    except FileExistsError:
+        raise SystemExit("candidate receipt already exists; choose a new --output path") from None
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--package", type=Path, default=Path(__file__).resolve().parents[1])
@@ -147,6 +176,9 @@ def main() -> None:
     package = args.package.resolve()
     output = args.output.resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
+    # Reject a known reused destination before even querying source metadata.
+    # run_checks rechecks and reserves it atomically before executing the first check.
+    require_fresh_output(output)
     initial_source = source_snapshot(package)
     project = tomllib.loads((package / "pyproject.toml").read_text(encoding="utf-8"))["project"]
     stem = project["name"].replace("-", "_") + "-" + project["version"]
@@ -197,6 +229,7 @@ def run_checks(
     bytecode_directory: Path,
     environment: dict[str, str],
 ) -> None:
+    reserve_output(output)
     results = []
     for number, command in enumerate(commands):
         binding = None
@@ -217,7 +250,7 @@ def run_checks(
         tick = time.monotonic()
         log = output.parent / f"{output.stem}-{number:02d}.log"
         print("Executing", " ".join(command), flush=True)
-        with log.open("w", encoding="utf-8") as stream:
+        with log.open("x", encoding="utf-8") as stream:
             completed = subprocess.run(
                 command,
                 cwd=package,

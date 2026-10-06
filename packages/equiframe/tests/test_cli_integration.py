@@ -106,7 +106,7 @@ def test_compare_absent_or_malformed_final_result_never_prints_success(
     response = CliRunner().invoke(cli.app, files(tmp_path, [1], [1]))
     assert response.exit_code == 3
     assert response.stdout == ""
-    assert response.stderr.strip() == "operation_failed"
+    assert response.stderr.splitlines()[0] == "operation_failed"
 
 
 @pytest.mark.parametrize(
@@ -127,7 +127,7 @@ def test_compare_revalidates_constructed_producer_results(tmp_path, monkeypatch,
     response = CliRunner().invoke(cli.app, files(tmp_path, [1], [1]))
     assert response.exit_code == 3
     assert response.stdout == ""
-    assert response.stderr.strip() == "operation_failed"
+    assert response.stderr.splitlines()[0] == "operation_failed"
     assert SECRET not in response.output
 
 
@@ -150,7 +150,7 @@ def test_compare_exception_matrix_has_no_secret_or_false_json(
     response = CliRunner().invoke(cli.app, files(tmp_path, [1], [1]))
     assert response.exit_code == code
     assert response.stdout == ""
-    assert response.stderr.strip() == diagnostic
+    assert response.stderr.splitlines()[0] == diagnostic
     assert SECRET not in response.output
     assert "Traceback" not in response.output
 
@@ -186,7 +186,7 @@ def test_compare_subprocess_persistence_failure_leaves_stdout_empty(tmp_path):
     )
     assert response.returncode == 3
     assert response.stdout == ""
-    assert response.stderr.strip() == "operation_failed"
+    assert response.stderr.splitlines()[0] == "operation_failed"
     assert occupied.read_text() == SECRET
 
 

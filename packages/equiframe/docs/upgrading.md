@@ -72,6 +72,34 @@ work around a rejection by turning precise numbers into floats or discarding
 metadata. A deliberate consumer-side conversion needs its own reviewed domain
 and range proof. Preserve the original data and conversion provenance.
 
+### Migration arithmetic rejects concealed intermediate overflow
+
+Pandas now enforces each arithmetic expression's declared range before its value
+is used by another expression. DuckDB rejects nested arithmetic and arithmetic
+predicates in preflight because SQL optimization can omit their intermediate
+overflow checks. A single direct arithmetic projection retains native support;
+its only supported suffix is Sort. Existing admitted source data is never cast
+lossily to avoid a rejection.
+
+The corrected pandas and DuckDB compiler implementation versions end in
+`/arithmetic-checks-v1`, and new transformation identities incorporate that
+revision. Polars identities and all historical formats/readers stay unchanged.
+Retain old evidence as historical observations; rerun affected plans with the
+corrected compiler before using their results for acceptance.
+
+## Optional configuration and pinned snapshots
+
+Optional `options`/`policy` arguments now use defaults only for `None`. Invalid
+falsey values such as `False`, `0` or `[]` raise validation errors before work
+begins. Existing option models and valid strict mappings, including an empty
+all-default mapping, retain their behavior. Use an explicit empty mapping only
+where a mapping is the documented input, not as a substitute for another type.
+
+The generic snapshot API is now available from `equiframe` and
+`equiframe.snapshot`. Existing `equiframe_benchmark` imports are supported aliases,
+so there is no forced import migration or manifest rewrite. New integrations can
+avoid installing the benchmark; see [extension ports](extending.md).
+
 ## Failure diagnosis
 
 | Symptom | Safe next step |

@@ -9,6 +9,25 @@ covers environment setup, final-byte checks, review, semantic boundaries and
 publishing permissions. [Compatibility](packages/equiframe/docs/compatibility.md)
 and [upgrading](packages/equiframe/docs/upgrading.md) describe the public contract.
 
+## Source-development setup helper
+
+The historical `install_deps_alma9.sh` entry point now uses the actual core package
+and committed lock. It requires an existing supported Python and `uv`, performs
+no OS updates, and does not install the benchmark or DW components:
+
+```bash
+bash install_deps_alma9.sh --python python3.12 --dry-run
+bash install_deps_alma9.sh --python python3.12
+```
+
+It can run from any working directory and targets only
+`packages/equiframe/.venv`, ignoring an unrelated `UV_PROJECT_ENVIRONMENT`.
+Use `--python python3.13` for an already-installed 3.13 interpreter. The filename
+is historical: neither these command-contract tests nor the Linux cloud gates
+qualify AlmaLinux. On Windows, use the direct `uv` commands below.
+Run the root helper tests without installing packages with
+`python -m unittest discover -s tests -v` (Bash required).
+
 ## Core checks
 
 From `packages/equiframe`, with Python 3.12 and `uv` available:
@@ -29,6 +48,12 @@ For the benchmark, first build the matching core wheel, then use its package
 directory and `uv sync --locked --all-extras --reinstall-package equiframe` before
 the same check sequence. Installed tests run outside the checkout; a successful
 source test or editable import does not establish distribution correctness.
+
+The aggregate `check_candidate.py` driver and `release_manifest.py` require the
+Git checkout; isolated sdists can run package checks but cannot establish that
+Git-bound source receipt. Benchmark distribution verification also requires the
+adjacent matching core source directory and built wheel. See the packaged
+contribution guide for the distinction between these verification inputs.
 
 These commands are instructions, not claims of a passed candidate. Preserve the
 aggregate byte-bound receipt from `tools/check_candidate.py`; repeat affected

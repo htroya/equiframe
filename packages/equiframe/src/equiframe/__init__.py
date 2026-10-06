@@ -318,6 +318,14 @@ from equiframe.serialization import (
     validate_contract,
     write_contract,
 )
+from equiframe.snapshot import (
+    SnapshotClient,
+    SnapshotColumn,
+    SnapshotDataSource,
+    SnapshotManifest,
+    SnapshotTable,
+    snapshot_fingerprint,
+)
 from equiframe.tables import (
     ArrowInput,
     ArtifactInput,
@@ -613,6 +621,11 @@ __all__ = [
     "SchemaVersionError",
     "Sha256",
     "SignificantOrder",
+    "SnapshotClient",
+    "SnapshotColumn",
+    "SnapshotDataSource",
+    "SnapshotManifest",
+    "SnapshotTable",
     "Sort",
     "SortKey",
     "SortSpec",
@@ -721,6 +734,7 @@ __all__ = [
     "run_workflow",
     "score_detectors",
     "sequence_contract",
+    "snapshot_fingerprint",
     "transform_profiles",
     "validate_contract",
     "validate_ir",

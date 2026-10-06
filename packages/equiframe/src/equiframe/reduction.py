@@ -126,7 +126,7 @@ def reduce_case(
     import pyarrow as pa
     from pydantic import TypeAdapter
 
-    options = ReductionOptions.model_validate(options or ReductionOptions())
+    options = ReductionOptions.model_validate(ReductionOptions() if options is None else options)
     TypeAdapter(Identifier).validate_python(failure_signature, strict=True)
     TypeAdapter(Text).validate_python(predicate_version, strict=True)
     names = tuple(sorted(inputs))

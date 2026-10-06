@@ -8,6 +8,7 @@ from typing import cast
 
 import typer
 
+from equiframe._cli_support import exit_with_failure
 from equiframe.assertion_types import EquivalencePolicy
 from equiframe.assertions import equivalence_decision
 from equiframe.bundle import export_bundle, import_bundle, inspect_bundle
@@ -224,9 +225,8 @@ def migration_validate(spec: Path) -> None:
     try:
         document = load_json(MigrationSpec, spec)
         checks = check_migration(document)
-    except CapabilityError:
-        typer.echo("unsupported_capability", err=True)
-        raise typer.Exit(code=2) from None
+    except CapabilityError as error:
+        exit_with_failure(error, code="unsupported_capability", exit_code=2)
     except Exception as error:
         _failure(error)
         return
@@ -310,8 +310,12 @@ def _trusted_callable(reference: str) -> Callable[..., object]:
 
 def _failure(error: Exception, *, input_validation: bool = True) -> None:
     invalid = input_validation and isinstance(error, (ValueError, ContractValidationError))
-    typer.echo("invalid_input" if invalid else "operation_failed", err=True)
-    raise typer.Exit(code=2 if invalid else 3) from None
+    exit_with_failure(
+        error,
+        code="invalid_input" if invalid else "operation_failed",
+        exit_code=2 if invalid else 3,
+        input_validation=input_validation,
+    )
 
 
 @app.command("run")

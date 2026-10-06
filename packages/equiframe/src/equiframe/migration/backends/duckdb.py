@@ -61,6 +61,8 @@ from ..validation import (
     references,
 )
 
+_COMPILER_VERSION = "migration-native-ir1.0/duckdb/arithmetic-checks-v1"
+
 
 def quote(name: str) -> str:
     return '"' + name.replace('"', '""') + '"'
@@ -242,6 +244,42 @@ class DuckDBCompiler:
                 for node in plan.nodes
             }
             for node in plan.nodes:
+                expressions = (
+                    tuple(item.expression for item in node.columns)
+                    if isinstance(node, Project)
+                    else (node.predicate,)
+                    if isinstance(node, Filter)
+                    else ()
+                )
+                if any(
+                    contains_arithmetic(expression)
+                    and (
+                        not isinstance(expression, Arithmetic)
+                        or contains_arithmetic(expression.left)
+                        or contains_arithmetic(expression.right)
+                    )
+                    for expression in expressions
+                ):
+                    # DuckDB can use the declared result range to simplify an
+                    # arithmetic predicate without evaluating its fallible cast,
+                    # or propagate NULL past a nested arithmetic operation.
+                    # Even a final projection or materialized CTE does not provide
+                    # an eager checkpoint for each intermediate expression.
+                    return CompilationCheck(
+                        engine=self.engine,
+                        supported=False,
+                        diagnostics=(
+                            CompilationDiagnostic(
+                                code="eager_semantics_not_supported",
+                                message=(
+                                    "DuckDB cannot preserve eager overflow rejection in nested "
+                                    "arithmetic or arithmetic predicates; arithmetic requires "
+                                    "one direct projected operation with only a final sort suffix"
+                                ),
+                                node_id=node.node_id,
+                            ),
+                        ),
+                    )
                 if not (
                     isinstance(node, Aggregate)
                     or (isinstance(node, Sort) and node.ties == "reject")
@@ -270,7 +308,8 @@ class DuckDBCompiler:
                                 CompilationDiagnostic(
                                     code="eager_semantics_not_supported",
                                     message=(
-                                        "DuckDB error-bearing aggregate/sort nodes only support "
+                                        "DuckDB error-bearing aggregate/sort/arithmetic nodes "
+                                        "only support "
                                         "a final sort suffix; later relational nodes may "
                                         "prune errors"
                                     ),
@@ -286,7 +325,9 @@ class DuckDBCompiler:
         if not check.supported:
             raise CapabilityError(check.diagnostics[0].message)
         validated = require_supported(self.engine, plan, contract)
-        identifier, ir_sha, contract_sha = compilation_identity(validated, self.engine)
+        identifier, ir_sha, contract_sha = compilation_identity(
+            validated, self.engine, implementation_version=_COMPILER_VERSION
+        )
         prefix = "__eq_" + ir_sha[:16] + "_"
         occupied = {table.name.casefold() for table in contract.inputs}
         while any((prefix + str(index)).casefold() in occupied for index in range(len(plan.nodes))):
@@ -396,5 +437,5 @@ class DuckDBCompiler:
                 + key.nulls.upper()
                 for key in output.by
             )
-        transformation = DuckDBTransformation(identifier, sql, "migration-native-ir1.0/duckdb")
+        transformation = DuckDBTransformation(identifier, sql, _COMPILER_VERSION)
         return CompiledPlan(self.engine, transformation, ir_sha, contract_sha, check)
