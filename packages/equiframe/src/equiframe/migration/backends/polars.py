@@ -84,11 +84,22 @@ def _dtype(dtype: LogicalType) -> Any:
     raise CapabilityError("unsupported Polars IR type")
 
 
+def _column(name: str) -> pl.Expr:
+    """Resolve an IR name literally, without Polars wildcard/regex expansion."""
+    import polars.selectors as cs
+
+    # In minimum Polars 1.30, require_all=True forwards names to pl.col and
+    # expands patterns. False uses escaped exact-name matching in both minimum
+    # and newer versions. IR validation resolves references, and _coerce checks
+    # every expected column by exact frame[name] lookup before any selection.
+    return cs.by_name(name, require_all=False).as_expr()
+
+
 def _expression(expression: Expression, columns: Any) -> pl.Expr:
     import polars as pl
 
     if isinstance(expression, Column):
-        return pl.col(expression.name)
+        return _column(expression.name)
     if isinstance(expression, LiteralExpression):
         scalar = literal_scalar(expression)
         return pl.lit(scalar, dtype=_dtype(expression.logical_type))
@@ -196,8 +207,6 @@ def _check_localizations(frame: pl.DataFrame, expression: Expression, columns: A
 
 
 def _coerce(frame: pl.DataFrame, validated: ValidatedIR, node_id: str) -> pl.DataFrame:
-    import polars as pl
-
     for column in validated.schema(node_id):
         dtype, series = column.logical_type, frame[column.name]
         if not column.nullable and series.null_count():
@@ -220,7 +229,7 @@ def _coerce(frame: pl.DataFrame, validated: ValidatedIR, node_id: str) -> pl.Dat
                     )
     return frame.select(
         [
-            pl.col(c.name).cast(_dtype(c.logical_type), strict=True)
+            _column(c.name).cast(_dtype(c.logical_type), strict=True)
             for c in validated.schema(node_id)
         ]
     )
@@ -231,7 +240,7 @@ def _aggregate(frame: pl.DataFrame, node: Aggregate, validated: ValidatedIR) -> 
 
     if node.null_groups == "drop" and node.group_by:
         frame = frame.filter(
-            pl.all_horizontal([pl.col(name).is_not_null() for name in node.group_by])
+            pl.all_horizontal([_column(name).is_not_null() for name in node.group_by])
         )
     expressions = []
     for measure in node.measures:
@@ -239,7 +248,7 @@ def _aggregate(frame: pl.DataFrame, node: Aggregate, validated: ValidatedIR) -> 
             result = pl.len()
         else:
             assert measure.column is not None
-            column = pl.col(measure.column)
+            column = _column(measure.column)
             if measure.operation == "count_valid":
                 result = column.count()
             elif measure.operation == "sum":
@@ -273,11 +282,37 @@ def _aggregate(frame: pl.DataFrame, node: Aggregate, validated: ValidatedIR) -> 
                 result = getattr(column, measure.operation)()
         expressions.append(result.alias(measure.name))
     aggregated = (
-        frame.group_by(list(node.group_by), maintain_order=True).agg(expressions)
+        frame.group_by([_column(name) for name in node.group_by], maintain_order=True).agg(
+            expressions
+        )
         if node.group_by
         else frame.select(expressions)
     )
     return _coerce(aggregated, validated, node.node_id)
+
+
+def _join(left: pl.DataFrame, right: pl.DataFrame, node: EquiJoin) -> pl.DataFrame:
+    """Keep join-key selectors scalar using collision-free native-local names."""
+    # Polars forbids selector expressions as join keys, including by_name().
+    # Rename every column simultaneously into disjoint safe namespaces; this
+    # also handles inputs whose real names equal one of these internal names.
+    left_names = {name: f"_equiframe_join_left_{i}" for i, name in enumerate(left.columns)}
+    right_names = {name: f"_equiframe_join_right_{i}" for i, name in enumerate(right.columns)}
+    joined = left.rename(left_names).join(
+        right.rename(right_names),
+        left_on=[left_names[key.left] for key in node.keys],
+        right_on=[right_names[key.right] for key in node.keys],
+        how=node.how,
+        nulls_equal=node.null_keys == "equal",
+        coalesce=False,
+        maintain_order="left_right",
+    )
+    restored = {temporary: name for name, temporary in left_names.items()}
+    if node.how not in ("semi", "anti"):
+        restored.update(
+            {temporary: node.right_prefix + name for name, temporary in right_names.items()}
+        )
+    return joined.rename(restored)
 
 
 class PolarsCompiler:
@@ -361,7 +396,7 @@ class PolarsCompiler:
         identifier, ir_sha, contract_sha = compilation_identity(
             validated,
             self.engine,
-            implementation_version="migration-native-ir1.0/polars/product-semantics-v2",
+            implementation_version="migration-native-ir1.0/polars/product-semantics-v3",
         )
 
         def transform(tables: Mapping[str, pl.DataFrame], context: RunContext) -> pl.DataFrame:
@@ -387,7 +422,7 @@ class PolarsCompiler:
                                 for item in node.columns
                             ]
                         )
-                        .select([item.name for item in node.columns])
+                        .select([_column(item.name) for item in node.columns])
                     )
                 elif isinstance(node, Filter):
                     _check_localizations(
@@ -415,28 +450,19 @@ class PolarsCompiler:
                             side
                             if node.null_keys == "equal"
                             else side.filter(
-                                pl.all_horizontal([pl.col(name).is_not_null() for name in names])
+                                pl.all_horizontal([_column(name).is_not_null() for name in names])
                             )
                         )
                         if (
                             unique
-                            and matchable.select(pl.struct(names).is_duplicated().any()).item()
+                            and matchable.select(
+                                pl.struct([_column(name) for name in names]).is_duplicated().any()
+                            ).item()
                         ):
                             raise CapabilityError(
                                 "Join violates declared cardinality: " + node.cardinality
                             )
-                    right = frames[node.right].rename(
-                        {name: node.right_prefix + name for name in frames[node.right].columns}
-                    )
-                    frame = frames[node.left].join(
-                        right,
-                        left_on=[key.left for key in node.keys],
-                        right_on=[node.right_prefix + key.right for key in node.keys],
-                        how=node.how,
-                        nulls_equal=node.null_keys == "equal",
-                        coalesce=False,
-                        maintain_order="left_right",
-                    )
+                    frame = _join(frames[node.left], frames[node.right], node)
                 elif isinstance(node, Aggregate):
                     frame = _aggregate(frames[node.source], node, validated)
                 elif isinstance(node, Concatenate):
@@ -447,26 +473,36 @@ class PolarsCompiler:
                         tie_keys = list(
                             dict.fromkeys((*node.keys, *(key.column for key in node.by)))
                         )
-                        if frame.select(pl.struct(tie_keys).is_duplicated().any()).item():
+                        if frame.select(
+                            pl.struct([_column(name) for name in tie_keys]).is_duplicated().any()
+                        ).item():
                             raise CapabilityError("Deduplicate encountered forbidden tiebreak ties")
                         frame = frame.sort(
-                            [key.column for key in node.by],
+                            [_column(key.column) for key in node.by],
                             descending=[key.direction == "descending" for key in node.by],
                             nulls_last=[key.nulls == "last" for key in node.by],
                             maintain_order=True,
                         )
-                    frame = frame.unique(subset=list(node.keys), keep="first", maintain_order=True)
+                    import polars.selectors as cs
+
+                    frame = frame.unique(
+                        subset=cs.by_name(*node.keys, require_all=False),
+                        keep="first",
+                        maintain_order=True,
+                    )
                 else:
                     frame = frames[node.source]
                     if (
                         node.ties == "reject"
                         and frame.select(
-                            pl.struct([key.column for key in node.by]).is_duplicated().any()
+                            pl.struct([_column(key.column) for key in node.by])
+                            .is_duplicated()
+                            .any()
                         ).item()
                     ):
                         raise CapabilityError("Sort encountered forbidden ties")
                     frame = frame.sort(
-                        [key.column for key in node.by],
+                        [_column(key.column) for key in node.by],
                         descending=[key.direction == "descending" for key in node.by],
                         nulls_last=[key.nulls == "last" for key in node.by],
                         maintain_order=True,
@@ -475,7 +511,7 @@ class PolarsCompiler:
             return frames[plan.output]
 
         transformation = PolarsTransformation(
-            identifier, transform, "migration-native-ir1.0/polars/product-semantics-v2"
+            identifier, transform, "migration-native-ir1.0/polars/product-semantics-v3"
         )
         return CompiledPlan(
             self.engine, transformation, ir_sha, contract_sha, self.check(plan, contract)

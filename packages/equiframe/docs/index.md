@@ -12,7 +12,7 @@ operational verification and experimental anomaly detection are separate service
 
 ## Release status
 
-This handbook describes the **private Alpha candidate 0.12.0a4**. The version string
+This handbook describes the **private Alpha candidate 0.12.0a5**. The version string
 alone does not identify its bytes: use the commit, wheel/sdist SHA-256 and build
 receipt supplied with your artifact. The team's package is **not publicly
 released on PyPI**. Do not install a project by the same name from an arbitrary

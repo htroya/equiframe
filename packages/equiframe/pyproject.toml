@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "equiframe"
-version = "0.12.0a4"
+version = "0.12.0a5"
 description = "Operational verification, native ETL migration and portable semantic evidence"
 readme = "README.md"
 requires-python = ">=3.12,<3.14"

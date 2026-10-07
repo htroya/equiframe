@@ -2,7 +2,7 @@
 
 [API](api.md) · [Semantics](semantics.md) · [Compatibility](compatibility.md)
 
-These experimental additions, introduced in 0.12.0a1 and retained in 0.12.0a4, extend the existing `RelationalPlan`
+These experimental additions, introduced in 0.12.0a1 and retained in 0.12.0a5, extend the existing `RelationalPlan`
 and `migrate` APIs. They do not infer business rules, change comparison policy,
 translate arbitrary code, or calculate one output for conversion into other
 engines. Every supported compiler executes its own native transformation.
@@ -10,6 +10,20 @@ The executable literal expectations were written and run failing before the
 implementation; installed-artifact receipts separately establish distribution
 validation. See the existing `get_adapter_capabilities()` and
 `get_stability_register()` records, not a second capability catalogue.
+
+## Literal column names
+
+Column references and output names are exact, case-sensitive strings. A name
+such as `*`, `^a$`, a dotted name, or a name containing quotes is a literal
+column name, never a wildcard, regular expression, or SQL expression. Input
+names, projected aliases, group keys, join keys, sort keys, and deduplication
+keys obey the same rule. Names and column order are preserved; a missing name
+is rejected by IR validation rather than expanded into matching columns.
+Backends may use temporary internal names to execute a native operation, but
+these do not appear in captured output. Existing `Text` validation, name
+uniqueness and engine-specific identifier limits still apply: for example,
+DuckDB rejects NUL names and case-insensitively colliding names. This contract
+does not relax those boundaries or the separate table-identifier restrictions.
 
 ## Outer joins and cardinality
 

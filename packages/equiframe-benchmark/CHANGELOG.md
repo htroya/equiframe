@@ -1,3 +1,12 @@
+# Private benchmark alpha 0.12.0a5 — 2026-10-06
+
+- Require exactly core `equiframe[arrow]==0.12.0a5` and matching engine/ML extras
+- Retain the benchmark algorithms and reader controls; identify rebuilt artifacts
+  separately after the core native literal-column-name correction
+- Preserve A4 installation, test and consumer receipts as historical observations
+
+No scientific method or detector independence changes.
+
 # Private benchmark alpha 0.12.0a4 — 2026-10-06
 
 - Enforce the declared boolean type of integrity-verification controls rather

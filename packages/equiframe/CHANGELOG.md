@@ -1,3 +1,19 @@
+# Private installed-product alpha 0.12.0a5 — 2026-10-06
+
+- Resolve IR column names literally in every native Polars selector context,
+  including wildcard/regex-shaped inputs and generated aliases
+- Use native-local collision-free join identifiers and restore exact original
+  names; preserve key multiplicity, NULL policy, column order and empty schemas
+- Retain the declared Polars 1.30 minimum through its escaped-name selector
+  path; keep exact name admission and missing-column checks
+- Version the corrected Polars compiler identity as product-semantics-v3;
+  Pandas and DuckDB implementations retain their independently executed code
+- Preserve all A4 artifacts and passing suites as historical evidence, alongside
+  the subsequently reproduced literal-name failures; revalidate new A5 bytes
+
+No scientific method, detector independence or evidence format changes.
+See `docs/upgrading.md` for the native-name correction and rerun guidance.
+
 # Private installed-product alpha 0.12.0a4 — 2026-10-06
 
 - Require actual boolean controls in pipeline, migration and workflow readers;

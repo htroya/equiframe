@@ -17,7 +17,7 @@ resolution ends, plus matching benchmark consumers. These are historical receipt
 for their exact artifact hashes, not a blanket validation of every later wheel
 that retains version `0.11.1`.
 
-For the current 0.12.0a4 artifact, use the supplied [release receipt](releasing.md) to see
+For the current 0.12.0a5 artifact, use the supplied [release receipt](releasing.md) to see
 which checks actually ran against its exact bytes. A configured workflow, test
 source, historical receipt or unexecuted platform job is not a current pass.
 No new Windows, macOS, ARM64, PyPy or other unrecorded platform support is claimed.

@@ -417,7 +417,7 @@ from equiframe.workflow import (
 )
 from equiframe.workflow_request import WorkflowExpected, WorkflowRequest
 
-__version__ = "0.12.0a4"
+__version__ = "0.12.0a5"
 
 __all__ = [
     "CANONICALIZATION",

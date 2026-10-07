@@ -266,3 +266,21 @@ manifest pin. Empty strings or other falsey supplied values no longer disable
 pin checking; they fail the exact SHA-256 comparison. This also applies to
 `inspect_bundle` and `import_bundle`; a rejected import does not create its
 destination. Bundle member checks remain mandatory even when the pin is omitted.
+
+
+## 0.12.0a5 literal native column names
+
+IR column strings denote exact names, including `*`, regex-shaped names and
+projected aliases. Earlier Polars compilers could expand such names, fail
+planning or return unintended extra columns. The comparison/expected gates
+remain necessary; successful native execution alone never proves correctness.
+
+The corrected Polars compiler uses literal selectors and temporary native-local
+join identifiers, restoring exact public names and order. It carries
+`product-semantics-v3`; Pandas/DuckDB compiler identities are unchanged. No IR
+format, comparison policy or scientific method changes. Existing name validation
+and engine-specific identifier limitations remain in force. See
+[migration contracts](migration-ir.md#literal-column-names).
+
+Preserve old artifacts and receipts. Recompile/rerun affected plans with the
+identified A5 wheel and retain new evidence; do not reinterpret A4 results as A5.
