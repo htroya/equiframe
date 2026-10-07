@@ -1,6 +1,6 @@
 # API Python y contratos de intercambio
 
-Versiones candidatas actuales: `equiframe 0.12.0a6` y `equiframe-benchmark 0.12.0a6`, formatos independientes `1.0`, Verify operacional, migrador y ETL local. El [README del
+Versiones candidatas actuales: `equiframe 0.12.0a7` y `equiframe-benchmark 0.12.0a7`, formatos independientes `1.0`, Verify operacional, migrador y ETL local. El [README del
 paquete](../packages/equiframe/README.md) contiene instalación, comandos y un
 ejemplo Python ejecutable. Las secciones por versión conservan la evolución de la API. La aceptación del servicio real, la evaluación científica y la comprobación final de las distribuciones actuales conservan sus controles propios.
 
@@ -22,7 +22,7 @@ equivalencia; la notación O y los nombres existentes `oracle`, `OracleResult`,
 | `contract_fingerprint(contract) -> str` | SHA-256 hexadecimal de esos bytes; no equivalencia tabular |
 | `contract_json_schema() -> dict[str, object]` | JSON Schema generado desde `Contract` |
 
-La API explícita está en `equiframe.__all__`; `__version__` es `0.12.0a6`.
+La API explícita está en `equiframe.__all__`; `__version__` es `0.12.0a7`.
 Desde STEP6 cada export, comando y esquema tiene clasificación explícita en
 [compatibilidad](COMPATIBILITY.md), consultable con `get_stability_register()`.
 `get_compatibility_policy()` publica los avisos/plazos; `get_adapter_capabilities()`

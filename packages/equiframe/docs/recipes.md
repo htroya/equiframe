@@ -2,7 +2,7 @@
 
 [Handbook](index.md) · [Quick start](quickstart.md) · [Semantics](semantics.md)
 
-This historical first-use kit predates candidate 0.12.0a6. For current candidate
+This historical first-use kit predates candidate 0.12.0a7. For current candidate
 installation use [the private wheelhouse guide](installed-private.md).
 
 These recipes use the private EquiFrame **0.11.1** first-use kit and **Python

@@ -1,3 +1,11 @@
+# Private benchmark alpha 0.12.0a7 — 2026-10-07
+
+- Require exactly `equiframe[arrow]==0.12.0a7` and matching engine/ML extras
+- Identify rebuilt artifacts after the minimum-Polars expression composition
+  correction; preserve the benchmark algorithms and historical producer readers
+
+No scientific method, detector independence or evidence format changes.
+
 # Private benchmark alpha 0.12.0a6 — 2026-10-07
 
 - Require exactly `equiframe[arrow]==0.12.0a6` and matching engine/ML extras

@@ -298,3 +298,30 @@ use the documented `ArtifactRef`, `ExecutionResult`, or `None` inputs.
 Supported snapshot inputs and recorded valid evidence are unchanged. Preserve
 A5 artifacts and receipts, and use the exact A6 package hashes for new validation.
 No output-model contract or scientific methodology changed.
+
+
+## 0.12.0a7 minimum-Polars expression composition
+
+The A5/A6 literal-name selector compiles to escaped regex expressions on admitted
+Polars 1.30. Combining different columns can fail with `ComputeError: an expression
+is not allowed to have different regexes`, including ordinary two-column Boolean
+filters. Affected migrations remain incomplete/non-evaluable; that is a defect for
+valid admitted plans, not acceptance of their data. Historical A5/A6 passes on a
+newer Polars do not establish minimum-version support for those combinations.
+
+The Polars compiler now evaluates expressions in a collision-free native-local
+column namespace, mapped from the actual input frame's literal names and order.
+Even `nth(index)` can expand its resolved name in Polars 1.30, so positional
+selection alone is insufficient. Logical names are restored after evaluation;
+every stored node is normalized to validated schema order. Projections compute
+all expressions from one renamed source using distinct temporary output aliases.
+New aliases, replacements and literal `*`/regex-shaped names stay literal.
+Aggregation, deduplication, sorting and join-key checks use the same safe naming
+boundary; existing collision-free join renaming is retained. There is no fallback
+to another engine and no raised Polars minimum.
+
+Reinstall the exact A7 wheel and rerun affected Polars plans against their
+independent expected output at both dependency endpoints. The compiler identity
+is `migration-native-ir1.0/polars/product-semantics-v4`; Pandas and DuckDB retain
+v2. The public IR, contract and evidence formats remain 1.0. Preserve old artifacts
+and receipts; do not relabel previous failures or passes as results for A7.

@@ -1,3 +1,21 @@
+# Private installed-product alpha 0.12.0a7 — 2026-10-07
+
+- Evaluate Polars expressions in a collision-free native-local column namespace;
+  escaped-name selectors in admitted Polars 1.30 cannot compose different columns
+  and positional selectors still expand wildcard/regex-shaped resolved names
+- Preserve ordinary and wildcard/regex-shaped names through Boolean, comparison,
+  arithmetic, coalesce and conditional expressions without raising the minimum
+- Map logical names from actual frame order before native evaluation and restore
+  them afterward; retain simultaneous aliases, reordered columns, NULLs, empty
+  schemas and native joins/aggregates/deduplication/sorts
+- Identify the corrected Polars compiler as product-semantics-v4; retain the
+  independently executed Pandas and DuckDB compiler identities unchanged
+- Retain A6 artifacts and failed minimum-consumer observations as historical;
+  exact new artifacts require their own source and installed validation receipts
+
+No public IR/format, dependency range, scientific method or detector independence
+changes. See `docs/upgrading.md` for affected reruns and historical evidence.
+
 # Private installed-product alpha 0.12.0a6 — 2026-10-07
 
 - Replace the snapshot input type assertion with an explicit TypeError, so

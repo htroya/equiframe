@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from decimal import Decimal, localcontext
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -39,6 +39,7 @@ from ..types import (
     EquiJoin,
     Expression,
     Filter,
+    IRColumn,
     IsNaN,
     IsNull,
     LiteralExpression,
@@ -84,22 +85,35 @@ def _dtype(dtype: LogicalType) -> Any:
     raise CapabilityError("unsupported Polars IR type")
 
 
-def _column(name: str) -> pl.Expr:
-    """Resolve an IR name literally, without Polars wildcard/regex expansion."""
-    import polars.selectors as cs
-
-    # In minimum Polars 1.30, require_all=True forwards names to pl.col and
-    # expands patterns. False uses escaped exact-name matching in both minimum
-    # and newer versions. IR validation resolves references, and _coerce checks
-    # every expected column by exact frame[name] lookup before any selection.
-    return cs.by_name(name, require_all=False).as_expr()
+def _native_name(position: int) -> str:
+    return f"_equiframe_column_{position}"
 
 
-def _expression(expression: Expression, columns: Any) -> pl.Expr:
+def _native_frame(frame: pl.DataFrame) -> pl.DataFrame:
+    """Enter a collision-free namespace before any native name resolution."""
+    return frame.rename({name: _native_name(i) for i, name in enumerate(frame.columns)})
+
+
+def _logical_frame(frame: pl.DataFrame, names: Sequence[str]) -> pl.DataFrame:
+    """Restore the declared names only after native expression evaluation."""
+    return frame.rename(dict(zip(frame.columns, names, strict=True)))
+
+
+def _column(name: str, names: Sequence[str]) -> pl.Expr:
+    """Resolve a literal logical name in an already renamed native frame."""
+    import polars as pl
+
+    # Polars 1.30 cannot compose different escaped-name regex selectors. Even
+    # nth(index) resolves back to a name which may expand '*' or '^...$'. All
+    # evaluated frames therefore use safe generated names, never user patterns.
+    return pl.col(_native_name(names.index(name)))
+
+
+def _expression(expression: Expression, columns: tuple[IRColumn, ...]) -> pl.Expr:
     import polars as pl
 
     if isinstance(expression, Column):
-        return _column(expression.name)
+        return _column(expression.name, tuple(column.name for column in columns))
     if isinstance(expression, LiteralExpression):
         scalar = literal_scalar(expression)
         return pl.lit(scalar, dtype=_dtype(expression.logical_type))
@@ -183,7 +197,9 @@ def _expression(expression: Expression, columns: Any) -> pl.Expr:
     raise CapabilityError("unknown Polars expression")
 
 
-def _check_localizations(frame: pl.DataFrame, expression: Expression, columns: Any) -> None:
+def _check_localizations(
+    frame: pl.DataFrame, expression: Expression, columns: tuple[IRColumn, ...]
+) -> None:
     """Validate each fallible native localization before relational pruning."""
     import polars as pl
 
@@ -202,7 +218,7 @@ def _check_localizations(frame: pl.DataFrame, expression: Expression, columns: A
         bad = (before.is_not_null() & after.is_null()) | (
             delta > pl.lit(Decimal(maximum_offset), dtype=pl.Decimal(38, 0))
         )
-        if frame.select(bad.fill_null(False).any()).item():
+        if _native_frame(frame).select(bad.fill_null(False).any()).item():
             raise CapabilityError("Polars timestamp localization exceeds faithful int64 range")
 
 
@@ -227,28 +243,32 @@ def _coerce(frame: pl.DataFrame, validated: ValidatedIR, node_id: str) -> pl.Dat
                     raise CapabilityError(
                         "IR output exceeds declared numeric range: " + column.name
                     )
-    return frame.select(
+    names = frame.columns
+    selected = _native_frame(frame).select(
         [
-            _column(c.name).cast(_dtype(c.logical_type), strict=True)
+            _column(c.name, names).cast(_dtype(c.logical_type), strict=True)
             for c in validated.schema(node_id)
         ]
     )
+    return _logical_frame(selected, [c.name for c in validated.schema(node_id)])
 
 
 def _aggregate(frame: pl.DataFrame, node: Aggregate, validated: ValidatedIR) -> pl.DataFrame:
     import polars as pl
 
+    names = frame.columns
+    frame = _native_frame(frame)
     if node.null_groups == "drop" and node.group_by:
         frame = frame.filter(
-            pl.all_horizontal([_column(name).is_not_null() for name in node.group_by])
+            pl.all_horizontal([_column(name, names).is_not_null() for name in node.group_by])
         )
     expressions = []
-    for measure in node.measures:
+    for i, measure in enumerate(node.measures):
         if measure.operation == "count_rows":
             result = pl.len()
         else:
             assert measure.column is not None
-            column = _column(measure.column)
+            column = _column(measure.column, names)
             if measure.operation == "count_valid":
                 result = column.count()
             elif measure.operation == "sum":
@@ -280,15 +300,16 @@ def _aggregate(frame: pl.DataFrame, node: Aggregate, validated: ValidatedIR) -> 
                 )
             else:
                 result = getattr(column, measure.operation)()
-        expressions.append(result.alias(measure.name))
+        expressions.append(result.alias(f"_equiframe_measure_{i}"))
     aggregated = (
-        frame.group_by([_column(name) for name in node.group_by], maintain_order=True).agg(
+        frame.group_by([_column(name, names) for name in node.group_by], maintain_order=True).agg(
             expressions
         )
         if node.group_by
         else frame.select(expressions)
     )
-    return _coerce(aggregated, validated, node.node_id)
+    logical = _logical_frame(aggregated, [*node.group_by, *(m.name for m in node.measures)])
+    return _coerce(logical, validated, node.node_id)
 
 
 def _join(left: pl.DataFrame, right: pl.DataFrame, node: EquiJoin) -> pl.DataFrame:
@@ -396,7 +417,7 @@ class PolarsCompiler:
         identifier, ir_sha, contract_sha = compilation_identity(
             validated,
             self.engine,
-            implementation_version="migration-native-ir1.0/polars/product-semantics-v3",
+            implementation_version="migration-native-ir1.0/polars/product-semantics-v4",
         )
 
         def transform(tables: Mapping[str, pl.DataFrame], context: RunContext) -> pl.DataFrame:
@@ -412,24 +433,31 @@ class PolarsCompiler:
                         _check_localizations(
                             frames[node.source], item.expression, validated.schema(node.source)
                         )
-                    frame = (
-                        frames[node.source]
-                        .with_columns(
-                            [
-                                _expression(item.expression, validated.schema(node.source)).alias(
-                                    item.name
-                                )
-                                for item in node.columns
-                            ]
-                        )
-                        .select([_column(item.name) for item in node.columns])
+                    # Stored source frames have validated order after _coerce.
+                    # Evaluate every expression against the same renamed source;
+                    # distinct temporary output names preserve simultaneous aliases.
+                    frame = _native_frame(frames[node.source]).with_columns(
+                        [
+                            _expression(item.expression, validated.schema(node.source)).alias(
+                                f"_equiframe_project_{i}"
+                            )
+                            for i, item in enumerate(node.columns)
+                        ]
                     )
+                    frame = frame.select(
+                        [pl.col(f"_equiframe_project_{i}") for i in range(len(node.columns))]
+                    )
+                    frame = _logical_frame(frame, [item.name for item in node.columns])
                 elif isinstance(node, Filter):
                     _check_localizations(
                         frames[node.source], node.predicate, validated.schema(node.source)
                     )
-                    frame = frames[node.source].filter(
-                        _expression(node.predicate, validated.schema(node.source))
+                    source = frames[node.source]
+                    frame = _logical_frame(
+                        _native_frame(source).filter(
+                            _expression(node.predicate, validated.schema(node.source))
+                        ),
+                        source.columns,
                     )
                 elif isinstance(node, Cast):
                     frame = frames[node.source]
@@ -446,17 +474,22 @@ class PolarsCompiler:
                             node.cardinality in ("one_to_one", "many_to_one"),
                         ),
                     ):
+                        native = _native_frame(side)
                         matchable = (
-                            side
+                            native
                             if node.null_keys == "equal"
-                            else side.filter(
-                                pl.all_horizontal([_column(name).is_not_null() for name in names])
+                            else native.filter(
+                                pl.all_horizontal(
+                                    [_column(name, side.columns).is_not_null() for name in names]
+                                )
                             )
                         )
                         if (
                             unique
                             and matchable.select(
-                                pl.struct([_column(name) for name in names]).is_duplicated().any()
+                                pl.struct([_column(name, side.columns) for name in names])
+                                .is_duplicated()
+                                .any()
                             ).item()
                         ):
                             raise CapabilityError(
@@ -468,50 +501,54 @@ class PolarsCompiler:
                 elif isinstance(node, Concatenate):
                     frame = pl.concat([frames[ref] for ref in node.sources], how="vertical")
                 elif isinstance(node, Deduplicate):
-                    frame = frames[node.source]
+                    names = frames[node.source].columns
+                    frame = _native_frame(frames[node.source])
                     if node.keep == "first":
                         tie_keys = list(
                             dict.fromkeys((*node.keys, *(key.column for key in node.by)))
                         )
                         if frame.select(
-                            pl.struct([_column(name) for name in tie_keys]).is_duplicated().any()
+                            pl.struct([_column(name, names) for name in tie_keys])
+                            .is_duplicated()
+                            .any()
                         ).item():
                             raise CapabilityError("Deduplicate encountered forbidden tiebreak ties")
                         frame = frame.sort(
-                            [_column(key.column) for key in node.by],
+                            [_column(key.column, names) for key in node.by],
                             descending=[key.direction == "descending" for key in node.by],
                             nulls_last=[key.nulls == "last" for key in node.by],
                             maintain_order=True,
                         )
-                    import polars.selectors as cs
-
                     frame = frame.unique(
-                        subset=cs.by_name(*node.keys, require_all=False),
+                        subset=[_native_name(names.index(name)) for name in node.keys],
                         keep="first",
                         maintain_order=True,
                     )
+                    frame = _logical_frame(frame, names)
                 else:
-                    frame = frames[node.source]
+                    names = frames[node.source].columns
+                    frame = _native_frame(frames[node.source])
                     if (
                         node.ties == "reject"
                         and frame.select(
-                            pl.struct([_column(key.column) for key in node.by])
+                            pl.struct([_column(key.column, names) for key in node.by])
                             .is_duplicated()
                             .any()
                         ).item()
                     ):
                         raise CapabilityError("Sort encountered forbidden ties")
                     frame = frame.sort(
-                        [_column(key.column) for key in node.by],
+                        [_column(key.column, names) for key in node.by],
                         descending=[key.direction == "descending" for key in node.by],
                         nulls_last=[key.nulls == "last" for key in node.by],
                         maintain_order=True,
                     )
+                    frame = _logical_frame(frame, names)
                 frames[node.node_id] = _coerce(frame, validated, node.node_id)
             return frames[plan.output]
 
         transformation = PolarsTransformation(
-            identifier, transform, "migration-native-ir1.0/polars/product-semantics-v3"
+            identifier, transform, "migration-native-ir1.0/polars/product-semantics-v4"
         )
         return CompiledPlan(
             self.engine, transformation, ir_sha, contract_sha, self.check(plan, contract)
