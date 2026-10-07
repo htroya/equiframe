@@ -284,3 +284,17 @@ and engine-specific identifier limitations remain in force. See
 
 Preserve old artifacts and receipts. Recompile/rerun affected plans with the
 identified A5 wheel and retain new evidence; do not reinterpret A4 results as A5.
+
+
+## 0.12.0a6 optimization-independent input rejection
+
+The shared snapshot boundary now rejects unsupported input objects with an
+explicit `TypeError` rather than a Python assertion. This avoids diagnostic
+behavior changing when assertions are disabled with `python -O`. In `verify`,
+an unsupported expected object follows the existing failed-capture path and
+cannot make a result publishable. It does not become a supported expected type;
+use the documented `ArtifactRef`, `ExecutionResult`, or `None` inputs.
+
+Supported snapshot inputs and recorded valid evidence are unchanged. Preserve
+A5 artifacts and receipts, and use the exact A6 package hashes for new validation.
+No output-model contract or scientific methodology changed.

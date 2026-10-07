@@ -1,3 +1,11 @@
+# Private benchmark alpha 0.12.0a6 — 2026-10-07
+
+- Require exactly `equiframe[arrow]==0.12.0a6` and matching engine/ML extras
+- Identify rebuilt artifacts after the core unsupported-input guard correction;
+  retain benchmark algorithms and the A4 integrity-reader controls unchanged
+
+No scientific method, detector independence or output-model changes.
+
 # Private benchmark alpha 0.12.0a5 — 2026-10-06
 
 - Require exactly core `equiframe[arrow]==0.12.0a5` and matching engine/ML extras

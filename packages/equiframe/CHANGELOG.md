@@ -1,3 +1,16 @@
+# Private installed-product alpha 0.12.0a6 — 2026-10-07
+
+- Replace the snapshot input type assertion with an explicit TypeError, so
+  unsupported input objects take the same rejection path under normal Python
+  and `python -O`; supported ArrowInput/ArtifactRef/Path behavior is unchanged
+- Preserve failed expected captures as non-publishable in the verification path;
+  no output-model validators, scientific methods or evidence formats changed
+- Retain A5's native literal-column correction and its installed regression
+  receipts; rebuild and validate this separately identified package pair
+
+The invalid object cases are caller misuse, not a newly supported input format.
+See `docs/upgrading.md` for the optimization-independent input boundary.
+
 # Private installed-product alpha 0.12.0a5 — 2026-10-06
 
 - Resolve IR column names literally in every native Polars selector context,

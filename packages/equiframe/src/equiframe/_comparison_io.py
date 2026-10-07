@@ -77,7 +77,8 @@ def snapshot(
             raise
     ref = ArtifactRef.model_validate(value) if isinstance(value, ArtifactRef) else None
     source = local_path(ref) if ref else value
-    assert isinstance(source, Path)
+    if not isinstance(source, Path):
+        raise TypeError("comparison input requires ArrowInput, ArtifactRef, or Path")
     format_name = (
         ref.format if ref else {".arrow": "arrow", ".parquet": "parquet"}.get(source.suffix.lower())
     )
