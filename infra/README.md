@@ -114,6 +114,19 @@ uv run --locked --extra arrow python -I examples/compare_local.py \
 
 Resultado esperado: `different 2` — el ejemplo detecta 2 valores intercambiados a propósito.
 
+### Verificación de permisos
+
+Comprobación ejecutada el 2026-10-06 — un colaborador sin permiso de escritura
+en `datos/` recibe error al intentar cargar:
+
+```bash
+sudo -u jair touch ~/datos/prueba_permiso.txt
+# Resultado: touch: cannot touch '/home/ubuntu/datos/prueba_permiso.txt': Permission denied
+```
+
+Solo `ubuntu` puede escribir en `datos/` y `respaldos/`. Los colaboradores
+`jair` y `hernan` reciben `Permission denied` al intentarlo.
+
 ### Pendiente
 
 - ~~Instalar Python 3.12~~ ✓ instalado (3.12.15, entorno venv312)
