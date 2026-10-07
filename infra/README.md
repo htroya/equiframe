@@ -59,6 +59,29 @@ Se intentó crear la VM en Ashburn con A1 Flex (ARM) pero OCI respondió
 La VM actual es AMD en región Bogotá. Ver `docs/OCI_INTEGRATION.md` para
 el historial completo de intentos.
 
+### Instalación de EquiFrame y ejecución de ejemplos en Ubuntu
+
+```bash
+# Activar entorno Python 3.12
+source ~/venv312/bin/activate
+
+# Instalar uv
+pip install uv
+
+# Clonar el repo (si no está clonado)
+git clone https://github.com/htroya/equiframe.git ~/equiframe
+
+# Crear carpeta de práctica
+mkdir -p ~/practica-equiframe/jose-comparacion-01
+
+# Instalar equiframe con extra arrow y ejecutar compare_local.py
+cd ~/equiframe/packages/equiframe
+uv run --locked --extra arrow python -I examples/compare_local.py \
+    --work-dir ~/practica-equiframe/jose-comparacion-01
+```
+
+Resultado esperado: `different 2` — el ejemplo detecta 2 valores intercambiados a propósito.
+
 ### Pendiente
 
 - ~~Instalar Python 3.12~~ ✓ instalado (3.12.15, entorno venv312)
