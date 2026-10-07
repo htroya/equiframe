@@ -1,5 +1,7 @@
 # EquiFrame user handbook
 
+[Recorrido del arquitecto](arquitecto.md) · [Recorrido del científico](cientifico.md)
+
 [Inicio en español](inicio.md) · [Choose an API](choosing-api.md) · [Eight journeys](journeys.md)
 
 **Semantic comparison and reviewable evidence for tabular results in Python.**

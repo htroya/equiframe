@@ -1,6 +1,6 @@
 # EquiFrame 0.12.0a7
 
-[Inicio en español](docs/inicio.md) · [Choose an API](docs/choosing-api.md) · [Eight journeys](docs/journeys.md)
+[Arquitecto](docs/arquitecto.md) · [Científico](docs/cientifico.md) · [Inicio en español](docs/inicio.md) · [Choose an API](docs/choosing-api.md) · [Eight journeys](docs/journeys.md)
 
 **Semantic comparison and reviewable evidence for tabular results in Python.**
 

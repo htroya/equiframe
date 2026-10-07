@@ -1,6 +1,6 @@
 # Empieza con EquiFrame
 
-[Manual](index.md) · [Elegir API](choosing-api.md) · [Ocho recorridos](journeys.md) ·
+[Arquitecto](arquitecto.md) · [Científico](cientifico.md) · [Manual](index.md) · [Elegir API](choosing-api.md) · [Ocho recorridos](journeys.md) ·
 [Semántica de referencia](semantics.md) · [Compatibilidad](compatibility.md)
 
 EquiFrame compara resultados tabulares completos y deja evidencia para explicar

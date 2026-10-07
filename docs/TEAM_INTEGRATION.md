@@ -2,7 +2,7 @@
 
 Este documento define entregas técnicas propuestas. Las tareas ya asignadas por el equipo son: José crea la VM y el acceso Python compartido; Jhair construye el DW; Hernán desarrolla y evalúa EquiFrame. Los detalles de sus componentes se acuerdan con sus responsables.
 
-Estado actual: candidatos `equiframe 0.11.1` y `equiframe-benchmark 0.11.1`,
+Estado actual (2026-10-07): candidatos `equiframe 0.12.0a7` y `equiframe-benchmark 0.12.0a7`,
 con Verify, ETL, migración y destino local. Las herramientas locales y las interfaces consumidoras están
 implementadas; el servicio/DW real, el corpus y la aceptación científica siguen
 pendientes. Las propuestas de despliegue de este documento no acreditan entregas

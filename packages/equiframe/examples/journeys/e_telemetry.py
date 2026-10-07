@@ -87,7 +87,7 @@ def run(output: Path, scenario: str = "good") -> dict[str, object]:
         options=ef.ComparisonOptions(max_rows=1 if scenario == "not_evaluable" else 100),
         work_dir=private,
     )
-    # Demonstrate the actual IR limit independently of direct comparison support.
+    # This Scan has no final Sort matching the significant-order contract.
     schema = declared.spec.contract.output.schema_spec
     contract = ef.Contract(
         schema_version="1.0",
@@ -112,7 +112,7 @@ def run(output: Path, scenario: str = "good") -> dict[str, object]:
     )
     if any(check.supported for check in checks):
         raise RuntimeError(
-            "Review updated timestamp migration capability before changing this example"
+            "Review the matching-final-Sort preflight contract before changing this example"
         )
     return write_summary(
         output,

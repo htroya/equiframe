@@ -17,35 +17,41 @@ receipts. No callbacks, models or hidden datasets are downloaded.
 
 ## Installation outside the checkout
 
-Use **Python 3.12** for the hash-pinned journey environment. The currently measured
-interpreter is CPython 3.12.14 on Linux x86-64. This lock is the existing
-`examples/first_use/requirements.lock`, copied byte-for-byte; its transitive
-versions and artifact hashes are checked by the test suite. It fixes pandas
-3.0.6, DuckDB 1.5.6, PyArrow 25.0.1, NumPy 2.5.3, pydantic 2.13.5, Typer 0.27.2,
-tzdata 2026.4 and pytest 9.1.1, plus all transitive dependencies. Other Python/OS
-combinations require their own run; admitted package metadata is not evidence.
-
-Obtain the candidate wheel, its independently delivered SHA-256, and the
-`journeys` directory through your authorized private channel. Compare the wheel
-hash against that receipt before installing. Do not install an unrelated package
-named `equiframe` from a public index. The following placeholders are paths to
-those received files, not public download locations:
+The current route is the identified **0.12.0a7 private wheelhouse**, with a
+matching Linux CPython 3.12 or 3.13 receipt. Follow
+[installed-private.md](installed-private.md) for normal resolution, `pip check`,
+import verification and the separate complete hash-lock trial. Use `[engines]`
+for the current common journey environment; ML and benchmark are unnecessary.
+Run from a fresh consumer directory outside the checkout:
 
 ```bash
-python3.12 -m venv /tmp/equiframe-journey-env
-/tmp/equiframe-journey-env/bin/python -m pip install --require-hashes -r /authorized/journeys/requirements.lock
-/tmp/equiframe-journey-env/bin/python -m pip install --no-deps /authorized/equiframe-0.11.1-py3-none-any.whl
-/tmp/equiframe-journey-env/bin/python -m pip check
-mkdir /tmp/equiframe-journey-consumer
-cd /tmp/equiframe-journey-consumer
-/tmp/equiframe-journey-env/bin/python -I -c 'import equiframe, pathlib, sys; assert pathlib.Path(equiframe.__file__).resolve().is_relative_to(pathlib.Path(sys.prefix).resolve()); print(equiframe.__version__)'
-/tmp/equiframe-journey-env/bin/python -I -m equiframe.examples.journeys.verify_journeys --output acceptance
+python3.12 -m venv .venv
+WHEELHOUSE=/absolute/path/reviewed-wheelhouse
+.venv/bin/python -I -m pip install --no-index --find-links "$WHEELHOUSE" \
+  'equiframe[engines]==0.12.0a7' --report install-report.json
+.venv/bin/python -I -m pip check
+.venv/bin/python -I -c 'import equiframe, sys; print(sys.executable); print(equiframe.__file__); print(equiframe.__version__)'
+.venv/bin/python -I -m equiframe.examples.journeys.verify_journeys --output acceptance
 ```
 
-For an offline environment, prepare the reviewed dependency wheelhouse in
-advance, then add `--no-index --find-links /authorized/wheels` to the dependency
-install. No example itself needs network access. Installation may access your
-configured package source; that is separate from example data execution.
+Replace the placeholder with the reviewed wheelhouse, containing exactly the
+chosen core artifact and compatible dependencies. Verify its separately supplied
+hash inventory first. The import must be in this environment's site-packages.
+Do not use editable installs, PYTHONPATH, `--no-deps`, or an unreviewed public
+homonym. A new repetition uses a new output directory.
+
+Historical recipe: the retained `examples/journeys/requirements.lock` is a
+byte-for-byte copy of the **0.11.1 / Python 3.12** first-use kit dependency lock.
+Its pins (including Typer 0.27.2 and tzdata 2026.4) and old receipts are retained
+for that exact historical kit, described in [recipes.md](recipes.md). It is not
+the current A7 platform lock. Current independent hash-locked installation uses
+`runtime-with-candidate.lock` supplied with the selected artifact/environment,
+including the candidate hash; never mix old and new wheels with one filename.
+
+Dependencies may need to be downloaded in a separately reviewed preparation
+step. The A7 private kit has a pinned public-dependency reconstruction procedure;
+only after that preparation is installation completely offline. None of these
+synthetic examples needs network data. No Windows/macOS/ARM64 execution is implied.
 
 The **candidate wheel includes these scripts** and the guide. Alternatively,
 copy the entire `examples/journeys` directory from the sdist or approved handoff:
@@ -67,7 +73,7 @@ migration tests separately cover all six pandas/Polars/DuckDB directions.
 Every completed script writes `environment.json` with the actual interpreter,
 platform, installed dependency versions and SHA-256 of the example scripts. The
 candidate's commit and wheel hash belong in the accompanying build receipt;
-`0.11.1` alone is insufficient to identify code. Historical results do not prove
+a version string alone is insufficient to identify code. Historical results do not prove
 a new wheel passed.
 
 ## Commands and exits
@@ -228,11 +234,14 @@ representations. All must fail. `good` preserves order and multiplicity.
 
 **Acceptance:** Arrow `diff` with significant order, NULL last, ties preserved,
 NaN distinct, exact readings and a declared instant policy. The script also
-runs real `check_migration` calls, which refuse timestamp IR. A successful direct
-comparison therefore never implies migration support.
+runs real `check_migration` calls: this Scan-only plan is refused because its
+significant-order contract has no matching final Sort. This is not evidence that
+all timestamp IR is unsupported. A successful direct comparison never implies
+admission of a particular migration plan.
 
 **API limits:** direct eager capture/comparison can retain nanoseconds. This
-migration IR does not admit timestamps. Native DuckDB zoned transport has its
+migration IR admits a bounded timestamp subset, documented in
+[migration-ir.md](migration-ir.md). Native DuckDB zoned transport has its
 separate microsecond limit; no silent conversion to it is demonstrated here.
 NaN distinctions already collapsed by NumPy cannot be recovered. Original
 per-row timestamp text/offset is not retained by Arrow; store it separately if

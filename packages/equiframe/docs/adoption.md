@@ -32,6 +32,26 @@ each exact tested artifact. The first-use kit is narrower: **Python 3.12 only**.
 An old passing receipt or a retained version string does not validate changed
 wheel bytes. No Windows, macOS, ARM64 or other unrecorded support is added here.
 
+## U12 acceptance for the 2026-10-07 usability plan
+
+The three eligible first-use observations must each reach a correct first diagnosis
+within **300 seconds**, without essential instructions outside the supplied guide.
+This threshold is an explicit acceptance condition of that plan, not a measured
+product property. At least one participant must perform data-architecture tasks
+and one data-science tasks. Consent and independence require human review.
+
+Freeze timing before observation: Python preparation and obtaining the kit are
+recorded separately; start at the beginning of installation and stop only at the
+first correct diagnosis. Include dependency downloads, retries, failed attempts
+and help. Never move the starting clock after seeing a result. Keep an unfavorable
+first-use observation; an already-practiced participant cannot produce a new
+first-use observation. Revalidation needs new independent participants. Retained
+integration after a later real project change is a separate necessary condition.
+
+[Three fictional role profiles](piloto-simulado.md) may rehearse instructions.
+They have no consent, human measurements, real projects or adoption credit.
+The schema checker only checks record consistency; it cannot close U12.
+
 ## Before an observation
 
 This is a protocol for an authorized pilot; it does not recruit participants,

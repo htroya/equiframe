@@ -3,8 +3,8 @@
 [Quick start](quickstart.md) · [Compatibility](compatibility.md) · [Release policy](releasing.md)
 
 The current candidate is `0.12.0a7` for both `equiframe` and
-`equiframe-benchmark`. This alpha supersedes the private 0.12.0a1 candidate after a reproduced strict
-Literal validation defect. Identify both versions by their separate wheel hashes.
+`equiframe-benchmark`. A7 includes the minimum-Polars expression-composition correction; earlier
+alpha revisions and their specific corrections remain in the changelog. Identify both versions by their separate wheel hashes.
 The earlier 0.11.1 artifacts retain their historical identity. Match the commit and SHA-256 in the supplied receipt as well as
 the version. No package has been published by this task to PyPI or TestPyPI.
 License, redistribution terms and a controlled TestPyPI project/account remain

@@ -1,3 +1,18 @@
+# Private A7 usability documentation revision — 2026-10-07
+
+- Add executable Spanish data-architect and data-scientist paths with explicit
+  expected results, reports before assertion and optimization-independent gates
+- Separate the current normal-resolver A7 journey recipe from the retained 0.11.1
+  kit; correct the Scan/significant-order preflight explanation in journey E
+- Freeze U01–U12 scope and evidence accounting; extend the real-human protocol
+  with predeclared timing/roles and clearly fictional rehearsal profiles
+
+Runtime modules, dependency metadata, formats, algorithms and consumer 0.1.9 pin
+are unchanged. This private documentation build keeps 0.12.0a7 but has distinct
+wheel/sdist hashes and source commit; never mix it with the earlier same-name
+artifact in one wheelhouse. Prior receipts retain their original identity.
+No security, scientific, human-adoption or public-release gate is closed by this.
+
 # Private installed-product alpha 0.12.0a7 — 2026-10-07
 
 - Evaluate Polars expressions in a collision-free native-local column namespace;

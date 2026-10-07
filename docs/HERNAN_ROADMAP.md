@@ -13,7 +13,9 @@ En los pasos de revisión, el entregable puede ser evidencia y documentación si
 cambios de código cuando no se encuentren defectos. Los pasos nuevos están
 **planificados, con avances acotados documentados abajo**. El estado técnico
 de partida era núcleo 0.10.0/benchmark 0.10.1 (pasos 1–10 y migrador); el candidato
-actual es 0.11.1 para ambos. Se preservan todos los pasos 11–20 incorporados por
+de aquella revisión era 0.11.1 para ambos. El candidato actual (2026-10-07)
+es 0.12.0a7; la [revisión de usabilidad](USABILITY_PLAN.md) no sustituye
+los criterios externos ni las evidencias históricas. Se preservan todos los pasos 11–20 incorporados por
 Hernán y la distinción entre ingeniería implementada y cierre científico pendiente.
 
 | Estado de esta entrega | Evidencia y límite |
@@ -722,5 +724,6 @@ Las instalaciones temporales para verificar artefactos conservan su función de
 prueba, sin instalaciones persistentes por anticipación. El objetivo público se
 cumple con `pip install equiframe` e `import equiframe as ef` desde PyPI, uso
 funcional independiente y soporte comprobado. Ni TestPyPI, ni un wheel local, ni
-un runner de GitHub acreditan por sí solos ese objetivo. El soporte Python actual
-permanece `>=3.12,<3.13` hasta ampliar y verificar la matriz.
+un runner de GitHub acreditan por sí solos ese objetivo. El soporte Python de aquella planificación era `>=3.12,<3.13`. Los metadatos
+actuales admiten 3.12/3.13; cada resultado depende del artefacto/plataforma
+identificado en [compatibilidad](../packages/equiframe/docs/compatibility.md).
