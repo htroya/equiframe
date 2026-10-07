@@ -38,18 +38,50 @@ El núcleo de EquiFrame debe poder desarrollarse y probarse localmente sin esta 
 | Respaldos | `/home/ubuntu/respaldos/` | Snapshots y copias del DW |
 | ETL | `/home/ubuntu/cargar_json.py` | Script ETL: JSON → Polars DataFrames |
 
-### Usuarios
+### Usuarios y permisos
 
-| Usuario | Rol |
-|---|---|
-| ubuntu | Administrador principal |
-| jair | Colaborador |
-| hernan | Colaborador |
+| Usuario | Grupo | Rol | datos/ | resultados/ | respaldos/ |
+|---|---|---|---|---|---|
+| ubuntu | equiframe | Administrador — carga datos | leer + escribir | leer + escribir | leer + escribir |
+| jair | equiframe | Colaborador | solo leer | leer + escribir | solo leer |
+| hernan | equiframe | Colaborador | solo leer | leer + escribir | solo leer |
+
+Solo `ubuntu` puede cargar o modificar datos en `datos/` y `respaldos/`.
+Todos los colaboradores pueden guardar resultados en `resultados/`.
 
 ### Conexión SSH
 
+Cada usuario se conecta con su propia llave privada (nunca compartir llaves entre personas):
+
 ```bash
-ssh -i <llave_privada.key> <usuario>@157.137.227.1
+# Administrador
+ssh -i <llave_ubuntu.key> ubuntu@157.137.227.1
+
+# Colaborador Jair
+ssh -i <jair.key> jair@157.137.227.1
+
+# Colaborador Hernan
+ssh -i <hernan.key> hernan@157.137.227.1
+```
+
+Las llaves privadas se entregan individualmente y se guardan fuera del repositorio.
+Nunca versionar archivos `.key`, `.pem` ni contraseñas en Git.
+
+### Qué puede hacer cada usuario al conectarse
+
+```bash
+# Ver datos disponibles (todos)
+ls ~/datos/
+
+# Ejecutar el ETL (todos)
+source ~/venv312/bin/activate
+python ~/cargar_json.py --entrada ~/datos/releases_2025.json
+
+# Guardar resultados (todos)
+# Escribir en ~/resultados/
+
+# Cargar nuevos datos (solo ubuntu)
+# Copiar archivos a ~/datos/ o ~/respaldos/
 ```
 
 ### Nota sobre capacidad OCI ARM (Ampere A1)
