@@ -65,6 +65,17 @@ class HandoffToolsTests(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             python_at(self.root / "missing")
 
+    @unittest.skipUnless(os.name == "posix", "POSIX virtual environments use interpreter links")
+    def test_python_at_preserves_a_valid_posix_interpreter_link(self):
+        entry = self.root / "linked/bin/python"
+        entry.parent.mkdir(parents=True)
+        entry.symlink_to(sys.executable)
+        self.assertEqual(python_at(self.root / "linked"), str(entry))
+        entry.unlink()
+        entry.symlink_to(self.root / "missing-interpreter")
+        with self.assertRaises(FileNotFoundError):
+            python_at(self.root / "linked")
+
     def test_member_rejects_traversal_even_when_target_exists(self):
         self.file("nested/value", "synthetic")
         with self.assertRaises(ValueError):

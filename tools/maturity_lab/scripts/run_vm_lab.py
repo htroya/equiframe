@@ -276,7 +276,9 @@ class Recorder:
 def python_at(venv: Path) -> str:
     candidates = (venv / "Scripts/python.exe", venv / "bin/python")
     for candidate in candidates:
-        if candidate.is_file() and not candidate.is_symlink():
+        # A POSIX venv normally links to its selected base interpreter. Keep
+        # the venv entry point: resolving it would lose the environment prefix.
+        if candidate.is_file():
             return str(candidate)
     raise FileNotFoundError(f"virtual-environment Python is missing under {venv}")
 
