@@ -166,6 +166,7 @@ def main() -> int:
         "".join(f"{item['sha256']}  {name}\n" for name, item in sorted(files.items()))
         + f"{sha(output / 'candidate.json')}  candidate.json\n",
         encoding="utf-8",
+        newline="\n",
     )
     verify_kit(output)
     print(

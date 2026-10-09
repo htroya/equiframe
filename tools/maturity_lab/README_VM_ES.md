@@ -1,4 +1,4 @@
-# Kit ARM64 A9: guía vigente de ejecución y devolución
+# Kit ARM64 A10: guía vigente de ejecución y devolución
 
 Este kit privado contiene núcleo y benchmark **0.12.0a10**, consumidor externo **0.1.12**, sus seis artefactos y el corpus congelado. A10 conserva la dependencia directa de `typing-extensions`, reutiliza el entorno bloqueado al reinstalar la rueda exacta del núcleo y exige candidatos binarios desde la resolución de perfiles del benchmark.
 
