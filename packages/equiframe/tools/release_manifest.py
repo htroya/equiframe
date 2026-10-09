@@ -8,10 +8,17 @@ import platform
 import re
 import subprocess
 import sys
-import tomllib
-from datetime import UTC, datetime
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
+from datetime import datetime
+from datetime import timezone as _timezone
 from pathlib import Path, PurePosixPath
 from typing import Any
+
+UTC = _timezone.utc
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_CHECK_STAGES = (
@@ -332,13 +339,24 @@ def command_parts(command: list[str], package: Path) -> tuple[str, list[str]] | 
         if not arguments or arguments[0] != "run":
             return None
         arguments = arguments[1:]
-        while arguments and arguments[0] in {"--locked", "--all-extras", "--frozen", "--no-sync"}:
-            arguments = arguments[1:]
+        while arguments and arguments[0] in {
+            "--locked",
+            "--all-extras",
+            "--frozen",
+            "--no-sync",
+            "--python",
+        }:
+            if arguments[0] == "--python":
+                if len(arguments) < 2 or not arguments[1] or arguments[1].startswith("-"):
+                    return None
+                arguments = arguments[2:]
+            else:
+                arguments = arguments[1:]
         if not arguments:
             return None
         program = Path(arguments[0]).name.lower().removesuffix(".exe")
         arguments = arguments[1:]
-    if program in {"python", "python3", "python3.12"}:
+    if program in {"python", "python3", "python3.10", "python3.11", "python3.12", "python3.13"}:
         while arguments and arguments[0] in {"-I", "-B", "-u"}:
             arguments = arguments[1:]
         if len(arguments) >= 2 and arguments[0] == "-m":
@@ -409,7 +427,8 @@ def check_stage(command: list[str], package: Path, artifacts: tuple[Path, ...]) 
                 elif option in remaining:
                     return None
         if (
-            sorted(remaining) == ["--all-extras", "--locked"]
+            sorted(remaining)
+            in (["--all-extras", "--locked"], ["--all-extras", "--locked", "--no-editable"])
             and len(reinstall) == len(set(reinstall))
             and set(reinstall).issubset(local_dependency_names(package))
         ):
@@ -420,6 +439,19 @@ def check_stage(command: list[str], package: Path, artifacts: tuple[Path, ...]) 
         if arguments == ["format", "--check", "."]:
             return "ruff_format"
     elif program == "mypy":
+        arguments = arguments.copy()
+        if "--python-version" in arguments:
+            index = arguments.index("--python-version")
+            if index + 1 >= len(arguments) or arguments[index + 1] not in {
+                "3.10",
+                "3.11",
+                "3.12",
+                "3.13",
+            }:
+                return None
+            del arguments[index : index + 2]
+            if "--python-version" in arguments:
+                return None
         positional = [value for value in arguments if value not in {"--strict", "--no-incremental"}]
         if positional in ([], ["."]) or set(positional) == {"src", "tools"}:
             return "mypy"

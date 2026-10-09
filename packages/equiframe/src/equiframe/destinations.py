@@ -7,10 +7,11 @@ import os
 import shutil
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Literal, Protocol, Self, cast
+from typing import Literal, Protocol, cast
 from uuid import uuid4
 
 from pydantic import TypeAdapter, model_validator
+from typing_extensions import Self
 
 from equiframe._base import FrozenModel, Identifier, NonNegativeInt
 from equiframe.errors import ArtifactIntegrityError

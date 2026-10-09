@@ -12,11 +12,12 @@ import re
 from collections import defaultdict
 from fractions import Fraction
 from math import ceil
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 
 from equiframe import ComponentDecision, Family
 from equiframe.detector_types import ScoreValue, numeric_score
 from pydantic import Field, model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.models import Digest, Document, Text, digest
 

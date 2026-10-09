@@ -4,7 +4,8 @@ import hashlib
 import json
 import math
 import time
-from datetime import UTC, date, datetime
+from datetime import date, datetime
+from datetime import timezone as _timezone
 from decimal import Decimal
 
 import equiframe as ef
@@ -30,6 +31,8 @@ from equiframe_benchmark.snapshot import (
     SnapshotTable,
     snapshot_fingerprint,
 )
+
+UTC = _timezone.utc
 
 
 class LocalClient:

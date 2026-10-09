@@ -16,7 +16,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager, suppress
 from dataclasses import dataclass
 from pathlib import Path
-from typing import BinaryIO
+from typing import BinaryIO, TypeVar
 from urllib.parse import unquote, urlsplit
 from urllib.request import url2pathname
 
@@ -25,6 +25,8 @@ from equiframe.comparison_types import ComparisonDifference, ComparisonResult
 from equiframe.contracts import ColumnKeyScope, SignificantOrder
 from equiframe.errors import ArtifactIntegrityError, ArtifactIOError, ResourceLimitError
 from equiframe.types import ArtifactRef
+
+_ModelT = TypeVar("_ModelT", bound=FrozenModel)
 
 _MAX_DOCUMENT_BYTES = 16 * 1024 * 1024
 _MAX_LINE_BYTES = 8 * 1024 * 1024
@@ -190,7 +192,7 @@ def _constant(value: str) -> object:
     raise ArtifactIntegrityError("nonstandard JSON number in evidence")
 
 
-def _document[T: FrozenModel](raw: bytes, model: type[T]) -> T:
+def _document(raw: bytes, model: type[_ModelT]) -> _ModelT:
     try:
         text = raw.decode("utf-8")
         parsed = json.loads(text, object_pairs_hook=_object, parse_constant=_constant)
@@ -200,7 +202,7 @@ def _document[T: FrozenModel](raw: bytes, model: type[T]) -> T:
         raise ArtifactIntegrityError("invalid typed evidence JSON") from error
 
 
-def _read_document[T: FrozenModel](path: Path, model: type[T], budget: int) -> tuple[T, int]:
+def _read_document(path: Path, model: type[_ModelT], budget: int) -> tuple[_ModelT, int]:
     with _open_regular(path) as source:
         limit = min(budget, _MAX_DOCUMENT_BYTES)
         if os.fstat(source.fileno()).st_size > limit:

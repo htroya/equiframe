@@ -139,3 +139,44 @@ def test_log_created_after_reservation_is_not_overwritten(driver, tmp_path, monk
         )
     assert log.read_bytes() == b"another retained log"
     assert json.loads(output.read_text())["results"] == []
+
+
+def test_driver_propagates_the_requested_interpreter_to_every_python_gate(
+    driver, tmp_path, monkeypatch
+):
+    main = driver["main"]
+    globals_ = main.__globals__
+    (tmp_path / "pyproject.toml").write_text('[project]\nname="synthetic"\nversion="0.0.0"\n')
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "check_candidate.py",
+            "--package",
+            str(tmp_path),
+            "--uv",
+            "uv",
+            "--output",
+            str(tmp_path / "checks.json"),
+            "--python",
+            "3.10",
+        ],
+    )
+    monkeypatch.setitem(globals_, "source_snapshot", lambda _: {})
+    monkeypatch.setitem(globals_, "dependency_artifacts", lambda _: ())
+    monkeypatch.setitem(globals_, "local_dependency_names", lambda _: ())
+    captured = []
+    monkeypatch.setitem(globals_, "run_checks", lambda *args: captured.append(args))
+    main()
+    commands = captured[0][5]
+    assert commands[0][-2:] == ["--python", "3.10"]
+    assert "--no-editable" in commands[0]
+    for command in commands[1:]:
+        assert command[command.index("--python") + 1] == "3.10"
+    assert captured[0][6][-3:] == ["--python", "3.10", "python"]
+
+
+def test_interpreter_identity_observes_the_actual_executable(driver, tmp_path):
+    identity = driver["interpreter_identity"]([sys.executable], tmp_path, {})
+    assert identity["python"] == driver["platform"].python_version()
+    assert Path(identity["executable"]).resolve() == Path(sys.executable).resolve()

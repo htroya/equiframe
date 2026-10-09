@@ -13,9 +13,10 @@ import json
 import stat
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Any, Literal, Self
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+from typing_extensions import Self
 
 Identifier = Annotated[str, Field(pattern=r"^[a-z0-9][a-z0-9_-]{0,63}$")]
 Digest = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]

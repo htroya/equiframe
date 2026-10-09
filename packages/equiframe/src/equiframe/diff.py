@@ -11,6 +11,8 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
+from typing_extensions import TypeAliasType
+
 from equiframe._base import FrozenModel
 from equiframe._diff_capture import (
     DiffCaptureOptions,
@@ -35,11 +37,11 @@ if TYPE_CHECKING:
     import polars as pl
     import pyarrow as pa
 
-    type DiffInput = ComparisonInput | pd.DataFrame | pl.DataFrame | pa.Table
+    DiffInput = TypeAliasType("DiffInput", ComparisonInput | pd.DataFrame | pl.DataFrame | pa.Table)
 else:
     # Introspection must not import optional engines. Capture performs actual
     # class admission; this runtime alias is not an admission validator.
-    type DiffInput = ComparisonInput | object
+    DiffInput = TypeAliasType("DiffInput", ComparisonInput | object)
 
 
 class _DiffReceipt(FrozenModel):

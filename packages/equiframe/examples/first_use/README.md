@@ -4,8 +4,7 @@ This standalone guide accompanies the verified private kit. The installed
 wheel also includes an English handbook, available through
 `importlib.resources.files("equiframe").joinpath("docs/index.md")`.
 
-These recipes use the private EquiFrame **0.11.1** first-use kit and **Python
-3.12 only**. The kit contains the exact wheel, three recipe scripts and their
+These recipes use the private EquiFrame **0.12.0a8** first-use kit and **the Python minor selected in the kit manifest (3.10-3.13)**. The kit contains the exact wheel, three recipe scripts and their
 pytest fixture, pinned dependencies with hashes, an integrity verifier and
 English guides. No checkout, real dataset, credential, remote SQL, notebook or
 service is required. Inputs are small synthetic fixtures defined in the scripts.
@@ -23,6 +22,10 @@ Extract it into a new directory named `kit`, outside the repository, and open a
 terminal there. Keep the kit unchanged: environments, outputs and completed
 observation records belong in sibling directories. The internal manifest detects
 byte changes; it does not authenticate the sender.
+
+The commands below show 3.12. If the manifest selects 3.10, 3.11 or 3.13,
+replace each python3.12 command with that exact interpreter; the supplied
+requirements.lock must belong to that same minor.
 
 ```bash
 python3.12 --version
@@ -42,14 +45,15 @@ Install into the new environment:
 
 ```bash
 python -m pip install --require-hashes --only-binary=:all: -r requirements.lock
-python -m pip install --no-index --no-deps --force-reinstall wheels/equiframe-0.11.1-py3-none-any.whl
+python -m pip install --no-index wheels/equiframe-0.12.0a8-py3-none-any.whl
 python -m pip check
 python -I -c "import equiframe, sys; print(sys.version); print(equiframe.__file__)"
 ```
 
 The **first command deliberately downloads dependencies from your configured pip
 index**; it does not download datasets. Pins and hashes come from the candidate's
-`uv.lock`. The second command installs only the verified local EquiFrame wheel.
+`uv.lock`. The second command installs the verified local EquiFrame wheel with normal
+dependency validation against the already pinned environment.
 The import must resolve to the environment, not the source checkout. Do not add
 `PYTHONPATH` or use an editable install.
 
@@ -61,7 +65,7 @@ versions to bypass a failure. If your platform has no compatible wheel, record
 the blocker; this guide does not certify a new platform matrix.
 
 A maintainer with the source distribution and built wheel can prepare a kit with
-`python tools/build_first_use_kit.py --output /absolute/path/new-kit` from the
+`python tools/build_first_use_kit.py --python-minor 3.12 --output /absolute/path/new-kit` from the
 core package directory. That builder does not resolve new dependencies or
 publish a package. Consumers continue using only the resulting kit.
 
@@ -234,3 +238,12 @@ copy of `OBSERVATION.md` in the work directory. Record installation time separat
 include failed attempts and help received, and distinguish engine agreement from
 correctness against a reference. [Interpretation](INTERPRETATION.md) explains the guarantees and failures;
 [observation record](OBSERVATION.md) remains pending until a real person completes it.
+
+## Interpreter-specific candidate kits
+
+The a8 builder can select Python 3.10, 3.11, 3.12 or 3.13. Read the received
+manifest's Python field and use that interpreter explicitly to create the venv.
+The kit's requirements.lock is generated for that minor; never reuse a 3.12
+closure or platform-specific binary dependencies for another cell. The source
+contains separately named closures for the other minors. Kit creation is not
+a proof that installation or the human first-use exercise passed.

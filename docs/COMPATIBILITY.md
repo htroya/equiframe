@@ -1,5 +1,7 @@
 # Compatibilidad y estabilidad del candidato STEP6
 
+Nota de candidato de madurez 2026-10-08: a8 amplía la admisión objetivo a Python 3.10-3.13; consulte [el plan M01-M16](MATURITY_PLAN.md). Las secciones y recibos históricos siguientes conservan su candidato y no acreditan pruebas nuevas.
+
 La política siguiente es un compromiso **prospectivo** del candidato privado
 0.11.1. No acredita una publicación, una versión que no se haya probado, una
 certificación externa ni la estabilidad científica del experimento. El registro

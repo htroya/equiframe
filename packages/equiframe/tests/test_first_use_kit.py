@@ -269,3 +269,18 @@ def test_packaged_journey_sources_are_exact_and_exclude_generated_cache(package,
     else:
         with pytest.raises(ValueError, match=r"runtime (inventory|bytes)"):
             BUILD["verify_wheel_source"](wheel, package, "0.0.0")
+
+
+@pytest.mark.parametrize("minor", ["3.10", "3.11", "3.12", "3.13"])
+def test_first_use_lock_selects_python_branch_without_changing_hashes(minor):
+    text = BUILD["locked_requirements"](ROOT / "uv.lock", python_minor=minor)
+    assert f"# Python {minor};" in text
+    name = BUILD["requirement_name"](minor)
+    assert (ROOT / "examples" / "first_use" / name).read_text("utf-8") == text
+    assert len([line for line in text.splitlines() if line.startswith("numpy==")]) == 1
+    assert ("exceptiongroup==" in text) == (minor == "3.10")
+
+
+def test_first_use_lock_rejects_unsupported_python_instead_of_reusing_312():
+    with pytest.raises(ValueError, match="unsupported first-use Python"):
+        BUILD["locked_requirements"](ROOT / "uv.lock", python_minor="3.9")

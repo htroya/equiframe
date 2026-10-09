@@ -1,7 +1,7 @@
 """Strict experimental metadata; never features or detector inputs."""
 
 from datetime import datetime
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 
 from equiframe import ArtifactRef, ComparisonResult, ComparisonSpec, Family
 from equiframe._base import strict_bool_literal
@@ -37,6 +37,7 @@ from pydantic import (
     StringConstraints,
     model_validator,
 )
+from typing_extensions import Self
 
 Label = Literal["normal", "divergent", "not_evaluable"]
 Partition = Literal["training", "calibration", "test"]
@@ -204,15 +205,15 @@ class OracleResult(Document):
             if review.packet_sha256 != self.packet_sha256:
                 raise ValueError("review packet mismatch")
             if self.assignment and datetime.fromisoformat(
-                review.recorded_at
-            ) < datetime.fromisoformat(self.assignment.assigned_at):
+                review.recorded_at.replace("Z", "+00:00")
+            ) < datetime.fromisoformat(self.assignment.assigned_at.replace("Z", "+00:00")):
                 raise ValueError("assignment must precede reviews")
         if self.resolution:
             if len(self.reviews) != 2 or self.reviews[0].label == self.reviews[1].label:
                 raise ValueError("resolution requires a primary disagreement")
             if any(
-                datetime.fromisoformat(self.resolution.recorded_at)
-                < datetime.fromisoformat(r.recorded_at)
+                datetime.fromisoformat(self.resolution.recorded_at.replace("Z", "+00:00"))
+                < datetime.fromisoformat(r.recorded_at.replace("Z", "+00:00"))
                 for r in self.reviews
             ):
                 raise ValueError("resolution must follow both reviews")

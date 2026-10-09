@@ -1,9 +1,10 @@
 """Versioned orchestration contracts; technical completion is distinct from alerts."""
 
 from pathlib import PurePosixPath
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 
 from pydantic import Field, model_validator
+from typing_extensions import Self
 
 from equiframe._base import FrozenModel, Identifier, NonNegativeInt, Text, _ExplicitOutcome
 from equiframe.comparison_types import ComparisonOptions, ComparisonPolicy, ComparisonResult

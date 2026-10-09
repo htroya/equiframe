@@ -5,10 +5,10 @@ exception, cause, model error, path or user-supplied value into terminal output.
 """
 
 import json
-from typing import Never
 
 import typer
 from pydantic import ValidationError
+from typing_extensions import Never
 
 from equiframe.errors import (
     ArtifactIntegrityError,

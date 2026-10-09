@@ -9,7 +9,11 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-import tomllib
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 import zipfile
 from pathlib import Path
 
@@ -20,6 +24,31 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def run(args: list[str], *, cwd: Path, env: dict[str, str]) -> None:
     subprocess.run(args, cwd=cwd, env=env, check=True)
+
+
+def typed_consumer_command(python: Path, config: Path, consumer: Path) -> list[str]:
+    """Check against the actual installed consumer interpreter, retaining strict mode."""
+    probe = subprocess.run(
+        [str(python), "-I", "-c", "import sys; print('.'.join(map(str, sys.version_info[:2])))"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    minor = probe.stdout.strip()
+    if minor not in {"3.10", "3.11", "3.12", "3.13"}:
+        raise RuntimeError("typed consumer interpreter is outside the committed Python matrix")
+    return [
+        str(python),
+        "-I",
+        "-m",
+        "mypy",
+        "--strict",
+        "--python-version",
+        minor,
+        "--config-file",
+        str(config),
+        str(consumer),
+    ]
 
 
 def single(pattern: str) -> Path:
@@ -432,7 +461,7 @@ def main() -> None:
         )
         python = runtime / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
         run(
-            [uv, "pip", "install", "--python", str(python), "--no-deps", str(wheel)],
+            [uv, "pip", "install", "--python", str(python), "--no-index", str(wheel)],
             cwd=work,
             env=env,
         )
@@ -637,7 +666,7 @@ print('Installed wheel API roundtrips all five fixtures exactly')
         if rebuilt_sdist.read_bytes() != sdist.read_bytes():
             raise RuntimeError("sdist rebuilt from sdist is not byte reproducible")
         run(
-            [uv, "pip", "install", "--python", str(source_python), "--no-deps", str(rebuilt)],
+            [uv, "pip", "install", "--python", str(source_python), "--no-index", str(rebuilt)],
             cwd=work,
             env=source_env,
         )
@@ -774,16 +803,7 @@ assert Path(equiframe.__file__).resolve().is_relative_to(Path(sys.prefix).resolv
             encoding="utf-8",
         )
         run(
-            [
-                str(source_python),
-                "-I",
-                "-m",
-                "mypy",
-                "--strict",
-                "--config-file",
-                str(source / "pyproject.toml"),
-                str(consumer),
-            ],
+            typed_consumer_command(source_python, source / "pyproject.toml", consumer),
             cwd=work,
             env=source_env,
         )

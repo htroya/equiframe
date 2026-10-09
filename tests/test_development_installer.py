@@ -79,6 +79,7 @@ class DevelopmentInstallerTests(unittest.TestCase):
                 "sync",
                 "--locked",
                 "--all-extras",
+                "--no-editable",
                 "--python",
                 str(self.python),
                 "--project",
@@ -91,7 +92,7 @@ class DevelopmentInstallerTests(unittest.TestCase):
         self.python.write_text("#!/bin/sh\nexit 2\n")
         result = self.run_script("--python", str(self.python))
         self.assertEqual(result.returncode, 2)
-        self.assertIn("requires Python 3.12 or 3.13", result.stderr)
+        self.assertIn("requires Python 3.10, 3.11, 3.12 or 3.13", result.stderr)
         self.assertFalse(self.log.exists())
 
     def test_missing_python_fails_before_sync(self):

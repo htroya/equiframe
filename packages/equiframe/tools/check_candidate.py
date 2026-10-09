@@ -6,10 +6,16 @@ import os
 import platform
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
-import tomllib
-from datetime import UTC, datetime
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
+from datetime import datetime
+from datetime import timezone as _timezone
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +27,8 @@ from release_manifest import (
     runtime_binding_matches,
     source_snapshot,
 )
+
+UTC = _timezone.utc
 
 # Only names obtained from the repository's src packages are resolved/imported.
 # No build backend, entry point, or plugin named by configuration is executed.
@@ -170,6 +178,9 @@ def main() -> None:
     parser.add_argument("--package", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--uv", default=shutil.which("uv"))
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--python", default=sys.executable, help="target Python executable or uv request"
+    )
     args = parser.parse_args()
     if not args.uv:
         raise SystemExit("an available uv executable is required")
@@ -187,8 +198,8 @@ def main() -> None:
         package / "dist" / (stem + ".tar.gz"),
     )
     dependencies = dependency_artifacts(package)
-    base = [args.uv, "run", "--locked", "--all-extras", "--no-sync"]
-    sync = [args.uv, "sync", "--locked", "--all-extras", "--python", "3.12"]
+    base = [args.uv, "run", "--locked", "--all-extras", "--no-sync", "--python", args.python]
+    sync = [args.uv, "sync", "--locked", "--all-extras", "--no-editable", "--python", args.python]
     for name in local_dependency_names(package):
         sync += ["--reinstall-package", name]
     commands = [
@@ -218,6 +229,36 @@ def main() -> None:
         )
 
 
+def interpreter_identity(
+    command: list[str], package: Path, environment: dict[str, str]
+) -> dict[str, str]:
+    """Observe the interpreter selected by uv, separately from the driver."""
+    result = subprocess.run(
+        [
+            *command,
+            "-I",
+            "-c",
+            "import json,platform,sys; print(json.dumps({"
+            "'executable':sys.executable,'python':platform.python_version(),"
+            "'implementation':platform.python_implementation(),"
+            "'machine':platform.machine(),'system':platform.system()}))",
+        ],
+        cwd=package,
+        env=environment,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=True,
+    )
+    parsed = json.loads(result.stdout)
+    required = {"executable", "python", "implementation", "machine", "system"}
+    if not isinstance(parsed, dict) or set(parsed) != required:
+        raise ValueError("target interpreter returned an invalid identity")
+    if any(not isinstance(value, str) or not value for value in parsed.values()):
+        raise ValueError("target interpreter identity fields must be nonempty text")
+    return {str(key): str(value) for key, value in parsed.items()}
+
+
 def run_checks(
     package: Path,
     output: Path,
@@ -231,6 +272,7 @@ def run_checks(
 ) -> None:
     reserve_output(output)
     results = []
+    target_interpreter: dict[str, str] | None = None
     for number, command in enumerate(commands):
         binding = None
         if number:
@@ -242,6 +284,9 @@ def run_checks(
         before = source_snapshot(package)
         if before != initial_source:
             raise SystemExit("source changed between candidate checks; restart against fixed bytes")
+        if number == 3 and target_interpreter is not None and "mypy" in command:
+            minor = ".".join(target_interpreter["python"].split(".")[:2])
+            command += ["--python-version", minor]
         if "twine" in command:
             command += [str(path) for path in artifacts]
         artifacts_before = artifact_inventory(artifacts)
@@ -263,6 +308,13 @@ def run_checks(
             binding = local_dependency_runtime_binding(
                 package, python_command, bytecode_directory, environment
             )
+        if (
+            number == 0
+            and completed.returncode == 0
+            and binding is not None
+            and binding["verified"]
+        ):
+            target_interpreter = interpreter_identity(python_command, package, environment)
         results.append(
             {
                 "command": command,
@@ -286,6 +338,8 @@ def run_checks(
                     "environment": {
                         "platform": platform.platform(),
                         "python_driver": platform.python_version(),
+                        "target_interpreter": target_interpreter,
+                        "target_python_command": python_command,
                         "uv": commands[0][0],
                         "PYTHONDONTWRITEBYTECODE": environment["PYTHONDONTWRITEBYTECODE"],
                         "PYTHONPYCACHEPREFIX": environment["PYTHONPYCACHEPREFIX"],

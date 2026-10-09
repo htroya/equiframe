@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 
 from pydantic import BeforeValidator, Field, model_validator
+from typing_extensions import Self
 
 from equiframe._base import (
     FrozenModel,

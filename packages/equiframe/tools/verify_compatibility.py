@@ -16,12 +16,18 @@ import re
 import shutil
 import stat
 import subprocess
+import sys
 import tarfile
 import time
-import tomllib
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 import xml.etree.ElementTree as ET
 import zipfile
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from email.parser import BytesParser
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -29,6 +35,8 @@ from typing import Any
 from packaging.requirements import Requirement
 from packaging.specifiers import SpecifierSet
 from packaging.utils import canonicalize_name
+
+UTC = _timezone.utc
 
 PROFILES = ("base", "arrow", "pandas", "polars", "duckdb", "engines", "ml", "all")
 ENDPOINTS = ("minimum", "latest")
@@ -778,7 +786,6 @@ def execute_cell(
                 "install",
                 "--python",
                 str(python),
-                "--no-deps",
                 "--no-index",
                 "--reinstall",
                 "--link-mode",

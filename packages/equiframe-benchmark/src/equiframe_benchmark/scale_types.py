@@ -1,9 +1,10 @@
 """Engineering cost protocol, separate from the frozen scientific paired protocol."""
 
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 
 import equiframe as ef
 from pydantic import Field, model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.costs import ResourceMeasurement
 from equiframe_benchmark.models import Digest, Document, Text

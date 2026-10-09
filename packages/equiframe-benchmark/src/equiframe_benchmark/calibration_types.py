@@ -1,9 +1,10 @@
 """Reviewed calibration lineage and group support stay outside detector features."""
 
-from typing import Literal, Self
+from typing import Literal
 
 from equiframe import NormalCalibrationProfiles
 from pydantic import model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.models import Digest, Document, Text, digest
 from equiframe_benchmark.training_types import TrainingRecord, TrainingSelection

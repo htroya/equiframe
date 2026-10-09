@@ -3,7 +3,8 @@
 import hashlib
 import json
 import stat
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
@@ -12,6 +13,8 @@ from pydantic import ValidationError
 
 from equiframe_benchmark import distribution as module
 from equiframe_benchmark.distribution import DistributionReadiness, NameCheck, inspect_distribution
+
+UTC = _timezone.utc
 
 PROJECT = """[project]
 name = "unit-pkg"

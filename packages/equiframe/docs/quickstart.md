@@ -2,9 +2,10 @@
 
 [Handbook](index.md) · [Recipes](recipes.md) · [Semantics](semantics.md)
 
-This guide uses synthetic local data and the private Alpha candidate **0.12.0a7**.
-It works outside a source checkout. You need Python 3.12 or 3.13 for the package;
-the separately pinned first-use kit currently targets **Python 3.12 only**.
+This guide uses synthetic local data and the private Alpha candidate **0.12.0a8**.
+It works outside a source checkout. The a8 candidate targets Python 3.10–3.13;
+use the exact interpreter/platform receipt delivered with your candidate.
+The first-use builder produces a separate hash lock for the selected minor.
 Metadata admission is not a claim of support for every platform. See
 [compatibility](compatibility.md).
 
@@ -14,7 +15,7 @@ The current route is the [private wheelhouse](installed-private.md), with normal
 pip resolution and a separate hash-locked trial. The earlier first-use kit is
 historical. Obtain these items through the authorized private channel:
 
-- `equiframe-0.12.0a7-py3-none-any.whl`
+- `equiframe-0.12.0a8-py3-none-any.whl`
 - A receipt identifying its commit and expected SHA-256, received through a
   channel you trust independently of the artifact
 - A wheelhouse containing the reviewed runtime dependency wheels for your
@@ -25,7 +26,7 @@ same untrusted archive cannot authenticate its sender. Check the supplied wheel
 against the separate receipt before installing. For example, from its directory:
 
 ```bash
-python3.12 -c "from pathlib import Path; import hashlib; p=Path('equiframe-0.12.0a7-py3-none-any.whl'); print(hashlib.sha256(p.read_bytes()).hexdigest())"
+python3.12 -c "from pathlib import Path; import hashlib; p=Path('equiframe-0.12.0a8-py3-none-any.whl'); print(hashlib.sha256(p.read_bytes()).hexdigest())"
 ```
 
 Compare the printed value with the receipt. Stop on a mismatch. Do not copy the
@@ -40,7 +41,7 @@ mkdir equiframe-consumer
 cd equiframe-consumer
 python3.12 -m venv .venv
 . .venv/bin/activate
-WHEEL=/absolute/path/equiframe-0.12.0a7-py3-none-any.whl
+WHEEL=/absolute/path/equiframe-0.12.0a8-py3-none-any.whl
 WHEELHOUSE=/absolute/path/reviewed-wheelhouse
 python -m pip install --no-index --find-links "$WHEELHOUSE" "${WHEEL}[arrow]"
 python -m pip check
@@ -57,9 +58,9 @@ editable install or add the checkout to `PYTHONPATH` as an installation test.
 On Windows, `py -3.12 -m venv .venv` creates the environment and
 `.venv\Scripts\python.exe` can be used directly instead of activation. Do not
 change security policy to activate it. These command conventions do not establish
-that this candidate was verified on Windows. Python 3.13 users must use a matching
-reviewed dependency set; do not reuse the Python 3.12-only kit lock as a claim of
-3.13 compatibility.
+that this candidate was verified on Windows. Each Python minor needs its matching
+reviewed dependency set; do not reuse a 3.12 kit lock as a claim of compatibility
+with 3.10, 3.11 or 3.13.
 
 ## 2. Compare two complete outputs
 

@@ -10,7 +10,8 @@ import tempfile
 import time
 from collections.abc import Callable, Iterator, Mapping
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from decimal import Decimal, localcontext
 from fractions import Fraction
 from pathlib import Path
@@ -62,6 +63,8 @@ from equiframe.rule_types import (
 from equiframe.serialization import _constant, _JsonObject, _unique_objects, contract_fingerprint
 from equiframe.tables import read_table
 from equiframe.types import ArtifactRef, DecisionState
+
+UTC = _timezone.utc
 
 if TYPE_CHECKING:
     import pyarrow as pa

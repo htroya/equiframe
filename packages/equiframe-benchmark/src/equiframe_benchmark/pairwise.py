@@ -9,11 +9,12 @@ scientific analyses requires a separately reviewed and frozen protocol.
 import hashlib
 import json
 from itertools import combinations
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 
 from equiframe import Family
 from equiframe._base import strict_bool_literal
 from pydantic import BeforeValidator, Field, model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.evaluation import (
     METHODS,

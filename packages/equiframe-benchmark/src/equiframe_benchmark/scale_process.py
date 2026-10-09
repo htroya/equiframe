@@ -24,9 +24,10 @@ from dataclasses import dataclass, field
 from importlib import import_module
 from pathlib import Path
 from threading import Event, Lock, Thread
-from typing import Annotated, Literal, Protocol, Self, cast
+from typing import Annotated, Literal, Protocol, cast
 
 from pydantic import Field, model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.models import Document, Text
 

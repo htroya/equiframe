@@ -28,12 +28,15 @@ import platform
 import re
 import sys
 import tempfile
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
 import equiframe as ef
+
+UTC = _timezone.utc
 
 CONTEXTS = ("refactor_python", "sql_duckdb", "ci_regression")
 PHASES = ("initial", "follow_up")

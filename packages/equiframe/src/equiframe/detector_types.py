@@ -2,9 +2,10 @@
 
 from fractions import Fraction
 from math import ceil
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 
 from pydantic import Field, model_validator
+from typing_extensions import Self
 
 from equiframe._base import FrozenModel, NonNegativeInt, PositiveInt, Text, _ExplicitOutcome
 from equiframe.profile_types import PreprocessorBundle, ProfileVector, profile_digest
@@ -137,7 +138,8 @@ class DetectorVersions(FrozenModel):
         "0.12.0a5",
         "0.12.0a6",
         "0.12.0a7",
-    ] = "0.12.0a7"
+        "0.12.0a8",
+    ] = "0.12.0a8"
     python: Text
     sklearn: Text | None = None
     numpy: Text | None = None

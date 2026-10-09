@@ -78,7 +78,12 @@ def test_money_ingestion_is_independent_of_the_callers_decimal_context(tmp_path,
         fields=(FieldMapping(column=column("money", dtype, unit="USD"), path=("money",)),),
         invalid_records="quarantine",
     )
-    with localcontext(prec=2, Emin=-9, Emax=9, rounding=ROUND_FLOOR, clamp=1) as context:
+    with localcontext() as context:
+        context.prec = 2
+        context.Emin = -9
+        context.Emax = 9
+        context.rounding = ROUND_FLOOR
+        context.clamp = 1
         context.traps[Inexact] = True
         context.traps[Rounded] = True
         original = context.copy()
@@ -140,7 +145,12 @@ def test_native_decimal_etl_is_independent_of_the_callers_decimal_context(
         if operation == "literal"
         else [Decimal("2469135780246913.56"), Decimal("2469135780246913.56")]
     )
-    with localcontext(prec=2, Emin=-9, Emax=9, rounding=ROUND_FLOOR, clamp=1) as context:
+    with localcontext() as context:
+        context.prec = 2
+        context.Emin = -9
+        context.Emax = 9
+        context.rounding = ROUND_FLOOR
+        context.clamp = 1
         context.traps[Inexact] = True
         context.traps[Rounded] = True
         original = context.copy()
@@ -246,7 +256,12 @@ def test_empty_native_sum_preserves_scaled_zero_and_consumer_context(tmp_path, e
         ),
         output="sum",
     )
-    with localcontext(prec=2, Emin=-9, Emax=9, rounding=ROUND_FLOOR, clamp=1) as context:
+    with localcontext() as context:
+        context.prec = 2
+        context.Emin = -9
+        context.Emax = 9
+        context.rounding = ROUND_FLOOR
+        context.clamp = 1
         original = context.copy()
         result = run(plan, schema, {"input": source}, engine, tmp_path)
         assert result.state == "completed", result.problem
@@ -293,7 +308,12 @@ def test_decimal_sum_rule_keeps_its_decision_under_the_callers_decimal_context(t
         }
     )
     execution = captured(schema, {"input": source}, output, tmp_path / "capture")
-    with localcontext(prec=2, Emin=-9, Emax=9, rounding=ROUND_FLOOR, clamp=1) as context:
+    with localcontext() as context:
+        context.prec = 2
+        context.Emin = -9
+        context.Emax = 9
+        context.rounding = ROUND_FLOOR
+        context.clamp = 1
         context.traps[Inexact] = True
         context.traps[Rounded] = True
         original = context.copy()

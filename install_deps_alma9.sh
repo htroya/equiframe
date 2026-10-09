@@ -8,7 +8,7 @@ usage() {
 Usage: bash install_deps_alma9.sh [--python EXECUTABLE] [--dry-run]
 
 Install the core development environment with all extras from its committed lock.
-Run from any directory. Requires Bash, uv and an existing Python 3.12 or 3.13.
+Run from any directory. Requires Bash, uv and an existing Python 3.10, 3.11, 3.12 or 3.13.
 The environment belongs to packages/equiframe/.venv; it is not a PyPI release.
 This script does not use sudo, upgrade the OS, or install the benchmark/DW.
 
@@ -47,8 +47,8 @@ if ! command -v -- "$python_executable" >/dev/null 2>&1; then
     echo "error: Python executable not found: $python_executable (use --python)" >&2
     exit 2
 fi
-if ! "$python_executable" -c 'import sys; sys.exit(0 if (3, 12) <= sys.version_info[:2] < (3, 14) else 2)'; then
-    echo 'error: EquiFrame requires Python 3.12 or 3.13; no installation was attempted' >&2
+if ! "$python_executable" -c 'import sys; sys.exit(0 if (3, 10) <= sys.version_info[:2] < (3, 14) else 2)'; then
+    echo 'error: EquiFrame requires Python 3.10, 3.11, 3.12 or 3.13; no installation was attempted' >&2
     exit 2
 fi
 if ! command -v uv >/dev/null 2>&1; then
@@ -56,7 +56,7 @@ if ! command -v uv >/dev/null 2>&1; then
     exit 2
 fi
 
-command=(uv sync --locked --all-extras --python "$python_executable" --project "$package")
+command=(uv sync --locked --all-extras --no-editable --python "$python_executable" --project "$package")
 echo "Environment: $package/.venv"
 printf 'Command:'
 printf ' %q' "${command[@]}"

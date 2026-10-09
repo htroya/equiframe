@@ -6,11 +6,13 @@ import hashlib
 import os
 import shutil
 from pathlib import Path
-from typing import Literal, Self
+from typing import Literal
 
 from pydantic import model_validator
+from typing_extensions import Self
 
 from equiframe._base import FrozenModel, Text
+from equiframe._path_compat import is_junction
 from equiframe.errors import ArtifactIntegrityError
 from equiframe.evidence import describe_file, load_json, parse_json, publish_json, verify_files
 from equiframe.local import _bundle_paths, local_path
@@ -53,7 +55,7 @@ def _members(root: Path) -> tuple[Path, ...]:
     for parent, dirs, files in os.walk(root, followlinks=False):
         for name in (*dirs, *files):
             p = Path(parent) / name
-            if p.is_symlink() or p.is_junction() or not p.resolve().is_relative_to(root):
+            if p.is_symlink() or is_junction(p) or not p.resolve().is_relative_to(root):
                 raise ArtifactIntegrityError(
                     "portable evidence rejects symlinks and escaping paths"
                 )

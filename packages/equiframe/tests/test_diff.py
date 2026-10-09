@@ -370,7 +370,8 @@ def test_decimal_precision_does_not_use_float_or_global_decimal_context(tmp_path
     huge = "1234567890123456789012345678901234567890.01"
     left = values([Decimal(huge)], pa.decimal256(50, 2))
     right = values([Decimal("1234567890123456789012345678901234567890.02")], pa.decimal256(50, 2))
-    with localcontext(prec=3):
+    with localcontext() as _test_decimal_context:
+        _test_decimal_context.prec = 3
         result = ef.diff(left, right, work_dir=tmp_path)
     assert result.state == "different" and result.complete
     assert {v.value for d in differences(result) for v in (*d.left, *d.right)} == {

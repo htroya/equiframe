@@ -11,10 +11,13 @@ import time
 from collections import Counter, deque
 from collections.abc import Iterator
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from pathlib import Path
 from typing import BinaryIO, Literal
 from uuid import uuid4
+
+from typing_extensions import TypeAliasType
 
 from equiframe._comparison_io import batches, file_ref, snapshot
 from equiframe._diff_capture import _CapturedInput, _NativeInput
@@ -56,8 +59,14 @@ from equiframe.serialization import _constant, _JsonObject, _unique_objects, con
 from equiframe.tables import ArrowInput
 from equiframe.types import ArtifactRef, ComparisonState
 
-type ComparisonInput = ArrowInput | ArtifactRef | TableArtifact | ExecutionResult | Path
-type _ComparisonInput = ComparisonInput | _NativeInput | _CapturedInput
+UTC = _timezone.utc
+
+ComparisonInput = TypeAliasType(
+    "ComparisonInput", ArrowInput | ArtifactRef | TableArtifact | ExecutionResult | Path
+)
+_ComparisonInput = TypeAliasType(
+    "_ComparisonInput", ComparisonInput | _NativeInput | _CapturedInput
+)
 
 
 def comparison_fingerprint(spec: ComparisonSpec) -> str:

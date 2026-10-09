@@ -15,12 +15,13 @@ from functools import partial
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from tempfile import TemporaryDirectory
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 
 import equiframe as ef
 from equiframe.local import local_path
 from equiframe.profile_types import profile_digest
 from pydantic import Field, model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.calibration_types import (
     CalibrationSelection,

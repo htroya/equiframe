@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import time
 from collections.abc import Mapping
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from itertools import combinations
 from pathlib import Path
 from uuid import uuid4
+
+from typing_extensions import TypeAliasType
 
 from equiframe._comparison_io import snapshot
 from equiframe._physical import verify_table_metadata
@@ -34,7 +37,11 @@ from equiframe.verify_types import (
     VerificationResult,
 )
 
-type VerificationInput = ArtifactRef | ExecutionResult | PipelineResult
+UTC = _timezone.utc
+
+VerificationInput = TypeAliasType(
+    "VerificationInput", ArtifactRef | ExecutionResult | PipelineResult
+)
 
 
 def _check(

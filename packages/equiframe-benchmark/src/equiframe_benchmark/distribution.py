@@ -8,18 +8,26 @@ Requirements are parsed by packaging; no backend or packaged code is executed.
 import hashlib
 import json
 import stat
-import tomllib
+import sys
+
+from equiframe._path_compat import is_junction
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 from datetime import datetime
 from email import policy
 from email.message import Message
 from email.parser import BytesParser
 from pathlib import Path, PurePosixPath
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 from urllib.parse import urlsplit
 from zipfile import ZipFile, ZipInfo
 
 from equiframe._base import strict_bool_literal
 from pydantic import BeforeValidator, Field, model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.models import Digest, Document, Text
 
@@ -334,7 +342,7 @@ def _file(root: Path, relative: str) -> Path:
     for parent in (path, *path.parents):
         if parent == root:
             break
-        if parent.is_symlink() or parent.is_junction():
+        if parent.is_symlink() or is_junction(parent):
             raise ValueError("inventory does not follow source symlinks")
     if not path.resolve().is_relative_to(root):
         raise ValueError("source artifact escapes the package directory")
@@ -476,13 +484,13 @@ def _source(root: Path) -> tuple[ProjectDistributionMetadata, tuple[SourceFileEv
         files.add(readme.file)
     files.update(licenses)
     source = root / "src"
-    if source.is_symlink() or source.is_junction():
+    if source.is_symlink() or is_junction(source):
         raise ValueError("inventory does not follow a source-directory symlink")
     if source.exists():
         for scanned, path in enumerate(source.rglob("*"), start=1):
             if scanned > MAX_MEMBERS:
                 raise ValueError("source inventory exceeds entry count limit")
-            if path.is_symlink() or path.is_junction():
+            if path.is_symlink() or is_junction(path):
                 raise ValueError("inventory does not follow source symlinks")
             if path.is_file() and "__pycache__" not in path.parts:
                 files.add(path.relative_to(root).as_posix())

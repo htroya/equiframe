@@ -1,6 +1,6 @@
 """Shared strict configuration and validation helpers (not public API)."""
 
-from typing import Annotated, ClassVar, Never
+from typing import Annotated, ClassVar
 
 from pydantic import (
     AfterValidator,
@@ -11,6 +11,7 @@ from pydantic import (
     ValidationError,
 )
 from pydantic_core import PydanticCustomError
+from typing_extensions import Never
 
 
 class _ExplicitOutcome:

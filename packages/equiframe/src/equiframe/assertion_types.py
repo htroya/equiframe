@@ -8,9 +8,10 @@ and evidence integrity does not authenticate the producer.
 
 from __future__ import annotations
 
-from typing import Literal, Never, Self
+from typing import Literal
 
 from pydantic import model_validator
+from typing_extensions import Never, Self
 
 from equiframe._base import FrozenModel, PositiveInt
 from equiframe.types import ComparisonState, Sha256

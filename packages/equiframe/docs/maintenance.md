@@ -187,9 +187,9 @@ deprecation window and fail-closed exception, and [upgrade checks](upgrading.md)
 New evidence must not change the meaning of historical records. Unknown formats
 remain rejected; migration needs explicit review and new traceable artifacts.
 
-Support claims must cite exact measured cells. Current recorded execution is
-Linux x86_64, CPython 3.12/3.13; the first-use kit remains Python 3.12-only. Do
-not expand support from metadata, configured but unexecuted CI, or past results
+Support claims must cite exact measured cells. The current maturity plan requires
+Python 3.10/3.11/3.12/3.13 with per-interpreter first-use closures and explicit
+platform receipts. Do not expand support from metadata, configured but unexecuted CI, or past results
 for different candidate hashes. Dependency changes require fresh affected-cell
 validation and updated artifact-bound inventories; timestamps and old advisory
 receipts cannot certify changed dependencies.
@@ -229,3 +229,12 @@ Record the decision and its evidence before adding an engine. Preserve genuine
 native execution and explicit registration; do not simulate a new engine by
 converting another engine's already-computed output. Missing demand, ownership,
 corpus, budget or support approval leaves the proposal pending.
+
+## Legacy-runtime decision required
+
+The a8 plan adds compatibility with end-of-life CPython 3.10 while preserving
+3.11-3.13. The owner must accept where that legacy runtime may be used, how its
+interpreter/dependency risks are reviewed, and the supported migration path.
+No responder, backup, deadline or vendor security-maintenance commitment is
+implied by passing package tests. The maintenance exercise and technical
+receipts do not replace actual acceptance of these responsibilities.

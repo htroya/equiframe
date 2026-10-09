@@ -2,7 +2,7 @@
 
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Release process](releasing.md)
 
-The repository and 0.12.0a7 artifacts are private candidates. Contribute through
+The repository and 0.12.0a8 artifacts are private candidates. Contribute through
 your own authorized account and a reviewable branch. Access does not grant
 redistribution rights. License, public release and nominal security/release
 ownership remain decisions for the owner; do not invent or preempt them.
@@ -40,7 +40,7 @@ From the core package directory:
 uv sync --locked --all-extras --python 3.12
 uv run --locked --all-extras ruff check .
 uv run --locked --all-extras ruff format --check .
-uv run --locked --all-extras mypy
+uv run --locked --all-extras mypy --python-version 3.12
 uv run --locked --all-extras python tools/generate_assets.py --check
 uv run --locked --all-extras pytest -q
 uv run --locked --all-extras python -m build --no-isolation
@@ -149,3 +149,10 @@ Use the [quick CI layer](fast-ci.md) for bounded PR/change feedback and the
 Its smoke receipt is separate from the full candidate/distribution/matrix checks.
 The installed [product journeys](journeys.md) make positive, different and
 unavailable outcomes reproducible without a source checkout.
+
+Type-check each selected Python with its own resolved dependency/stub set and
+matching `mypy --python-version X.Y`. The aggregate driver observes that version
+after sync and supplies it automatically. The checked-in minimum target remains
+3.10 and strict mode remains enabled; no error codes or imports are suppressed.
+A 3.11+ stub package requiring newer typing syntax is not evidence about the
+3.10 dependency branch. Each branch must pass under its actual interpreter.

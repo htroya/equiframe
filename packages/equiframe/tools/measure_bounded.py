@@ -17,13 +17,17 @@ import statistics
 import sys
 import time
 from collections.abc import Callable
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from decimal import Decimal
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeVar
 
 import equiframe as ef
+
+UTC = _timezone.utc
+_T = TypeVar("_T")
 
 MIB = 1024**2
 CASES = ("late-difference", "many-differences", "duplicates", "wide-strings", "disk-evidence")
@@ -127,7 +131,7 @@ def decimal_trial(directory: Path, rows: int, repetition: int) -> dict[str, Any]
     stages: list[dict[str, Any]] = []
     started = time.perf_counter()
 
-    def measured[T](name: str, scope: str, action: Callable[[], T]) -> T:
+    def measured(name: str, scope: str, action: Callable[[], _T]) -> _T:
         began = time.perf_counter()
         value = action()
         stages.append({"name": name, "wall_seconds": time.perf_counter() - began, "scope": scope})
@@ -154,7 +158,10 @@ def decimal_trial(directory: Path, rows: int, repetition: int) -> dict[str, Any]
         hashes = {}
         for path in paths:
             with path.open("rb") as source:
-                hashes[path.name] = hashlib.file_digest(source, "sha256").hexdigest()
+                hasher = hashlib.sha256()
+                for chunk in iter(lambda: source.read(1024 * 1024), b""):
+                    hasher.update(chunk)
+                hashes[path.name] = hasher.hexdigest()
         return hashes
 
     hashes = measured(

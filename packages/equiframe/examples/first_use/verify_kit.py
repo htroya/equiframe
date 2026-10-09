@@ -38,7 +38,10 @@ class KitError(ValueError):
 
 def sha256(path: Path) -> str:
     with path.open("rb") as stream:
-        return hashlib.file_digest(stream, "sha256").hexdigest()
+        hasher = hashlib.sha256()
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            hasher.update(chunk)
+        return hasher.hexdigest()
 
 
 def _object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:

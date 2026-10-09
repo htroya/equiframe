@@ -11,10 +11,11 @@ from __future__ import annotations
 import hashlib
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Literal, Protocol, Self
+from typing import TYPE_CHECKING, Annotated, Literal, Protocol
 from uuid import uuid4
 
 from pydantic import BeforeValidator, Field, StringConstraints, TypeAdapter, model_validator
+from typing_extensions import Self
 
 from equiframe._base import strict_bool_literal
 from equiframe._documents import (

@@ -6,10 +6,11 @@ label. No DW is opened, transformed or published by this module.
 
 from collections import Counter
 from decimal import Decimal
-from typing import TYPE_CHECKING, Annotated, Literal, Self
+from typing import TYPE_CHECKING, Annotated, Literal
 
 from equiframe._base import strict_bool_literal
 from pydantic import BeforeValidator, Field, model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.models import Document, Text
 

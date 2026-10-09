@@ -4,7 +4,7 @@
 
 ## Admission is not a measured support matrix
 
-The private Alpha candidate declares **Python `>=3.12,<3.14`**, meaning 3.12 and
+The private Alpha candidate declares **Python `>=3.10,<3.14`**, meaning 3.10, 3.11, 3.12 and
 3.13. Dependency ranges describe installable admission, not every tested
 combination. A lock captures one resolution; it does not prove every operating
 system, architecture, Python patch or cross-product of package versions works.
@@ -17,15 +17,18 @@ resolution ends, plus matching benchmark consumers. These are historical receipt
 for their exact artifact hashes, not a blanket validation of every later wheel
 that retains version `0.11.1`.
 
-For the current 0.12.0a7 artifact, use the supplied [release receipt](releasing.md) to see
+For the current 0.12.0a8 candidate, use the supplied [release receipt](releasing.md) to see
 which checks actually ran against its exact bytes. A configured workflow, test
 source, historical receipt or unexecuted platform job is not a current pass.
 No new Windows, macOS, ARM64, PyPy or other unrecorded platform support is claimed.
 Older Windows results do not validate the current candidate. Skips, xfails,
 blocked cells and missing receipts are not successful conformity checks.
 
-The first-use kit has a narrower **Python 3.12-only** pinned dependency closure.
-Using its commands on another interpreter does not extend that tested contract.
+The first-use builder selects an explicit Python minor and its own hash-pinned
+dependency closure. The legacy `requirements.lock` is the 3.12 closure;
+`requirements-py310.lock`, `requirements-py311.lock` and
+`requirements-py313.lock` identify the other minors. Do not treat one closure as
+universal. A generated kit records its selected Python and still needs testing.
 
 ## Declared runtime dependencies
 
@@ -33,7 +36,7 @@ The installed wheel metadata is authoritative. Current direct ranges are:
 
 | Profile | Dependencies |
 |---|---|
-| Base | pydantic `>=2.12,<3`; typer `>=0.20,<1`; tzdata `>=2025.2` |
+| Base | typing-extensions `>=4.14,<5`; pydantic `>=2.12,<3`; typer `>=0.20,<1`; tzdata `>=2025.2` |
 | `arrow` | pyarrow `>=20,<26` |
 | `pandas` | pandas `>=2.2,<4`; pyarrow `>=20,<26` |
 | `polars` | polars `>=1.30,<2`; pyarrow `>=20,<26` |
@@ -135,3 +138,25 @@ package. Explicit DataSource/adapter integrations can provide external services;
 that integration's authentication, network policy, snapshot consistency and
 acceptance must be verified separately. A local synthetic test does not certify
 a real service or another team's implementation.
+
+## Python 3.10 legacy-runtime boundary
+
+Python upstream lists 3.10 as end-of-life from 2026-10-01. EquiFrame compatibility
+with that runtime does not provide upstream security maintenance. No claim is
+made about Ubuntu/vendor extended maintenance without separate verification.
+The owner still needs to accept the deployment/support policy for this legacy
+runtime; this does not remove 3.10 from the required compatibility matrix.
+Source: [Python lifecycle](https://devguide.python.org/versions/).
+
+The a8 compatibility changes preserve named type aliases through
+`typing_extensions.TypeAliasType`, retain strict typing, use local Decimal
+contexts without 3.11-only keyword arguments, and validate supported timestamp
+literals consistently while retaining their original nanoseconds/text.
+Windows junction checks use lstat reparse tags available since 3.8; simulated
+branch tests are not evidence of actual Windows execution. ARM64 3.10/3.12
+receipts and the preserved Windows/macOS roadmap cells remain required.
+
+The benchmark declares `tomli` only below Python 3.11. Source-development tools
+use the same fallback from the explicitly declared development dependency.
+Normal pip resolution chooses compatible branches within unchanged native
+dependency ranges; the recorded locks identify those branches per Python.

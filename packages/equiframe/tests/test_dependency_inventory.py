@@ -8,13 +8,16 @@ import json
 import runpy
 import tarfile
 import zipfile
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
+from datetime import timezone as _timezone
 from pathlib import Path
 from typing import Any
 
 import pytest
 from jsonschema.exceptions import ValidationError
 from packaging.markers import default_environment
+
+UTC = _timezone.utc
 
 MODULE = runpy.run_path(str(Path(__file__).parents[1] / "tools" / "dependency_inventory.py"))
 

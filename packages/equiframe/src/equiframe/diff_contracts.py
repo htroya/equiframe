@@ -9,9 +9,10 @@ inferred physical unit. Declare ColumnSpec explicitly for units or tolerances.
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Literal, Self, cast
+from typing import TYPE_CHECKING, Literal, TypeVar, cast
 
 from pydantic import Field, model_validator
+from typing_extensions import Self
 
 from equiframe._base import FrozenModel, Text, fail
 from equiframe._timezones import timezone
@@ -45,6 +46,8 @@ from equiframe.contracts import (
 from equiframe.errors import CapabilityError, InvalidExecutionInput
 from equiframe.tables import require_dependency
 from equiframe.values import TimeUnit
+
+_T = TypeVar("_T")
 
 if TYPE_CHECKING:
     import pyarrow as pa
@@ -172,7 +175,7 @@ class DiffContract(FrozenModel):
         return cls(spec=spec, reference=chosen_reference, provenance=_provenance(spec, sources))
 
 
-def _choice[T](value: T, marker: T, default: T) -> tuple[T, _Source]:
+def _choice(value: _T, marker: _T, default: _T) -> tuple[_T, _Source]:
     return (default, _DEFAULT) if value is marker else (value, _USER)
 
 

@@ -14,10 +14,11 @@ from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal, InvalidOperation, localcontext
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, Self, TextIO
+from typing import TYPE_CHECKING, Any, Literal, TextIO
 from uuid import uuid4
 
 from pydantic import Field, model_validator
+from typing_extensions import Self
 
 from equiframe._base import FrozenModel, NonNegativeInt, Text, _ExplicitOutcome
 from equiframe._decimal import exact_decimal_context

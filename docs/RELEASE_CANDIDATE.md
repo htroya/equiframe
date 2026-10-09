@@ -1,5 +1,7 @@
 # Candidatos Python 0.11.1
 
+Nota de candidato de madurez 2026-10-08: a8 amplía la admisión objetivo a Python 3.10-3.13; consulte [el plan M01-M16](MATURITY_PLAN.md). Las secciones y recibos históricos siguientes conservan su candidato y no acreditan pruebas nuevas.
+
 **Current STEP9 guidance:** [English distribution handbook](../packages/equiframe/docs/releasing.md),
 [security boundaries and incomplete assessment](../packages/equiframe/docs/security.md),
 [dependency evidence](../packages/equiframe/docs/dependencies.md).

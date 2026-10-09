@@ -13,7 +13,8 @@ import tempfile
 import time
 import weakref
 from collections.abc import Callable, Mapping
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from importlib.metadata import version
 from pathlib import Path
 from threading import Event, Lock, Thread
@@ -40,6 +41,8 @@ from equiframe.errors import (
 from equiframe.execution import CancellationToken
 from equiframe.execution_types import PhysicalColumn, TableArtifact
 from equiframe.tables import require_dependency
+
+UTC = _timezone.utc
 
 if TYPE_CHECKING:
     import duckdb

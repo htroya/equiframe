@@ -84,3 +84,21 @@ def test_receipt_tracks_actual_commands_and_stops_on_failure(
     assert len(calls) == len(receipt["results"]) == (2 if exit_code == 0 else 1)
     assert receipt["results"][0]["exit_code"] == exit_code
     assert (output / "one.log").read_text() == "retained output\n"
+
+
+@pytest.mark.parametrize("minor", [10, 11, 12, 13])
+def test_quick_typing_targets_actual_interpreter_without_narrowing_scope(
+    driver, tmp_path, monkeypatch, minor
+):
+    from types import SimpleNamespace
+
+    planner = driver["plan"]
+    monkeypatch.setitem(
+        planner.__globals__,
+        "sys",
+        SimpleNamespace(executable="chosen-python", version_info=(3, minor)),
+    )
+    checks = planner(tmp_path, "core", tmp_path / "receipts")
+    typing = next(check for check in checks if check.name == "mypy")
+    assert typing.command == ("chosen-python", "-m", "mypy", "--python-version", f"3.{minor}")
+    assert typing.directory == tmp_path / "packages/equiframe"

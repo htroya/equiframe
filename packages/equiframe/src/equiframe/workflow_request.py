@@ -1,8 +1,7 @@
 """Strict artifact-only ETL requests; no callback or plugin imports in JSON."""
 
-from typing import Self
-
 from pydantic import model_validator
+from typing_extensions import Self
 
 from equiframe._base import FrozenModel, Identifier
 from equiframe.pipeline_types import PipelineInput

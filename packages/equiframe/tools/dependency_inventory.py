@@ -16,12 +16,17 @@ import stat
 import subprocess
 import sys
 import tarfile
-import tomllib
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 import urllib.error
 import urllib.request
 import zipfile
 from contextlib import suppress
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
+from datetime import timezone as _timezone
 from email.parser import BytesParser
 from pathlib import Path, PurePosixPath
 from typing import Any, NoReturn
@@ -35,6 +40,8 @@ from packaging.specifiers import SpecifierSet
 from packaging.utils import canonicalize_name
 from packaging.version import Version
 from referencing import Registry, Resource
+
+UTC = _timezone.utc
 
 FORMAT = "equiframe.dependencies/1.0"
 AUDIT_FORMAT = "equiframe.advisories/1.0"
@@ -75,7 +82,10 @@ def file_ref(path: Path) -> dict[str, Any]:
     if path.is_symlink() or not path.is_file():
         fail(f"Expected regular non-symlink file: {path}")
     with path.open("rb") as stream:
-        digest = hashlib.file_digest(stream, "sha256").hexdigest()
+        hasher = hashlib.sha256()
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            hasher.update(chunk)
+        digest = hasher.hexdigest()
     return {"filename": path.name, "sha256": digest, "size_bytes": path.stat().st_size}
 
 

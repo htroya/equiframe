@@ -4,9 +4,11 @@ import csv
 import hashlib
 import io
 from pathlib import Path
-from typing import Annotated, Self
+from typing import Annotated
 
+from equiframe._path_compat import is_junction
 from pydantic import Field, model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.evaluation import EvaluationReport, MetricValue
 from equiframe_benchmark.io import load_document, save_document
@@ -315,7 +317,7 @@ def write_tables(report: EvaluationReport, directory: Path) -> TableExport:
 def read_tables(directory: Path, *, report: EvaluationReport) -> TableExport:
     """Verify every byte against regeneration and reject unlisted files or links."""
     report = EvaluationReport.model_validate(report)
-    if directory.is_symlink() or directory.is_junction():
+    if directory.is_symlink() or is_junction(directory):
         raise ValueError("the table directory cannot be a filesystem link")
     directory = directory.resolve()
     manifest = directory / "tables.json"

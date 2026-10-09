@@ -7,7 +7,11 @@ import inspect
 import json
 import subprocess
 import sys
-import tomllib
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 from functools import reduce
 from operator import or_
 from pathlib import Path

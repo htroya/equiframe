@@ -16,11 +16,14 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from pathlib import Path
 from typing import Any
 
 from build_first_use_kit import ROOT, build_kit, file_record
+
+UTC = _timezone.utc
 
 _INSTALL_PROBE = r"""
 import hashlib, importlib.metadata, importlib.util, json, re, sys
@@ -87,8 +90,8 @@ def verify_first_use(
     environment: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     """Fail the release gate on any incorrect install, exit code or report."""
-    if sys.version_info[:2] != (3, 12):
-        raise RuntimeError("the first-use candidate requires a Python 3.12 interpreter")
+    if sys.version_info[:2] not in {(3, 10), (3, 11), (3, 12), (3, 13)}:
+        raise RuntimeError("the first-use candidate requires Python 3.10-3.13")
     checkout = ROOT.parents[1]
     if work.resolve().is_relative_to(checkout):
         raise ValueError("consumer environment and output must be outside the checkout")
@@ -156,7 +159,7 @@ def verify_first_use(
 
     try:
         kit = work / "kit"
-        manifest = build_kit(kit)
+        manifest = build_kit(kit, python_minor=f"{sys.version_info[0]}.{sys.version_info[1]}")
         receipt["kit_manifest"] = file_record(kit / "manifest.json")
         receipt["wheel"] = {"file": manifest["wheel"], **manifest["files"][manifest["wheel"]]}
         receipt["source_payload"] = manifest["source_payload"]
@@ -190,7 +193,6 @@ def verify_first_use(
                 "--python",
                 python,
                 "--no-index",
-                "--no-deps",
                 str(kit / manifest["wheel"]),
             ],
         )

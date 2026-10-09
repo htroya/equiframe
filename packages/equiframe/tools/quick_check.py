@@ -11,11 +11,14 @@ import subprocess
 import sys
 import time
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any, Literal
 from uuid import uuid4
+
+UTC = _timezone.utc
 
 Package = Literal["core", "benchmark"]
 CORE_TESTS = (
@@ -64,7 +67,11 @@ def plan(repository: Path, package: Package, output: Path) -> tuple[Check, ...]:
     checks = [
         Check("ruff", (python, "-m", "ruff", "check", "."), directory),
         Check("format", (python, "-m", "ruff", "format", "--check", "."), directory),
-        Check("mypy", (python, "-m", "mypy"), directory),
+        Check(
+            "mypy",
+            (python, "-m", "mypy", "--python-version", ".".join(map(str, sys.version_info[:2]))),
+            directory,
+        ),
         Check("generated", (python, "tools/generate_assets.py", "--check"), directory),
         Check(
             "semantic-smoke",

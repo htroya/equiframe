@@ -1,9 +1,8 @@
 """Selection audit stays in the benchmark; only vectors cross into the library."""
 
-from typing import Self
-
 from equiframe import NormalTrainingProfiles
 from pydantic import model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.models import Digest, Document, Text, digest
 

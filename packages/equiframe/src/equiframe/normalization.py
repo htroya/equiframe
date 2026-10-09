@@ -5,7 +5,8 @@ from __future__ import annotations
 import json
 import math
 import struct
-from datetime import UTC, date, datetime, timedelta
+from datetime import date, datetime, timedelta
+from datetime import timezone as _timezone
 from decimal import Decimal, localcontext
 from fractions import Fraction
 from typing import TYPE_CHECKING
@@ -15,6 +16,8 @@ from equiframe.comparison_types import ComparisonPolicy, ComparisonValue
 from equiframe.contracts import ColumnSpec, DatePolicy, TimestampPolicy
 from equiframe.errors import CapabilityError
 from equiframe.values import ScalarValue, offset_nanoseconds
+
+UTC = _timezone.utc
 
 if TYPE_CHECKING:
     import pyarrow as pa
@@ -99,7 +102,8 @@ def physical_value(scalar: pa.Scalar) -> ComparisonValue:
     if kind == "boolean":
         return ComparisonValue(kind="boolean", value="true" if value else "false")
     if kind == "decimal":
-        with localcontext(capitals=1):
+        with localcontext() as decimal_context:
+            decimal_context.capitals = 1
             return ComparisonValue(kind="decimal", value=str(value))
     if kind == "integer":
         return ComparisonValue(kind="integer", value=str(value))
@@ -312,7 +316,8 @@ def literal(value: ScalarValue) -> ComparisonValue:
         )
     if value.kind == "boolean":
         return ComparisonValue(kind="boolean", value="true" if value.value else "false")
-    with localcontext(capitals=1):
+    with localcontext() as decimal_context:
+        decimal_context.capitals = 1
         return ComparisonValue(kind=value.kind, value=str(value.value))
 
 

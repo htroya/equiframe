@@ -12,21 +12,25 @@ import platform
 import shutil
 import statistics
 import sys
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-from typing import Literal, Self
+from typing import Literal
 from uuid import uuid4
 
 import equiframe as ef
 from equiframe.evidence import describe_file, inventory, load_json, verify_files
 from equiframe.local import local_path
 from pydantic import model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.models import Digest, Document, Text, digest
 from equiframe_benchmark.scale_io import save_scale_document
 from equiframe_benchmark.scale_process import ProcessObservation, supervise
 from equiframe_benchmark.scale_types import ScaleSpec, ScaleTrial, ScaleWorkerCompletion
+
+UTC = _timezone.utc
 
 
 class ScaleRun(Document):

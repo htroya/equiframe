@@ -2,9 +2,10 @@
 
 import time
 from collections.abc import Callable
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from pathlib import Path
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 from uuid import uuid4
 
 import equiframe as ef
@@ -22,6 +23,7 @@ from equiframe.evidence import (
 )
 from equiframe.local import local_path
 from pydantic import BeforeValidator, Field, model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.models import Digest, Document, Text, digest
 from equiframe_benchmark.snapshot import (
@@ -29,6 +31,8 @@ from equiframe_benchmark.snapshot import (
     SnapshotManifest,
     snapshot_fingerprint,
 )
+
+UTC = _timezone.utc
 
 Engine = Literal["pandas", "polars", "duckdb"]
 ENGINES: tuple[Engine, ...] = ("pandas", "polars", "duckdb")

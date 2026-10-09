@@ -1,8 +1,7 @@
 """Data-only requests for verification of explicitly supplied external artifacts."""
 
-from typing import Self
-
 from pydantic import model_validator
+from typing_extensions import Self
 
 from equiframe._base import FrozenModel
 from equiframe.comparison_types import ComparisonOptions, ComparisonPolicy

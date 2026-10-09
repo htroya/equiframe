@@ -4,7 +4,7 @@ import math
 import re
 from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation, localcontext
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 
 from pydantic import (
     AfterValidator,
@@ -14,6 +14,7 @@ from pydantic import (
     WithJsonSchema,
     model_validator,
 )
+from typing_extensions import Self
 
 from equiframe._base import FrozenModel, Text, fail
 from equiframe._timezones import timezone
@@ -38,7 +39,8 @@ def _decimal(value: object) -> Decimal:
 
 def _decimal_text(value: Decimal) -> str:
     # str(Decimal) consults context.capitals even though it never rounds.
-    with localcontext(capitals=1):
+    with localcontext() as decimal_context:
+        decimal_context.capitals = 1
         return str(value)
 
 
@@ -142,6 +144,25 @@ _TIMESTAMP = re.compile(
 )
 
 
+def _timestamp_datetime(value: str) -> datetime:
+    """Calendar/offset validation without relying on the Python 3.11 ISO parser.
+
+    The declared literal grammar admits 1-9 fraction digits. datetime stores only
+    microseconds; exact nanosecond ordering is calculated separately from the
+    original unmodified literal by TimestampValue.nanoseconds.
+    """
+    match = _TIMESTAMP.fullmatch(value)
+    if match is None:
+        raise ValueError("invalid declared timestamp grammar")
+    fraction = (match["fraction"] or "").removeprefix(".")
+    microseconds = ("." + fraction[:6].ljust(6, "0")) if fraction else ""
+    offset = "+00:00" if match["offset"] == "Z" else (match["offset"] or "")
+    calendar = (
+        f"{match['date']}T{match['hour']}:{match['minute']}:{match['second']}{microseconds}{offset}"
+    )
+    return datetime.fromisoformat(calendar)
+
+
 class TimestampValue(FrozenModel):
     kind: Literal["timestamp"] = "timestamp"
     value: str
@@ -164,7 +185,7 @@ class TimestampValue(FrozenModel):
         if offset not in (None, "Z") and (int(offset[1:3]) > 23 or int(offset[4:6]) > 59):
             fail("invalid_offset", "invalid timestamp offset", "value")
         try:
-            instant = datetime.fromisoformat(self.value)
+            instant = _timestamp_datetime(self.value)
         except ValueError:
             fail("invalid_timestamp", "invalid calendar date or clock time", "value")
         if self.zone is not None:
@@ -205,7 +226,7 @@ class TimestampValue(FrozenModel):
 
     def in_zone(self, zone: str, *, fold: int) -> datetime:
         """Used only to validate an explicitly declared naive-time policy."""
-        return datetime.fromisoformat(self.value).replace(tzinfo=timezone(zone), fold=fold)
+        return _timestamp_datetime(self.value).replace(tzinfo=timezone(zone), fold=fold)
 
 
 ScalarValue = Annotated[

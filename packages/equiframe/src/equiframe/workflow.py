@@ -6,10 +6,11 @@ import time
 from collections.abc import Mapping
 from dataclasses import replace
 from pathlib import Path
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 from uuid import uuid4
 
 from pydantic import BeforeValidator, Field, model_validator
+from typing_extensions import Self
 
 from equiframe._base import FrozenModel, Identifier, Text, _ExplicitOutcome, strict_bool_literal
 from equiframe.errors import ArtifactIntegrityError, ResourceLimitError

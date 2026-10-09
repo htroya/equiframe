@@ -25,13 +25,14 @@ DuckDB join, so it needs the `duckdb` extra. It does not require pandas, Polars,
 scikit-learn, network access, credentials or any real data to run.
 
 Use the [verified first-use installation](recipes.md#1-obtain-verify-and-install-the-kit)
-in a fresh Python 3.12 environment outside the checkout. Its hash-pinned
+in a fresh supported Python environment outside the checkout. Commands below
+show 3.12; use the minor recorded by your interpreter-specific kit. Its hash-pinned
 `requirements.lock` covers this demo as well as the other recipes; pandas/pytest
 in that shared kit are not new dependencies of this producer. Copy **both**
 integration files from the installed wheel's resources (shown below) or the
 corresponding verified source distribution into a new working directory.
 Do not fetch a same-named package from a public index or use a different candidate
-merely because it has version `0.11.1`.
+merely because it has version `0.12.0a8`.
 
 For example, after verifying the private kit, use these POSIX commands from
 outside the checkout. `KIT` is the extracted verified first-use kit:
@@ -40,8 +41,8 @@ outside the checkout. `KIT` is the extracted verified first-use kit:
 python3.12 -m venv sqlite-example-env
 sqlite-example-env/bin/python -m pip install --require-hashes --only-binary=:all: \
   -r "$KIT/requirements.lock"
-sqlite-example-env/bin/python -m pip install --no-index --no-deps \
-  "$KIT/wheels/equiframe-0.11.1-py3-none-any.whl"
+sqlite-example-env/bin/python -m pip install --no-index \
+  "$KIT/wheels/equiframe-0.12.0a8-py3-none-any.whl"
 sqlite-example-env/bin/python -m pip check
 mkdir sqlite-example-work
 sqlite-example-env/bin/python - <<'PY'
@@ -243,7 +244,7 @@ From `packages/equiframe` in the existing locked development environment:
 ```bash
 uv run --locked --all-extras ruff check examples/integrations tests/test_sqlite_snapshot_example.py
 uv run --locked --all-extras ruff format --check examples/integrations tests/test_sqlite_snapshot_example.py
-uv run --locked --all-extras mypy examples/integrations/sqlite_snapshot.py examples/integrations/sqlite_snapshot_demo.py
+uv run --locked --all-extras mypy --python-version 3.12 examples/integrations/sqlite_snapshot.py examples/integrations/sqlite_snapshot_demo.py
 uv run --locked --all-extras pytest -q tests/test_sqlite_snapshot_example.py
 ```
 

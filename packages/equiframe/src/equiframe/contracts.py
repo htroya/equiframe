@@ -1,10 +1,12 @@
 """Strict declarative semantic contracts. No table processing or rule execution."""
 
 import struct
-from datetime import UTC, date, datetime
-from typing import Annotated, Literal, Self
+from datetime import date
+from datetime import timezone as _timezone
+from typing import Annotated, Literal
 
 from pydantic import BeforeValidator, Field, ValidationError, model_validator
+from typing_extensions import Self
 
 from equiframe._base import (
     FrozenModel,
@@ -24,8 +26,11 @@ from equiframe.values import (
     TimestampValue,
     TimeUnit,
     TimeZone,
+    _timestamp_datetime,
     offset_nanoseconds,
 )
+
+UTC = _timezone.utc
 
 SCHEMA_VERSION = "1.0"
 Family = Literal["nulls_types", "joins", "duplicates_order", "aggregations", "dates"]
@@ -199,7 +204,7 @@ class TimestampPolicy(FrozenModel):
             fail("temporal_zone", "bound zone must match policy zone", field, "zone")
         if value.has_offset:
             if self.timezone is not None:
-                stamp = datetime.fromisoformat(value.value)
+                stamp = _timestamp_datetime(value.value)
                 try:
                     actual_offset = stamp.astimezone(timezone(self.timezone)).utcoffset()
                 except (OverflowError, ValueError):

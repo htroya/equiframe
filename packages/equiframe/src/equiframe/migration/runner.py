@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable, Mapping
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, TypeVar
 from uuid import uuid4
+
+from typing_extensions import TypeAliasType
 
 from equiframe._comparison_io import snapshot
 from equiframe._duckdb_transport import duckdb_temporal_capabilities
@@ -59,10 +62,13 @@ from .runner_types import (
 from .types import CompilationCheck
 from .validation import ir_fingerprint
 
+UTC = _timezone.utc
+_T = TypeVar("_T")
+
 if TYPE_CHECKING:
     from equiframe.contracts import TableSpec
 
-type ExpectedInput = ArrowInput | ArtifactRef | Path
+ExpectedInput = TypeAliasType("ExpectedInput", ArrowInput | ArtifactRef | Path)
 
 
 def check_migration(
@@ -92,14 +98,14 @@ class _Steps:
         if self.deadline is not None and time.perf_counter() >= self.deadline:
             raise ExecutionTimeout("migration budget exceeded at a cooperative checkpoint")
 
-    def run[T](
+    def run(
         self,
         name: MigrationStageName,
-        action: Callable[[], T],
-        complete: Callable[[T], bool],
+        action: Callable[[], _T],
+        complete: Callable[[_T], bool],
         *,
         skip: str | None = None,
-    ) -> T | None:
+    ) -> _T | None:
         if skip:
             record = MigrationStage(stage=name, state="skipped", code=skip, elapsed_seconds=0.0)
             result = None

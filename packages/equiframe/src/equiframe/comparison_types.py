@@ -3,9 +3,10 @@
 import math
 import re
 from decimal import Decimal, InvalidOperation
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 
 from pydantic import Field, model_validator
+from typing_extensions import Self
 
 from equiframe._base import FrozenModel, Identifier, NonNegativeInt, PositiveInt, Text, fail
 from equiframe.contracts import Contract

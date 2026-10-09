@@ -3,9 +3,10 @@
 import hashlib
 import json
 import os
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from pathlib import Path
-from typing import Literal
+from typing import Literal, TypeVar
 
 from pydantic import BaseModel
 
@@ -15,6 +16,9 @@ from equiframe.errors import ArtifactIntegrityError, ResourceLimitError
 from equiframe.local import local_path
 from equiframe.pipeline_types import EvidenceFile, PipelineResult
 from equiframe.types import ArtifactRef, Sha256
+
+UTC = _timezone.utc
+_ModelT = TypeVar("_ModelT", bound=BaseModel)
 
 MAX_DOCUMENT_BYTES = 64 * 1024 * 1024
 
@@ -56,7 +60,7 @@ def parse_json(data: bytes) -> object:
     return json.loads(data.decode("utf-8"), object_pairs_hook=_pairs, parse_constant=_constant)
 
 
-def load_json[T: BaseModel](model: type[T], path: Path) -> T:
+def load_json(model: type[_ModelT], path: Path) -> _ModelT:
     with path.open("rb") as stream:
         data = stream.read(MAX_DOCUMENT_BYTES + 1)
     if len(data) > MAX_DOCUMENT_BYTES:

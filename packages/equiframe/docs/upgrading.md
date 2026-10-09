@@ -325,3 +325,19 @@ independent expected output at both dependency endpoints. The compiler identity
 is `migration-native-ir1.0/polars/product-semantics-v4`; Pandas and DuckDB retain
 v2. The public IR, contract and evidence formats remain 1.0. Preserve old artifacts
 and receipts; do not relabel previous failures or passes as results for A7.
+
+## Private a8 compatibility candidate
+
+Install a8 into a new environment; its runtime bytes and package identity differ
+from a7. The benchmark requires exactly a8 and the independent consumer is
+0.1.10. Named aliases retain their names and underlying alternatives; no public
+signature, default, acceptance state or format is intentionally withdrawn.
+The detector producer version admits a8 and retains every previously accepted
+producer version. Its new default identifies a8; prior saved artifacts are not
+rewritten. Two producer-version schemas consequently extend their known-version
+enumeration; this does not change the detector algorithm or scientific protocol.
+
+Use the chosen interpreter explicitly. Never force requires-python, ignore
+dependencies or reuse a 3.12 binary wheelhouse on ARM64/3.10. Restore the retained
+a7 environment only on its supported Python (3.12/3.13), using original hashes;
+an attempted a7 rollback on 3.10/3.11 must fail normal metadata admission.

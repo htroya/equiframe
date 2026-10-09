@@ -12,14 +12,16 @@ pass does not establish full-suite, wheel/sdist, platform or release readiness.
 
 ## Run exactly the quick selection locally
 
-From the repository root, with the existing supported interpreter and `uv`:
+From the repository root, with the existing supported interpreter and `uv`.
+These commands explicitly select 3.12 for development; choose 3.10, 3.11 or 3.13
+for another cell. The driver uses its actual interpreter for strict typing:
 
 ```bash
 cd packages/equiframe
-uv sync --locked --all-extras --python 3.12
+uv sync --locked --all-extras --no-editable --python 3.12
 uv run --locked --all-extras python tools/quick_check.py --package core
 cd ../equiframe-benchmark
-uv sync --locked --all-extras --reinstall-package equiframe --python 3.12
+uv sync --locked --all-extras --no-editable --reinstall-package equiframe --python 3.12
 uv run --locked --all-extras python ../equiframe/tools/quick_check.py --package benchmark
 ```
 

@@ -1,0 +1,844 @@
+#!/usr/bin/env python3
+"""Run the exact private candidate in an isolated owned ARM64 lab; never use SSH keys.
+
+Run on the VM from the already-authorized Codex executor. Receipts are unsigned
+observations, not operator authentication or independent human acceptance.
+"""
+
+from __future__ import annotations
+
+import argparse
+import getpass
+import hashlib
+import json
+import os
+import platform
+import resource
+import shutil
+import signal
+import socket
+import subprocess
+import sys
+import tarfile
+import tempfile
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+PROFILES = ("base", "arrow", "pandas", "polars", "duckdb", "engines", "ml", "all")
+PROBE = (
+    "import hashlib,json,platform,sys; from pathlib import Path; print(json.dumps({"
+    "'python':platform.python_version(),'executable':sys.executable,"
+    "'system':platform.system(),'machine':platform.machine(),'prefix':sys.prefix,"
+    "'executable_sha256':hashlib.sha256(Path(sys.executable).read_bytes()).hexdigest()}))"
+)
+
+
+def sha(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def write(path: Path, data: object) -> None:
+    temporary = path.with_suffix(path.suffix + ".partial")
+    temporary.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    os.replace(temporary, path)
+
+
+def checked_member(root: Path, name: str) -> Path:
+    path = root / name
+    if path.is_symlink() or not path.resolve().is_relative_to(root.resolve()) or not path.is_file():
+        raise ValueError("manifest member missing, linked or outside kit: " + name)
+    return path
+
+
+def verify_kit(kit: Path) -> dict:
+    manifest = json.loads((kit / "candidate.json").read_text("utf-8"))
+    if manifest.get("schema") != "equiframe-maturity-candidate-1":
+        raise ValueError("unsupported candidate manifest")
+    for name, record in manifest["files"].items():
+        path = checked_member(kit, name)
+        if path.stat().st_size != record["size_bytes"] or sha(path) != record["sha256"]:
+            raise ValueError("candidate member hash/size differs: " + name)
+    expected = {
+        name + suffix
+        for name in ("core", "benchmark", "consumer")
+        for suffix in ("_wheel", "_sdist")
+    }
+    if (
+        set(manifest.get("artifacts", {})) != expected
+        or set(manifest.get("artifact_hashes", {})) != expected
+    ):
+        raise ValueError("candidate must identify all six exact distribution artifacts")
+    for key, name in manifest["artifacts"].items():
+        if (
+            name not in manifest["files"]
+            or manifest["files"][name]["sha256"] != manifest["artifact_hashes"][key]
+        ):
+            raise ValueError("artifact identity disagrees with the candidate file manifest")
+    if not manifest.get("source"):
+        raise ValueError("candidate source identity is required")
+    return manifest
+
+
+class Recorder:
+    def __init__(self, directory: Path, receipt: dict):
+        self.directory, self.receipt = directory, receipt
+        self.environment = dict(os.environ)
+        for key in list(self.environment):
+            if key.startswith(("PYTHON", "PIP_", "UV_")) or key in (
+                "VIRTUAL_ENV",
+                "CONDA_PREFIX",
+            ):
+                self.environment.pop(key, None)
+        self.environment.update(
+            PYTHONNOUSERSITE="1",
+            PYTHONDONTWRITEBYTECODE="1",
+            OMP_NUM_THREADS="1",
+            OPENBLAS_NUM_THREADS="1",
+            POLARS_MAX_THREADS="1",
+            PYTEST_DISABLE_PLUGIN_AUTOLOAD="1",
+            UV_PYTHON_DOWNLOADS="never",
+            UV_CACHE_DIR=str(directory / "uv-cache"),
+            TMPDIR=str(directory / "temporary"),
+        )
+        (directory / "temporary").mkdir()
+        (directory / "logs").mkdir()
+        self.save()
+
+    def save(self) -> None:
+        write(self.directory / "receipt.json", self.receipt)
+
+    def run(
+        self,
+        label: str,
+        command: list[str],
+        *,
+        expected: int = 0,
+        timeout: int = 1800,
+        cwd: Path | None = None,
+    ) -> subprocess.CompletedProcess:
+        number = len(self.receipt["commands"])
+        log = self.directory / "logs" / f"{number:03d}-{label}.log"
+        record = {
+            "label": label,
+            "command": command,
+            "cwd": str(cwd or self.directory),
+            "expected_exit": expected,
+            "started_at": now(),
+            "timeout_seconds": timeout,
+            "exit_code": None,
+            "status": "running",
+            "log": str(log.relative_to(self.directory)),
+        }
+        self.receipt["commands"].append(record)
+        self.save()
+        start = time.monotonic()
+        try:
+            available = shutil.disk_usage(self.directory).free
+            record["disk_free_before_bytes"] = available
+            if available < 1024**3:
+                record.update(status="blocked_resource", error="Less than 1 GiB free disk")
+                log.write_text(
+                    "Stopped before command: less than 1 GiB free disk\n", encoding="utf-8"
+                )
+                raise RuntimeError("Resource guard: less than 1 GiB free disk")
+            process = subprocess.Popen(
+                command,
+                cwd=cwd or self.directory,
+                env=self.environment,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                start_new_session=True,
+            )
+            try:
+                stdout, stderr = process.communicate(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                # Signal only the process group created for this exact command.
+                os.killpg(process.pid, signal.SIGTERM)
+                try:
+                    stdout, stderr = process.communicate(timeout=5)
+                except subprocess.TimeoutExpired:
+                    os.killpg(process.pid, signal.SIGKILL)
+                    stdout, stderr = process.communicate()
+                raise subprocess.TimeoutExpired(
+                    command, timeout, output=stdout, stderr=stderr
+                ) from None
+            result = subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
+            log.write_text(result.stdout + result.stderr, encoding="utf-8")
+            record.update(
+                exit_code=result.returncode,
+                status="passed" if result.returncode == expected else "failed",
+            )
+        except subprocess.TimeoutExpired as error:
+            output = (error.stdout or "") + (error.stderr or "")
+            if isinstance(output, bytes):
+                output = output.decode("utf-8", errors="replace")
+            log.write_text(output, encoding="utf-8")
+            record["status"] = "timeout"
+            raise
+        except OSError as error:
+            record.update(status="failed_to_start", error=type(error).__name__)
+            log.write_text(str(error) + "\n", encoding="utf-8")
+            raise
+        finally:
+            record.update(seconds=time.monotonic() - start, finished_at=now())
+            if log.exists():
+                record["log_sha256"] = sha(log)
+            self.save()
+        if result.returncode != expected:
+            raise RuntimeError(
+                f"{label}: exit {result.returncode}, expected {expected}; preserve {log}"
+            )
+        return result
+
+
+def python_at(venv: Path) -> str:
+    return str(venv / "bin/python")
+
+
+def extract(sdist: Path, destination: Path) -> Path:
+    destination.mkdir(parents=True, exist_ok=False)
+    with tarfile.open(sdist) as archive:
+        archive.extractall(destination, filter="data")
+    roots = list(destination.iterdir())
+    if len(roots) != 1 or not roots[0].is_dir():
+        raise ValueError("unexpected sdist root")
+    return roots[0]
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--kit", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument(
+        "--executor",
+        required=True,
+        help="Actual operator/Codex task identity; not a fabricated reviewer",
+    )
+    parser.add_argument("--python310", default="/usr/bin/python3.10")
+    parser.add_argument("--python312", default="/usr/bin/python3.12")
+    parser.add_argument("--lab-parent", type=Path, default=Path.home())
+    parser.add_argument(
+        "--cloud-validation",
+        action="store_true",
+        help="Test this runner on cloud x64; never counts as VM evidence",
+    )
+    parser.add_argument("--keep-successful-venvs", action="store_true")
+    args = parser.parse_args()
+    if not args.executor.strip() or "NOMBRE REAL" in args.executor:
+        raise ValueError("record the actual executor, not the placeholder")
+    kit = args.kit.resolve()
+    manifest = verify_kit(kit)
+    actual = {
+        "hostname": socket.gethostname(),
+        "user": getpass.getuser(),
+        "uid": os.getuid(),
+        "system": platform.system(),
+        "machine": platform.machine(),
+        "kernel": platform.release(),
+    }
+    if not args.cloud_validation and (
+        actual["hostname"] != "maestria-vnic"
+        or actual["user"] != "hernan"
+        or actual["uid"] != 1003
+        or actual["system"] != "Linux"
+        or actual["machine"] != "aarch64"
+    ):
+        raise RuntimeError(
+            "VM identity differs; stop and verify the environment before installation"
+        )
+    parent = args.lab_parent.resolve()
+    if not parent.is_dir() or parent.stat().st_uid != os.getuid():
+        raise ValueError("lab parent must already exist and be owned/authorized")
+    if shutil.disk_usage(parent).free < 6 * 1024**3:
+        raise RuntimeError(
+            "Need 6 GiB free before preparing the lab; consumer retains its 4 GiB guard"
+        )
+    memory = {}
+    for line in Path("/proc/meminfo").read_text().splitlines():
+        if line.startswith(("MemTotal:", "MemAvailable:")):
+            name, amount, _unit = line.split()
+            memory[name.rstrip(":")] = int(amount) * 1024
+    if memory.get("MemAvailable", 0) < 2 * 1024**3:
+        raise RuntimeError("Need at least 2 GiB available memory before lab work")
+    cgroup = {}
+    for name in ("memory.max", "memory.current", "memory.high", "cpu.max"):
+        try:
+            cgroup[name] = Path("/sys/fs/cgroup", name).read_text().strip()
+        except (OSError, ValueError) as error:
+            cgroup[name] = {"unavailable": type(error).__name__}
+    if isinstance(cgroup.get("memory.max"), str) and cgroup["memory.max"].isdigit():
+        if (
+            not isinstance(cgroup.get("memory.current"), str)
+            or not cgroup["memory.current"].isdigit()
+        ):
+            raise RuntimeError("Finite cgroup memory limit without readable current usage")
+        headroom = int(cgroup["memory.max"]) - int(cgroup["memory.current"])
+        if headroom < 2 * 1024**3:
+            raise RuntimeError("Need at least 2 GiB effective cgroup memory headroom")
+    actual["resources"] = {
+        "cpu_count": os.cpu_count(),
+        "memory_bytes": memory,
+        "cgroup_observed": cgroup,
+        "rlimit_as": list(resource.getrlimit(resource.RLIMIT_AS)),
+        "rlimit_cpu": list(resource.getrlimit(resource.RLIMIT_CPU)),
+        "rlimit_nofile": list(resource.getrlimit(resource.RLIMIT_NOFILE)),
+        "budget_is_system_quota": False,
+    }
+    os.umask(0o077)
+    lab = Path(tempfile.mkdtemp(prefix="equiframe-maturity-", dir=parent))
+    receipt = {
+        "schema": "equiframe-maturity-vm-execution-1",
+        "status": "running",
+        "started_at": now(),
+        "executor_declared": args.executor,
+        "operator_authenticated": False,
+        "independent_human_acceptance": False,
+        "cloud_validation_only": args.cloud_validation,
+        "actual_host": actual,
+        "source": manifest["source"],
+        "candidate_manifest_sha256": sha(kit / "candidate.json"),
+        "artifact_hashes": manifest["artifact_hashes"],
+        "lab": str(lab),
+        "preflight_disk_free_bytes": shutil.disk_usage(parent).free,
+        "commands": [],
+        "python_cells": [],
+        "created_environments": [],
+        "removed_successful_environments": [],
+        "errors": [],
+    }
+    record = Recorder(lab, receipt)
+    print("Isolated lab:", lab, flush=True)
+    artifacts = {name: kit / path for name, path in manifest["artifacts"].items()}
+    try:
+        control = lab / "controller"
+        record.run("controller-venv", [sys.executable, "-m", "venv", str(control)])
+        receipt["created_environments"].append(str(control))
+        cp = python_at(control)
+        record.run("controller-pip", [cp, "-m", "ensurepip", "--upgrade"])
+        record.run(
+            "controller-tools",
+            [
+                cp,
+                "-m",
+                "pip",
+                "--isolated",
+                "install",
+                "--no-cache-dir",
+                "--index-url",
+                "https://pypi.org/simple",
+                "--require-hashes",
+                "-r",
+                str(kit / "locks/controller.lock"),
+            ],
+        )
+        uv = str(control / "bin/uv")
+        sources = lab / "source"
+        core = extract(artifacts["core_sdist"], sources / "core")
+        benchmark = extract(artifacts["benchmark_sdist"], sources / "benchmark")
+        consumer = extract(artifacts["consumer_sdist"], sources / "consumer")
+        declared = lab / "declared-source-packages"
+        for project, name in ((core, "equiframe"), (benchmark, "equiframe-benchmark")):
+            target = declared / name
+            target.mkdir(parents=True)
+            for filename in ("pyproject.toml", "uv.lock", "README.md"):
+                shutil.copy2(project / filename, target / filename)
+            shutil.copytree(project / "src", target / "src")
+        record.environment["EQUIFRAME_TEST_SOURCE_PACKAGES"] = str(declared)
+        for minor, interpreter in (("3.10", args.python310), ("3.12", args.python312)):
+            cell = {
+                "minor": minor,
+                "status": "running",
+                "profiles": [],
+                "benchmark_profiles": [],
+                "errors": [],
+            }
+            receipt["python_cells"].append(cell)
+            try:
+                info = json.loads(
+                    record.run("python-" + minor, [interpreter, "-I", "-c", PROBE]).stdout
+                )
+                if (
+                    not info["python"].startswith(minor + ".")
+                    or info["machine"] != actual["machine"]
+                ):
+                    raise ValueError(
+                        "requested interpreter version/architecture differs from reality"
+                    )
+                cell["interpreter"] = info
+                for profile in PROFILES:
+                    for endpoint in ("minimum", "latest"):
+                        output = lab / f"py{minor}-{profile}-{endpoint}"
+                        try:
+                            record.run(
+                                "core-" + minor + "-" + profile + "-" + endpoint,
+                                [
+                                    cp,
+                                    str(core / "tools/verify_compatibility.py"),
+                                    "--wheel",
+                                    str(artifacts["core_wheel"]),
+                                    "--sdist",
+                                    str(artifacts["core_sdist"]),
+                                    "--python",
+                                    interpreter,
+                                    "--profile",
+                                    profile,
+                                    "--endpoint",
+                                    endpoint,
+                                    "--uv",
+                                    uv,
+                                    "--timeout",
+                                    "1800",
+                                    "--output",
+                                    str(output),
+                                ],
+                                timeout=3600,
+                            )
+                            matrix = json.loads((output / "matrix.json").read_text("utf-8"))
+                            if matrix["status"] != "passed":
+                                raise RuntimeError("core matrix cell did not pass")
+                        except Exception as error:
+                            cell["profiles"].append(
+                                {
+                                    "profile": profile,
+                                    "endpoint": endpoint,
+                                    "status": "failed",
+                                    "error": {
+                                        "type": type(error).__name__,
+                                        "message": str(error),
+                                    },
+                                }
+                            )
+                            cell["errors"].append(
+                                {
+                                    "profile": profile,
+                                    "endpoint": endpoint,
+                                    "message": str(error),
+                                }
+                            )
+                            record.save()
+                            continue
+                        inner = output / f"python-1-{profile}-{endpoint}"
+                        cell["profiles"].append(
+                            {
+                                "profile": profile,
+                                "endpoint": endpoint,
+                                "matrix": str((output / "matrix.json").relative_to(lab)),
+                                "matrix_sha256": sha(output / "matrix.json"),
+                                "status": "passed",
+                            }
+                        )
+                        env = inner / "venv"
+                        receipt["created_environments"].append(str(env))
+                        if profile == "all" and endpoint == "latest":
+                            all_python = python_at(env)
+                            record.run(
+                                "all-pip-" + minor,
+                                [all_python, "-m", "ensurepip", "--upgrade"],
+                            )
+                            record.run(
+                                "pip-upgrade-" + minor,
+                                [
+                                    all_python,
+                                    "-m",
+                                    "pip",
+                                    "--isolated",
+                                    "install",
+                                    "--no-cache-dir",
+                                    "--index-url",
+                                    "https://pypi.org/simple",
+                                    "pip==25.2",
+                                ],
+                            )
+                            record.run(
+                                "install-pair-consumer-" + minor,
+                                [
+                                    all_python,
+                                    "-m",
+                                    "pip",
+                                    "--isolated",
+                                    "install",
+                                    "--no-cache-dir",
+                                    "--index-url",
+                                    "https://pypi.org/simple",
+                                    "--report",
+                                    str(inner / "pair-install-report.json"),
+                                    "--constraint",
+                                    str(inner / "runtime.lock"),
+                                    str(artifacts["benchmark_wheel"]) + "[engines,ml,resources]",
+                                    str(artifacts["consumer_wheel"]),
+                                ],
+                            )
+                            record.run(
+                                "pair-pip-check-" + minor,
+                                [all_python, "-m", "pip", "check"],
+                            )
+                            record.run(
+                                "benchmark-suite-" + minor,
+                                [
+                                    all_python,
+                                    "-I",
+                                    "-m",
+                                    "pytest",
+                                    "-q",
+                                    str(benchmark / "tests"),
+                                    "--junitxml",
+                                    str(inner / "benchmark-junit.xml"),
+                                    "--basetemp",
+                                    str(inner / "benchmark-pytest"),
+                                ],
+                                timeout=1800,
+                            )
+                            record.run(
+                                "consumer-suite-" + minor,
+                                [
+                                    all_python,
+                                    "-I",
+                                    "-m",
+                                    "pytest",
+                                    "-q",
+                                    str(consumer / "tests"),
+                                    "--junitxml",
+                                    str(inner / "consumer-junit.xml"),
+                                    "--basetemp",
+                                    str(inner / "consumer-pytest"),
+                                ],
+                                timeout=1800,
+                            )
+                            for scenario, expected in (
+                                ("good", 0),
+                                ("different", 1),
+                                ("not_evaluable", 3),
+                                ("error", 2),
+                            ):
+                                target = inner / ("optimized-H-" + scenario)
+                                record.run(
+                                    "optimized-H-" + minor + "-" + scenario,
+                                    [
+                                        all_python,
+                                        "-I",
+                                        "-O",
+                                        "-m",
+                                        "equiframe.examples.journeys.h_portable_ci",
+                                        "--case",
+                                        scenario,
+                                        "--output",
+                                        str(target),
+                                    ],
+                                    expected=expected,
+                                    timeout=120,
+                                )
+                            record.run(
+                                "measure-bounded-" + minor,
+                                [
+                                    all_python,
+                                    "-I",
+                                    str(kit / "scripts/measure_maturity.py"),
+                                    "--output",
+                                    str(inner / "measurements"),
+                                    "--storage",
+                                    "disk",
+                                ],
+                                timeout=600,
+                            )
+                            record.run(
+                                "consumer-" + minor,
+                                [
+                                    all_python,
+                                    "-I",
+                                    "-m",
+                                    "equiframe_consumer_lab",
+                                    "run",
+                                    "--all",
+                                    "--data",
+                                    str(kit / "consumer-data"),
+                                    "--output",
+                                    str(inner / "consumer"),
+                                ],
+                                timeout=1800,
+                            )
+                            record.run(
+                                "consumer-recovery-" + minor,
+                                [
+                                    all_python,
+                                    "-I",
+                                    "-O",
+                                    "-m",
+                                    "equiframe_consumer_lab",
+                                    "fault-checks",
+                                    "--output",
+                                    str(inner / "consumer-faults"),
+                                ],
+                                timeout=120,
+                            )
+                            summary = json.loads(
+                                (inner / "consumer/summary.json").read_text("utf-8")
+                            )
+                            if summary["status"] != "PASS" or summary["distinct_cases"] != 72:
+                                raise RuntimeError("consumer did not execute all 72 required cases")
+                            cell["consumer"] = {
+                                "summary": str((inner / "consumer/summary.json").relative_to(lab)),
+                                "sha256": sha(inner / "consumer/summary.json"),
+                                "accepted": summary["accepted_cases"],
+                                "rejected": summary["rejected_cases"],
+                            }
+                            record.run(
+                                "pair-binding-" + minor,
+                                [
+                                    all_python,
+                                    "-I",
+                                    str(kit / "scripts/installed_pair_probe.py"),
+                                    "--core",
+                                    str(artifacts["core_wheel"]),
+                                    "--benchmark",
+                                    str(artifacts["benchmark_wheel"]),
+                                    "--consumer",
+                                    str(artifacts["consumer_wheel"]),
+                                    "--output",
+                                    str(inner / "pair-binding.json"),
+                                ],
+                            )
+                            # Rebuild each immutable sdist and compare every artifact byte.
+                            cell["sdist_rebuilds"] = {}
+                            for name in ("core", "benchmark", "consumer"):
+                                rebuild_source = extract(
+                                    artifacts[name + "_sdist"],
+                                    inner / (name + "-rebuild"),
+                                )
+                                record.run(
+                                    "sdist-build-" + name + "-" + minor,
+                                    [all_python, "-m", "build"],
+                                    cwd=rebuild_source,
+                                    timeout=600,
+                                )
+                                rebuilt = rebuild_source / "dist" / artifacts[name + "_wheel"].name
+                                if sha(rebuilt) != sha(artifacts[name + "_wheel"]):
+                                    raise RuntimeError(
+                                        name + " sdist did not reproduce the exact wheel"
+                                    )
+                                rebuilt_sdist = (
+                                    rebuild_source / "dist" / artifacts[name + "_sdist"].name
+                                )
+                                if sha(rebuilt_sdist) != sha(artifacts[name + "_sdist"]):
+                                    raise RuntimeError(
+                                        name + " sdist did not reproduce the exact sdist"
+                                    )
+                                cell["sdist_rebuilds"][name] = {
+                                    "wheel_sha256": sha(rebuilt),
+                                    "sdist_sha256": sha(rebuilt_sdist),
+                                }
+                            sdvenv = inner / "sdist-environment"
+                            record.run(
+                                "sdist-venv-" + minor,
+                                [interpreter, "-m", "venv", str(sdvenv)],
+                            )
+                            receipt["created_environments"].append(str(sdvenv))
+                            sp = python_at(sdvenv)
+                            record.run(
+                                "sdist-pip-" + minor,
+                                [sp, "-m", "ensurepip", "--upgrade"],
+                            )
+                            record.run(
+                                "sdist-pip-upgrade-" + minor,
+                                [
+                                    sp,
+                                    "-m",
+                                    "pip",
+                                    "--isolated",
+                                    "install",
+                                    "--no-cache-dir",
+                                    "--index-url",
+                                    "https://pypi.org/simple",
+                                    "pip==25.2",
+                                ],
+                            )
+                            record.run(
+                                "sdist-install-" + minor,
+                                [
+                                    sp,
+                                    "-m",
+                                    "pip",
+                                    "--isolated",
+                                    "install",
+                                    "--no-cache-dir",
+                                    "--index-url",
+                                    "https://pypi.org/simple",
+                                    "--report",
+                                    str(inner / "sdist-install-report.json"),
+                                    str(artifacts["core_sdist"]) + "[engines,ml]",
+                                    str(artifacts["benchmark_sdist"]) + "[resources]",
+                                    str(artifacts["consumer_sdist"]),
+                                ],
+                                timeout=1800,
+                            )
+                            record.run("sdist-pip-check-" + minor, [sp, "-m", "pip", "check"])
+                            record.run(
+                                "sdist-consumer-" + minor,
+                                [
+                                    sp,
+                                    "-I",
+                                    "-O",
+                                    "-m",
+                                    "equiframe_consumer_lab",
+                                    "fault-checks",
+                                    "--output",
+                                    str(inner / "sdist-consumer"),
+                                ],
+                                timeout=120,
+                            )
+                            record.run(
+                                "sdist-binding-" + minor,
+                                [
+                                    sp,
+                                    "-I",
+                                    str(kit / "scripts/installed_pair_probe.py"),
+                                    "--core",
+                                    str(artifacts["core_wheel"]),
+                                    "--benchmark",
+                                    str(artifacts["benchmark_wheel"]),
+                                    "--consumer",
+                                    str(artifacts["consumer_wheel"]),
+                                    "--output",
+                                    str(inner / "sdist-binding.json"),
+                                ],
+                            )
+                            cell["sdist_verified"] = True
+                            if not args.keep_successful_venvs:
+                                shutil.rmtree(sdvenv)
+                                receipt["removed_successful_environments"].append(str(sdvenv))
+                        if not args.keep_successful_venvs:
+                            shutil.rmtree(env)
+                            receipt["removed_successful_environments"].append(str(env))
+                        if not args.keep_successful_venvs:
+                            cache = output / "uv-cache"
+                            if cache.is_dir() and not cache.is_symlink():
+                                shutil.rmtree(cache)
+                                receipt.setdefault("removed_reconstructible_caches", []).append(
+                                    str(cache)
+                                )
+                        record.save()
+                for profile in ("base", "engines", "ml", "resources", "all"):
+                    for endpoint in ("minimum", "latest"):
+                        out = lab / f"benchmark-{minor}-{profile}-{endpoint}"
+                        item = {"profile": profile, "endpoint": endpoint, "status": "running"}
+                        cell["benchmark_profiles"].append(item)
+                        try:
+                            record.run(
+                                f"benchmark-profile-{minor}-{profile}-{endpoint}",
+                                [
+                                    cp,
+                                    str(kit / "scripts/check_benchmark_profile.py"),
+                                    "--python",
+                                    interpreter,
+                                    "--uv",
+                                    uv,
+                                    "--core",
+                                    str(artifacts["core_wheel"]),
+                                    "--benchmark",
+                                    str(artifacts["benchmark_wheel"]),
+                                    "--profile",
+                                    profile,
+                                    "--endpoint",
+                                    endpoint,
+                                    "--output",
+                                    str(out),
+                                ],
+                                timeout=1800,
+                            )
+                            checked = json.loads((out / "receipt.json").read_text("utf-8"))
+                            if checked.get("status") != "passed":
+                                raise RuntimeError("benchmark profile did not pass")
+                            item.update(
+                                status="passed",
+                                receipt=str((out / "receipt.json").relative_to(lab)),
+                                receipt_sha256=sha(out / "receipt.json"),
+                            )
+                            if not args.keep_successful_venvs:
+                                for name in ("venv", "uv-cache"):
+                                    target = out / name
+                                    if target.is_dir() and not target.is_symlink():
+                                        shutil.rmtree(target)
+                                        receipt.setdefault(
+                                            "removed_reconstructible_profile_directories", []
+                                        ).append(str(target))
+                        except Exception as error:
+                            item.update(
+                                status="failed",
+                                error={"type": type(error).__name__, "message": str(error)},
+                            )
+                            cell["errors"].append(item)
+                        record.save()
+                cell["status"] = (
+                    "passed"
+                    if not cell["errors"]
+                    and all(profile["status"] == "passed" for profile in cell["profiles"])
+                    and len(cell["profiles"]) == 16
+                    and cell.get("sdist_verified")
+                    and len(cell["benchmark_profiles"]) == 10
+                    and all(profile["status"] == "passed" for profile in cell["benchmark_profiles"])
+                    else "failed"
+                )
+            except Exception as error:
+                cell["status"] = "failed"
+                cell["errors"].append({"type": type(error).__name__, "message": str(error)})
+            record.save()
+        receipt["status"] = (
+            "passed"
+            if len(receipt["python_cells"]) == 2
+            and all(cell["status"] == "passed" for cell in receipt["python_cells"])
+            else "failed"
+        )
+    except Exception as error:
+        receipt["status"] = "failed"
+        receipt["errors"].append({"type": type(error).__name__, "message": str(error)})
+    finally:
+        receipt["finished_at"] = now()
+        receipt["final_disk_free_bytes"] = shutil.disk_usage(parent).free
+        record.save()
+        files = {}
+        for path in sorted(lab.rglob("*")):
+            if (
+                path.is_file()
+                and not path.is_symlink()
+                and not any(
+                    part
+                    in {
+                        "venv",
+                        "controller",
+                        "uv-cache",
+                        "temporary",
+                        "sdist-environment",
+                        "__pycache__",
+                    }
+                    for part in path.relative_to(lab).parts
+                )
+            ):
+                files[str(path.relative_to(lab))] = {
+                    "sha256": sha(path),
+                    "size_bytes": path.stat().st_size,
+                }
+        write(lab / "evidence-inventory.json", {"files": files, "unsigned": True})
+    print(
+        json.dumps(
+            {
+                "status": receipt["status"],
+                "lab": str(lab),
+                "cloud_validation_only": args.cloud_validation,
+            }
+        )
+    )
+    return 0 if receipt["status"] == "passed" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

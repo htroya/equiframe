@@ -1,3 +1,14 @@
+## 0.12.0a8 - Python compatibility maturity candidate (2026-10-08)
+
+- Target CPython 3.10-3.13 without discarding existing native extras or semantic gates
+- Replace post-3.10 syntax/std-library requirements with typed equivalents; preserve named aliases, historical formats and nanosecond/Decimal semantics
+- Resolve dependency branches by interpreter and propagate the chosen Python through validation tools
+- Produce Python-specific first-use closures; retain failed attempts and exact-byte distribution evidence
+- Keep the candidate private Alpha. VM/platform receipts, rights, governance, security coverage and actual independent acceptance remain explicit gates
+
+- Match quick and installed-consumer strict type checks to the actual Python; preserve complete type-check scope
+- Extend the historical installer to the declared minors and keep all GitHub workflows manual and unexecuted
+
 # Private A7 usability documentation revision — 2026-10-07
 
 - Add executable Spanish data-architect and data-scientist paths with explicit

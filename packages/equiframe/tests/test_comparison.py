@@ -310,7 +310,8 @@ def test_decimal_no_rounding_and_currency_preserved(tmp_path):
     a = pa.table(
         {"currency": ["USD"], "amount": pa.array([Decimal(huge)], type=pa.decimal256(76, 2))}
     )
-    with localcontext(prec=3):
+    with localcontext() as _test_decimal_context:
+        _test_decimal_context.prec = 3
         assert run(tmp_path, a, a, spec).state == "equivalent"
     b = pa.table(
         {"currency": ["EUR"], "amount": pa.array([Decimal(huge)], type=pa.decimal256(76, 2))}

@@ -30,13 +30,13 @@ Run the root helper tests without installing packages with
 
 ## Core checks
 
-From `packages/equiframe`, with Python 3.12 and `uv` available:
+From `packages/equiframe`, with a selected supported Python and `uv` available:
 
 ```bash
 uv sync --locked --all-extras --python 3.12
 uv run --locked --all-extras ruff check .
 uv run --locked --all-extras ruff format --check .
-uv run --locked --all-extras mypy
+uv run --locked --all-extras mypy --python-version 3.12
 uv run --locked --all-extras python tools/generate_assets.py --check
 uv run --locked --all-extras pytest -q
 uv run --locked --all-extras python -m build --no-isolation
@@ -48,6 +48,11 @@ For the benchmark, first build the matching core wheel, then use its package
 directory and `uv sync --locked --all-extras --reinstall-package equiframe` before
 the same check sequence. Installed tests run outside the checkout; a successful
 source test or editable import does not establish distribution correctness.
+
+The aggregate `check_candidate.py` driver accepts `--python` (default: the driver executable),
+propagates it to sync/run, and records the observed target interpreter separately.
+For example: `python3.10 tools/check_candidate.py --python python3.10 --output /absolute/new/checks.json`.
+Every attempt needs a new receipt path.
 
 The aggregate `check_candidate.py` driver and `release_manifest.py` require the
 Git checkout; isolated sdists can run package checks but cannot establish that
@@ -78,3 +83,10 @@ remain owner decisions. No PyPI publication before STEP10, global review and
 specific owner approval. See [security](packages/equiframe/docs/security.md),
 [dependency evidence](packages/equiframe/docs/dependencies.md) and
 [release/rollback](packages/equiframe/docs/releasing.md).
+
+Type-check each selected Python with its own resolved dependency/stub set and
+matching `mypy --python-version X.Y`. The aggregate driver observes that version
+after sync and supplies it automatically. The checked-in minimum target remains
+3.10 and strict mode remains enabled; no error codes or imports are suppressed.
+A 3.11+ stub package requiring newer typing syntax is not evidence about the
+3.10 dependency branch. Each branch must pass under its actual interpreter.

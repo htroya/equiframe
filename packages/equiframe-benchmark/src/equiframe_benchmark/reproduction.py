@@ -13,15 +13,18 @@ import stat
 import unicodedata
 from collections.abc import Callable, Mapping
 from pathlib import Path, PurePosixPath
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal, TypeVar
 from uuid import uuid4
 
 from equiframe import ArtifactRef
 from equiframe.errors import ArtifactIntegrityError, ResourceLimitError
 from equiframe.evidence import canonical_bytes, parse_json
 from pydantic import AfterValidator, Field, TypeAdapter, model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.models import Digest, Document, Text, digest
+
+_ModelT = TypeVar("_ModelT", bound=Document)
 
 _CHUNK = 1024 * 1024
 _MANIFEST = "bundle.json"
@@ -309,7 +312,7 @@ def _stream_file(path: Path, maximum: int, destination: Path | None = None) -> t
     return checksum.hexdigest(), count
 
 
-def _bounded_json[T: Document](model: type[T], path: Path, maximum: int) -> tuple[T, str]:
+def _bounded_json(model: type[_ModelT], path: Path, maximum: int) -> tuple[_ModelT, str]:
     path = _plain_path(path)
     expected = path.lstat()
     flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)

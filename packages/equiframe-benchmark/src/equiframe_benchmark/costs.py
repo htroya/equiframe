@@ -13,13 +13,14 @@ import platform
 import random
 import time
 from collections.abc import Callable
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from importlib import import_module
 from importlib.metadata import PackageNotFoundError, version
 from itertools import pairwise
 from pathlib import Path
 from threading import Event, Thread
-from typing import Annotated, Literal, Protocol, Self, cast
+from typing import Annotated, Literal, Protocol, cast
 from uuid import uuid4
 
 import equiframe as ef
@@ -28,9 +29,12 @@ from equiframe.evidence import inventory, verify_files
 from equiframe.local import local_path
 from equiframe.profile_types import profile_digest
 from pydantic import BeforeValidator, Field, model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.io import load_document, save_document
 from equiframe_benchmark.models import Digest, Document, Text, digest
+
+UTC = _timezone.utc
 
 Seconds = Annotated[float, Field(ge=0)]
 Bytes = Annotated[int, Field(ge=0)]

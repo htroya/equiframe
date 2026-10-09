@@ -10,9 +10,10 @@ orquestador actual conserva transporte, secretos, reintentos y cuotas. No hace
 falta desplegar otro servicio, usar el benchmark o conocer todos los modelos.
 
 Instala el wheel privado identificado con `[duckdb]` para este ejemplo; usa
-`[engines]` para las seis direcciones y el consumidor 0.1.9. Sigue la receta
+`[engines]` para las seis direcciones y el consumidor 0.1.10. Sigue la receta
 normal de pip y el ensayo separado con lock completo de [installed-private](installed-private.md).
-Python 3.12/3.13 están admitidos; los recibos de esta revisión son Linux x86_64.
+El candidato a8 declara Python 3.10–3.13. Usa el recibo real de tu minor y
+plataforma; el objetivo ARM64 no se acredita con un ensayo Linux x86_64.
 No uses el antiguo wheel 0.11.1 de la receta histórica ni un homónimo público.
 
 ## Python y SQL: evidencia antes de rechazar
@@ -126,7 +127,7 @@ Antes del commit, un fallo de validación/escritura conserva la versión anterio
 Después de cambiar el puntero, un fallo de escritura del recibo puede dejar los
 datos publicados y la aplicación incompleta: consulta el puntero/recibos,
 conserva el fallo y reconcilia el estado antes de reintentar. No declares rollback
-ni éxito por no haber llegado un recibo. El consumidor 0.1.9 documenta y conserva
+ni éxito por no haber llegado un recibo. El consumidor 0.1.10 documenta y conserva
 `committed_application_incomplete` cuando puede escribir ese diagnóstico.
 
 El diagnóstico minimizado no borra los datos de `private/`, capturas ni bundles.

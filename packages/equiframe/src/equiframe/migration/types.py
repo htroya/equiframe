@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Any, Literal, Self, cast
+from typing import Annotated, Any, Literal, cast
 
 from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
+from typing_extensions import Self
 
 from equiframe._base import FrozenModel, Identifier, Text, _ExplicitOutcome
 from equiframe.contracts import DecimalType, LogicalType

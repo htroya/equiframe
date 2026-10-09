@@ -477,7 +477,7 @@ def installed_identity(
         "artifact": artifact,
         "module_file": str(location),
         "site_packages": str(purelib),
-        "requires_python": metadata.get("Requires-Python"),
+        "requires_python": next(iter(metadata.get_all("Requires-Python", [])), None),
         "requires_dist": metadata.get_all("Requires-Dist", []),
         "extras": metadata.get_all("Provides-Extra", []),
         "entry_points": [

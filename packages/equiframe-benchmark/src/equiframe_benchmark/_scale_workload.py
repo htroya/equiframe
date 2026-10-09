@@ -9,7 +9,7 @@ import sys
 import time
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, TypeVar
 
 import equiframe as ef
 from equiframe.evidence import describe_file, inventory, load_json, publish_json, verify_files
@@ -24,6 +24,8 @@ from equiframe_benchmark.scale_types import (
     ScaleWorkerCompletion,
     StageCost,
 )
+
+_T = TypeVar("_T")
 
 
 def make_contract(spec: ScaleSpec) -> ef.Contract:
@@ -235,7 +237,7 @@ def run_trial(spec: ScaleSpec, directory: Path, repetition: int) -> ScaleTrial:
     monitor.start()
     start = time.perf_counter()
 
-    def measured[T](name: str, scope: str, action: Callable[[], T]) -> T:
+    def measured(name: str, scope: str, action: Callable[[], _T]) -> _T:
         began = time.perf_counter()
         value = action()
         stages.append(StageCost(name=name, wall_seconds=time.perf_counter() - began, scope=scope))

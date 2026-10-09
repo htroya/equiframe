@@ -31,11 +31,17 @@ from equiframe.cli import app
 def test_decimal_context_cannot_change_canonical_bytes_or_hash(
     precision: int, capitals: int, clamp: bool
 ) -> None:
-    with localcontext(capitals=1):
+    with localcontext() as _test_decimal_context:
+        _test_decimal_context.capitals = 1
         contract = read_contract(EXAMPLES / "aggregations.json")
         expected = canonical_contract_bytes(contract)
         fingerprint = contract_fingerprint(contract)
-    with localcontext(prec=precision, capitals=capitals, clamp=int(clamp), Emin=-9, Emax=9) as ctx:
+    with localcontext() as ctx:
+        ctx.prec = precision
+        ctx.capitals = capitals
+        ctx.clamp = int(clamp)
+        ctx.Emin = -9
+        ctx.Emax = 9
         previous_flags = dict(ctx.flags)
         assert canonical_contract_bytes(contract) == expected
         assert contract_fingerprint(validate_contract(expected)) == fingerprint

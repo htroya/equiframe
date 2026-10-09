@@ -862,3 +862,39 @@ def test_installed_examples_are_part_of_exact_runtime_binding(
         package, [str(python)], tmp_path / "stale-example"
     )
     assert stale["verified"] is False
+
+
+@pytest.mark.parametrize("minor", ["3.10", "3.11", "3.12", "3.13"])
+def test_strict_type_gate_can_identify_the_tested_python_minor(package, minor):
+    assert (
+        MODULE["check_stage"](
+            [
+                "uv",
+                "run",
+                "--locked",
+                "--all-extras",
+                "--python",
+                minor,
+                "mypy",
+                "--python-version",
+                minor,
+            ],
+            package,
+            (),
+        )
+        == "mypy"
+    )
+    assert MODULE["check_stage"](["mypy", "--python-version", minor, "src"], package, ()) is None
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    [
+        ["--python-version", "3.9"],
+        ["--python-version", "3.14"],
+        ["--python-version", "3.10", "--python-version", "3.11"],
+        ["--python-version"],
+    ],
+)
+def test_type_gate_rejects_unknown_or_conflicting_python_targets(package, arguments):
+    assert MODULE["check_stage"](["mypy", *arguments], package, ()) is None

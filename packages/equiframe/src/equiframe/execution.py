@@ -8,7 +8,8 @@ import time
 from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from threading import Event
@@ -43,6 +44,8 @@ from equiframe.serialization import contract_fingerprint
 from equiframe.tables import LoadedTable, capture_artifact, require_dependency
 from equiframe.types import ExecutionState
 from equiframe.values import InfinityValue, NaNValue, NullValue, StringValue
+
+UTC = _timezone.utc
 
 if TYPE_CHECKING:
     import pyarrow as pa

@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "equiframe"
-version = "0.12.0a7"
+version = "0.12.0a8"
 description = "Operational verification, native ETL migration and portable semantic evidence"
 readme = "README.md"
-requires-python = ">=3.12,<3.14"
+requires-python = ">=3.10,<3.14"
 authors = [{ name = "Hernán Troya" }]
-classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3.12", "Programming Language :: Python :: 3.13", "Typing :: Typed"]
-dependencies = ["pydantic>=2.12,<3", "typer>=0.20,<1", "tzdata>=2025.2"]
+classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11", "Programming Language :: Python :: 3.12", "Programming Language :: Python :: 3.13", "Typing :: Typed"]
+dependencies = ["typing-extensions>=4.14,<5", "pydantic>=2.12,<3", "typer>=0.20,<1", "tzdata>=2025.2"]
 
 [project.urls]
 Repository = "https://github.com/htroya/equiframe"
@@ -30,6 +30,7 @@ equiframe = "equiframe.cli:main"
 [dependency-groups]
 dev = [
   "build>=1.3,<2",
+  "tomli>=2.2,<3; python_version < '3.11'",
   "hatchling==1.28.0",
   "hypothesis>=6.140,<7",
   "jsonschema>=4.25,<5",
@@ -71,7 +72,7 @@ include = ["/docs", "/src", "/tests", "/examples", "/schemas", "/tools", "/pypro
 "tests/fixtures/versioned" = "tests/fixtures/versioned"
 
 [tool.ruff]
-target-version = "py312"
+target-version = "py310"
 line-length = 100
 
 [tool.ruff.lint]
@@ -81,7 +82,7 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 extend-immutable-calls = ["typer.Option"]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.10"
 strict = true
 files = ["src", "tools"]
 

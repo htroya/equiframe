@@ -1,3 +1,12 @@
+## 0.12.0a8 - Python compatibility maturity candidate (2026-10-08)
+
+- Target CPython 3.10-3.13 without discarding existing native extras or semantic gates
+- Replace post-3.10 syntax/std-library requirements with typed equivalents; preserve named aliases, historical formats and nanosecond/Decimal semantics
+- Resolve dependency branches by interpreter and propagate the chosen Python through validation tools
+- Preserve the paired native pilot, resource supervisor and benchmark public profiles across the selected interpreters
+- Keep the candidate private Alpha. VM/platform receipts, rights, governance, security coverage and actual independent acceptance remain explicit gates
+
+
 # Private benchmark alpha 0.12.0a7 — 2026-10-07
 
 - Require exactly `equiframe[arrow]==0.12.0a7` and matching engine/ML extras

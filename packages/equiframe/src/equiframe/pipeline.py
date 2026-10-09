@@ -3,10 +3,11 @@
 import platform
 import time
 from collections.abc import Callable
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-from typing import cast
+from typing import TypeVar, cast
 from uuid import uuid4
 
 from pydantic import BaseModel
@@ -33,6 +34,10 @@ from equiframe.registry import TransformationRegistry
 from equiframe.reporting import pipeline_summary, render_report
 from equiframe.rules import RuleRegistry, evaluate_rules
 
+UTC = _timezone.utc
+_ModelT = TypeVar("_ModelT", bound=BaseModel)
+_T = TypeVar("_T")
+
 
 def _environment() -> dict[str, object]:
     packages: dict[str, str] = {}
@@ -57,19 +62,19 @@ class _Stages:
         self.cancellation = cancellation
         self.records: list[StageRecord] = []
 
-    def run[T: BaseModel](
+    def run(
         self,
         name: StageName,
-        action: Callable[[], T],
-        complete: Callable[[T], bool],
+        action: Callable[[], _ModelT],
+        complete: Callable[[_ModelT], bool],
         *,
         skip: str | None = None,
         always: bool = False,
-    ) -> T | None:
+    ) -> _ModelT | None:
         if self.cancellation.cancelled and not always:
             skip = "cancelled"
         start = time.perf_counter()
-        result: T | None = None
+        result: _ModelT | None = None
         if skip:
             record = StageRecord(stage=name, state="skipped", code=skip, elapsed_seconds=0.0)
         else:
@@ -259,7 +264,7 @@ def run_pipeline(
     return result
 
 
-def _present[T](value: T | None) -> T:
+def _present(value: _T | None) -> _T:
     if value is None:
         raise ValueError("required component unavailable")
     return value

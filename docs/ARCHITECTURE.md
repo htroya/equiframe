@@ -1,5 +1,7 @@
 # Arquitectura de EquiFrame
 
+Nota de candidato de madurez 2026-10-08: a8 amplía la admisión objetivo a Python 3.10-3.13; consulte [el plan M01-M16](MATURITY_PLAN.md). Las secciones y recibos históricos siguientes conservan su candidato y no acreditan pruebas nuevas.
+
 Estado actual: candidatos núcleo `0.12.0a7` y benchmark `0.12.0a7`, sobre pasos 1–10 técnicos y migrador, con Verify operacional y ETL local. Las revisiones actuales contribuyen a 11–13 y la preparación de distribución sin cerrar sus criterios externos. La aceptación del servicio/DW real, el corpus, las revisiones independientes y la evaluación científica siguen pendientes. Fuente histórica del diseño: borrador identificado en [trazabilidad](THESIS_TRACEABILITY.md). La [arquitectura del paso 8](STEP_08_DESIGN.md), el [paso 9](STEP_09_DESIGN.md), la [evaluación del paso 10](STEP_10_EVALUATION.md) y el [diseño del migrador](MIGRATION_DESIGN.md) conservan sus decisiones y evidencias. Las secciones fechadas por versiones anteriores describen esa evolución; no sustituyen este estado actual.
 
 ## 1. Propósito y alcance

@@ -158,8 +158,14 @@ def _expression(expression: Expression, frame: pd.DataFrame, columns: Any) -> pd
         if expression.ambiguous == "reject":
             localized = naive_values.dt.tz_localize(zone, ambiguous="raise", nonexistent="raise")
         else:
-            first = naive_values.dt.tz_localize(zone, ambiguous=True, nonexistent="raise")
-            second = naive_values.dt.tz_localize(zone, ambiguous=False, nonexistent="raise")
+            import numpy as np
+
+            first = naive_values.dt.tz_localize(
+                zone, ambiguous=np.ones(len(naive_values), dtype=bool), nonexistent="raise"
+            )
+            second = naive_values.dt.tz_localize(
+                zone, ambiguous=np.zeros(len(naive_values), dtype=bool), nonexistent="raise"
+            )
             choose_first = (
                 first.le(second) if expression.ambiguous == "earlier" else first.ge(second)
             )
@@ -233,7 +239,10 @@ def _checked_series(series: pd.Series[Any], column: IRColumn) -> pd.Series[Any]:
     if not column.nullable and series.isna().any():
         raise CapabilityError("IR output contains forbidden NULL: " + column.name)
     if series.dtype != _dtype(dtype):
-        return pd.Series(pd.array(series, dtype=_dtype(dtype)), index=series.index)
+        converted = pd.Series(series, dtype=_dtype(dtype), index=series.index, copy=True)
+        if not isinstance(converted, pd.Series):
+            raise CapabilityError("Pandas numeric conversion did not return a Series")
+        return converted
     return series
 
 
@@ -295,7 +304,12 @@ def _aggregate(frame: pd.DataFrame, node: Aggregate, validated: ValidatedIR) -> 
                         zero: int | Decimal = 0
                         if isinstance(measure.logical_type, DecimalType):
                             zero = Decimal(0).quantize(Decimal(10) ** -measure.logical_type.scale)
-                        value = value.mask(count == 0, None if node.empty_sum == "null" else zero)
+                        replacement = pd.Series(
+                            [None if node.empty_sum == "null" else zero] * len(value),
+                            index=value.index,
+                            dtype=object,
+                        )
+                        value = value.mask(count == 0, replacement)
                     else:
                         value = (
                             getattr(grouping, measure.operation)()

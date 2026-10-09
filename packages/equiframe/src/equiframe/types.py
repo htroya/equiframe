@@ -1,10 +1,11 @@
 """Public states and minimal immutable artifact metadata (no execution results yet)."""
 
 import re
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 from urllib.parse import urlsplit
 
 from pydantic import Field, model_validator
+from typing_extensions import Self
 
 from equiframe._base import FrozenModel, Identifier, NonNegativeInt, PositiveInt, Text, fail
 

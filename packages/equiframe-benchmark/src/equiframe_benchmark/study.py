@@ -1,15 +1,17 @@
 """Run frozen held-out cases without fitting, fabricating labels or dropping failures."""
 
-from datetime import UTC, datetime
+from datetime import datetime
+from datetime import timezone as _timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Literal, Self, cast
+from typing import Literal, cast
 from uuid import uuid4
 
 import equiframe as ef
 from equiframe.evidence import inventory, verify_files
 from equiframe.local import local_path
 from pydantic import model_validator
+from typing_extensions import Self
 
 from equiframe_benchmark.evaluation import (
     Engine,
@@ -29,6 +31,8 @@ from equiframe_benchmark.io import load_document, save_document
 from equiframe_benchmark.models import Digest, Document, Scenario, Text, digest, same_content
 from equiframe_benchmark.reproduction import _bounded_json, _stream_file
 from equiframe_benchmark.tables import TableExport, read_tables, write_tables
+
+UTC = _timezone.utc
 
 
 class StudyCaseResult(Document):

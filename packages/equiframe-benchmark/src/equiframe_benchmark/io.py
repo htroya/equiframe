@@ -2,10 +2,13 @@
 
 import json
 from pathlib import Path
+from typing import TypeVar
 
 from equiframe._documents import save_document as save_document
 
 from equiframe_benchmark.models import Document
+
+_ModelT = TypeVar("_ModelT", bound=Document)
 
 
 def _pairs(pairs: list[tuple[str, object]]) -> dict[str, object]:
@@ -17,7 +20,7 @@ def _pairs(pairs: list[tuple[str, object]]) -> dict[str, object]:
     return result
 
 
-def load_document[T: Document](model: type[T], path: Path) -> T:
+def load_document(model: type[_ModelT], path: Path) -> _ModelT:
     data = path.read_bytes()
     json.loads(data, object_pairs_hook=_pairs, parse_constant=_constant)
     return model.model_validate_json(data)
