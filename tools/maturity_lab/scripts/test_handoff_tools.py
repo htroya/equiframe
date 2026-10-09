@@ -9,9 +9,11 @@ import tempfile
 import unittest
 import zipfile
 from pathlib import Path
+from unittest.mock import patch
 
 from check_benchmark_profile import requirements
-from run_vm_lab import Recorder, sha, verify_kit
+from measure_maturity import observed_filesystem
+from run_vm_lab import Recorder, sha, verify_kit, write_runtime_constraints
 from validate_vm_receipts import Review, member
 
 
@@ -209,6 +211,146 @@ class HandoffToolsTests(unittest.TestCase):
         }
         with self.assertRaisesRegex(ValueError, "another candidate"):
             review.validate()
+
+    def test_runtime_constraints_keep_pins_without_implicit_hash_mode(self):
+        path = self.root / "constraints.txt"
+        write_runtime_constraints(path, {"typing-extensions": "4.15.0", "numpy": "2.2.6"})
+        self.assertEqual(path.read_text(), "numpy==2.2.6\ntyping-extensions==4.15.0\n")
+        self.assertNotIn("--hash", path.read_text())
+
+    def test_runtime_constraints_reject_non_version_input(self):
+        with self.assertRaises(ValueError):
+            write_runtime_constraints(self.root / "constraints", {"numpy": "2.2.6\nother==1"})
+
+    def test_runtime_constraints_reject_empty_resolution(self):
+        with self.assertRaises(ValueError):
+            write_runtime_constraints(self.root / "constraints", {})
+
+    def test_measurement_uses_deepest_observed_mount(self):
+        mounts = "1 0 0:1 / / rw - overlay overlay rw\n2 1 0:2 / /tmp rw - tmpfs tmpfs rw\n"
+        with patch.object(Path, "read_text", return_value=mounts):
+            self.assertEqual(observed_filesystem(Path("/tmp/measurement")), "tmpfs")
+            self.assertEqual(observed_filesystem(Path("/workspace/measurement")), "overlay")
+
+    def test_measurement_decodes_mount_path_escapes(self):
+        mounts = (
+            "1 0 0:1 / / rw - overlay overlay rw\n2 1 0:2 / /test\\040path rw - tmpfs tmpfs rw\n"
+        )
+        with patch.object(Path, "read_text", return_value=mounts):
+            self.assertEqual(observed_filesystem(Path("/test path/measurement")), "tmpfs")
+
+    def test_unknown_measurement_mount_fails_closed(self):
+        with (
+            patch.object(Path, "read_text", return_value="unusable mount line\n"),
+            self.assertRaisesRegex(RuntimeError, "not found"),
+        ):
+            observed_filesystem(self.root)
+
+    def test_unreadable_measurement_mount_fails_closed(self):
+        with (
+            patch.object(Path, "read_text", side_effect=PermissionError("synthetic denial")),
+            self.assertRaisesRegex(RuntimeError, "Cannot observe"),
+        ):
+            observed_filesystem(self.root)
+
+    def synthetic_consumer_case(self):
+        # Deliberately fabricated UNIT DATA; never a VM execution receipt.
+        return {
+            "synthetic_unit_fixture": True,
+            "program": "reconciliation",
+            "variant": "good",
+            "direction": "pandas->duckdb",
+            "observed_exit_code": 0,
+            "expected_exit_code": 0,
+            "status": "PASS",
+            "accepted": True,
+            "published": True,
+            "evidence_integrity_verified": True,
+            "portable_verified_without_native_origin": True,
+            "frozen_data_unchanged": True,
+            "native_execution_count_complete": True,
+            "dataset_manifest_sha256": "a" * 64,
+            "native_result": {"executions": [{"engine": "pandas"}, {"engine": "duckdb"}]},
+            "environment": {
+                "python": "3.10.0 synthetic fixture",
+                "machine": "aarch64",
+                "isolated": 1,
+                "optimized": 1,
+            },
+        }
+
+    def case_review(self, case):
+        self.file("case.json", json.dumps(case))
+        review = self.review()
+        review.candidate = {"files": {"consumer-data/manifest.json": {"sha256": "a" * 64}}}
+        return review
+
+    def test_synthetic_case_validator_checks_positive_structure_only(self):
+        review = self.case_review(self.synthetic_consumer_case())
+        review.consumer_case(
+            "case.json", "3.10", "reconciliation", "good", "pandas", "duckdb", optimized=True
+        )
+
+    def test_consumer_unknown_native_count_cannot_pass(self):
+        case = self.synthetic_consumer_case()
+        case["native_execution_count_complete"] = False
+        with self.assertRaisesRegex(ValueError, "coverage missing"):
+            self.case_review(case).consumer_case(
+                "case.json", "3.10", "reconciliation", "good", "pandas", "duckdb"
+            )
+
+    def test_consumer_peer_is_not_an_independent_second_engine(self):
+        case = self.synthetic_consumer_case()
+        case["native_result"]["executions"] = [{"engine": "pandas"}, {"engine": "pandas"}]
+        with self.assertRaisesRegex(ValueError, "independent native"):
+            self.case_review(case).consumer_case(
+                "case.json", "3.10", "reconciliation", "good", "pandas", "duckdb"
+            )
+
+    def test_consumer_different_dataset_cannot_pass(self):
+        case = self.synthetic_consumer_case()
+        case["dataset_manifest_sha256"] = "b" * 64
+        with self.assertRaisesRegex(ValueError, "different frozen dataset"):
+            self.case_review(case).consumer_case(
+                "case.json", "3.10", "reconciliation", "good", "pandas", "duckdb"
+            )
+
+    def test_consumer_optimized_flag_must_be_observed(self):
+        case = self.synthetic_consumer_case()
+        case["environment"]["optimized"] = 0
+        with self.assertRaisesRegex(ValueError, "optimized"):
+            self.case_review(case).consumer_case(
+                "case.json", "3.10", "reconciliation", "good", "pandas", "duckdb", optimized=True
+            )
+
+    def test_consumer_expected_rejections_remain_rejections(self):
+        for variant, expected in (("defect", 1), ("not_evaluable", 3)):
+            with self.subTest(variant=variant):
+                case = self.synthetic_consumer_case()
+                case.update(
+                    variant=variant,
+                    observed_exit_code=expected,
+                    expected_exit_code=expected,
+                    status="EXPECTED_REJECTION",
+                    accepted=False,
+                    published=False,
+                )
+                self.case_review(case).consumer_case(
+                    "case.json", "3.10", "reconciliation", variant, "pandas", "duckdb"
+                )
+                case["published"] = True
+                with self.assertRaisesRegex(ValueError, "acceptance/publication"):
+                    self.case_review(case).consumer_case(
+                        "case.json", "3.10", "reconciliation", variant, "pandas", "duckdb"
+                    )
+
+    def test_consumer_x64_cannot_establish_arm64_pass(self):
+        case = self.synthetic_consumer_case()
+        case["environment"]["machine"] = "x86_64"
+        with self.assertRaisesRegex(ValueError, "Python/platform/isolation"):
+            self.case_review(case).consumer_case(
+                "case.json", "3.10", "reconciliation", "good", "pandas", "duckdb"
+            )
 
 
 if __name__ == "__main__":

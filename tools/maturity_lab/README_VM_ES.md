@@ -102,3 +102,23 @@ Los locks de controlador provienen de PyPI con hashes de los wheels aptos.
 Cada celda resuelve además su propio runtime y conserva ese lock con hashes,
 inventario instalado y payload de los wheels. Los pins x64 entregados como
 referencia no deben confundirse con una instalación ARM64 ejecutada.
+
+## Edición revisada de herramientas
+
+La entrega standalone revisada conserva exactamente los seis artefactos de c4.
+`candidate.json` distingue `source` (fuente de esos artefactos) de
+`tooling_source` (commit de scripts/documentación revisados) y registra el
+manifiesto predecesor. La evidencia nueva debe vincular el SHA-256 del
+`candidate.json` de este kit revisado. No sobrescribir scripts ni manifestar
+que un recibo antiguo corrió contra esta revisión del arnés.
+
+El benchmark c4 aún no contiene el parche de declaración directa del backport;
+el parche se entrega solo para revisión. Su reconstrucción y nuevo lock siguen
+pendientes. Ejecutar este kit no elimina esa brecha de metadatos.
+
+El runner conserva pins exactos del runtime al instalar la pareja y al consumir
+sdists. Comprueba tres resultados consumidores nativos desde sdist bajo -O;
+conserva la guardia de 4 GiB. Una medición incompleta queda fallida/parcial y no
+se convierte en aceptación, aunque continúen los controles independientes.
+El validador coteja los 72 casos individuales del consumidor, sus logs y
+resultados nativos, no solo los totales declarados en el resumen.

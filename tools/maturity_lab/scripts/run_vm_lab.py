@@ -13,6 +13,7 @@ import hashlib
 import json
 import os
 import platform
+import re
 import resource
 import shutil
 import signal
@@ -86,6 +87,22 @@ def verify_kit(kit: Path) -> dict:
     if not manifest.get("source"):
         raise ValueError("candidate source identity is required")
     return manifest
+
+
+def write_runtime_constraints(path: Path, versions: dict) -> None:
+    """Use exact solved runtime pins without implicitly enabling pip hash mode."""
+    if not versions or any(
+        not isinstance(name, str)
+        or not isinstance(version, str)
+        or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", name) is None
+        or re.fullmatch(r"[0-9][A-Za-z0-9.!+_-]*", version) is None
+        for name, version in versions.items()
+    ):
+        raise ValueError("runtime constraints must be exact registry name/version pairs")
+    path.write_text(
+        "\n".join(f"{name}=={version}" for name, version in sorted(versions.items())) + "\n",
+        encoding="utf-8",
+    )
 
 
 class Recorder:
@@ -442,6 +459,10 @@ def main() -> int:
                         receipt["created_environments"].append(str(env))
                         if profile == "all" and endpoint == "latest":
                             all_python = python_at(env)
+                            solved_core = json.loads((inner / "receipt.json").read_text("utf-8"))
+                            constraints = inner / "pair-constraints.txt"
+                            write_runtime_constraints(constraints, solved_core["runtime_versions"])
+                            cell["paired_runtime_constraints_sha256"] = sha(constraints)
                             record.run(
                                 "all-pip-" + minor,
                                 [all_python, "-m", "ensurepip", "--upgrade"],
@@ -474,7 +495,7 @@ def main() -> int:
                                     "--report",
                                     str(inner / "pair-install-report.json"),
                                     "--constraint",
-                                    str(inner / "runtime.lock"),
+                                    str(constraints),
                                     str(artifacts["benchmark_wheel"]) + "[engines,ml,resources]",
                                     str(artifacts["consumer_wheel"]),
                                 ],
@@ -538,19 +559,29 @@ def main() -> int:
                                     expected=expected,
                                     timeout=120,
                                 )
-                            record.run(
-                                "measure-bounded-" + minor,
-                                [
-                                    all_python,
-                                    "-I",
-                                    str(kit / "scripts/measure_maturity.py"),
-                                    "--output",
-                                    str(inner / "measurements"),
-                                    "--storage",
-                                    "disk",
-                                ],
-                                timeout=600,
-                            )
+                            try:
+                                record.run(
+                                    "measure-bounded-" + minor,
+                                    [
+                                        all_python,
+                                        "-I",
+                                        str(kit / "scripts/measure_maturity.py"),
+                                        "--output",
+                                        str(inner / "measurements"),
+                                        "--storage",
+                                        "disk",
+                                    ],
+                                    timeout=600,
+                                )
+                            except (RuntimeError, OSError, subprocess.TimeoutExpired) as error:
+                                cell["errors"].append(
+                                    {
+                                        "stage": "bounded-measurements",
+                                        "type": type(error).__name__,
+                                        "message": str(error),
+                                    }
+                                )
+                                record.save()
                             record.run(
                                 "consumer-" + minor,
                                 [
@@ -675,6 +706,8 @@ def main() -> int:
                                     "https://pypi.org/simple",
                                     "--report",
                                     str(inner / "sdist-install-report.json"),
+                                    "--constraint",
+                                    str(constraints),
                                     str(artifacts["core_sdist"]) + "[engines,ml]",
                                     str(artifacts["benchmark_sdist"]) + "[resources]",
                                     str(artifacts["consumer_sdist"]),
@@ -696,6 +729,59 @@ def main() -> int:
                                 ],
                                 timeout=120,
                             )
+                            # This direct sdist journey is additional to the 72-case wheel run.
+                            # Keep the same consumer disk reserve; never use it to bypass run_all.
+                            if shutil.disk_usage(inner).free < 4 * 1024**3:
+                                raise RuntimeError(
+                                    "Less than 4 GiB free before the sdist consumer journey"
+                                )
+                            cell["sdist_consumer_cases"] = []
+                            for variant, expected in (
+                                ("good", 0),
+                                ("defect", 1),
+                                ("not_evaluable", 3),
+                            ):
+                                destination = inner / ("sdist-native-" + variant)
+                                record.run(
+                                    "sdist-native-" + minor + "-" + variant,
+                                    [
+                                        sp,
+                                        "-I",
+                                        "-O",
+                                        "-m",
+                                        "equiframe_consumer_lab",
+                                        "run",
+                                        "--program",
+                                        "reconciliation",
+                                        "--variant",
+                                        variant,
+                                        "--source",
+                                        "pandas",
+                                        "--target",
+                                        "duckdb",
+                                        "--data",
+                                        str(kit / "consumer-data"),
+                                        "--output",
+                                        str(destination),
+                                    ],
+                                    expected=expected,
+                                    timeout=300,
+                                )
+                                case_file = destination / "case.json"
+                                case = json.loads(case_file.read_text("utf-8"))
+                                if (
+                                    case.get("observed_exit_code") != expected
+                                    or case.get("accepted") is not (variant == "good")
+                                    or case.get("published") is not (variant == "good")
+                                ):
+                                    raise RuntimeError("sdist native consumer outcome differs")
+                                cell["sdist_consumer_cases"].append(
+                                    {
+                                        "variant": variant,
+                                        "receipt": str(case_file.relative_to(lab)),
+                                        "sha256": sha(case_file),
+                                    }
+                                )
                             record.run(
                                 "sdist-binding-" + minor,
                                 [
@@ -727,6 +813,10 @@ def main() -> int:
                                     str(cache)
                                 )
                         record.save()
+            except Exception as error:
+                cell["status"] = "failed"
+                cell["errors"].append({"type": type(error).__name__, "message": str(error)})
+            if "interpreter" in cell:
                 for profile in ("base", "engines", "ml", "resources", "all"):
                     for endpoint in ("minimum", "latest"):
                         out = lab / f"benchmark-{minor}-{profile}-{endpoint}"
@@ -788,9 +878,6 @@ def main() -> int:
                     and all(profile["status"] == "passed" for profile in cell["benchmark_profiles"])
                     else "failed"
                 )
-            except Exception as error:
-                cell["status"] = "failed"
-                cell["errors"].append({"type": type(error).__name__, "message": str(error)})
             record.save()
         receipt["status"] = (
             "passed"

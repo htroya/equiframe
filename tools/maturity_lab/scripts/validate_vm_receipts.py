@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import itertools
 import json
 import re
 import xml.etree.ElementTree as ET
@@ -308,6 +309,57 @@ class Review:
             }:
                 raise ValueError("benchmark profile payload differs")
 
+    def consumer_case(
+        self,
+        path: str,
+        minor: str,
+        program: str,
+        variant: str,
+        source: str,
+        target: str,
+        *,
+        optimized: bool = False,
+    ) -> dict:
+        case = self.json(path)
+        expected = {"good": 0, "defect": 1, "not_evaluable": 3}[variant]
+        if (
+            case.get("program"),
+            case.get("variant"),
+            case.get("direction"),
+            case.get("observed_exit_code"),
+            case.get("expected_exit_code"),
+        ) != (program, variant, source + "->" + target, expected, expected):
+            raise ValueError("consumer case identity or independent expected exit differs")
+        if case.get("status") != ("PASS" if variant == "good" else "EXPECTED_REJECTION"):
+            raise ValueError("consumer case did not observe the required verdict")
+        if case.get("accepted") is not (variant == "good") or case.get("published") is not (
+            variant == "good"
+        ):
+            raise ValueError("consumer acceptance/publication differs from independent expectation")
+        if (
+            case.get("evidence_integrity_verified") is not True
+            or case.get("portable_verified_without_native_origin") is not True
+            or case.get("frozen_data_unchanged") is not True
+            or case.get("native_execution_count_complete") is not True
+        ):
+            raise ValueError("consumer integrity, portability or native coverage missing")
+        expected_data = self.candidate["files"]["consumer-data/manifest.json"]["sha256"]
+        if case.get("dataset_manifest_sha256") != expected_data:
+            raise ValueError("consumer used a different frozen dataset")
+        executions = case["native_result"]["executions"]
+        if len(executions) != 2 or {item["engine"] for item in executions} != {source, target}:
+            raise ValueError("consumer must retain both independent native executions")
+        env = case["environment"]
+        if (
+            not env["python"].startswith(minor + ".")
+            or env["machine"] != "aarch64"
+            or env["isolated"] != 1
+        ):
+            raise ValueError("consumer execution has the wrong Python/platform/isolation")
+        if optimized and env.get("optimized") != 1:
+            raise ValueError("required optimized consumer execution was not observed")
+        return case
+
     def validate(self) -> dict:
         receipt, candidate = self.receipt, self.candidate
         if receipt.get("schema") != "equiframe-maturity-vm-execution-1":
@@ -366,6 +418,10 @@ class Review:
                 for case in ("good", "different", "not_evaluable", "error")
             )
             required.update(
+                "sdist-native-" + minor + "-" + variant
+                for variant in ("good", "defect", "not_evaluable")
+            )
+            required.update(
                 "sdist-build-" + name + "-" + minor for name in ("core", "benchmark", "consumer")
             )
         self.commands(receipt["commands"], required)
@@ -373,6 +429,10 @@ class Review:
         for command in receipt["commands"]:
             if command["label"].startswith("optimized-H-"):
                 expected = outcomes[command["label"].split("-", 3)[-1]]
+            elif command["label"].startswith("sdist-native-"):
+                expected = {"good": 0, "defect": 1, "not_evaluable": 3}[
+                    command["label"].split("-", 3)[-1]
+                ]
             else:
                 expected = 0
             if command["expected_exit"] != expected:
@@ -414,8 +474,48 @@ class Review:
             root = f"py{minor}-all-latest/python-1-all-latest"
             self.junit(root + "/benchmark-junit.xml", candidate["suite_minimums"]["benchmark"])
             self.junit(root + "/consumer-junit.xml", candidate["suite_minimums"]["consumer"])
+            constraints = self.file(
+                root + "/pair-constraints.txt", cell["paired_runtime_constraints_sha256"]
+            )
+            core_cell = self.json(root + "/receipt.json")
+            expected_pins = (
+                "\n".join(
+                    f"{name}=={version}"
+                    for name, version in sorted(core_cell["runtime_versions"].items())
+                )
+                + "\n"
+            )
+            if constraints.read_text("utf-8") != expected_pins:
+                raise ValueError("paired install constraints differ from the solved core runtime")
             for name in ("pair-binding.json", "sdist-binding.json"):
                 self.pair_binding(root + "/" + name, minor)
+                installed = self.json(root + "/" + name)["installed_distributions"]
+                normalized = {
+                    key.lower().replace("_", "-"): value for key, value in installed.items()
+                }
+                if any(
+                    normalized.get(key) != value
+                    for key, value in core_cell["runtime_versions"].items()
+                ):
+                    raise ValueError("paired wheel/sdist runtime changed a locked core dependency")
+            sdist_cases = cell["sdist_consumer_cases"]
+            if len(sdist_cases) != 3 or {case["variant"] for case in sdist_cases} != {
+                "good",
+                "defect",
+                "not_evaluable",
+            }:
+                raise ValueError("sdist native journey missing a required outcome")
+            for case in sdist_cases:
+                self.file(case["receipt"], case["sha256"])
+                self.consumer_case(
+                    case["receipt"],
+                    minor,
+                    "reconciliation",
+                    case["variant"],
+                    "pandas",
+                    "duckdb",
+                    optimized=True,
+                )
             for name in ("core", "benchmark", "consumer"):
                 rebuild = cell["sdist_rebuilds"][name]
                 if (
@@ -435,6 +535,45 @@ class Review:
                 summary.get("cases_with_unavailable_native_count"),
             ) != ("PASS", 72, 24, 48, True, 144, 0):
                 raise ValueError("consumer actual/expected native outcomes incomplete")
+            wanted = {
+                (program, variant, source, target)
+                for program in ("reconciliation", "refactor", "migration", "preparation")
+                for source, target in itertools.permutations(("pandas", "polars", "duckdb"), 2)
+                for variant in ("good", "defect", "not_evaluable")
+            }
+            records = summary["records"]
+            observed = [
+                (item["program"], item["variant"], item["source"], item["target"])
+                for item in records
+            ]
+            if len(observed) != 72 or set(observed) != wanted:
+                raise ValueError(
+                    "72 consumer records are missing, repeated or outside the frozen matrix"
+                )
+            base = Path(consumer["summary"]).parent
+            for item in records:
+                expected = {"good": 0, "defect": 1, "not_evaluable": 3}[item["variant"]]
+                if (
+                    item.get("harness_pass") is not True
+                    or item.get("process_outcome") != "completed"
+                    or item.get("expected_exit") != expected
+                    or item.get("actual_exit") != expected
+                    or any(
+                        item.get(key) is not None
+                        for key in ("process_error", "receipt_error", "logs_error")
+                    )
+                ):
+                    raise ValueError("consumer child process failed or changed its expected exit")
+                for stream in ("stdout", "stderr"):
+                    self.file(str(base / "logs" / (item["case_id"] + "." + stream + ".txt")))
+                self.consumer_case(
+                    str(base / item["case_receipt"]),
+                    minor,
+                    item["program"],
+                    item["variant"],
+                    item["source"],
+                    item["target"],
+                )
         return {
             "technical_receipts_consistent": True,
             "criteria_automatically_closed": [],

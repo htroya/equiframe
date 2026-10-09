@@ -6,8 +6,34 @@ from __future__ import annotations
 import argparse
 import json
 import platform
+import re
 import sys
 from pathlib import Path
+
+
+def observed_filesystem(directory: Path) -> str:
+    """Record Linux mount type; never silently call a RAM-backed path disk."""
+    selected = None
+    try:
+        rows = Path("/proc/self/mountinfo").read_text("utf-8").splitlines()
+    except OSError as error:
+        raise RuntimeError("Cannot observe filesystem type for the measurement") from error
+    for row in rows:
+        before, separator, after = row.partition(" - ")
+        if not separator:
+            continue
+        fields = before.split()
+        if len(fields) < 5 or not after.split():
+            continue
+        decoded = re.sub(r"\\([0-7]{3})", lambda match: chr(int(match.group(1), 8)), fields[4])
+        mount = Path(decoded)
+        if directory.resolve().is_relative_to(mount) and (
+            selected is None or len(mount.parts) > selected[0]
+        ):
+            selected = (len(mount.parts), after.split()[0])
+    if selected is None:
+        raise RuntimeError("Measurement filesystem was not found in this mount namespace")
+    return selected[1]
 
 
 def main() -> int:
@@ -18,6 +44,10 @@ def main() -> int:
     if args.output.exists():
         raise ValueError("choose a new measurement directory")
     args.output.mkdir(parents=True)
+    filesystem = observed_filesystem(args.output)
+    observed_storage = "tmpfs" if filesystem in {"tmpfs", "ramfs"} else "disk"
+    if observed_storage != args.storage:
+        raise ValueError("requested storage label differs from observed filesystem")
     import equiframe as ef
     import equiframe_benchmark as eb
 
@@ -30,7 +60,8 @@ def main() -> int:
         "timeout_seconds": 120,
         "threads_per_engine": 1,
         "expected_state": "different",
-        "storage": args.storage,
+        "storage": observed_storage,
+        "filesystem_observed": filesystem,
         "concurrent_known_loads": "No other task-controlled suite; shared host not controlled",
         "os_cache": "uncontrolled",
         "slo_accepted": False,
@@ -68,8 +99,8 @@ def main() -> int:
             json.dumps({"protocol": protocol, "results": results}, indent=2) + "\n",
             encoding="utf-8",
         )
-        if not result.complete or not result.resource_measurement_complete:
-            raise RuntimeError("measurement incomplete; retain the actual partial result")
+        # Independent sizes continue even when one instrument is incomplete.
+        # The final return code remains nonzero; no partial measurement becomes a pass.
     # A separate tiny case exercises cooperative admission, never an OOM or shared-host disruption.
     import pyarrow as pa
 
@@ -85,18 +116,21 @@ def main() -> int:
     (args.output / "bounded-limit.json").write_text(
         limited.model_dump_json(indent=2) + "\n", encoding="utf-8"
     )
+    complete = all(item["complete"] and item["resource_measurement_complete"] for item in results)
+    status = "passed" if complete else "partial"
     print(
         json.dumps(
             {
-                "status": "passed",
+                "status": status,
                 "sizes": protocol["rows"],
                 "repetitions_each": 3,
-                "storage": args.storage,
+                "storage": observed_storage,
+                "filesystem_observed": filesystem,
                 "slo_accepted": False,
             }
         )
     )
-    return 0
+    return 0 if complete else 3
 
 
 if __name__ == "__main__":
