@@ -685,7 +685,12 @@ def test_driver_reinstalls_local_closure_and_holds_sync(
     )
     main()
     commands = captured[0][5]
-    assert commands[0][-2:] == ["--reinstall-package", "runtime-dependency"]
+    assert commands[0][-4:] == [
+        "--reinstall-package",
+        "synthetic-release-check",
+        "--reinstall-package",
+        "runtime-dependency",
+    ]
     assert all("--no-sync" in command for command in commands[1:])
     artifacts = tuple(sorted((package / "dist").iterdir()))
     commands[7] += [str(path) for path in artifacts]

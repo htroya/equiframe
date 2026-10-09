@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "equiframe-benchmark"
-version = "0.12.0a8"
+version = "0.12.0a9"
 description = "EquiFrame Verify, paired evaluation and reproducible experimental evidence"
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
 authors = [{ name = "Hernán Troya" }]
 classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11", "Programming Language :: Python :: 3.12", "Programming Language :: Python :: 3.13", "Typing :: Typed"]
-dependencies = ["tomli>=2.2,<3; python_version < '3.11'", "equiframe[arrow]==0.12.0a8", "packaging>=26,<27"]
+dependencies = ["typing-extensions>=4.14,<5", "tomli>=2.2,<3; python_version < '3.11'", "equiframe[arrow]==0.12.0a9", "packaging>=26,<27"]
 
 [project.urls]
 Repository = "https://github.com/htroya/equiframe"
@@ -21,8 +21,8 @@ equiframe-benchmark-pilot = "equiframe_benchmark.pilot:main"
 equiframe-benchmark = "equiframe_benchmark.cli:main"
 
 [project.optional-dependencies]
-engines = ["equiframe[engines]==0.12.0a8"]
-ml = ["equiframe[ml]==0.12.0a8"]
+engines = ["equiframe[engines]==0.12.0a9"]
+ml = ["equiframe[ml]==0.12.0a9"]
 resources = ["psutil==7.2.2"]
 
 [tool.uv.sources]

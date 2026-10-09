@@ -169,7 +169,9 @@ def test_driver_propagates_the_requested_interpreter_to_every_python_gate(
     monkeypatch.setitem(globals_, "run_checks", lambda *args: captured.append(args))
     main()
     commands = captured[0][5]
-    assert commands[0][-2:] == ["--python", "3.10"]
+    offset = commands[0].index("--python")
+    assert commands[0][offset : offset + 2] == ["--python", "3.10"]
+    assert commands[0][-2:] == ["--reinstall-package", "synthetic"]
     assert "--no-editable" in commands[0]
     for command in commands[1:]:
         assert command[command.index("--python") + 1] == "3.10"

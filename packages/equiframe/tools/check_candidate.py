@@ -200,7 +200,8 @@ def main() -> None:
     dependencies = dependency_artifacts(package)
     base = [args.uv, "run", "--locked", "--all-extras", "--no-sync", "--python", args.python]
     sync = [args.uv, "sync", "--locked", "--all-extras", "--no-editable", "--python", args.python]
-    for name in local_dependency_names(package):
+    # A same-version non-editable root may otherwise retain a stale cached wheel.
+    for name in (project["name"], *local_dependency_names(package)):
         sync += ["--reinstall-package", name]
     commands = [
         sync,

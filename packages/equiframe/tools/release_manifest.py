@@ -430,7 +430,14 @@ def check_stage(command: list[str], package: Path, artifacts: tuple[Path, ...]) 
             sorted(remaining)
             in (["--all-extras", "--locked"], ["--all-extras", "--locked", "--no-editable"])
             and len(reinstall) == len(set(reinstall))
-            and set(reinstall).issubset(local_dependency_names(package))
+            and set(reinstall).issubset(
+                {
+                    tomllib.loads((package / "pyproject.toml").read_text("utf-8"))["project"][
+                        "name"
+                    ],
+                    *local_dependency_names(package),
+                }
+            )
         ):
             return "locked_sync"
     elif program == "ruff":

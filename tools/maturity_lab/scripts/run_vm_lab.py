@@ -26,6 +26,8 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+from manifest_scope import receipt_schema, required_pythons
+
 PROFILES = ("base", "arrow", "pandas", "polars", "duckdb", "engines", "ml", "all")
 PROBE = (
     "import hashlib,json,platform,sys; from pathlib import Path; print(json.dumps({"
@@ -62,8 +64,7 @@ def checked_member(root: Path, name: str) -> Path:
 
 def verify_kit(kit: Path) -> dict:
     manifest = json.loads((kit / "candidate.json").read_text("utf-8"))
-    if manifest.get("schema") != "equiframe-maturity-candidate-1":
-        raise ValueError("unsupported candidate manifest")
+    required_pythons(manifest)
     for name, record in manifest["files"].items():
         path = checked_member(kit, name)
         if path.stat().st_size != record["size_bytes"] or sha(path) != record["sha256"]:
@@ -243,7 +244,9 @@ def main() -> int:
         help="Actual operator/Codex task identity; not a fabricated reviewer",
     )
     parser.add_argument("--python310", default="/usr/bin/python3.10")
+    parser.add_argument("--python311", default="/usr/bin/python3.11")
     parser.add_argument("--python312", default="/usr/bin/python3.12")
+    parser.add_argument("--python313", default="/usr/bin/python3.13")
     parser.add_argument("--lab-parent", type=Path, default=Path.home())
     parser.add_argument(
         "--cloud-validation",
@@ -256,6 +259,7 @@ def main() -> int:
         raise ValueError("record the actual executor, not the placeholder")
     kit = args.kit.resolve()
     manifest = verify_kit(kit)
+    minors = required_pythons(manifest)
     actual = {
         "hostname": socket.gethostname(),
         "user": getpass.getuser(),
@@ -315,7 +319,8 @@ def main() -> int:
     os.umask(0o077)
     lab = Path(tempfile.mkdtemp(prefix="equiframe-maturity-", dir=parent))
     receipt = {
-        "schema": "equiframe-maturity-vm-execution-1",
+        "schema": receipt_schema(manifest),
+        "required_python_versions": list(minors),
         "status": "running",
         "started_at": now(),
         "executor_declared": args.executor,
@@ -324,6 +329,12 @@ def main() -> int:
         "cloud_validation_only": args.cloud_validation,
         "actual_host": actual,
         "source": manifest["source"],
+        "tooling_source": manifest.get("tooling_source"),
+        "script_hashes": {
+            name: sha(kit / name) for name in manifest["files"] if name.startswith("scripts/")
+        },
+        "controller_lock_sha256": sha(kit / "locks/controller.lock"),
+        "data_manifest_sha256": sha(kit / "consumer-data/manifest.json"),
         "candidate_manifest_sha256": sha(kit / "candidate.json"),
         "artifact_hashes": manifest["artifact_hashes"],
         "lab": str(lab),
@@ -372,7 +383,8 @@ def main() -> int:
                 shutil.copy2(project / filename, target / filename)
             shutil.copytree(project / "src", target / "src")
         record.environment["EQUIFRAME_TEST_SOURCE_PACKAGES"] = str(declared)
-        for minor, interpreter in (("3.10", args.python310), ("3.12", args.python312)):
+        for minor in minors:
+            interpreter = getattr(args, "python" + minor.replace(".", ""))
             cell = {
                 "minor": minor,
                 "status": "running",
@@ -881,7 +893,7 @@ def main() -> int:
             record.save()
         receipt["status"] = (
             "passed"
-            if len(receipt["python_cells"]) == 2
+            if len(receipt["python_cells"]) == len(minors)
             and all(cell["status"] == "passed" for cell in receipt["python_cells"])
             else "failed"
         )
@@ -889,6 +901,13 @@ def main() -> int:
         receipt["status"] = "failed"
         receipt["errors"].append({"type": type(error).__name__, "message": str(error)})
     finally:
+        try:
+            verify_kit(kit)
+            receipt["kit_unchanged_after_run"] = True
+        except Exception as error:
+            receipt["kit_unchanged_after_run"] = False
+            receipt["status"] = "failed"
+            receipt["errors"].append({"stage": "final-kit-integrity", "type": type(error).__name__})
         receipt["finished_at"] = now()
         receipt["final_disk_free_bytes"] = shutil.disk_usage(parent).free
         record.save()

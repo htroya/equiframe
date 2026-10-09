@@ -637,17 +637,74 @@ def verify_inventory(
     return fresh
 
 
+ANONYMOUS_HEADERS = {"Accept": "application/json", "Content-Type": "application/json"}
+
+
+def public_identity(name: str, version: str) -> None:
+    if (
+        re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", name) is None
+        or name.startswith(("equiframe", "private-", "internal-", "consumer-"))
+        or re.fullmatch(r"[A-Za-z0-9.!_-]+", version) is None
+        or Version(version).local is not None
+    ):
+        fail("Only reviewed public package identities may leave this process")
+
+
+def request_preview(url: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Validate the entire outbound surface, before constructing an HTTP request."""
+    if url == "https://api.osv.dev/v1/query":
+        if not isinstance(body, dict) or set(body) not in (
+            {"package", "version"},
+            {"package", "version", "page_token"},
+        ):
+            fail("OSV request must contain only public package/version and provider pagination")
+        package = body["package"]
+        if (
+            not isinstance(package, dict)
+            or set(package) != {"name", "ecosystem"}
+            or package["ecosystem"] != "PyPI"
+        ):
+            fail("OSV package fields differ from the public-only contract")
+        public_identity(package["name"], body["version"])
+        if "page_token" in body and (
+            not isinstance(body["page_token"], str)
+            or not body["page_token"]
+            or len(body["page_token"]) > 4096
+            or not body["page_token"].isprintable()
+        ):
+            fail("Invalid provider pagination token")
+    else:
+        matched = re.fullmatch(r"https://pypi\.org/pypi/([a-z0-9-]+)/([A-Za-z0-9.!_-]+)/json", url)
+        if matched is None or body is not None:
+            fail("URL/body outside the public advisory destinations")
+        public_identity(*matched.groups())
+    return {
+        "url": url,
+        "method": "POST" if body is not None else "GET",
+        "headers": dict(ANONYMOUS_HEADERS),
+        "body": body,
+    }
+
+
+class NoAdvisoryRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(
+        self, req: Any, fp: Any, code: int, msg: str, headers: Any, newurl: str
+    ) -> NoReturn:
+        fail("Advisory redirects are not permitted; coverage remains unknown")
+
+
 def request_json(url: str, body: dict[str, Any] | None = None) -> tuple[dict[str, Any], str]:
+    preview = request_preview(url, body)
     request = urllib.request.Request(
         url,
         data=json.dumps(body).encode() if body is not None else None,
-        headers={
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "User-Agent": "EquiFrame-private-release-audit/1.0",
-        },
+        headers=preview["headers"],
     )
-    with urllib.request.urlopen(request, timeout=30) as response:
+    opener = urllib.request.build_opener(NoAdvisoryRedirect())
+    opener.addheaders = []  # No project-identifying User-Agent, referer, cookie or authorization.
+    with opener.open(request, timeout=30) as response:
+        if response.geturl() != url:
+            fail("Unexpected advisory response destination")
         data = response.read(MAX_JSON + 1)
     result: dict[str, Any] = strict_json(data)
     if not isinstance(result, dict):
@@ -656,6 +713,9 @@ def request_json(url: str, body: dict[str, Any] | None = None) -> tuple[dict[str
 
 
 def fetch_snapshot(name: str, version: str, provider: str) -> dict[str, Any]:
+    public_identity(name, version)
+    if provider not in {"pypi", "osv"}:
+        fail("Unsupported advisory provider")
     url = (
         f"https://pypi.org/pypi/{quote(name)}/{quote(version)}/json"
         if provider == "pypi"
@@ -823,16 +883,51 @@ def audit_components(inventory: dict[str, Any]) -> list[dict[str, Any]]:
     return list(components)
 
 
-def scan_coverage(inventory: dict[str, Any]) -> dict[str, Any]:
+def selected_public_components(
+    inventory: dict[str, Any], allowlist: list[dict[str, str]]
+) -> list[dict[str, Any]]:
+    """A registry label alone never authorizes transmitting an internal package name."""
+    components = audit_components(inventory)
+    allowed: set[tuple[str, str]] = set()
+    for item in allowlist:
+        if not isinstance(item, dict) or set(item) != {"name", "version"}:
+            fail("Allowlist admits only exact public name/version pairs")
+        public_identity(item["name"], item["version"])
+        pair = (item["name"], item["version"])
+        if pair in allowed:
+            fail("Duplicate public allowlist identity")
+        allowed.add(pair)
+    root = inventory["project"]["name"]
+    selected = [
+        c
+        for c in components
+        if (c["name"], c["version"]) in allowed
+        and c["name"] != root
+        and c["source"] == {"registry": "https://pypi.org/simple"}
+        and not c.get("local_artifact")
+    ]
+    if {(c["name"], c["version"]) for c in selected} != allowed:
+        fail("Allowlist identity lacks unambiguous public provenance in this inventory")
+    return selected
+
+
+def scan_coverage(inventory: dict[str, Any], allowlist: list[dict[str, str]]) -> dict[str, Any]:
+    selected = {c["name"] for c in selected_public_components(inventory, allowlist)}
     return {
         "providers": ["PyPI release JSON", "OSV query including its GHSA/PYSEC sources"],
         "excluded_components": [
+            c["name"] for c in audit_components(inventory) if c["name"] not in selected
+        ],
+        "unqueried_public_components": [
             c["name"]
             for c in audit_components(inventory)
-            if c["source"].get("registry") != "https://pypi.org/simple"
+            if c["source"].get("registry") == "https://pypi.org/simple"
+            and c["name"] != inventory["project"]["name"]
+            and c["name"] not in selected
         ],
         "limitations": [
-            "Point-in-time, exact versions, recorded environment only.",
+            "Point-in-time, exact explicitly allowed public versions, recorded environment only.",
+            "Excluded, unqueried or ambiguously sourced dependencies remain unassessed.",
             "No direct GHSA API query; GHSA content is preserved through OSV/PyPI.",
             "Failures and missing provider coverage remain unknown, never clean.",
             *LIMITATIONS,
@@ -840,17 +935,58 @@ def scan_coverage(inventory: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def scan(inventory_path: Path, output: Path) -> dict[str, Any]:
+def covered_summary(snapshots: list[dict[str, Any]], coverage: dict[str, Any]) -> dict[str, Any]:
+    summary = summarize_snapshots(snapshots)
+    if coverage["unqueried_public_components"] and summary["status"] == "no_known_advisories":
+        summary["status"] = "unknown"
+    return summary
+
+
+def prepare_scan(inventory_path: Path, allowlist_path: Path) -> dict[str, Any]:
+    inventory = strict_json(inventory_path.read_bytes())
+    allowlist = strict_json(allowlist_path.read_bytes())
+    if not isinstance(allowlist, list) or not allowlist:
+        fail("A reviewed nonempty public allowlist is required")
+    components = selected_public_components(inventory, allowlist)
+    requests = []
+    for c in components:
+        name, version = c["name"], c["version"]
+        requests.append(request_preview(f"https://pypi.org/pypi/{name}/{version}/json"))
+        requests.append(
+            request_preview(
+                "https://api.osv.dev/v1/query",
+                {"package": {"name": name, "ecosystem": "PyPI"}, "version": version},
+            )
+        )
+    return {
+        "schema": "public-dependency-request-plan-1",
+        "inventory_sha256": file_ref(inventory_path)["sha256"],
+        "public_allowlist": allowlist,
+        "requests": requests,
+        "coverage": scan_coverage(inventory, allowlist),
+        "network_executed": False,
+    }
+
+
+def scan(
+    inventory_path: Path,
+    output: Path,
+    allowlist_path: Path | None = None,
+    request_plan: Path | None = None,
+) -> dict[str, Any]:
     inventory = strict_json(inventory_path.read_bytes())
     audit_components(inventory)
+    if allowlist_path is None or request_plan is None:
+        fail("Prepare and inspect a public allowlist/request plan before a network scan")
+    plan = prepare_scan(inventory_path, allowlist_path)
+    if strict_json(request_plan.read_bytes()) != plan:
+        fail("Inspected request plan differs; prepare and review again")
+    selected = selected_public_components(inventory, plan["public_allowlist"])
     if output.exists():
         fail("Audit output must be new; preserve earlier snapshot")
     output.mkdir(parents=True)
     queries = [
-        (c["name"], c["version"], provider)
-        for c in inventory["components"]
-        if c["source"].get("registry") == "https://pypi.org/simple"
-        for provider in ["pypi", "osv"]
+        (c["name"], c["version"], provider) for c in selected for provider in ["pypi", "osv"]
     ]
     snapshots = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
@@ -867,8 +1003,10 @@ def scan(inventory_path: Path, output: Path) -> dict[str, Any]:
         "created_at": utc_now(),
         "inventory": file_ref(inventory_path),
         "snapshots": references,
-        "summary": summarize_snapshots(snapshots),
-        "coverage": scan_coverage(inventory),
+        "summary": covered_summary(snapshots, plan["coverage"]),
+        "coverage": plan["coverage"],
+        "public_allowlist": plan["public_allowlist"],
+        "request_plan_sha256": file_ref(request_plan)["sha256"],
     }
     write_json(output / "advisories.json", report)
     return report
@@ -910,14 +1048,13 @@ def verify_scan(
         snapshots.append(snapshot)
     expected = {
         (c["name"], c["version"], provider)
-        for c in inventory["components"]
-        if c["source"].get("registry") == "https://pypi.org/simple"
+        for c in selected_public_components(inventory, report["public_allowlist"])
         for provider in ["pypi", "osv"]
     }
     if (
         seen != expected
-        or report["summary"] != summarize_snapshots(snapshots)
-        or report["coverage"] != scan_coverage(inventory)
+        or report["summary"] != covered_summary(snapshots, report["coverage"])
+        or report["coverage"] != scan_coverage(inventory, report["public_allowlist"])
     ):
         fail("Advisory coverage or summary mismatch")
     return dict(report["summary"])
@@ -942,6 +1079,14 @@ def main() -> int:
     command = commands.add_parser("scan", help="Explicitly networked PyPI/OSV scan")
     command.add_argument("--inventory", type=Path, required=True)
     command.add_argument("--output", type=Path, required=True)
+    command.add_argument("--public-allowlist", type=Path, required=True)
+    command.add_argument("--request-plan", type=Path, required=True)
+    command = commands.add_parser(
+        "prepare-scan", help="Offline inspectable public-only request plan"
+    )
+    command.add_argument("--inventory", type=Path, required=True)
+    command.add_argument("--public-allowlist", type=Path, required=True)
+    command.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     try:
         if args.command == "generate":
@@ -960,8 +1105,14 @@ def main() -> int:
                     }
                 )
             )
+        elif args.command == "prepare-scan":
+            if args.output.exists():
+                fail("Preserve earlier request plans; choose a new output")
+            result = prepare_scan(args.inventory, args.public_allowlist)
+            write_json(args.output, result)
+            print(json.dumps({"network_executed": False, "requests": len(result["requests"])}))
         elif args.command == "scan":
-            result = scan(args.inventory, args.output)
+            result = scan(args.inventory, args.output, args.public_allowlist, args.request_plan)
             print(json.dumps(result["summary"]))
             return 0 if result["summary"]["status"] == "no_known_advisories" else 2
         else:

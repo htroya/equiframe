@@ -1,5 +1,9 @@
 ## 0.12.0a8 - Python compatibility maturity candidate (2026-10-08)
 
+## 0.12.0a9 — candidato de universalidad (sin publicación pública)
+
+Nueva identidad distribuida para herramientas/guías revisadas y dependencia directa de typing-extensions en benchmark. A8 permanece histórico. La matriz de veinte celdas requiere recibos nativos; preparación no equivale a soporte observado.
+
 - Target CPython 3.10-3.13 without discarding existing native extras or semantic gates
 - Replace post-3.10 syntax/std-library requirements with typed equivalents; preserve named aliases, historical formats and nanosecond/Decimal semantics
 - Resolve dependency branches by interpreter and propagate the chosen Python through validation tools

@@ -10,6 +10,7 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
+from manifest_scope import CANDIDATE_V2, UNIVERSALITY_PYTHONS
 from run_vm_lab import sha, verify_kit, write
 
 
@@ -33,6 +34,14 @@ def main() -> int:
     parser.add_argument("--core-tests", type=int, required=True)
     parser.add_argument("--benchmark-tests", type=int, required=True)
     parser.add_argument("--consumer-tests", type=int, required=True)
+    parser.add_argument(
+        "--verified-base", required=True, help="Observed remote main commit; must be an ancestor"
+    )
+    parser.add_argument(
+        "--tooling-repository",
+        type=Path,
+        help="Separate committed tooling checkout, when applicable",
+    )
     args = parser.parse_args()
     repository, consumer, data, output = (
         path.resolve() for path in (args.repository, args.consumer, args.consumer_data, args.output)
@@ -44,6 +53,13 @@ def main() -> int:
     for project in (repository, consumer):
         if git(project, "status", "--porcelain"):
             raise ValueError("commit reviewed source changes before assembling the kit")
+    base = git(repository, "rev-parse", args.verified_base + "^{commit}")
+    subprocess.run(
+        ["git", "-C", str(repository), "merge-base", "--is-ancestor", base, "HEAD"], check=True
+    )
+    tooling = (args.tooling_repository or repository).resolve()
+    if git(tooling, "status", "--porcelain"):
+        raise ValueError("commit tooling changes before assembling")
     output.mkdir(parents=True, mode=0o700)
     source = {}
     for label, project in (("equiframe", repository), ("consumer", consumer)):
@@ -52,7 +68,7 @@ def main() -> int:
             "tree": git(project, "rev-parse", "HEAD^{tree}"),
             "branch": git(project, "branch", "--show-current"),
             "worktree_clean": True,
-            "history": "local isolated review branch; no remote main merge",
+            "history": "observed committed source; integration status is recorded separately",
         }
         bundle = output / "source" / (label + ".bundle")
         bundle.parent.mkdir(exist_ok=True)
@@ -62,9 +78,17 @@ def main() -> int:
         subprocess.run(["git", "-C", str(project), "bundle", "verify", str(bundle)], check=True)
     source["verified_remote_baseline"] = {
         "repository": "htroya/equiframe",
-        "commit": "876033ce111fd38123799db4e4c40bd0202ec8df",
-        "tree": "3a8ec2c938ccc716d33b4d0954ca00d56f83bebc",
-        "note": "Recovered local baseline has the identical tree and different local history",
+        "commit": base,
+        "tree": git(repository, "rev-parse", base + "^{tree}"),
+        "note": (
+            "Caller-observed remote main; source is a verified descendant, "
+            "not a claim of final integration"
+        ),
+    }
+    tooling_source = {
+        "commit": git(tooling, "rev-parse", "HEAD"),
+        "tree": git(tooling, "rev-parse", "HEAD^{tree}"),
+        "worktree_clean": True,
     }
     artifacts, hashes = {}, {}
     for label, package in (
@@ -80,13 +104,13 @@ def main() -> int:
             relative = "artifacts/" + path.name
             copy(path, output / relative)
             artifacts[label + suffix], hashes[label + suffix] = relative, sha(path)
-    prepared = Path(__file__).resolve().parents[1]
+    prepared = tooling / "tools/maturity_lab"
     for path in sorted((prepared / "scripts").glob("*.py")):
         copy(path, output / "scripts" / path.name)
     for path in sorted((prepared / "locks").iterdir()):
         if path.is_file():
             copy(path, output / "locks" / path.name)
-    for name in ("README_VM_ES.md", "OPERATOR_RECEIPT_TEMPLATE.json"):
+    for name in ("README_VM_ES.md", "OPERATOR_RECEIPT_TEMPLATE.json", "run_from_windows.ps1"):
         copy(prepared / name, output / name)
     # The data inventory is a frozen explicit list, never a recursive copy of private input.
     frozen = json.loads((data / "manifest.json").read_text("utf-8"))
@@ -108,7 +132,9 @@ def main() -> int:
         if path.is_file()
     }
     manifest = {
-        "schema": "equiframe-maturity-candidate-1",
+        "schema": CANDIDATE_V2,
+        "required_python_versions": list(UNIVERSALITY_PYTHONS),
+        "tooling_source": tooling_source,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "source": source,
         "artifacts": artifacts,
@@ -125,6 +151,11 @@ def main() -> int:
         "private_credentials_included": False,
     }
     write(output / "candidate.json", manifest)
+    (output / "SHA256SUMS").write_text(
+        "".join(f"{item['sha256']}  {name}\n" for name, item in sorted(files.items()))
+        + f"{sha(output / 'candidate.json')}  candidate.json\n",
+        encoding="utf-8",
+    )
     verify_kit(output)
     print(
         json.dumps(

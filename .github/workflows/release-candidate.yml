@@ -50,24 +50,24 @@ jobs:
           PY=packages/equiframe/.venv/bin/python
           TOOL=packages/equiframe/tools/dependency_inventory.py
           "$PY" "$TOOL" generate --package packages/equiframe \
-            --artifact packages/equiframe/dist/equiframe-0.12.0a8-py3-none-any.whl \
-            --artifact packages/equiframe/dist/equiframe-0.12.0a8.tar.gz \
+            --artifact packages/equiframe/dist/equiframe-0.12.0a9-py3-none-any.whl \
+            --artifact packages/equiframe/dist/equiframe-0.12.0a9.tar.gz \
             --output packages/equiframe/dist/dependencies
           "$PY" "$TOOL" generate --package packages/equiframe-benchmark \
-            --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.12.0a8-py3-none-any.whl \
-            --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.12.0a8.tar.gz \
+            --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.12.0a9-py3-none-any.whl \
+            --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.12.0a9.tar.gz \
             --environment-python packages/equiframe-benchmark/.venv/bin/python \
-            --local-artifact packages/equiframe/dist/equiframe-0.12.0a8-py3-none-any.whl \
+            --local-artifact packages/equiframe/dist/equiframe-0.12.0a9-py3-none-any.whl \
             --output packages/equiframe-benchmark/dist/dependencies
           "$PY" "$TOOL" verify --package packages/equiframe \
-            --artifact packages/equiframe/dist/equiframe-0.12.0a8-py3-none-any.whl \
-            --artifact packages/equiframe/dist/equiframe-0.12.0a8.tar.gz \
+            --artifact packages/equiframe/dist/equiframe-0.12.0a9-py3-none-any.whl \
+            --artifact packages/equiframe/dist/equiframe-0.12.0a9.tar.gz \
             --inventory packages/equiframe/dist/dependencies/inventory.json
           "$PY" "$TOOL" verify --package packages/equiframe-benchmark \
-            --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.12.0a8-py3-none-any.whl \
-            --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.12.0a8.tar.gz \
+            --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.12.0a9-py3-none-any.whl \
+            --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.12.0a9.tar.gz \
             --environment-python packages/equiframe-benchmark/.venv/bin/python \
-            --local-artifact packages/equiframe/dist/equiframe-0.12.0a8-py3-none-any.whl \
+            --local-artifact packages/equiframe/dist/equiframe-0.12.0a9-py3-none-any.whl \
             --inventory packages/equiframe-benchmark/dist/dependencies/inventory.json
       - name: Query current dependency advisories (explicit networked check)
         if: inputs.run_advisories
@@ -81,16 +81,16 @@ jobs:
             --output packages/equiframe-benchmark/dist/advisories || status=$?
           if [ "$status" -eq 0 ]; then
             "$PY" "$TOOL" verify --package packages/equiframe \
-              --artifact packages/equiframe/dist/equiframe-0.12.0a8-py3-none-any.whl \
-              --artifact packages/equiframe/dist/equiframe-0.12.0a8.tar.gz \
+              --artifact packages/equiframe/dist/equiframe-0.12.0a9-py3-none-any.whl \
+              --artifact packages/equiframe/dist/equiframe-0.12.0a9.tar.gz \
               --inventory packages/equiframe/dist/dependencies/inventory.json \
               --advisories packages/equiframe/dist/advisories/advisories.json \
               --max-age-hours 24 --require-clean
             "$PY" "$TOOL" verify --package packages/equiframe-benchmark \
-              --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.12.0a8-py3-none-any.whl \
-              --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.12.0a8.tar.gz \
+              --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.12.0a9-py3-none-any.whl \
+              --artifact packages/equiframe-benchmark/dist/equiframe_benchmark-0.12.0a9.tar.gz \
               --environment-python packages/equiframe-benchmark/.venv/bin/python \
-              --local-artifact packages/equiframe/dist/equiframe-0.12.0a8-py3-none-any.whl \
+              --local-artifact packages/equiframe/dist/equiframe-0.12.0a9-py3-none-any.whl \
               --inventory packages/equiframe-benchmark/dist/dependencies/inventory.json \
               --advisories packages/equiframe-benchmark/dist/advisories/advisories.json \
               --max-age-hours 24 --require-clean

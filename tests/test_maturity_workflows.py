@@ -10,8 +10,11 @@ class MaturityWorkflowTests(unittest.TestCase):
     def test_full_matrix_preserves_platforms_and_required_python_minors(self):
         text = (ROOT / '.github/workflows/equiframe.yml').read_text()
         cells = set(re.findall(r'- os: ([^\n]+)\n\s+architecture: ([^\n]+)\n\s+python: \'([^\']+)\'', text))
-        expected = {('ubuntu-24.04', 'x64', minor) for minor in ('3.10','3.11','3.12','3.13')}
-        expected |= {('windows-2022','x64','3.12'),('macos-15-intel','x64','3.12'),('macos-15','arm64','3.12'),('ubuntu-24.04-arm','arm64','3.10'),('ubuntu-24.04-arm','arm64','3.12')}
+        expected = {(os, arch, minor)
+                    for os, arch in (("ubuntu-24.04", "x64"), ("ubuntu-24.04-arm", "arm64"),
+                                     ("windows-2022", "x64"), ("macos-15-intel", "x64"),
+                                     ("macos-15", "arm64"))
+                    for minor in ("3.10", "3.11", "3.12", "3.13")}
         self.assertEqual(cells, expected)
         self.assertIn('python-version: ${{ matrix.python }}', text)
         self.assertEqual(text.count('mypy --python-version ${{ matrix.python }}'), 2)

@@ -293,7 +293,20 @@ def audit(sample: dict[str, Any], monkeypatch: pytest.MonkeyPatch) -> tuple[Path
     monkeypatch.setitem(MODULE["scan"].__globals__, "fetch_snapshot", snapshot)
     inventory = sample["output"] / "inventory.json"
     output = sample["output"] / "audit"
-    report = MODULE["scan"](inventory, output)
+    allowlist = sample["output"] / "public-allowlist.json"
+    components = json.loads(inventory.read_text())["components"]
+    allowlist.write_text(
+        json.dumps(
+            [
+                {"name": c["name"], "version": c["version"]}
+                for c in components
+                if c["source"] == {"registry": "https://pypi.org/simple"}
+            ]
+        )
+    )
+    plan = sample["output"] / "request-plan.json"
+    plan.write_text(json.dumps(MODULE["prepare_scan"](inventory, allowlist)))
+    report = MODULE["scan"](inventory, output, allowlist, plan)
     assert report["summary"]["status"] == "no_known_advisories"
     return inventory, output / "advisories.json"
 
@@ -528,3 +541,118 @@ def test_conflicting_license_declarations_do_not_gain_clearance() -> None:
     result = MODULE["license_evidence"]({"license_expression": "MIT", "license": "GPL-3.0-only"})
     assert result["status"] == "conflicting_declarations"
     assert result["expression"] is None
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "equiframe",
+        "equiframe-benchmark",
+        "equiframe-consumer-lab",
+        "private-forecast",
+        "internal-helper",
+        "consumer-private",
+    ],
+)
+def test_public_preview_rejects_private_names_even_with_public_registry(name: str) -> None:
+    with pytest.raises(ValueError, match="public package"):
+        MODULE["request_preview"](
+            "https://api.osv.dev/v1/query",
+            {"package": {"name": name, "ecosystem": "PyPI"}, "version": "1.0"},
+        )
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://api.osv.dev/v1/query",
+        "https://api.osv.dev.attacker.invalid/v1/query",
+        "https://pypi.org/pypi/numpy/2.0/json?private=value",
+        "https://user:password@pypi.org/pypi/numpy/2.0/json",
+    ],
+)
+def test_public_preview_rejects_unapproved_url_surface(url: str) -> None:
+    with pytest.raises(ValueError):
+        MODULE["request_preview"](url)
+
+
+def test_public_preview_has_no_private_headers_or_payload() -> None:
+    body = {"package": {"name": "numpy", "ecosystem": "PyPI"}, "version": "2.0.0"}
+    value = MODULE["request_preview"]("https://api.osv.dev/v1/query", body)
+    assert value["headers"] == {"Accept": "application/json", "Content-Type": "application/json"}
+    assert value["body"] == body
+    body["project"] = "private-name"
+    with pytest.raises(ValueError):
+        MODULE["request_preview"]("https://api.osv.dev/v1/query", body)
+
+
+def test_redirect_cannot_send_even_public_payload_elsewhere() -> None:
+    with pytest.raises(ValueError, match="redirects"):
+        MODULE["NoAdvisoryRedirect"]().redirect_request(
+            None, None, 302, "found", {}, "https://elsewhere.invalid/"
+        )
+
+
+def test_ambiguous_public_provenance_cannot_leave(sample: dict[str, Any]) -> None:
+    generate(sample)
+    path = sample["output"] / "inventory.json"
+    inventory = json.loads(path.read_text())
+    component = next(c for c in inventory["components"] if c["name"] == "dep")
+    allowlist = [{"name": "dep", "version": "2.0"}]
+    component["source"]["directory"] = "/private/path"
+    with pytest.raises(ValueError, match="provenance"):
+        MODULE["selected_public_components"](inventory, allowlist)
+
+
+def test_unlisted_private_component_mislabeled_public_is_excluded(sample: dict[str, Any]) -> None:
+    generate(sample)
+    inventory = json.loads((sample["output"] / "inventory.json").read_text())
+    inventory["components"].append(
+        {
+            "name": "secret-forecast",
+            "version": "1.0",
+            "source": {"registry": "https://pypi.org/simple"},
+        }
+    )
+    selected = MODULE["selected_public_components"](inventory, [{"name": "dep", "version": "2.0"}])
+    assert [c["name"] for c in selected] == ["dep"]
+
+
+def test_real_transport_surface_uses_no_automatic_headers(monkeypatch: pytest.MonkeyPatch) -> None:
+    seen = {}
+
+    class Response:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+        def geturl(self):
+            return "https://api.osv.dev/v1/query"
+
+        def read(self, limit):
+            return b"{}"
+
+    class Opener:
+        def __init__(self):
+            self.addheaders = [("User-Agent", "synthetic default")]
+
+        def open(self, request, timeout):
+            seen.update(
+                url=request.full_url,
+                headers=dict(request.header_items()),
+                body=json.loads(request.data),
+                automatic=self.addheaders,
+            )
+            return Response()
+
+    monkeypatch.setattr(MODULE["urllib"].request, "build_opener", lambda *_: Opener())
+    body = {"package": {"name": "numpy", "ecosystem": "PyPI"}, "version": "2.0.0"}
+    MODULE["request_json"]("https://api.osv.dev/v1/query", body)
+    assert seen == {
+        "url": "https://api.osv.dev/v1/query",
+        "headers": {"Accept": "application/json", "Content-type": "application/json"},
+        "body": body,
+        "automatic": [],
+    }

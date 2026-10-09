@@ -115,16 +115,22 @@ memoria administrada por el motor, no toda la memoria del proceso.
 
 ### Migración
 
+Estado implementado antes de esta revisión, conservado desde A8; no son funciones nuevas de R2. [Contrato detallado vigente](../packages/equiframe/docs/migration-ir.md).
+
+
 El registro común admite únicamente el IR cerrado implementado: Scan, Project,
-Filter, Cast de ampliación exacta, EquiJoin inner/left/semi/anti, Aggregate, Sort,
-Concatenate y Deduplicate de filas idénticas. Expresiones tipadas, lógica de tres
+Filter, Cast de ampliación exacta, EquiJoin inner/left/right/full/semi/anti, Aggregate, Sort,
+Concatenate y Deduplicate idéntico o selección determinista con orden y rechazo de empates. Expresiones tipadas, lógica de tres
 valores, claves NULL y sumas/grupos vacíos conservan políticas explícitas.
 
 - Decimal común hasta precisión 38; Cast conserva escala, no introduce redondeo
-- Timestamp IR no soportado. Claves float de join/group/sort y sum/min/max float
-  rechazados; `count_valid` puede recibir float
+- Timestamp IR condicionado por unidad/zona y motor; Pandas admite s/ms/us/ns,
+  Polars ms/us/ns y DuckDB naive s/ms/us/ns o UTC us. Localización DST: Pandas/Polars
+  con fold explícito y gaps rechazados; DuckDB la rechaza. Claves float de
+  join/group/sort y sum/min/max float rechazados; `count_valid` puede recibir float
 - Aritmética usa los operadores/tipos/cotas que valida `validate_ir`; no se promete
-  división ni multiplicación Decimal genérica
+  aritmética genérica: multiply exacto/round tienen cotas nativas explícitas;
+  divide Decimal está implementado en Pandas y rechazado por Polars/DuckDB
 - Polars impone una cota conservadora para sumas Decimal; puede rechazar términos
   grandes cuya cancelación matemática produciría un total pequeño
 - DuckDB restringe Aggregate/Sort intermedios que el optimizador podría eliminar;

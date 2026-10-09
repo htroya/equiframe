@@ -35,7 +35,10 @@ class HandoffToolsTests(unittest.TestCase):
         review = Review.__new__(Review)
         review.evidence = self.root
         review.inventory = {
-            p.relative_to(self.root).as_posix(): {"sha256": sha(p), "size_bytes": p.stat().st_size}
+            p.relative_to(self.root).as_posix(): {
+                "sha256": sha(p),
+                "size_bytes": p.stat().st_size,
+            }
             for p in self.root.rglob("*")
             if p.is_file()
         }
@@ -133,12 +136,15 @@ class HandoffToolsTests(unittest.TestCase):
         receipt = {"commands": []}
         record = Recorder(self.root, receipt)
         record.run(
-            "synthetic-rejection", [sys.executable, "-I", "-c", "raise SystemExit(3)"], expected=3
+            "synthetic-rejection",
+            [sys.executable, "-I", "-c", "raise SystemExit(3)"],
+            expected=3,
         )
         self.assertEqual(receipt["commands"][0]["exit_code"], 3)
         self.assertEqual(receipt["commands"][0]["status"], "passed")
         self.assertEqual(
-            sha(self.root / receipt["commands"][0]["log"]), receipt["commands"][0]["log_sha256"]
+            sha(self.root / receipt["commands"][0]["log"]),
+            receipt["commands"][0]["log_sha256"],
         )
 
     def test_recorder_retains_unexpected_nonzero(self):
@@ -186,7 +192,8 @@ class HandoffToolsTests(unittest.TestCase):
             ["pyarrow>=20", "scikit-learn>=1.7", "tomli>=2.2"],
         )
         self.assertEqual(
-            requirements(core, benchmark, "base", {"python_version": "3.12"}), ["pyarrow>=20"]
+            requirements(core, benchmark, "base", {"python_version": "3.12"}),
+            ["pyarrow>=20"],
         )
 
     def test_cloud_validation_receipt_is_never_vm_evidence(self):
@@ -288,7 +295,13 @@ class HandoffToolsTests(unittest.TestCase):
     def test_synthetic_case_validator_checks_positive_structure_only(self):
         review = self.case_review(self.synthetic_consumer_case())
         review.consumer_case(
-            "case.json", "3.10", "reconciliation", "good", "pandas", "duckdb", optimized=True
+            "case.json",
+            "3.10",
+            "reconciliation",
+            "good",
+            "pandas",
+            "duckdb",
+            optimized=True,
         )
 
     def test_consumer_unknown_native_count_cannot_pass(self):
@@ -301,7 +314,10 @@ class HandoffToolsTests(unittest.TestCase):
 
     def test_consumer_peer_is_not_an_independent_second_engine(self):
         case = self.synthetic_consumer_case()
-        case["native_result"]["executions"] = [{"engine": "pandas"}, {"engine": "pandas"}]
+        case["native_result"]["executions"] = [
+            {"engine": "pandas"},
+            {"engine": "pandas"},
+        ]
         with self.assertRaisesRegex(ValueError, "independent native"):
             self.case_review(case).consumer_case(
                 "case.json", "3.10", "reconciliation", "good", "pandas", "duckdb"
@@ -320,7 +336,13 @@ class HandoffToolsTests(unittest.TestCase):
         case["environment"]["optimized"] = 0
         with self.assertRaisesRegex(ValueError, "optimized"):
             self.case_review(case).consumer_case(
-                "case.json", "3.10", "reconciliation", "good", "pandas", "duckdb", optimized=True
+                "case.json",
+                "3.10",
+                "reconciliation",
+                "good",
+                "pandas",
+                "duckdb",
+                optimized=True,
             )
 
     def test_consumer_expected_rejections_remain_rejections(self):
@@ -341,7 +363,12 @@ class HandoffToolsTests(unittest.TestCase):
                 case["published"] = True
                 with self.assertRaisesRegex(ValueError, "acceptance/publication"):
                     self.case_review(case).consumer_case(
-                        "case.json", "3.10", "reconciliation", variant, "pandas", "duckdb"
+                        "case.json",
+                        "3.10",
+                        "reconciliation",
+                        variant,
+                        "pandas",
+                        "duckdb",
                     )
 
     def test_consumer_x64_cannot_establish_arm64_pass(self):
@@ -351,6 +378,149 @@ class HandoffToolsTests(unittest.TestCase):
             self.case_review(case).consumer_case(
                 "case.json", "3.10", "reconciliation", "good", "pandas", "duckdb"
             )
+
+
+class VersionedScopeTests(unittest.TestCase):
+    def candidate(self):
+        from manifest_scope import CANDIDATE_V2, UNIVERSALITY_PYTHONS
+
+        return {
+            "schema": CANDIDATE_V2,
+            "required_python_versions": list(UNIVERSALITY_PYTHONS),
+        }
+
+    def receipt(self):
+        from manifest_scope import RECEIPT_V2, UNIVERSALITY_PYTHONS
+
+        return {
+            "schema": RECEIPT_V2,
+            "required_python_versions": list(UNIVERSALITY_PYTHONS),
+            "python_cells": [{"minor": minor} for minor in UNIVERSALITY_PYTHONS],
+        }
+
+    def test_legacy_scope_is_not_retroactively_four_versions(self):
+        from manifest_scope import required_pythons, validate_cell_scope
+
+        candidate = {"schema": "equiframe-maturity-candidate-1"}
+        self.assertEqual(required_pythons(candidate), ("3.10", "3.12"))
+        validate_cell_scope(
+            candidate,
+            {
+                "schema": "equiframe-maturity-vm-execution-1",
+                "python_cells": [{"minor": "3.10"}, {"minor": "3.12"}],
+            },
+        )
+
+    def test_four_version_scope_is_explicit(self):
+        from manifest_scope import validate_cell_scope
+
+        self.assertEqual(
+            validate_cell_scope(self.candidate(), self.receipt()),
+            ("3.10", "3.11", "3.12", "3.13"),
+        )
+
+    def test_new_candidate_cannot_reduce_or_omit_scope(self):
+        from manifest_scope import required_pythons
+
+        for versions in (None, ["3.10", "3.12"], ["3.10", "3.11", "3.12", "3.12"]):
+            candidate = self.candidate()
+            candidate["required_python_versions"] = versions
+            with self.subTest(versions=versions), self.assertRaises(ValueError):
+                required_pythons(candidate)
+
+    def test_missing_new_minor_cannot_pass(self):
+        from manifest_scope import validate_cell_scope
+
+        for minor in ("3.11", "3.13"):
+            receipt = self.receipt()
+            receipt["python_cells"] = [c for c in receipt["python_cells"] if c["minor"] != minor]
+            with self.subTest(minor=minor), self.assertRaises(ValueError):
+                validate_cell_scope(self.candidate(), receipt)
+
+    def test_duplicate_new_minor_cannot_pass(self):
+        from manifest_scope import validate_cell_scope
+
+        for minor in ("3.11", "3.13"):
+            receipt = self.receipt()
+            receipt["python_cells"][0] = {"minor": minor}
+            with self.subTest(minor=minor), self.assertRaises(ValueError):
+                validate_cell_scope(self.candidate(), receipt)
+
+    def test_mixing_legacy_receipt_with_new_manifest_fails(self):
+        from manifest_scope import validate_cell_scope
+
+        receipt = self.receipt()
+        receipt["schema"] = "equiframe-maturity-vm-execution-1"
+        with self.assertRaises(ValueError):
+            validate_cell_scope(self.candidate(), receipt)
+
+    def test_receipt_scope_cannot_differ_from_manifest(self):
+        from manifest_scope import validate_cell_scope
+
+        receipt = self.receipt()
+        receipt["required_python_versions"] = ["3.10", "3.12"]
+        with self.assertRaises(ValueError):
+            validate_cell_scope(self.candidate(), receipt)
+
+
+class FinalIdentityTests(unittest.TestCase):
+    setUp = HandoffToolsTests.setUp
+    tearDown = HandoffToolsTests.tearDown
+    file = HandoffToolsTests.file
+    review = HandoffToolsTests.review
+    synthetic_consumer_case = HandoffToolsTests.synthetic_consumer_case
+    case_review = HandoffToolsTests.case_review
+
+    def test_new_receipt_rejects_changed_tooling_controller_input_or_unfinished_integrity(self):
+        candidate = {
+            "schema": "equiframe-maturity-candidate-2",
+            "required_python_versions": ["3.10", "3.11", "3.12", "3.13"],
+            "source": {},
+            "artifact_hashes": {},
+            "tooling_source": {"commit": "a" * 40},
+            "files": {
+                "scripts/run_vm_lab.py": {"sha256": "a" * 64},
+                "locks/controller.lock": {"sha256": "b" * 64},
+                "consumer-data/manifest.json": {"sha256": "c" * 64},
+            },
+        }
+        self.file("candidate.json", json.dumps(candidate))
+        receipt = {
+            "schema": "equiframe-maturity-vm-execution-2",
+            "cloud_validation_only": False,
+            "candidate_manifest_sha256": sha(self.root / "candidate.json"),
+            "source": {},
+            "artifact_hashes": {},
+            "tooling_source": candidate["tooling_source"],
+            "script_hashes": {"scripts/run_vm_lab.py": "a" * 64},
+            "controller_lock_sha256": "b" * 64,
+            "data_manifest_sha256": "c" * 64,
+            "kit_unchanged_after_run": True,
+        }
+        for key, wrong in (
+            ("tooling_source", {}),
+            ("script_hashes", {}),
+            ("controller_lock_sha256", "0" * 64),
+            ("data_manifest_sha256", "0" * 64),
+            ("kit_unchanged_after_run", False),
+        ):
+            review = self.review()
+            review.kit = self.root
+            review.candidate = candidate
+            review.receipt = {**receipt, key: wrong}
+            with self.subTest(key=key), self.assertRaisesRegex(ValueError, "identity differs"):
+                review.validate()
+
+    def test_new_minor_claims_require_matching_observed_interpreter(self):
+        for minor in ("3.11", "3.13"):
+            case = self.synthetic_consumer_case()
+            with (
+                self.subTest(minor=minor),
+                self.assertRaisesRegex(ValueError, "Python/platform/isolation"),
+            ):
+                self.case_review(case).consumer_case(
+                    "case.json", minor, "reconciliation", "good", "pandas", "duckdb"
+                )
 
 
 if __name__ == "__main__":

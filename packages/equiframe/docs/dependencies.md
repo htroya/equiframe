@@ -35,15 +35,15 @@ CORE=packages/equiframe
 BENCH=packages/equiframe-benchmark
 
 $PY $TOOL generate --package "$CORE" \
-  --artifact "$CORE/dist/equiframe-0.12.0a8-py3-none-any.whl" \
-  --artifact "$CORE/dist/equiframe-0.12.0a8.tar.gz" \
+  --artifact "$CORE/dist/equiframe-0.12.0a9-py3-none-any.whl" \
+  --artifact "$CORE/dist/equiframe-0.12.0a9.tar.gz" \
   --output evidence/dependencies/core
 
 $PY $TOOL generate --package "$BENCH" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a8-py3-none-any.whl" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a8.tar.gz" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a9-py3-none-any.whl" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a9.tar.gz" \
   --environment-python "$BENCH/.venv/bin/python" \
-  --local-artifact "$CORE/dist/equiframe-0.12.0a8-py3-none-any.whl" \
+  --local-artifact "$CORE/dist/equiframe-0.12.0a9-py3-none-any.whl" \
   --output evidence/dependencies/benchmark
 ```
 
@@ -64,14 +64,29 @@ environment and distribution metadata. Other-platform lock branches are not
 claimed to have been installed or scanned. Missing installed metadata is recorded
 as unknown; exact lock versions are never relabelled as installed when absent.
 
-An advisory refresh is a separate, explicitly networked operation:
+An advisory refresh requires an inspected public-only allowlist and an offline
+request preview. Create `public-allowlist.json` containing only exact reviewed
+public `name`/`version` objects from the artifact-bound inventory; exclude the
+project, all private consumers/internal packages and any ambiguous provenance.
+A registry label by itself is insufficient. This file and the preview remain
+local; neither the complete inventory nor its metadata is uploaded.
 
 ```sh
+$PY $TOOL prepare-scan --inventory evidence/dependencies/core/inventory.json \
+  --public-allowlist public-allowlist.json --output public-requests.json
+# Inspect public-requests.json: URLs, bodies, anonymous headers and exclusions.
 $PY $TOOL scan --inventory evidence/dependencies/core/inventory.json \
+  --public-allowlist public-allowlist.json --request-plan public-requests.json \
   --output evidence/dependencies/core-advisories
-$PY $TOOL scan --inventory evidence/dependencies/benchmark/inventory.json \
-  --output evidence/dependencies/benchmark-advisories
 ```
+
+Repeat with the benchmark inventory and its own reviewed allowlist/preview.
+Preparation is offline and proves no provider coverage. Execution rejects a
+changed preview, names absent from the allowlist, private/local sources, extra
+payload fields, URL query/userinfo/insecure destinations and all redirects.
+No project-identifying User-Agent, credentials, cookies or referer is supplied.
+Provider pagination tokens are validated and remain bound to the same query.
+Platform-denied requests must stop; changing a route is not authorization.
 
 `scan` writes `advisories.json` (`equiframe.advisories/1.0`) and one snapshot per
 public package/version/provider. It preserves the exact UTF-8 JSON response,
@@ -86,17 +101,17 @@ Reverify the final artifact bytes, lock, selected environment, BOMs and audit:
 
 ```sh
 $PY $TOOL verify --package "$CORE" \
-  --artifact "$CORE/dist/equiframe-0.12.0a8-py3-none-any.whl" \
-  --artifact "$CORE/dist/equiframe-0.12.0a8.tar.gz" \
+  --artifact "$CORE/dist/equiframe-0.12.0a9-py3-none-any.whl" \
+  --artifact "$CORE/dist/equiframe-0.12.0a9.tar.gz" \
   --inventory evidence/dependencies/core/inventory.json \
   --advisories evidence/dependencies/core-advisories/advisories.json \
   --max-age-hours 24 --require-clean
 
 $PY $TOOL verify --package "$BENCH" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a8-py3-none-any.whl" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a8.tar.gz" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a9-py3-none-any.whl" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a9.tar.gz" \
   --environment-python "$BENCH/.venv/bin/python" \
-  --local-artifact "$CORE/dist/equiframe-0.12.0a8-py3-none-any.whl" \
+  --local-artifact "$CORE/dist/equiframe-0.12.0a9-py3-none-any.whl" \
   --inventory evidence/dependencies/benchmark/inventory.json \
   --advisories evidence/dependencies/benchmark-advisories/advisories.json \
   --max-age-hours 24 --require-clean

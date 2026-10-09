@@ -12,6 +12,8 @@ import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
+from manifest_scope import RECEIPT_V1, RECEIPT_V2, required_pythons, validate_cell_scope
+
 
 def sha(path: Path) -> str:
     h = hashlib.sha256()
@@ -39,8 +41,7 @@ class Review:
     def __init__(self, kit: Path, evidence: Path):
         self.kit, self.evidence = kit, evidence
         self.candidate = json.loads(member(kit, "candidate.json").read_text("utf-8"))
-        if self.candidate.get("schema") != "equiframe-maturity-candidate-1":
-            raise ValueError("unsupported candidate schema")
+        required_pythons(self.candidate)
         for name, record in self.candidate["files"].items():
             path = member(kit, name)
             if sha(path) != record["sha256"] or path.stat().st_size != record["size_bytes"]:
@@ -362,7 +363,7 @@ class Review:
 
     def validate(self) -> dict:
         receipt, candidate = self.receipt, self.candidate
-        if receipt.get("schema") != "equiframe-maturity-vm-execution-1":
+        if receipt.get("schema") not in (RECEIPT_V1, RECEIPT_V2):
             raise ValueError("unknown VM receipt format")
         if receipt.get("cloud_validation_only") is not False:
             raise ValueError("cloud validation is not evidence of the required ARM64 VM")
@@ -373,6 +374,22 @@ class Review:
             or receipt.get("artifact_hashes") != candidate["artifact_hashes"]
         ):
             raise ValueError("VM source/artifact identity differs")
+        if candidate["schema"] == "equiframe-maturity-candidate-2":
+            expected_scripts = {
+                name: item["sha256"]
+                for name, item in candidate["files"].items()
+                if name.startswith("scripts/")
+            }
+            if (
+                receipt.get("tooling_source") != candidate.get("tooling_source")
+                or receipt.get("script_hashes") != expected_scripts
+                or receipt.get("controller_lock_sha256")
+                != candidate["files"]["locks/controller.lock"]["sha256"]
+                or receipt.get("data_manifest_sha256")
+                != candidate["files"]["consumer-data/manifest.json"]["sha256"]
+                or receipt.get("kit_unchanged_after_run") is not True
+            ):
+                raise ValueError("runtime tooling/lock/input identity differs or is unverified")
         host = receipt["actual_host"]
         if (host["hostname"], host["user"], host["uid"], host["system"], host["machine"]) != (
             "maestria-vnic",
@@ -388,8 +405,9 @@ class Review:
             or receipt.get("errors")
         ):
             raise ValueError("VM execution incomplete, failed or executor unrecorded")
+        minors = validate_cell_scope(candidate, receipt)
         required = {"controller-venv", "controller-pip", "controller-tools"}
-        for minor in ("3.10", "3.12"):
+        for minor in minors:
             required.update(
                 prefix + minor
                 for prefix in (
@@ -438,8 +456,6 @@ class Review:
             if command["expected_exit"] != expected:
                 raise ValueError("command changed the independent expected exit")
         cells = receipt["python_cells"]
-        if len(cells) != 2 or {cell["minor"] for cell in cells} != {"3.10", "3.12"}:
-            raise ValueError("both Python minors are required exactly once")
         for cell in cells:
             minor = cell["minor"]
             if (
@@ -576,6 +592,7 @@ class Review:
                 )
         return {
             "technical_receipts_consistent": True,
+            "required_python_versions": list(minors),
             "criteria_automatically_closed": [],
             "operator_authenticated_by_hashes": False,
             "independent_human_acceptance": False,

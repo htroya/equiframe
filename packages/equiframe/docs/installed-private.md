@@ -2,7 +2,7 @@
 
 [Quick start](quickstart.md) · [Compatibility](compatibility.md) · [Release policy](releasing.md)
 
-The current candidate is `0.12.0a8` for both `equiframe` and
+The current candidate is `0.12.0a9` for both `equiframe` and
 `equiframe-benchmark`. A7 includes the minimum-Polars expression-composition correction; earlier
 alpha revisions and their specific corrections remain in the changelog. Identify both versions by their separate wheel hashes.
 The earlier 0.11.1 artifacts retain their historical identity. Match the commit and SHA-256 in the supplied receipt as well as
@@ -26,7 +26,7 @@ cd equiframe-consumer
 python3.12 -m venv .venv
 WHEELHOUSE=/absolute/path/reviewed-wheelhouse
 .venv/bin/python -I -m pip install --no-index --find-links="$WHEELHOUSE" \
-  'equiframe[engines,ml]==0.12.0a8' --report install-report.json
+  'equiframe[engines,ml]==0.12.0a9' --report install-report.json
 .venv/bin/python -I -m pip check
 .venv/bin/python -I -c 'import equiframe, importlib.metadata, sys; print(sys.executable); print(equiframe.__file__); print(importlib.metadata.version("equiframe"))'
 ```
@@ -38,7 +38,7 @@ New-Item -ItemType Directory equiframe-consumer
 Set-Location equiframe-consumer
 py -3.12 -m venv .venv
 $Wheelhouse = 'C:\authorized\wheelhouse'
-.\.venv\Scripts\python.exe -I -m pip install --no-index --find-links="$Wheelhouse" 'equiframe[engines,ml]==0.12.0a8' --report install-report.json
+.\.venv\Scripts\python.exe -I -m pip install --no-index --find-links="$Wheelhouse" 'equiframe[engines,ml]==0.12.0a9' --report install-report.json
 .\.venv\Scripts\python.exe -I -m pip check
 .\.venv\Scripts\python.exe -I -c 'import equiframe, importlib.metadata, sys; print(sys.executable); print(equiframe.__file__); print(importlib.metadata.version("equiframe"))'
 ```
@@ -54,7 +54,7 @@ For the benchmark, the wheelhouse must contain its exact matching core wheel:
 
 ```bash
 .venv/bin/python -I -m pip install --no-index --find-links="$WHEELHOUSE" \
-  'equiframe-benchmark[engines,ml,resources]==0.12.0a8' --report benchmark-install.json
+  'equiframe-benchmark[engines,ml,resources]==0.12.0a9' --report benchmark-install.json
 .venv/bin/python -I -m pip check
 ```
 
