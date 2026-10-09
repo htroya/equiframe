@@ -4,7 +4,7 @@ Informe privado para Hernán. Corte de revisión del 8 de octubre de 2026. Se en
 
 ## Resultado y alcance
 
-1/16 criterios íntegramente cumplidos = 6,25 % de cierre de este plan. Nueve criterios están PARCIAL y seis BLOQUEADO. Este índice estricto cuenta criterios completos, no pruebas individuales ni porcentaje de calidad del software. El 65 % anterior no tiene rúbrica verificable localizada y no permite calcular avance ni retroceso. La matriz conserva las dieciséis condiciones, todas las versiones y plataformas comprometidas.
+1/16 criterios íntegramente cumplidos = 6,25 % de cierre de este plan. Nueve criterios están PARCIAL y seis BLOQUEADO. Este índice estricto cuenta criterios completos, no pruebas individuales ni porcentaje de calidad del software. El 65 % anterior no tiene rúbrica verificable localizada y no permite calcular avance ni retroceso. El 6,25 % tampoco significa que el resto de las funciones falle: cuenta obligaciones completas, incluidas puertas externas, con una regla de todo o nada. La matriz conserva las dieciséis condiciones, todas las versiones y plataformas comprometidas.
 
 El alcance es núcleo privado, benchmark y consumidor. La entrega de usabilidad se preservó (U01–U11 completos; U12 humano pendiente). El servicio/DW real, aceptación científica, derechos, operación productiva y publicación tienen puertas propias. No se modificaron infraestructura de José, DW de Jhair, sistema global ni main.
 
@@ -14,6 +14,7 @@ El alcance es núcleo privado, benchmark y consumidor. La entrega de usabilidad 
 - Fuente producto: c4f6a903f580f5e98d63db6e225e0a042221f4ec
 - Árbol producto: a43aa2c8af0e07540195252d2b38abd37404f7f0
 - Consumidor: 28cd3d7d43f79466270378c4752c5ef50560e5e0
+- Herramientas revisadas: 07a9923730de5b124b86cb77c1f1d4b93a36a62d (scripts distintos de la fuente producto c4)
 - Base remota verificada: 876033ce111fd38123799db4e4c40bd0202ec8df, árbol 3a8ec2c938ccc716d33b4d0954ca00d56f83bebc
 - El historial local recuperado conserva el mismo árbol base pero no se presenta como el historial remoto original
 - Versiones: equiframe 0.12.0a8; equiframe-benchmark 0.12.0a8; equiframe-consumer-lab 0.1.10
@@ -61,7 +62,7 @@ Los 34 tests focalizados del handoff revisado pasan con 3.10 y 3.12, además de 
 
 A7 → c4 → A7, más recuperación A7 en otro venv nuevo, ejecutados en Linux x64/Python 3.12.14 con pip normal --no-index y un wheelhouse local verificado. Los 42 comandos observaron el exit esperado. En cada fase: pip check, payload exacto, cuatro estados H bajo -O, recorrido de fallos del consumidor y ayuda de benchmark. Los 235 archivos de evidencia anterior permanecen idénticos. Se retiraron solo los dos venvs nuevos de este ensayo después de guardar sus pruebas. Las instalaciones antiguas cuya eliminación se consultó permanecen intactas.
 
-Es una prueba acotada de recuperación, no el cierre de toda M11 ni una prueba de upgrade en ARM64. A7 conserva su admisión original 3.12/3.13; no se fuerza su instalación en 3.10/3.11.
+Es una prueba acotada de recuperación, no el cierre de toda M11 ni una prueba de upgrade en ARM64. M11 sigue parcial por ausencia de evidencia del resto del alcance; no se observó un fallo en los 42 comandos de recuperación ejecutados. A7 conserva su admisión original 3.12/3.13; no se fuerza su instalación en 3.10/3.11.
 
 ### Recursos
 
