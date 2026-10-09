@@ -35,6 +35,7 @@ class HandoffToolsTests(unittest.TestCase):
 
     def review(self):
         review = Review.__new__(Review)
+        review.test_manifests = {}
         review.evidence = self.root
         review.inventory = {
             p.relative_to(self.root).as_posix(): {

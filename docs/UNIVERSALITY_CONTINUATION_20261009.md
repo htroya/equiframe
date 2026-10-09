@@ -22,6 +22,11 @@ Esta continuación conserva el denominador de doce criterios y veinte celdas de
 - Tests del arnés: separar modos normal/optimizado y usar rutas de fixtures
   válidas en el sistema anfitrión. Los controles de Bash/AlmaLinux se ejecutan
   únicamente en POSIX; no acreditan un instalador Bash nativo de Windows.
+- Kits OCI: incluir los tres manifiestos de tests y pasar el del núcleo al
+  verificador A10. Los archivos se comparan con cada sdist; la revisión exige
+  identidades JUnit exactas y las dos omisiones exclusivas de Windows en Linux.
+- Entornos POSIX: conservar la entrada del venv aunque sea un enlace válido
+  al intérprete, para no ejecutar accidentalmente el Python global.
 
 ## Evidencia inicial ejecutada
 
@@ -31,6 +36,12 @@ Los controladores tienen 25 tests y 46 subcasos aprobados. Las herramientas de
 handoff tienen 78 tests y 30 subcasos aprobados. El foco de recursos tiene
 84 tests aprobados y cinco omisiones explícitas de comportamientos POSIX/Linux
 en Windows, con sus sustitutos Windows comprobados por la suite.
+
+Tras corregir la conexión de manifiestos del kit OCI, las herramientas de handoff
+tienen 86 tests y 35 subcasos aprobados en Windows. Una prueba adicional de enlaces
+de intérprete requiere POSIX y sigue pendiente de ejecución en esa plataforma.
+Los manifiestos congelados de 4506, 617 y 16 casos coinciden con todos los bytes
+de las pruebas de los tres sdists entregados.
 
 Los inventarios de dependencias ligados a los seis artefactos locales tienen
 134 consultas core y 124 benchmark completas a PyPI/OSV, cero consultas

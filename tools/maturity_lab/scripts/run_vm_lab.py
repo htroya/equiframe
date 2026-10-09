@@ -25,6 +25,8 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+from frozen_tests import candidate_manifests
+
 try:
     import resource
 except ImportError:  # Windows imports shared receipt helpers for the offline lifecycle check.
@@ -91,6 +93,7 @@ def verify_kit(kit: Path) -> dict:
             raise ValueError("artifact identity disagrees with the candidate file manifest")
     if not manifest.get("source"):
         raise ValueError("candidate source identity is required")
+    candidate_manifests(kit, manifest)
     return manifest
 
 
@@ -203,7 +206,8 @@ class Recorder:
             if available < 1024**3:
                 record.update(status="blocked_resource", error="Less than 1 GiB free disk")
                 log.write_text(
-                    "Stopped before command: less than 1 GiB free disk\n", encoding="utf-8"
+                    "Stopped before command: less than 1 GiB free disk\n",
+                    encoding="utf-8",
                 )
                 raise RuntimeError("Resource guard: less than 1 GiB free disk")
             process = subprocess.Popen(
@@ -317,6 +321,7 @@ def main() -> int:
         raise ValueError("record the actual executor, not the placeholder")
     kit = args.kit.resolve()
     manifest = verify_kit(kit)
+    candidate_manifests(kit, manifest, required=True)
     minors = required_pythons(manifest)
     actual = {
         "hostname": socket.gethostname(),
@@ -397,6 +402,7 @@ def main() -> int:
         "data_manifest_sha256": sha(kit / "consumer-data/manifest.json"),
         "candidate_manifest_sha256": sha(kit / "candidate.json"),
         "artifact_hashes": manifest["artifact_hashes"],
+        "test_manifests": manifest["test_manifests"],
         "lab": str(lab),
         "preflight_disk_free_bytes": shutil.disk_usage(parent).free,
         "commands": [],
@@ -478,6 +484,8 @@ def main() -> int:
                                     str(artifacts["core_wheel"]),
                                     "--sdist",
                                     str(artifacts["core_sdist"]),
+                                    "--test-manifest",
+                                    str(kit / manifest["test_manifests"]["core"]["path"]),
                                     "--python",
                                     interpreter,
                                     "--profile",
@@ -649,7 +657,11 @@ def main() -> int:
                                     ],
                                     timeout=600,
                                 )
-                            except (RuntimeError, OSError, subprocess.TimeoutExpired) as error:
+                            except (
+                                RuntimeError,
+                                OSError,
+                                subprocess.TimeoutExpired,
+                            ) as error:
                                 cell["errors"].append(
                                     {
                                         "stage": "bounded-measurements",
@@ -934,7 +946,11 @@ def main() -> int:
                 for profile in ("base", "engines", "ml", "resources", "all"):
                     for endpoint in ("minimum", "latest"):
                         out = lab / f"benchmark-{minor}-{profile}-{endpoint}"
-                        item = {"profile": profile, "endpoint": endpoint, "status": "running"}
+                        item = {
+                            "profile": profile,
+                            "endpoint": endpoint,
+                            "status": "running",
+                        }
                         cell["benchmark_profiles"].append(item)
                         try:
                             record.run(
@@ -973,12 +989,16 @@ def main() -> int:
                                     if target.is_dir() and not target.is_symlink():
                                         shutil.rmtree(target)
                                         receipt.setdefault(
-                                            "removed_reconstructible_profile_directories", []
+                                            "removed_reconstructible_profile_directories",
+                                            [],
                                         ).append(str(target))
                         except Exception as error:
                             item.update(
                                 status="failed",
-                                error={"type": type(error).__name__, "message": str(error)},
+                                error={
+                                    "type": type(error).__name__,
+                                    "message": str(error),
+                                },
                             )
                             cell["errors"].append(item)
                         record.save()

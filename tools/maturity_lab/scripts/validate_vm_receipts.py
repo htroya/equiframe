@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
+from frozen_tests import candidate_manifests, identity_sha256, verify_linux_junit
 from manifest_scope import RECEIPT_V1, RECEIPT_V2, required_pythons, validate_cell_scope
 
 
@@ -121,6 +122,7 @@ class Review:
             path = member(kit, name)
             if sha(path) != record["sha256"] or path.stat().st_size != record["size_bytes"]:
                 raise ValueError("candidate kit changed: " + name)
+        self.test_manifests = candidate_manifests(kit, self.candidate)
         self.receipt = json.loads(member(evidence, "receipt.json").read_text("utf-8"))
         self.inventory = json.loads(member(evidence, "evidence-inventory.json").read_text("utf-8"))[
             "files"
@@ -179,10 +181,14 @@ class Review:
                 raise ValueError("failed/timed-out command cannot be counted as passing")
             self.file((Path(base) / entry["log"]).as_posix(), entry["log_sha256"])
 
-    def junit(self, path: str, minimum: int) -> None:
+    def junit(self, path: str, minimum: int, label: str | None = None) -> None:
         root = ET.parse(self.file(path)).getroot()
         if root.tag not in ("testsuite", "testsuites"):
             raise ValueError("unrecognized JUnit document")
+        frozen = getattr(self, "test_manifests", {}).get(label)
+        if frozen is not None:
+            verify_linux_junit(root, frozen, label)
+            return
         cases = list(root.iter("testcase"))
         if len(cases) < minimum or any(
             case.find(tag) is not None for case in cases for tag in ("failure", "error", "skipped")
@@ -237,6 +243,18 @@ class Review:
             raise ValueError("core matrix and cell labels differ")
         name = self.relative(outer["receipt"])
         inner = self.json(name, outer["receipt_artifact"]["sha256"])
+        if getattr(self, "test_manifests", {}):
+            frozen = self.test_manifests["core"]
+            summary = inner.get("test_manifest", {})
+            if (
+                summary.get("record", {}).get("sha256")
+                != self.candidate["test_manifests"]["core"]["sha256"]
+                or summary.get("test_count") != frozen["test_count"]
+                or summary.get("junit_identities_sha256") != identity_sha256(frozen)
+                or summary.get("pytest_version") != frozen["pytest_version"]
+                or summary.get("hypothesis_version") != frozen["hypothesis_version"]
+            ):
+                raise ValueError("core profile used a different frozen test manifest")
         if (
             inner["status"] != "passed"
             or inner.get("skips")
@@ -276,7 +294,13 @@ class Review:
         needed.update({"cli-help", "cli-invalid-contract"})
         needed.update(
             "cli-contract-" + name
-            for name in ("aggregations", "dates", "duplicates_order", "joins", "nulls_types")
+            for name in (
+                "aggregations",
+                "dates",
+                "duplicates_order",
+                "joins",
+                "nulls_types",
+            )
         )
         selected = profile["profile"]
         if selected not in ("base", "ml"):
@@ -333,12 +357,17 @@ class Review:
             if command.get("exit_code") != command.get("expected_exit_code"):
                 raise ValueError("core command failed or timed out")
             for stream in ("stdout", "stderr"):
-                self.file(self.relative(command[stream]), command[stream + "_artifact"]["sha256"])
+                self.file(
+                    self.relative(command[stream]),
+                    command[stream + "_artifact"]["sha256"],
+                )
         if profile["profile"] == "all":
             if "full-installed-suite" not in stages or inner["suite"].get("accepted") is not True:
                 raise ValueError("all-profile suite not fully accepted")
             self.junit(
-                str(Path(name).parent / "pytest.xml"), self.candidate["suite_minimums"]["core"]
+                str(Path(name).parent / "pytest.xml"),
+                self.candidate["suite_minimums"]["core"],
+                "core",
             )
 
     def benchmark_profile(self, profile: dict, minor: str) -> None:
@@ -346,7 +375,10 @@ class Review:
         inner = self.json(path, profile["receipt_sha256"])
         if inner.get("status") != "passed" or inner.get("errors"):
             raise ValueError("benchmark isolated profile did not pass")
-        if (inner["profile"], inner["endpoint"]) != (profile["profile"], profile["endpoint"]):
+        if (inner["profile"], inner["endpoint"]) != (
+            profile["profile"],
+            profile["endpoint"],
+        ):
             raise ValueError("benchmark profile identity mismatch")
         for key in ("core_wheel", "benchmark_wheel"):
             if inner["artifacts"][key] != self.candidate["artifact_hashes"][key]:
@@ -372,7 +404,8 @@ class Review:
         self.commands(inner["commands"], needed, str(Path(path).parent))
         validate_benchmark_command_contract(inner["commands"])
         binding = self.json(
-            str(Path(path).parent / "runtime-binding.json"), inner["runtime_binding_sha256"]
+            str(Path(path).parent / "runtime-binding.json"),
+            inner["runtime_binding_sha256"],
         )
         lock = self.file(str(Path(path).parent / "runtime.lock"), inner["runtime_lock_sha256"])
         pins = dict(re.findall(r"^([A-Za-z0-9_.-]+)==([^\s;]+)", lock.read_text("utf-8"), re.M))
@@ -428,7 +461,10 @@ class Review:
         if case.get("dataset_manifest_sha256") != expected_data:
             raise ValueError("consumer used a different frozen dataset")
         executions = case["native_result"]["executions"]
-        if len(executions) != 2 or {item["engine"] for item in executions} != {source, target}:
+        if len(executions) != 2 or {item["engine"] for item in executions} != {
+            source,
+            target,
+        }:
             raise ValueError("consumer must retain both independent native executions")
         env = case["environment"]
         if (
@@ -454,6 +490,8 @@ class Review:
             or receipt.get("artifact_hashes") != candidate["artifact_hashes"]
         ):
             raise ValueError("VM source/artifact identity differs")
+        if self.test_manifests and receipt.get("test_manifests") != candidate["test_manifests"]:
+            raise ValueError("VM frozen test-manifest identity differs")
         if candidate["schema"] == "equiframe-maturity-candidate-2":
             expected_scripts = {
                 name: item["sha256"]
@@ -471,7 +509,13 @@ class Review:
             ):
                 raise ValueError("runtime tooling/lock/input identity differs or is unverified")
         host = receipt["actual_host"]
-        if (host["hostname"], host["user"], host["uid"], host["system"], host["machine"]) != (
+        if (
+            host["hostname"],
+            host["user"],
+            host["uid"],
+            host["system"],
+            host["machine"],
+        ) != (
             "maestria-vnic",
             "hernan",
             1003,
@@ -553,7 +597,16 @@ class Review:
             for key, names, function in [
                 (
                     "profiles",
-                    ("base", "arrow", "pandas", "polars", "duckdb", "engines", "ml", "all"),
+                    (
+                        "base",
+                        "arrow",
+                        "pandas",
+                        "polars",
+                        "duckdb",
+                        "engines",
+                        "ml",
+                        "all",
+                    ),
                     self.core_profile,
                 ),
                 (
@@ -569,10 +622,19 @@ class Review:
                 for item in cell[key]:
                     function(item, minor)
             root = f"py{minor}-all-latest/python-1-all-latest"
-            self.junit(root + "/benchmark-junit.xml", candidate["suite_minimums"]["benchmark"])
-            self.junit(root + "/consumer-junit.xml", candidate["suite_minimums"]["consumer"])
+            self.junit(
+                root + "/benchmark-junit.xml",
+                candidate["suite_minimums"]["benchmark"],
+                "benchmark",
+            )
+            self.junit(
+                root + "/consumer-junit.xml",
+                candidate["suite_minimums"]["consumer"],
+                "consumer",
+            )
             constraints = self.file(
-                root + "/pair-constraints.txt", cell["paired_runtime_constraints_sha256"]
+                root + "/pair-constraints.txt",
+                cell["paired_runtime_constraints_sha256"],
             )
             core_cell = self.json(root + "/receipt.json")
             expected_pins = (
@@ -636,7 +698,12 @@ class Review:
                 raise ValueError("consumer actual/expected native outcomes incomplete")
             wanted = {
                 (program, variant, source, target)
-                for program in ("reconciliation", "refactor", "migration", "preparation")
+                for program in (
+                    "reconciliation",
+                    "refactor",
+                    "migration",
+                    "preparation",
+                )
                 for source, target in itertools.permutations(("pandas", "polars", "duckdb"), 2)
                 for variant in ("good", "defect", "not_evaluable")
             }
@@ -717,11 +784,7 @@ class Review:
                     )
                 for stream in ("stdout", "stderr"):
                     self.file(
-                        str(
-                            optimized_base
-                            / "logs"
-                            / (item["case_id"] + "." + stream + ".txt")
-                        )
+                        str(optimized_base / "logs" / (item["case_id"] + "." + stream + ".txt"))
                     )
                 self.consumer_case(
                     str(optimized_base / item["case_receipt"]),
