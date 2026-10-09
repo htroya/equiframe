@@ -10,7 +10,7 @@ import json
 import re
 import xml.etree.ElementTree as ET
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from frozen_tests import candidate_manifests, identity_sha256, verify_linux_junit
 from manifest_scope import RECEIPT_V1, RECEIPT_V2, required_pythons, validate_cell_scope
@@ -131,7 +131,7 @@ class Review:
             raise ValueError("the top receipt is absent from its inventory")
         for name in self.inventory:
             self.file(name)
-        self.lab = Path(self.receipt["lab"])
+        self.lab = PurePosixPath(self.receipt["lab"])
         self.wheel_payloads = {}
         for key, module in [
             ("core_wheel", "equiframe"),
@@ -152,7 +152,10 @@ class Review:
                 }
 
     def relative(self, original: str) -> str:
-        path = Path(original)
+        # These paths were recorded by the Linux VM, regardless of the review host.
+        path = PurePosixPath(original)
+        if ".." in path.parts or "\\" in original:
+            raise ValueError("VM evidence path is not canonical POSIX")
         return path.relative_to(self.lab).as_posix() if path.is_absolute() else path.as_posix()
 
     def file(self, name: str, digest: str | None = None) -> Path:
@@ -179,7 +182,7 @@ class Review:
                 "expected_exit"
             ):
                 raise ValueError("failed/timed-out command cannot be counted as passing")
-            self.file((Path(base) / entry["log"]).as_posix(), entry["log_sha256"])
+            self.file((PurePosixPath(base) / entry["log"]).as_posix(), entry["log_sha256"])
 
     def junit(self, path: str, minimum: int, label: str | None = None) -> None:
         root = ET.parse(self.file(path)).getroot()
@@ -327,7 +330,9 @@ class Review:
         if not needed <= stages:
             raise ValueError("core profile omitted a required stage")
         validate_core_command_contract(inner["commands"])
-        lock = self.file(str(Path(name).parent / "runtime.lock"), inner["runtime_lock"]["sha256"])
+        lock = self.file(
+            str(PurePosixPath(name).parent / "runtime.lock"), inner["runtime_lock"]["sha256"]
+        )
         pins = dict(re.findall(r"^([A-Za-z0-9_.-]+)==([^\s;]+)", lock.read_text("utf-8"), re.M))
         normalized = {key.lower().replace("_", "-"): value for key, value in pins.items()}
         if not normalized or normalized != inner["runtime_versions"]:
@@ -365,7 +370,7 @@ class Review:
             if "full-installed-suite" not in stages or inner["suite"].get("accepted") is not True:
                 raise ValueError("all-profile suite not fully accepted")
             self.junit(
-                str(Path(name).parent / "pytest.xml"),
+                str(PurePosixPath(name).parent / "pytest.xml"),
                 self.candidate["suite_minimums"]["core"],
                 "core",
             )
@@ -401,13 +406,15 @@ class Review:
         }
         if profile["profile"] in ("engines", "all"):
             needed.add("native-pilot")
-        self.commands(inner["commands"], needed, str(Path(path).parent))
+        self.commands(inner["commands"], needed, str(PurePosixPath(path).parent))
         validate_benchmark_command_contract(inner["commands"])
         binding = self.json(
-            str(Path(path).parent / "runtime-binding.json"),
+            str(PurePosixPath(path).parent / "runtime-binding.json"),
             inner["runtime_binding_sha256"],
         )
-        lock = self.file(str(Path(path).parent / "runtime.lock"), inner["runtime_lock_sha256"])
+        lock = self.file(
+            str(PurePosixPath(path).parent / "runtime.lock"), inner["runtime_lock_sha256"]
+        )
         pins = dict(re.findall(r"^([A-Za-z0-9_.-]+)==([^\s;]+)", lock.read_text("utf-8"), re.M))
         installed = {
             key.lower().replace("_", "-"): version
@@ -716,7 +723,7 @@ class Review:
                 raise ValueError(
                     "72 consumer records are missing, repeated or outside the frozen matrix"
                 )
-            base = Path(consumer["summary"]).parent
+            base = PurePosixPath(consumer["summary"]).parent
             for item in records:
                 expected = {"good": 0, "defect": 1, "not_evaluable": 3}[item["variant"]]
                 if (
@@ -765,7 +772,7 @@ class Review:
                 raise ValueError(
                     "72 optimized consumer records are missing, repeated or outside the matrix"
                 )
-            optimized_base = Path(optimized_consumer["summary"]).parent
+            optimized_base = PurePosixPath(optimized_consumer["summary"]).parent
             for item in optimized_records:
                 expected = {"good": 0, "defect": 1, "not_evaluable": 3}[item["variant"]]
                 if (

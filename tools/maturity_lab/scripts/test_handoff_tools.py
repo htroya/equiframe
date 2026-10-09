@@ -9,7 +9,7 @@ import sys
 import tempfile
 import unittest
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from unittest.mock import patch
 
 from check_benchmark_profile import requirements, resolution_command
@@ -86,6 +86,20 @@ class HandoffToolsTests(unittest.TestCase):
         path = self.file("value", "synthetic")
         with self.assertRaises(ValueError):
             member(self.root, str(path))
+
+    def test_linux_receipt_paths_are_relative_on_every_review_host(self):
+        review = self.review()
+        review.lab = PurePosixPath("/home/hernan/owned-lab")
+        self.assertEqual(
+            review.relative("/home/hernan/owned-lab/py3.10-all/receipt.json"),
+            "py3.10-all/receipt.json",
+        )
+        self.assertEqual(review.relative("py3.10-all/receipt.json"), "py3.10-all/receipt.json")
+        with self.assertRaises(ValueError):
+            review.relative("/home/hernan/other-lab/receipt.json")
+        for invalid in ("../outside", "nested/../receipt.json", "nested\\receipt.json"):
+            with self.subTest(invalid=invalid), self.assertRaisesRegex(ValueError, "canonical"):
+                review.relative(invalid)
 
     def test_member_accepts_inventory_file(self):
         path = self.file("value", "synthetic")
@@ -214,9 +228,7 @@ class HandoffToolsTests(unittest.TestCase):
             "frozen_data_unchanged": True,
             "native_execution_count_complete": True,
             "dataset_manifest_sha256": dataset_hash,
-            "native_result": {
-                "executions": [{"engine": "pandas"}, {"engine": "duckdb"}]
-            },
+            "native_result": {"executions": [{"engine": "pandas"}, {"engine": "duckdb"}]},
             "environment": {
                 "python": "3.12.1",
                 "machine": "aarch64",
@@ -226,9 +238,7 @@ class HandoffToolsTests(unittest.TestCase):
         }
         self.file("case.json", json.dumps(case))
         review = self.review()
-        review.candidate = {
-            "files": {"consumer-data/manifest.json": {"sha256": dataset_hash}}
-        }
+        review.candidate = {"files": {"consumer-data/manifest.json": {"sha256": dataset_hash}}}
         review.consumer_case(
             "case.json",
             "3.12",

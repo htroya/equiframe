@@ -27,6 +27,10 @@ Esta continuación conserva el denominador de doce criterios y veinte celdas de
   identidades JUnit exactas y las dos omisiones exclusivas de Windows en Linux.
 - Entornos POSIX: conservar la entrada del venv aunque sea un enlace válido
   al intérprete, para no ejecutar accidentalmente el Python global.
+- Revisión desde Windows: interpretar las rutas de los recibos Linux como
+  POSIX y mantener separadas las rutas del inventario y del disco local.
+  Se rechazan rutas de otro laboratorio y traversal; no se normalizan los
+  nombres de miembros para ocultar diferencias del inventario.
 
 ## Evidencia inicial ejecutada
 
@@ -43,12 +47,25 @@ de intérprete requiere POSIX y sigue pendiente de ejecución en esa plataforma.
 Los manifiestos congelados de 4506, 617 y 16 casos coinciden con todos los bytes
 de las pruebas de los tres sdists entregados.
 
+En Linux ARM64 se ejecutaron 18 controles de repositorio sin omisiones y las
+87 pruebas del arnés del commit `aae584b`: 86 aprobadas y una omisión exclusiva
+de APIs Win32. La regresión de enlaces POSIX pasa realmente en esa VM.
+La corrección posterior de rutas del revisor tiene 66 pruebas y 29 subcasos
+aprobados en Windows; una prueba de enlaces exclusiva de POSIX se omite allí.
+
 Los inventarios de dependencias ligados a los seis artefactos locales tienen
 134 consultas core y 124 benchmark completas a PyPI/OSV, cero consultas
 desconocidas y cero avisos conocidos. Se verificaron offline contra artefactos,
 locks y entornos registrados. Este resultado corresponde a Windows CPython
 3.12 y versiones exactas; no cubre otros entornos, bibliotecas nativas incluidas
 ni sustituye la decisión de licencia del propietario.
+
+Los inventarios se regeneraron para los artefactos reconstruidos del núcleo.
+Se comprobaron sin red: dependencias públicas, declaraciones, locks, entorno y
+evidencia de licencias permanecen idénticos. La diferencia es documental y está
+ligada a hashes nuevos de artefactos/SBOM; las respuestas de avisos y sus fechas
+originales se conservan mediante una relación explícita, sin presentar un nuevo
+escaneo ni ampliar su alcance a otras plataformas.
 
 La ejecución histórica A9 de OCI terminó con código 1. Sus recibos se conservan.
 Los intentos locales previos de A10 tampoco se relabelan como éxitos: quedaron
