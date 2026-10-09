@@ -141,11 +141,22 @@ def test_real_supervised_pipeline_roundtrip_and_summary(measured):
     directory, result = measured
     assert read_scale(directory) == result
     assert result.process.cleanup_reaped and result.process.exit_code == 0
+    assert result.process.observed_descendant_pids == ()
     assert result.process.sampled_rss_peak_bytes > 0
+    assert result.process.sample_interval_seconds == 0.25
+    assert all(trial.resources.sample_interval_seconds == 0.25 for trial in result.trials)
+    assert result.resource_measurement_complete == (not result.process.monitoring_errors)
     summary = summarize_scale(result)
     assert summary["correct_complete_repetitions"] == 2
     assert summary["unsuccessful_or_missing_repetitions"] == 0
     assert summary["statistics_by_cache"]["warm_process_os_cache_uncontrolled"]["n"] == 1
+    assert summary["resource_measurement_contract"]["id"] == ("equiframe_process_resources_v1")
+    assert summary["resource_measurement_contract"]["platform"] in (
+        "linux",
+        "windows",
+        "macos",
+    )
+    assert len(summary["resource_measurement_contract"]["metrics"]) == 9
     assert not any(name in result.environment for name in ("hostname", "username", "HOME", "PATH"))
 
 
@@ -292,8 +303,18 @@ def test_measurement_quality_keeps_missing_counters_explicit(measured):
 
     _, result = measured
     data = result.model_dump()
-    data["process"]["io_read_bytes"] = None
-    data["process"]["monitoring_errors"] = ("io_read_bytes_unavailable",)
+    data["process"]["sampled_rss_peak_bytes"] = None
+    data["process"]["monitoring_errors"] = ("sampled_rss_peak_bytes_unavailable",)
+    coverage = next(
+        item
+        for item in data["process"]["metric_coverage"]
+        if item["metric"] == "sampled_rss_peak_bytes"
+    )
+    coverage.update(
+        state="measurement_failed",
+        source=None,
+        reason="sampled_rss_peak_bytes_unavailable",
+    )
     partial = ScaleRun.model_validate(data)
     assert partial.complete
     assert not partial.resource_measurement_complete

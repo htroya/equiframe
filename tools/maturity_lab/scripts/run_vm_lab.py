@@ -14,7 +14,6 @@ import json
 import os
 import platform
 import re
-import resource
 import shutil
 import signal
 import socket
@@ -25,6 +24,11 @@ import tempfile
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+
+try:
+    import resource
+except ImportError:  # Windows imports shared receipt helpers for the offline lifecycle check.
+    resource = None  # type: ignore[assignment]
 
 from manifest_scope import receipt_schema, required_pythons
 
@@ -109,20 +113,54 @@ def write_runtime_constraints(path: Path, versions: dict) -> None:
 class Recorder:
     def __init__(self, directory: Path, receipt: dict):
         self.directory, self.receipt = directory, receipt
-        self.environment = dict(os.environ)
-        for key in list(self.environment):
-            if key.startswith(("PYTHON", "PIP_", "UV_")) or key in (
-                "VIRTUAL_ENV",
-                "CONDA_PREFIX",
-            ):
-                self.environment.pop(key, None)
+        allowed = {
+            "APPDATA",
+            "COLORTERM",
+            "COMMONPROGRAMFILES",
+            "COMMONPROGRAMFILES(X86)",
+            "COMMONPROGRAMW6432",
+            "COMSPEC",
+            "CURL_CA_BUNDLE",
+            "DEVELOPER_DIR",
+            "HOME",
+            "HOMEDRIVE",
+            "HOMEPATH",
+            "LANG",
+            "LC_ALL",
+            "LC_CTYPE",
+            "LOCALAPPDATA",
+            "MACOSX_DEPLOYMENT_TARGET",
+            "PATH",
+            "PATHEXT",
+            "PROGRAMDATA",
+            "PROGRAMFILES",
+            "PROGRAMFILES(X86)",
+            "PROGRAMW6432",
+            "REQUESTS_CA_BUNDLE",
+            "SDKROOT",
+            "SSL_CERT_DIR",
+            "SSL_CERT_FILE",
+            "SYSTEMDRIVE",
+            "SYSTEMROOT",
+            "TEMP",
+            "TERM",
+            "TMP",
+            "TMPDIR",
+            "TZ",
+            "USERPROFILE",
+            "WINDIR",
+        }
+        self.environment = {
+            key: value for key, value in os.environ.items() if key.upper() in allowed
+        }
         self.environment.update(
             PYTHONNOUSERSITE="1",
             PYTHONDONTWRITEBYTECODE="1",
+            PYTHONUTF8="1",
+            PYTEST_DISABLE_PLUGIN_AUTOLOAD="1",
             OMP_NUM_THREADS="1",
             OPENBLAS_NUM_THREADS="1",
             POLARS_MAX_THREADS="1",
-            PYTEST_DISABLE_PLUGIN_AUTOLOAD="1",
             UV_PYTHON_DOWNLOADS="never",
             UV_CACHE_DIR=str(directory / "uv-cache"),
             TMPDIR=str(directory / "temporary"),
@@ -183,11 +221,25 @@ class Recorder:
                 stdout, stderr = process.communicate(timeout=timeout)
             except subprocess.TimeoutExpired:
                 # Signal only the process group created for this exact command.
-                os.killpg(process.pid, signal.SIGTERM)
+                if os.name == "nt":
+                    # Venv Python can be a launcher with a child interpreter.
+                    # Terminate its owned tree so it cannot retain pipes/cwd.
+                    subprocess.run(
+                        ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        timeout=5,
+                        check=False,
+                    )
+                else:
+                    os.killpg(process.pid, signal.SIGTERM)
                 try:
                     stdout, stderr = process.communicate(timeout=5)
                 except subprocess.TimeoutExpired:
-                    os.killpg(process.pid, signal.SIGKILL)
+                    if os.name == "nt":
+                        process.kill()
+                    else:
+                        os.killpg(process.pid, signal.SIGKILL)
                     stdout, stderr = process.communicate()
                 raise subprocess.TimeoutExpired(
                     command, timeout, output=stdout, stderr=stderr
@@ -222,7 +274,11 @@ class Recorder:
 
 
 def python_at(venv: Path) -> str:
-    return str(venv / "bin/python")
+    candidates = (venv / "Scripts/python.exe", venv / "bin/python")
+    for candidate in candidates:
+        if candidate.is_file() and not candidate.is_symlink():
+            return str(candidate)
+    raise FileNotFoundError(f"virtual-environment Python is missing under {venv}")
 
 
 def extract(sdist: Path, destination: Path) -> Path:
@@ -307,6 +363,8 @@ def main() -> int:
         headroom = int(cgroup["memory.max"]) - int(cgroup["memory.current"])
         if headroom < 2 * 1024**3:
             raise RuntimeError("Need at least 2 GiB effective cgroup memory headroom")
+    if resource is None:
+        raise RuntimeError("the ARM64 lab requires POSIX resource limits")
     actual["resources"] = {
         "cpu_count": os.cpu_count(),
         "memory_bytes": memory,
@@ -523,6 +581,8 @@ def main() -> int:
                                     "-I",
                                     "-m",
                                     "pytest",
+                                    "-p",
+                                    "_hypothesis_pytestplugin",
                                     "-q",
                                     str(benchmark / "tests"),
                                     "--junitxml",
@@ -539,6 +599,8 @@ def main() -> int:
                                     "-I",
                                     "-m",
                                     "pytest",
+                                    "-p",
+                                    "_hypothesis_pytestplugin",
                                     "-q",
                                     str(consumer / "tests"),
                                     "--junitxml",
@@ -611,6 +673,24 @@ def main() -> int:
                                 timeout=1800,
                             )
                             record.run(
+                                "consumer-optimized-" + minor,
+                                [
+                                    all_python,
+                                    "-I",
+                                    "-O",
+                                    "-m",
+                                    "equiframe_consumer_lab",
+                                    "run",
+                                    "--all",
+                                    "--require-optimized",
+                                    "--data",
+                                    str(kit / "consumer-data"),
+                                    "--output",
+                                    str(inner / "consumer-optimized"),
+                                ],
+                                timeout=1800,
+                            )
+                            record.run(
                                 "consumer-recovery-" + minor,
                                 [
                                     all_python,
@@ -627,13 +707,33 @@ def main() -> int:
                             summary = json.loads(
                                 (inner / "consumer/summary.json").read_text("utf-8")
                             )
-                            if summary["status"] != "PASS" or summary["distinct_cases"] != 72:
+                            optimized_summary = json.loads(
+                                (inner / "consumer-optimized/summary.json").read_text("utf-8")
+                            )
+                            if (
+                                summary["status"] != "PASS"
+                                or summary["distinct_cases"] != 72
+                                or summary.get("optimization_required") is not False
+                                or summary.get("optimized") is not False
+                                or optimized_summary["status"] != "PASS"
+                                or optimized_summary["distinct_cases"] != 72
+                                or optimized_summary.get("optimization_required") is not True
+                                or optimized_summary.get("optimized") is not True
+                            ):
                                 raise RuntimeError("consumer did not execute all 72 required cases")
                             cell["consumer"] = {
                                 "summary": str((inner / "consumer/summary.json").relative_to(lab)),
                                 "sha256": sha(inner / "consumer/summary.json"),
                                 "accepted": summary["accepted_cases"],
                                 "rejected": summary["rejected_cases"],
+                            }
+                            cell["consumer_optimized"] = {
+                                "summary": str(
+                                    (inner / "consumer-optimized/summary.json").relative_to(lab)
+                                ),
+                                "sha256": sha(inner / "consumer-optimized/summary.json"),
+                                "accepted": optimized_summary["accepted_cases"],
+                                "rejected": optimized_summary["rejected_cases"],
                             }
                             record.run(
                                 "pair-binding-" + minor,

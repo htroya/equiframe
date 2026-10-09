@@ -1,5 +1,6 @@
 """Real bounded child processes; these are conformance tests, not scale claims."""
 
+import json
 import os
 import signal
 import subprocess
@@ -28,7 +29,7 @@ def run_child(directory, source, **overrides):
         "sample_interval_seconds": 0.01,
     }
     options.update(overrides)
-    return supervise([sys.executable, "-c", source], directory=directory, **options)
+    return supervise([sys.executable, "-I", "-c", source], directory=directory, **options)
 
 
 def assert_reaped(observation):
@@ -38,6 +39,32 @@ def assert_reaped(observation):
     if os.name == "posix":
         with pytest.raises(ChildProcessError):
             os.waitpid(observation.pid, os.WNOHANG)
+
+
+def complete_observation(platform):
+    measurements = scale_process._Measurements(measurement_platform=platform)
+    measurements.sampled_rss_peak_bytes = 1024
+    measurements.cpu_user_seconds = 0.1
+    measurements.cpu_system_seconds = 0.2
+    measurements.disk_apparent_peak_bytes = 2048
+    if platform != "windows":
+        measurements.disk_allocated_peak_bytes = 4096
+    if platform != "macos":
+        measurements.io_read_bytes = 10
+        measurements.io_write_bytes = 20
+        measurements.io_counter_source = "psutil"
+    if platform == "linux":
+        measurements.io_read_chars = 30
+        measurements.io_write_chars = 40
+    measurements.sample_count = 2
+    measurements.max_sample_gap_seconds = 0.01
+    return measurements.observation(
+        SimpleNamespace(pid=419, returncode=0),
+        "exited",
+        time.monotonic(),
+        0.05,
+        True,
+    )
 
 
 def test_normal_exit_logs_local_temporary_files_and_observed_resources(tmp_path):
@@ -64,6 +91,12 @@ def test_normal_exit_logs_local_temporary_files_and_observed_resources(tmp_path)
     assert observed.disk_apparent_peak_bytes >= 65536
     assert observed.resource_scope == "direct_child_excluding_descendants"
     assert observed.budget_method == "reactive_sampled_thresholds_not_hard_quotas"
+    assert observed.io_counter_source in ("psutil", "linux_proc_pid_io")
+    assert (observed.io_counter_fallback_reason is not None) == (
+        observed.io_counter_source == "linux_proc_pid_io"
+    )
+    assert observed.measurement_platform == scale_process.current_measurement_platform()
+    assert len(observed.metric_coverage) == len(scale_process._MEASUREMENT_METRICS)
     if sys.platform.startswith("linux"):
         assert observed.disk_allocated_peak_bytes > 0
         assert observed.io_read_bytes >= 0
@@ -75,6 +108,104 @@ def test_normal_exit_logs_local_temporary_files_and_observed_resources(tmp_path)
     assert "complete" not in observed.model_dump()
     save_document(observed, tmp_path / "observation.json")
     assert load_document(ProcessObservation, tmp_path / "observation.json") == observed
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows CPython venv redirector")
+def test_windows_venv_redirector_runs_real_interpreter_as_owned_child(tmp_path):
+    launcher = Path(sys.executable).resolve()
+    base = Path(getattr(sys, "_base_executable", sys.executable)).resolve()
+    if launcher == base or launcher.parent.name.casefold() != "scripts":
+        pytest.skip("the test interpreter does not use a Windows venv redirector")
+    source = (
+        "import json, os, psutil, sys, time; from pathlib import Path; "
+        "Path('identity.json').write_text(json.dumps({"
+        "'pid': os.getpid(), 'executable': sys.executable, "
+        "'base_executable': sys._base_executable, 'prefix': sys.prefix, "
+        "'psutil_path': psutil.__file__, "
+        "'launcher_variable': os.environ.get('__PYVENV_LAUNCHER__')})); "
+        "time.sleep(0.15)"
+    )
+    observed = supervise(
+        [sys.executable, "-I", "-c", source],
+        directory=tmp_path,
+        timeout_seconds=5.0,
+        rss_budget_bytes=256 * MIB,
+        disk_budget_bytes=16 * MIB,
+        sample_interval_seconds=0.01,
+    )
+    identity = json.loads((tmp_path / "identity.json").read_text())
+    assert observed.termination_reason == "exited" and observed.exit_code == 0
+    assert observed.pid == identity["pid"]
+    assert observed.observed_descendant_pids == ()
+    assert identity["executable"] == sys.executable
+    assert Path(identity["executable"]).resolve() == launcher
+    assert Path(identity["base_executable"]).resolve() == base
+    assert Path(identity["prefix"]).resolve() == launcher.parent.parent
+    assert Path(identity["psutil_path"]).resolve().is_relative_to(launcher.parent.parent)
+    assert identity["launcher_variable"] is None
+
+
+def test_windows_venv_redirect_bypass_does_not_rewrite_an_unbound_command(tmp_path):
+    command = [str(tmp_path / "python.exe"), "-c", "pass"]
+    environment = {"BOUND": "original"}
+    prepared_command, prepared_environment = scale_process._windows_venv_base_launch(
+        command, environment
+    )
+    assert prepared_command is command
+    assert prepared_environment is environment
+    assert environment == {"BOUND": "original"}
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows environment names are case-insensitive")
+def test_windows_venv_redirect_bypass_replaces_all_launcher_variable_casings():
+    if Path(sys.executable).resolve() == Path(sys._base_executable).resolve():
+        pytest.skip("the test interpreter does not use a Windows venv redirector")
+    command = [sys.executable, "-I", "-c", "pass"]
+    environment = {
+        "__PYVENV_LAUNCHER__": r"C:\bad-upper\python.exe",
+        "__pyvenv_launcher__": r"C:\bad-lower\python.exe",
+        "RETAINED": "yes",
+    }
+    prepared_command, prepared_environment = scale_process._windows_venv_base_launch(
+        command, environment
+    )
+    assert prepared_command == [sys._base_executable, "-I", "-c", "pass"]
+    launcher_keys = [key for key in prepared_environment if key.casefold() == "__pyvenv_launcher__"]
+    assert launcher_keys == ["__PYVENV_LAUNCHER__"]
+    assert prepared_environment[launcher_keys[0]] == sys.executable
+    assert prepared_environment["RETAINED"] == "yes"
+    assert environment["__pyvenv_launcher__"] == r"C:\bad-lower\python.exe"
+
+
+def test_windows_venv_redirect_bypass_requires_isolated_mode():
+    command = [sys.executable, "-c", "pass"]
+    environment = {"BOUND": "original"}
+    assert scale_process._windows_venv_base_launch(command, environment) == (
+        command,
+        environment,
+    )
+
+
+def test_descendant_cleanup_uses_captured_identity_without_pid_wait_or_reopen():
+    calls = []
+
+    class CapturedIdentity:
+        pid = 419
+
+        def kill(self):
+            calls.append("kill")
+
+        def is_running(self):
+            calls.append("is_running")
+            return False  # Includes the safe PID-reused outcome from psutil.
+
+        def wait(self, timeout=None):
+            raise AssertionError("a numeric PID wait is unsafe after possible reuse")
+
+    measurements = scale_process._Measurements(descendants=[CapturedIdentity()])
+    scale_process._kill_observed_descendants(measurements)
+    assert calls == ["kill", "is_running"]
+    assert measurements.errors == []
 
 
 def test_nonzero_exit_preserved(tmp_path):
@@ -99,34 +230,49 @@ def test_sigkill_preserves_missing_finalization(tmp_path):
     assert not (tmp_path / "completion.json").exists()
 
 
-def assert_descendant_stopped(pid):
+def assert_descendant_stopped(pid, created):
     psutil = pytest.importorskip("psutil")
+    try:
+        process = psutil.Process(pid)
+        if process.create_time() != created:
+            return
+    except psutil.NoSuchProcess:
+        return
     deadline = time.monotonic() + 1.0
     while time.monotonic() < deadline:
         try:
-            if psutil.Process(pid).status() in (psutil.STATUS_ZOMBIE, psutil.STATUS_DEAD):
+            if not process.is_running() or process.status() in (
+                psutil.STATUS_ZOMBIE,
+                psutil.STATUS_DEAD,
+            ):
                 return
         except psutil.NoSuchProcess:
             return
         time.sleep(0.01)
-    # Retain a bounded cleanup even if a regression makes the assertion fail.
+    # Retain a bounded identity-checked cleanup even if a regression makes the assertion fail.
     with suppress(psutil.NoSuchProcess):
-        psutil.Process(pid).kill()
+        if process.create_time() == created and process.is_running():
+            process.kill()
     pytest.fail("observed descendant survived supervisor cleanup")
 
 
 def test_descendant_workload_is_rejected_and_observed_child_stopped(tmp_path):
     observed = run_child(
         tmp_path,
-        "import subprocess, sys, time; from pathlib import Path; "
+        "import json, os, psutil, subprocess, sys, time; from pathlib import Path; "
+        "Path('worker.pid').write_text(str(os.getpid())); "
         "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(2)']); "
-        "Path('descendant.pid').write_text(str(child.pid)); time.sleep(2)",
+        "Path('descendant.json').write_text(json.dumps("
+        "[child.pid, psutil.Process(child.pid).create_time()])); time.sleep(2)",
+        sample_interval_seconds=0.1,
     )
     assert_reaped(observed)
     assert observed.termination_reason == "unsupported_descendant"
+    assert observed.pid == int((tmp_path / "worker.pid").read_text())
     assert observed.observed_descendant_pids
-    for pid in observed.observed_descendant_pids:
-        assert_descendant_stopped(pid)
+    identity = json.loads((tmp_path / "descendant.json").read_text())
+    assert identity[0] in observed.observed_descendant_pids
+    assert_descendant_stopped(*identity)
 
 
 @pytest.mark.skipif(
@@ -147,15 +293,16 @@ def test_private_group_is_killed_after_leader_exits_between_samples(tmp_path, mo
     monkeypatch.setattr(scale_process, "_watch", wait_for_leader_without_sampling)
     observed = run_child(
         tmp_path,
-        "import subprocess, sys; from pathlib import Path; "
+        "import json, psutil, subprocess, sys; from pathlib import Path; "
         "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(2)']); "
-        "Path('descendant.pid').write_text(str(child.pid))",
+        "Path('descendant.json').write_text(json.dumps("
+        "[child.pid, psutil.Process(child.pid).create_time()]))",
     )
     assert_reaped(observed)
     assert observed.termination_reason == "exited" and observed.exit_code == 0
     # It escaped sampling, so the supervisor cannot claim it observed the child.
     assert observed.observed_descendant_pids == ()
-    assert_descendant_stopped(int((tmp_path / "descendant.pid").read_text()))
+    assert_descendant_stopped(*json.loads((tmp_path / "descendant.json").read_text()))
 
 
 @pytest.mark.skipif(os.name != "posix", reason="POSIX group-ID reuse safety")
@@ -289,7 +436,12 @@ def test_missing_dependency_fails_closed_without_launch(tmp_path, monkeypatch):
     assert observed.pid is None and observed.exit_code is None
     assert observed.sampled_rss_peak_bytes is None and observed.cpu_user_seconds is None
     assert observed.sample_count == 0 and observed.max_sample_gap_seconds is None
-    assert observed.monitoring_errors == ("resources_extra_unavailable:ModuleNotFoundError",)
+    assert observed.monitoring_errors[0] == "resources_extra_unavailable:ModuleNotFoundError"
+    assert not observed.resource_contract_complete
+    assert all(
+        item.state in ("measurement_failed", "unavailable_on_platform")
+        for item in observed.metric_coverage
+    )
 
 
 def test_psutil_is_not_imported_when_loading_module(tmp_path):
@@ -400,7 +552,11 @@ def test_optional_io_counter_failure_preserves_partial_observation(tmp_path, mon
         def io_counters(self):
             raise NotImplementedError("synthetic platform without I/O counters")
 
+    def unavailable_proc(pid):
+        raise PermissionError("synthetic unavailable Linux /proc counter file")
+
     monkeypatch.setattr(scale_process, "import_module", lambda name: SimpleNamespace(Process=Probe))
+    monkeypatch.setattr(scale_process, "_read_linux_proc_io", unavailable_proc)
     observed = run_child(tmp_path, "import time; time.sleep(0.1)")
     assert_reaped(observed)
     assert observed.termination_reason == "exited" and observed.exit_code == 0
@@ -408,9 +564,155 @@ def test_optional_io_counter_failure_preserves_partial_observation(tmp_path, mon
     assert observed.io_read_bytes is None and observed.io_write_bytes is None
     assert observed.io_read_chars is None and observed.io_write_chars is None
     assert "io_counters_unavailable:NotImplementedError" in observed.monitoring_errors
+    if sys.platform.startswith("linux"):
+        assert "linux_proc_io_unavailable:PermissionError" in observed.monitoring_errors
+    assert observed.io_counter_source == "unavailable"
+    assert observed.io_counter_fallback_reason is None
 
 
-def test_io_missing_fields_remain_unknown_not_zero():
+def test_linux_proc_io_parses_only_kernel_cumulative_counters(tmp_path):
+    path = tmp_path / "419" / "io"
+    path.parent.mkdir()
+    path.write_text(
+        "rchar: 101\n"
+        "wchar: 202\n"
+        "syscr: 3\n"
+        "syscw: 4\n"
+        "read_bytes: 303\n"
+        "write_bytes: 404\n"
+        "cancelled_write_bytes: 9\n",
+        encoding="ascii",
+    )
+    assert scale_process._read_linux_proc_io(419, proc_root=tmp_path) == {
+        "read_bytes": 303,
+        "write_bytes": 404,
+        "read_chars": 101,
+        "write_chars": 202,
+    }
+
+
+@pytest.mark.parametrize(
+    "contents",
+    [
+        "rchar: 1\nwchar: 2\nread_bytes: 3\n",
+        "rchar: 1\nrchar: 2\nwchar: 3\nread_bytes: 4\nwrite_bytes: 5\n",
+        "rchar: -1\nwchar: 2\nread_bytes: 3\nwrite_bytes: 4\n",
+    ],
+)
+def test_linux_proc_io_rejects_incomplete_duplicate_or_invalid_data(tmp_path, contents):
+    path = tmp_path / "419" / "io"
+    path.parent.mkdir()
+    path.write_text(contents, encoding="ascii")
+    with pytest.raises(ValueError):
+        scale_process._read_linux_proc_io(419, proc_root=tmp_path)
+
+
+def test_linux_proc_io_replaces_denied_psutil_counter_probe(monkeypatch):
+    class Probe:
+        def memory_info(self):
+            return SimpleNamespace(rss=1024)
+
+        def cpu_times(self):
+            return SimpleNamespace(user=0.1, system=0.2)
+
+        def io_counters(self):
+            raise PermissionError("synthetic psutil access denial")
+
+    monkeypatch.setattr(scale_process.sys, "platform", "linux")
+    monkeypatch.setattr(
+        scale_process,
+        "_read_linux_proc_io",
+        lambda pid: {
+            "read_bytes": 10,
+            "write_bytes": 20,
+            "read_chars": 30,
+            "write_chars": 40,
+        },
+    )
+    observed = scale_process._Measurements()
+    process = SimpleNamespace(pid=419, poll=lambda: None)
+    assert observed.child(Probe(), process)
+    assert (
+        observed.io_read_bytes,
+        observed.io_write_bytes,
+        observed.io_read_chars,
+        observed.io_write_chars,
+    ) == (10, 20, 30, 40)
+    assert observed.io_counter_source == "linux_proc_pid_io"
+    assert observed.io_counter_fallback_reason == "psutil_io_counters_unavailable:PermissionError"
+    assert observed.errors == []
+
+
+@pytest.mark.skipif(not sys.platform.startswith("linux"), reason="Linux /proc process counters")
+def test_linux_proc_io_fallback_observes_the_owned_live_child(tmp_path, monkeypatch):
+    psutil = pytest.importorskip("psutil")
+
+    class Probe:
+        def __init__(self, pid):
+            self.actual = psutil.Process(pid)
+
+        def children(self, recursive=False):
+            return self.actual.children(recursive=recursive)
+
+        def memory_info(self):
+            return self.actual.memory_info()
+
+        def cpu_times(self):
+            return self.actual.cpu_times()
+
+        def io_counters(self):
+            raise PermissionError("synthetic psutil access denial")
+
+    monkeypatch.setattr(scale_process, "import_module", lambda name: SimpleNamespace(Process=Probe))
+    observed = run_child(
+        tmp_path,
+        "import time; from pathlib import Path; "
+        "Path('payload').write_bytes(b'x' * 4096); Path('payload').read_bytes(); "
+        "time.sleep(0.1)",
+    )
+    assert_reaped(observed)
+    assert observed.termination_reason == "exited" and observed.exit_code == 0
+    assert observed.io_counter_source == "linux_proc_pid_io"
+    assert observed.io_counter_fallback_reason == ("psutil_io_counters_unavailable:PermissionError")
+    assert observed.io_read_bytes is not None and observed.io_write_bytes is not None
+    assert observed.io_read_chars is not None and observed.io_write_chars is not None
+    assert not any(error.startswith("io_") for error in observed.monitoring_errors)
+    assert not any(error.startswith("linux_proc_io_") for error in observed.monitoring_errors)
+
+
+def test_failed_linux_proc_io_fallback_remains_explicitly_incomplete(monkeypatch):
+    class Probe:
+        def memory_info(self):
+            return SimpleNamespace(rss=1024)
+
+        def cpu_times(self):
+            return SimpleNamespace(user=0.1, system=0.2)
+
+        def io_counters(self):
+            raise PermissionError("synthetic psutil access denial")
+
+    def denied(pid):
+        raise PermissionError("synthetic /proc access denial")
+
+    monkeypatch.setattr(scale_process.sys, "platform", "linux")
+    monkeypatch.setattr(scale_process, "_read_linux_proc_io", denied)
+    observed = scale_process._Measurements()
+    assert observed.child(Probe(), SimpleNamespace(pid=419, poll=lambda: None))
+    assert (
+        observed.io_read_bytes,
+        observed.io_write_bytes,
+        observed.io_read_chars,
+        observed.io_write_chars,
+    ) == (None, None, None, None)
+    assert observed.io_counter_source == "unavailable"
+    assert observed.io_counter_fallback_reason is None
+    assert set(observed.errors) == {
+        "io_counters_unavailable:PermissionError",
+        "linux_proc_io_unavailable:PermissionError",
+    }
+
+
+def test_windows_native_io_character_absence_is_not_zero_or_failure():
     class Probe:
         def memory_info(self):
             return SimpleNamespace(rss=1024)
@@ -421,11 +723,111 @@ def test_io_missing_fields_remain_unknown_not_zero():
         def io_counters(self):
             return SimpleNamespace(read_bytes=100, write_bytes=200)
 
-    observed = scale_process._Measurements()
+    observed = scale_process._Measurements(measurement_platform="windows")
     assert observed.child(Probe(), SimpleNamespace(poll=lambda: None))
     assert observed.io_read_bytes == 100 and observed.io_write_bytes == 200
     assert observed.io_read_chars is None and observed.io_write_chars is None
-    assert set(observed.errors) == {"io_read_chars_unavailable", "io_write_chars_unavailable"}
+    assert observed.io_counter_source == "psutil"
+    assert observed.errors == []
+
+
+def test_macos_documented_io_absence_does_not_call_an_unsupported_probe():
+    class Probe:
+        def memory_info(self):
+            return SimpleNamespace(rss=1024)
+
+        def cpu_times(self):
+            return SimpleNamespace(user=0.1, system=0.2)
+
+        def io_counters(self):
+            raise AssertionError("macOS contract must not call an unsupported psutil API")
+
+    observed = scale_process._Measurements(measurement_platform="macos")
+    assert observed.child(Probe(), SimpleNamespace(poll=lambda: None))
+    assert observed.io_counter_source == "unavailable"
+    assert observed.io_read_bytes is None and observed.io_write_bytes is None
+    assert observed.io_read_chars is None and observed.io_write_chars is None
+    assert observed.errors == []
+
+
+def test_missing_allocated_blocks_are_expected_only_on_windows(tmp_path, monkeypatch):
+    monkeypatch.setattr(scale_process, "_disk_usage", lambda directory: (10, None))
+    windows = scale_process._Measurements(measurement_platform="windows")
+    windows.disk(tmp_path)
+    assert windows.disk_apparent_peak_bytes == 10
+    assert windows.disk_allocated_peak_bytes is None
+    assert windows.errors == []
+
+    for platform in ("linux", "macos"):
+        measured = scale_process._Measurements(measurement_platform=platform)
+        measured.disk(tmp_path)
+        assert measured.disk_allocated_peak_bytes is None
+        assert measured.errors == ["disk_allocated_bytes_unavailable"]
+
+
+@pytest.mark.parametrize("platform", ["linux", "windows", "macos"])
+def test_platform_contract_accepts_only_its_documented_complete_coverage(platform):
+    observed = complete_observation(platform)
+    assert observed.resource_contract_complete
+    coverage = {item.metric: item for item in observed.metric_coverage}
+    assert tuple(coverage) == scale_process._MEASUREMENT_METRICS
+    for metric, reason in scale_process._PLATFORM_UNAVAILABLE[platform].items():
+        assert getattr(observed, metric) is None
+        assert coverage[metric].state == "unavailable_on_platform"
+        assert coverage[metric].source is None
+        assert coverage[metric].reason == reason
+    for metric in set(scale_process._MEASUREMENT_METRICS) - set(
+        scale_process._PLATFORM_UNAVAILABLE[platform]
+    ):
+        assert getattr(observed, metric) is not None
+        assert coverage[metric].state == "observed"
+        assert coverage[metric].source is not None
+        assert coverage[metric].reason is None
+
+
+def test_supported_metric_failure_cannot_be_closed_as_platform_unavailable():
+    observed = complete_observation("windows")
+    failed = observed.model_dump()
+    failed["io_read_bytes"] = None
+    item = next(entry for entry in failed["metric_coverage"] if entry["metric"] == "io_read_bytes")
+    item.update(
+        state="unavailable_on_platform",
+        source=None,
+        reason="windows_psutil_process_io_read_chars_not_exposed",
+    )
+    with pytest.raises(ValidationError, match="supported platform metric"):
+        ProcessObservation.model_validate(failed)
+
+
+def test_platform_absence_requires_the_exact_reason_and_never_a_value():
+    observed = complete_observation("windows")
+    wrong_reason = observed.model_dump()
+    item = next(
+        entry for entry in wrong_reason["metric_coverage"] if entry["metric"] == "io_read_chars"
+    )
+    item["reason"] = "generic_unavailable"
+    with pytest.raises(ValidationError, match="exact reason"):
+        ProcessObservation.model_validate(wrong_reason)
+
+    invented = observed.model_dump()
+    invented["io_read_chars"] = 0
+    with pytest.raises(ValidationError, match="exact reason"):
+        ProcessObservation.model_validate(invented)
+
+
+def test_linux_contract_requires_all_four_io_semantics():
+    observed = complete_observation("linux")
+    data = observed.model_dump()
+    data["io_read_chars"] = None
+    data["monitoring_errors"] = ("io_read_chars_measurement_unavailable",)
+    item = next(entry for entry in data["metric_coverage"] if entry["metric"] == "io_read_chars")
+    item.update(
+        state="measurement_failed",
+        source=None,
+        reason="io_read_chars_measurement_unavailable",
+    )
+    partial = ProcessObservation.model_validate(data)
+    assert not partial.resource_contract_complete
 
 
 def test_rss_probe_error_fails_closed_for_running_child(tmp_path, monkeypatch):
@@ -447,6 +849,22 @@ def test_rss_probe_error_fails_closed_for_running_child(tmp_path, monkeypatch):
     assert observed.termination_reason == "monitoring_failed"
     assert observed.sampled_rss_peak_bytes is None
     assert "rss_monitoring_failed:PermissionError" in observed.monitoring_errors
+
+
+def test_rss_exit_race_is_benign_only_after_an_actual_observation():
+    class Probe:
+        def memory_info(self):
+            raise RuntimeError("synthetic process already exited")
+
+    process = SimpleNamespace(pid=419, returncode=0, poll=lambda: 0)
+    observed = scale_process._Measurements()
+    observed.sampled_rss_peak_bytes = 1024
+    assert observed.child(Probe(), process)
+    assert observed.errors == []
+
+    missing = scale_process._Measurements()
+    assert missing.child(Probe(), process)
+    assert missing.errors == ["rss_unavailable_at_exit:RuntimeError"]
 
 
 @pytest.mark.skipif(os.name != "posix", reason="POSIX hard links and symlinks")
@@ -488,6 +906,21 @@ def test_invalid_limits_rejected_before_start(tmp_path, key, value):
 
 def test_observation_strict_model_rejects_false_exit_claim(tmp_path):
     observed = run_child(tmp_path, "pass")
+    legacy = observed.model_dump()
+    legacy.pop("io_counter_source")
+    legacy.pop("io_counter_fallback_reason")
+    legacy.pop("measurement_contract")
+    legacy.pop("measurement_platform")
+    legacy.pop("metric_coverage")
+    restored = ProcessObservation.model_validate(legacy)
+    assert restored.io_counter_source == "legacy_unspecified"
+    assert restored.io_counter_fallback_reason is None
+    assert restored.measurement_contract == "legacy_unspecified"
+    assert not restored.resource_contract_complete
+    contradictory = observed.model_dump()
+    contradictory["io_counter_source"] = "unavailable"
+    with pytest.raises(ValidationError, match="cannot contain observations"):
+        ProcessObservation.model_validate(contradictory)
     data = observed.model_dump()
     data["exit_code"] = None
     with pytest.raises(ValidationError, match="reaped child"):

@@ -18,6 +18,13 @@ SCRIPT = EXAMPLES / "adoption_replay.py"
 SENTINEL = "private-environment-or-error-message"
 
 
+def symlink_or_skip(link, target, *, directory=False):
+    try:
+        link.symlink_to(target, target_is_directory=directory)
+    except (NotImplementedError, OSError) as error:
+        pytest.skip(f"symlinks unavailable on this host: {error}")
+
+
 @pytest.fixture
 def recipe():
     spec = importlib.util.spec_from_file_location("adoption_replay", SCRIPT)
@@ -221,7 +228,7 @@ def test_report_verifier_rejects_open_or_corrupted_inventory(recipe, tmp_path, k
         target = tmp_path / "outside.txt"
         target.write_text(SENTINEL)
         (report / "report.txt").unlink()
-        (report / "report.txt").symlink_to(target)
+        symlink_or_skip(report / "report.txt", target)
     with pytest.raises(recipe.ReplayError):
         recipe.verify_report(report)
 
@@ -237,8 +244,13 @@ def test_output_and_hash_validation_do_not_overwrite_evidence(recipe, tmp_path):
     with pytest.raises(recipe.ReplayError, match="SHA-256"):
         recipe.run_replay(tmp_path / "invalid", wheel_sha256="not-a-hash")
     assert not (tmp_path / "invalid").exists()
+
+
+def test_linked_output_is_rejected(recipe, tmp_path):
+    output = tmp_path / "existing"
+    output.mkdir()
     link = tmp_path / "linked"
-    link.symlink_to(output, target_is_directory=True)
+    symlink_or_skip(link, output, directory=True)
     with pytest.raises(recipe.ReplayError, match="symlink"):
         recipe.run_replay(link / "nested")
     assert not (output / "nested").exists()

@@ -344,44 +344,50 @@ def _write_reader(
 
     rows = 0
     nulls, nans = [0] * len(native_types), [0] * len(native_types)
-    with path.open("xb") as sink, pa.ipc.new_file(sink, reader.schema) as writer:
-        while True:
-            check()
-            try:
-                batch = reader.read_next_batch()
-            except StopIteration:
-                break
-            except (OSError, pa.ArrowException) as error:
-                # The Arrow stream bridge can wrap DuckDB conversion/UDF and
-                # interrupt errors in OSError, outside duckdb.Error's hierarchy.
-                # Inspect cancellation/deadline before assigning a native failure.
-                # Keep this boundary around fetch only: disk write/fsync failures
-                # below remain filesystem errors rather than being mislabeled.
+    with path.open("xb") as sink:
+        with pa.ipc.new_file(sink, reader.schema) as writer:
+            while True:
                 check()
-                if isinstance(error, pa.ArrowMemoryError):
-                    raise ResourceLimitError("DuckDB capture exhausted Arrow memory") from error
-                raise NativeEngineError(
-                    "DuckDB capture fetch failed; no complete snapshot published"
-                ) from error
+                try:
+                    batch = reader.read_next_batch()
+                except StopIteration:
+                    break
+                except (OSError, pa.ArrowException) as error:
+                    # The Arrow stream bridge can wrap DuckDB conversion/UDF and
+                    # interrupt errors in OSError, outside duckdb.Error's hierarchy.
+                    # Inspect cancellation/deadline before assigning a native failure.
+                    # Keep this boundary around fetch only: disk write/fsync failures
+                    # below remain filesystem errors rather than being mislabeled.
+                    check()
+                    if isinstance(error, pa.ArrowMemoryError):
+                        raise ResourceLimitError("DuckDB capture exhausted Arrow memory") from error
+                    raise NativeEngineError(
+                        "DuckDB capture fetch failed; no complete snapshot published"
+                    ) from error
+                check()
+                rows += batch.num_rows
+                if rows > options.max_rows:
+                    raise ResourceLimitError("DuckDB capture row budget exhausted")
+                if batch.nbytes > options.max_batch_bytes:
+                    raise ResourceLimitError("DuckDB capture batch byte budget exhausted")
+                table = pa.Table.from_batches([batch])
+                verify_duckdb_table(table, native_types, timezone)
+                for i, column in enumerate(batch.columns):
+                    nulls[i] += column.null_count
+                    if pa.types.is_floating(column.type):
+                        nans[i] += int(pc.sum(pc.is_nan(column)).as_py() or 0)
+                writer.write_batch(batch)
+                sink.flush()
+                if sink.tell() > options.max_bytes:
+                    raise ResourceLimitError("DuckDB capture serialized byte budget exhausted")
             check()
-            rows += batch.num_rows
-            if rows > options.max_rows:
-                raise ResourceLimitError("DuckDB capture row budget exhausted")
-            if batch.nbytes > options.max_batch_bytes:
-                raise ResourceLimitError("DuckDB capture batch byte budget exhausted")
-            table = pa.Table.from_batches([batch])
-            verify_duckdb_table(table, native_types, timezone)
-            for i, column in enumerate(batch.columns):
-                nulls[i] += column.null_count
-                if pa.types.is_floating(column.type):
-                    nans[i] += int(pc.sum(pc.is_nan(column)).as_py() or 0)
-            writer.write_batch(batch)
-            sink.flush()
-            if sink.tell() > options.max_bytes:
-                raise ResourceLimitError("DuckDB capture serialized byte budget exhausted")
-        check()
+        # Arrow writes its footer while closing the writer. Flush and sync that
+        # complete file through the original writable descriptor: Windows rejects
+        # fsync on a descriptor reopened read-only.
+        sink.flush()
+        if sink.tell() > options.max_bytes:
+            raise ResourceLimitError("DuckDB capture serialized byte budget exhausted")
+        os.fsync(sink.fileno())
     if path.stat().st_size > options.max_bytes:
         raise ResourceLimitError("DuckDB capture serialized byte budget exhausted")
-    with path.open("rb") as finished:
-        os.fsync(finished.fileno())
     return rows, nulls, nans

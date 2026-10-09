@@ -179,6 +179,7 @@ def test_driver_propagates_the_requested_interpreter_to_every_python_gate(
 
 
 def test_interpreter_identity_observes_the_actual_executable(driver, tmp_path):
-    identity = driver["interpreter_identity"]([sys.executable], tmp_path, {})
+    environment = driver["candidate_environment"](tmp_path / "bytecode")
+    identity = driver["interpreter_identity"]([sys.executable], tmp_path, environment)
     assert identity["python"] == driver["platform"].python_version()
     assert Path(identity["executable"]).resolve() == Path(sys.executable).resolve()

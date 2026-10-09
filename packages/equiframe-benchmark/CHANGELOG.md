@@ -1,4 +1,9 @@
-## 0.12.0a8 - Python compatibility maturity candidate (2026-10-08)
+## 0.12.0a10 — remediación del laboratorio de universalidad (2026-10-09)
+
+- Require binary-compatible candidates during minimum/latest benchmark resolution,
+  matching the existing binary-only hash-locked synchronization step.
+- Preserve dependency ranges, native benchmark behavior and scientific protocols.
+- Keep A9 receipts historical; they do not establish A10 support.
 
 ## 0.12.0a9 — candidato de universalidad (sin publicación pública)
 
@@ -10,6 +15,7 @@ Nueva identidad distribuida para herramientas/guías revisadas y dependencia dir
 - Preserve the paired native pilot, resource supervisor and benchmark public profiles across the selected interpreters
 - Keep the candidate private Alpha. VM/platform receipts, rights, governance, security coverage and actual independent acceptance remain explicit gates
 
+## 0.12.0a8 - Python compatibility maturity candidate (2026-10-08)
 
 # Private benchmark alpha 0.12.0a7 — 2026-10-07
 

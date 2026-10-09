@@ -37,6 +37,81 @@ def member(root: Path, name: str) -> Path:
     return path
 
 
+def command_for(commands: list[dict], identity: str, value: str) -> list[str]:
+    """Return one recorded argv after proving its stage/label identity is unique."""
+    matches = [entry for entry in commands if entry.get(identity) == value]
+    if len(matches) != 1:
+        raise ValueError(f"expected exactly one {identity} command: {value}")
+    command = matches[0].get("command")
+    if (
+        not isinstance(command, list)
+        or not command
+        or any(not isinstance(argument, str) or not argument for argument in command)
+    ):
+        raise ValueError(f"{value} command argv is absent or malformed")
+    return command
+
+
+def require_command_contract(
+    command: list[str],
+    operation: tuple[str, ...],
+    *,
+    flags: tuple[str, ...] = (),
+    pairs: tuple[tuple[str, str], ...] = (),
+    forbidden: tuple[str, ...] = (),
+) -> None:
+    """Prove security/reproducibility switches from the recorded argv itself."""
+    occurrences = sum(
+        command[index : index + len(operation)] == list(operation)
+        for index in range(len(command) - len(operation) + 1)
+    )
+    if occurrences != 1:
+        raise ValueError("recorded command does not contain the required operation")
+    for flag in flags:
+        if command.count(flag) != 1:
+            raise ValueError("recorded command lacks one unambiguous " + flag)
+    for flag, value in pairs:
+        positions = [index for index, argument in enumerate(command) if argument == flag]
+        if len(positions) != 1 or positions[0] + 1 >= len(command):
+            raise ValueError("recorded command lacks one unambiguous " + flag)
+        if command[positions[0] + 1] != value:
+            raise ValueError(f"recorded command requires {flag} {value}")
+    unexpected = sorted(set(command).intersection(forbidden))
+    if unexpected:
+        raise ValueError("recorded command contains forbidden option: " + ", ".join(unexpected))
+
+
+def validate_core_command_contract(commands: list[dict]) -> None:
+    """Bind a passing core profile to the exact-wheel, no-resolution reinstall."""
+    command = command_for(commands, "stage", "install-exact-wheel")
+    require_command_contract(
+        command,
+        ("pip", "install"),
+        flags=("--no-index", "--no-deps", "--reinstall"),
+        forbidden=("--index-url", "--extra-index-url"),
+    )
+
+
+def validate_benchmark_command_contract(commands: list[dict]) -> None:
+    """Bind a passing benchmark profile to binary-only hashed solve and sync."""
+    resolve = command_for(commands, "label", "resolve")
+    require_command_contract(
+        resolve,
+        ("pip", "compile"),
+        flags=("--generate-hashes",),
+        pairs=(("--only-binary", ":all:"),),
+        forbidden=("--no-binary",),
+    )
+    dependencies = command_for(commands, "label", "dependencies")
+    require_command_contract(
+        dependencies,
+        ("pip", "sync"),
+        flags=("--require-hashes",),
+        pairs=(("--only-binary", ":all:"),),
+        forbidden=("--no-binary",),
+    )
+
+
 class Review:
     def __init__(self, kit: Path, evidence: Path):
         self.kit, self.evidence = kit, evidence
@@ -184,7 +259,10 @@ class Review:
             or inner["runtime_binding"]["machine"] != "aarch64"
         ):
             raise ValueError("installed runtime differs from interpreter probe")
-        stages = {item["stage"] for item in inner["commands"]}
+        stage_names = [item["stage"] for item in inner["commands"]]
+        if len(stage_names) != len(set(stage_names)):
+            raise ValueError("core profile repeated a command stage")
+        stages = set(stage_names)
         needed = {
             "interpreter",
             "resolve-runtime",
@@ -224,6 +302,7 @@ class Review:
             needed.add("native-migration-six-directions")
         if not needed <= stages:
             raise ValueError("core profile omitted a required stage")
+        validate_core_command_contract(inner["commands"])
         lock = self.file(str(Path(name).parent / "runtime.lock"), inner["runtime_lock"]["sha256"])
         pins = dict(re.findall(r"^([A-Za-z0-9_.-]+)==([^\s;]+)", lock.read_text("utf-8"), re.M))
         normalized = {key.lower().replace("_", "-"): value for key, value in pins.items()}
@@ -291,6 +370,7 @@ class Review:
         if profile["profile"] in ("engines", "all"):
             needed.add("native-pilot")
         self.commands(inner["commands"], needed, str(Path(path).parent))
+        validate_benchmark_command_contract(inner["commands"])
         binding = self.json(
             str(Path(path).parent / "runtime-binding.json"), inner["runtime_binding_sha256"]
         )
@@ -357,8 +437,8 @@ class Review:
             or env["isolated"] != 1
         ):
             raise ValueError("consumer execution has the wrong Python/platform/isolation")
-        if optimized and env.get("optimized") != 1:
-            raise ValueError("required optimized consumer execution was not observed")
+        if env.get("optimized") != int(optimized):
+            raise ValueError("consumer optimized execution differs from the required mode")
         return case
 
     def validate(self) -> dict:
@@ -420,6 +500,7 @@ class Review:
                     "consumer-suite-",
                     "measure-bounded-",
                     "consumer-",
+                    "consumer-optimized-",
                     "consumer-recovery-",
                     "pair-binding-",
                     "sdist-venv-",
@@ -549,7 +630,9 @@ class Review:
                 summary.get("all_expected_outcomes_observed"),
                 summary.get("recorded_native_executions"),
                 summary.get("cases_with_unavailable_native_count"),
-            ) != ("PASS", 72, 24, 48, True, 144, 0):
+                summary.get("optimization_required"),
+                summary.get("optimized"),
+            ) != ("PASS", 72, 24, 48, True, 144, 0, False, False):
                 raise ValueError("consumer actual/expected native outcomes incomplete")
             wanted = {
                 (program, variant, source, target)
@@ -589,6 +672,65 @@ class Review:
                     item["variant"],
                     item["source"],
                     item["target"],
+                )
+            optimized_consumer = cell["consumer_optimized"]
+            optimized_summary = self.json(
+                optimized_consumer["summary"], optimized_consumer["sha256"]
+            )
+            if (
+                optimized_summary.get("status"),
+                optimized_summary.get("distinct_cases"),
+                optimized_summary.get("accepted_cases"),
+                optimized_summary.get("rejected_cases"),
+                optimized_summary.get("all_expected_outcomes_observed"),
+                optimized_summary.get("recorded_native_executions"),
+                optimized_summary.get("cases_with_unavailable_native_count"),
+                optimized_summary.get("optimization_required"),
+                optimized_summary.get("optimized"),
+            ) != ("PASS", 72, 24, 48, True, 144, 0, True, True):
+                raise ValueError("optimized consumer actual/expected native outcomes incomplete")
+            optimized_records = optimized_summary["records"]
+            optimized_observed = [
+                (item["program"], item["variant"], item["source"], item["target"])
+                for item in optimized_records
+            ]
+            if len(optimized_observed) != 72 or set(optimized_observed) != wanted:
+                raise ValueError(
+                    "72 optimized consumer records are missing, repeated or outside the matrix"
+                )
+            optimized_base = Path(optimized_consumer["summary"]).parent
+            for item in optimized_records:
+                expected = {"good": 0, "defect": 1, "not_evaluable": 3}[item["variant"]]
+                if (
+                    item.get("harness_pass") is not True
+                    or item.get("process_outcome") != "completed"
+                    or item.get("expected_exit") != expected
+                    or item.get("actual_exit") != expected
+                    or "-O" not in item.get("command", [])
+                    or any(
+                        item.get(key) is not None
+                        for key in ("process_error", "receipt_error", "logs_error")
+                    )
+                ):
+                    raise ValueError(
+                        "optimized consumer child failed or changed its expected execution"
+                    )
+                for stream in ("stdout", "stderr"):
+                    self.file(
+                        str(
+                            optimized_base
+                            / "logs"
+                            / (item["case_id"] + "." + stream + ".txt")
+                        )
+                    )
+                self.consumer_case(
+                    str(optimized_base / item["case_receipt"]),
+                    minor,
+                    item["program"],
+                    item["variant"],
+                    item["source"],
+                    item["target"],
+                    optimized=True,
                 )
         return {
             "technical_receipts_consistent": True,

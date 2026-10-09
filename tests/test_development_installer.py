@@ -10,7 +10,10 @@ import unittest
 from pathlib import Path
 
 
-@unittest.skipUnless(shutil.which("bash"), "the historical installer requires Bash")
+@unittest.skipUnless(
+    os.name == "posix" and shutil.which("bash"),
+    "the historical AlmaLinux installer requires a POSIX Bash environment",
+)
 class DevelopmentInstallerTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="equiframe installer ")

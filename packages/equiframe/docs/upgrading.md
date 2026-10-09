@@ -341,3 +341,11 @@ Use the chosen interpreter explicitly. Never force requires-python, ignore
 dependencies or reuse a 3.12 binary wheelhouse on ARM64/3.10. Restore the retained
 a7 environment only on its supported Python (3.12/3.13), using original hashes;
 an attempted a7 rollback on 3.10/3.11 must fail normal metadata admission.
+
+The Windows offline lifecycle check uses the reviewed executable A7 core wheel
+`5d435e75a79754ab45c8a27f7d30ff513c006034bdddbff170ec9506816b9ff0`.
+The distinct A7 documentary-delivery wheel
+`abab950c4bdbaf38056f493ca4efc97148b0d85d8d34322d2725437c9f2b42c9`
+is retained as document history, not substituted as the runtime baseline. The
+upgrade receipt records both identities and rejects any baseline whose outer
+wheel hash differs from the reviewed executable artifact.

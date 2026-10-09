@@ -819,6 +819,33 @@ def test_capture_fsync_oserror_is_not_misclassified_as_native_failure(monkeypatc
     assert_no_capture(tmp_path)
 
 
+def test_capture_fsyncs_snapshot_through_its_writable_descriptor(monkeypatch, tmp_path):
+    real_open = implementation.Path.open
+    real_fsync = implementation.os.fsync
+    opened_files = {}
+    synced_modes = []
+
+    def tracked_open(path, mode="r", *args, **kwargs):
+        stream = real_open(path, mode, *args, **kwargs)
+        opened_files[stream.fileno()] = (path.name, mode)
+        return stream
+
+    def checked_fsync(descriptor):
+        name, mode = opened_files.get(descriptor, (None, None))
+        if name == "snapshot.arrow":
+            assert mode is not None
+            assert any(marker in mode for marker in ("w", "a", "x", "+"))
+            synced_modes.append(mode)
+        return real_fsync(descriptor)
+
+    monkeypatch.setattr(implementation.Path, "open", tracked_open)
+    monkeypatch.setattr(implementation.os, "fsync", checked_fsync)
+    artifact = capture_duckdb("SELECT 1 AS value", work_dir=tmp_path)
+
+    assert ef.read_table(artifact.data)["value"].to_pylist() == [1]
+    assert synced_modes == ["xb"]
+
+
 def test_concurrent_capture_same_session_is_refused_while_first_finishes(
     connection, monkeypatch, tmp_path
 ):

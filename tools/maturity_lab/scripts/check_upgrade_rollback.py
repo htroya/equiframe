@@ -10,13 +10,26 @@ import shutil
 import sys
 from pathlib import Path
 
-from run_vm_lab import PROBE, Recorder, now, python_at, sha, verify_kit, write_runtime_constraints
+from run_vm_lab import (
+    PROBE,
+    Recorder,
+    now,
+    python_at,
+    sha,
+    verify_kit,
+    write_runtime_constraints,
+)
 
 OLD_HASHES = {
-    "core": "abab950c4bdbaf38056f493ca4efc97148b0d85d8d34322d2725437c9f2b42c9",
+    # This is the reviewed, executable A7 wheel.  The distinct ``abab...``
+    # wheel identifies the documentary A7 delivery and was never the runtime
+    # baseline for the upgrade/rollback exercise.
+    "core": "5d435e75a79754ab45c8a27f7d30ff513c006034bdddbff170ec9506816b9ff0",
     "benchmark": "e7d5546f4b177fee234ba50a17113cd1564c1645a6485b117c4f11783737237c",
     "consumer": "760db03975a15d327406a0baafb84da085bcc9ddc6fff924b04cb11b54635e02",
 }
+
+DOCUMENTARY_A7_CORE_HASH = "abab950c4bdbaf38056f493ca4efc97148b0d85d8d34322d2725437c9f2b42c9"
 
 
 def files(directory: Path) -> dict:
@@ -149,8 +162,12 @@ def main() -> int:
         "consumer": args.old_consumer.resolve(),
     }
     for name, path in old.items():
-        if path.is_symlink() or not path.is_file() or sha(path) != OLD_HASHES[name]:
-            raise ValueError("baseline must match the exact identified historical artifact")
+        actual = sha(path) if path.is_file() and not path.is_symlink() else None
+        if actual != OLD_HASHES[name]:
+            raise ValueError(
+                f"baseline {name} must match the reviewed executable A7 artifact: "
+                f"expected {OLD_HASHES[name]}, observed {actual}"
+            )
     if not wheelhouse.is_dir() or wheelhouse.is_symlink():
         raise ValueError("reviewed local wheelhouse directory required")
     if output.exists():
@@ -164,6 +181,7 @@ def main() -> int:
         "candidate_manifest_sha256": sha(kit / "candidate.json"),
         "source": candidate["source"],
         "baseline_artifact_hashes": OLD_HASHES,
+        "documentary_a7_core_hash_not_executed": DOCUMENTARY_A7_CORE_HASH,
         "candidate_artifact_hashes": candidate["artifact_hashes"],
         "commands": [],
         "errors": [],
@@ -174,8 +192,9 @@ def main() -> int:
         "global_environment_changed": False,
         "legacy_consumer_git_fields_authoritative": False,
         "baseline_identity_note": (
-            "Outer wheel hashes identify the baseline; "
-            "old consumer hard-coded Git fields are not reused as authority"
+            "Outer wheel hashes identify the reviewed executable A7 baseline. "
+            "The distinct abab950c documentary core wheel is recorded separately and is not "
+            "executed; old consumer hard-coded Git fields are not reused as authority"
         ),
         "wheelhouse": {
             p.name: {"sha256": sha(p), "size_bytes": p.stat().st_size}

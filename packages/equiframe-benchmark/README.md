@@ -1,4 +1,4 @@
-# EquiFrame Benchmark 0.12.0a9
+# EquiFrame Benchmark 0.12.0a10
 
 **Experimental evaluation, reproducible evidence and bounded engineering costs.**
 
@@ -10,15 +10,15 @@ detector features.
 
 ## Candidate and release status
 
-This is the **private Alpha candidate 0.12.0a9**, requiring exactly
-`equiframe[arrow]==0.12.0a9`, with Python `>=3.12,<3.14`. Version strings alone do
+This is the **private Alpha candidate 0.12.0a10**, requiring exactly
+`equiframe[arrow]==0.12.0a10`, with Python `>=3.12,<3.14`. Version strings alone do
 not identify private builds: verify the commit and SHA-256 of both wheels/sdists
 against their separate trusted receipt. The team's packages are **not publicly
 released on PyPI**; do not resolve an unrelated project by name from an arbitrary
 index. License, name/ownership and public release remain owner decisions.
 Publication requires STEP10, global review and specific owner approval.
 
-The current pair is core `0.12.0a9` and benchmark `0.12.0a9`, joined by an exact
+The current pair is core `0.12.0a10` and benchmark `0.12.0a10`, joined by an exact
 core dependency. Earlier a6 artifacts and observations are retained separately;
 a passing older test does not close the reproduced minimum-Polars composition defect.
 
@@ -50,8 +50,8 @@ In a fresh directory outside the repository, using a POSIX shell:
 ```bash
 python3.12 -m venv .venv
 . .venv/bin/activate
-CORE=/absolute/path/equiframe-0.12.0a9-py3-none-any.whl
-BENCH=/absolute/path/equiframe_benchmark-0.12.0a9-py3-none-any.whl
+CORE=/absolute/path/equiframe-0.12.0a10-py3-none-any.whl
+BENCH=/absolute/path/equiframe_benchmark-0.12.0a10-py3-none-any.whl
 WHEELHOUSE=/absolute/path/reviewed-wheelhouse
 python -m pip install --no-index --find-links "$WHEELHOUSE" "${CORE}[engines]" "${BENCH}[resources]"
 python -m pip check

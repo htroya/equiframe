@@ -1,6 +1,6 @@
 # Kit ARM64 A9: guía vigente de ejecución y devolución
 
-Este kit privado contiene núcleo y benchmark **0.12.0a9**, consumidor externo **0.1.11**, sus seis artefactos y el corpus congelado. El benchmark A9 **ya declara typing-extensions directamente**; el lock conserva EquiFrame como fuente local y las versiones públicas del cierre A8. La corrección no está pendiente en este kit.
+Este kit privado contiene núcleo y benchmark **0.12.0a10**, consumidor externo **0.1.12**, sus seis artefactos y el corpus congelado. A10 conserva la dependencia directa de `typing-extensions`, reutiliza el entorno bloqueado al reinstalar la rueda exacta del núcleo y exige candidatos binarios desde la resolución de perfiles del benchmark.
 
 `candidate.json` identifica los commits/árboles de las fuentes, tooling_source, los seis artefactos, hashes y la lista obligatoria **3.10, 3.11, 3.12, 3.13**. `SHA256SUMS` identifica sus archivos. No sustituya artefactos o scripts ni mezcle manifests. El kit es intermedio: las matrices/celdas no ejecutadas siguen pendientes y no se declara 100 %.
 

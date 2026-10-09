@@ -91,7 +91,7 @@ def test_ci_subprocess_publishes_redacted_report_before_failed_assertion(
     assert not list(output.rglob("*.arrow"))
     assert not list(output.rglob("*.jsonl"))
     if code:
-        assert str(output / "report.html") in response.stderr
+        assert json.dumps(str(output / "report.html"), ensure_ascii=True) in response.stderr
         assert response.stdout == ""
     else:
         assert "Complete equivalence accepted" in response.stdout
@@ -166,7 +166,7 @@ def test_report_io_failure_is_not_pass_and_keeps_original_state(
     message = str(caught.value)
     assert "Report publication failed" in message
     assert "comparison state=" + scenario in message
-    assert str(output) in message
+    assert json.dumps(str(output), ensure_ascii=True) in message
     assert SENTINEL not in message
     assert caught.value.__suppress_context__
     assert not output.exists()

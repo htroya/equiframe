@@ -54,6 +54,32 @@ def requirements(core: Path, benchmark: Path, profile: str, env: dict) -> list[s
     return sorted(result)
 
 
+def resolution_command(
+    uv: list[str], runtime_input: Path, python: str, endpoint: str, lock: Path
+) -> list[str]:
+    """Resolve only versions that can also satisfy the binary-only installation gate."""
+    if endpoint not in ("minimum", "latest"):
+        raise ValueError("unknown benchmark profile endpoint: " + endpoint)
+    return [
+        *uv,
+        "pip",
+        "compile",
+        str(runtime_input),
+        "--python",
+        python,
+        "--generate-hashes",
+        "--only-binary",
+        ":all:",
+        "--resolution",
+        "lowest-direct" if endpoint == "minimum" else "highest",
+        "--refresh",
+        "--index-url",
+        "https://pypi.org/simple",
+        "--output-file",
+        str(lock),
+    ]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--python", required=True)
@@ -99,22 +125,7 @@ def main() -> int:
         lock = directory / "runtime.lock"
         record.run(
             "resolve",
-            [
-                *uv,
-                "pip",
-                "compile",
-                str(directory / "runtime.in"),
-                "--python",
-                args.python,
-                "--generate-hashes",
-                "--resolution",
-                "lowest-direct" if args.endpoint == "minimum" else "highest",
-                "--refresh",
-                "--index-url",
-                "https://pypi.org/simple",
-                "--output-file",
-                str(lock),
-            ],
+            resolution_command(uv, directory / "runtime.in", args.python, args.endpoint, lock),
         )
         receipt["runtime_lock_sha256"] = sha(lock)
         venv = directory / "venv"

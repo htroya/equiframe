@@ -16,6 +16,13 @@ TOOL = ROOT / "tools" / "check_adoption.py"
 M = runpy.run_path(str(TOOL))
 
 
+def symlink_or_skip(link: Path, target: Path) -> None:
+    try:
+        link.symlink_to(target)
+    except (NotImplementedError, OSError) as error:
+        pytest.skip(f"symlinks unavailable on this host: {error}")
+
+
 def attempt(repeat: bool = False, state: str = "equivalent") -> dict[str, Any]:
     outcome = {
         "state": state,
@@ -320,15 +327,20 @@ def test_invalid_json_does_not_echo_private_values(tmp_path: Path, payload: byte
     assert completed.stderr == ""
 
 
-def test_reader_rejects_links_directory_and_oversized_input(tmp_path: Path) -> None:
+def test_reader_rejects_directory_and_oversized_input(tmp_path: Path) -> None:
     with pytest.raises(ValueError):
         M["read_registry"](tmp_path)
     path = tmp_path / "large.json"
     path.write_bytes(b" " * (M["MAX_BYTES"] + 1))
     with pytest.raises(ValueError):
         M["read_registry"](path)
+
+
+def test_reader_rejects_links(tmp_path: Path) -> None:
+    path = tmp_path / "record.json"
+    path.write_text("{}", encoding="utf-8")
     link = tmp_path / "linked.json"
-    link.symlink_to(path)
+    symlink_or_skip(link, path)
     with pytest.raises(ValueError):
         M["read_registry"](link)
 

@@ -50,7 +50,7 @@ def main() -> int:
         raise ValueError("choose a new output; retain previous candidate identity")
     if any(count <= 0 for count in (args.core_tests, args.benchmark_tests, args.consumer_tests)):
         raise ValueError("freeze actual required suite counts, never zero")
-    for project in (repository, consumer):
+    for project in (repository, consumer, data):
         if git(project, "status", "--porcelain"):
             raise ValueError("commit reviewed source changes before assembling the kit")
     base = git(repository, "rev-parse", args.verified_base + "^{commit}")
@@ -76,6 +76,13 @@ def main() -> int:
             ["git", "-C", str(project), "bundle", "create", str(bundle), "HEAD"], check=True
         )
         subprocess.run(["git", "-C", str(project), "bundle", "verify", str(bundle)], check=True)
+    source["consumer_data"] = {
+        "commit": git(data, "rev-parse", "HEAD"),
+        "tree": git(data, "rev-parse", "HEAD^{tree}"),
+        "branch": git(data, "branch", "--show-current"),
+        "worktree_clean": True,
+        "history": "observed committed frozen-data source; no remote publication implied",
+    }
     source["verified_remote_baseline"] = {
         "repository": "htroya/equiframe",
         "commit": base,
@@ -114,6 +121,10 @@ def main() -> int:
         copy(prepared / name, output / name)
     # The data inventory is a frozen explicit list, never a recursive copy of private input.
     frozen = json.loads((data / "manifest.json").read_text("utf-8"))
+    tracked_data = set(git(data, "ls-files").splitlines())
+    required_data = {"manifest.json", *(item["path"] for item in frozen["files"])}
+    if not required_data <= tracked_data:
+        raise ValueError("frozen data members must belong to the committed data source")
     for item in frozen["files"]:
         relative = Path(item["path"])
         if relative.is_absolute() or ".." in relative.parts:

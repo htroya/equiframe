@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -11,9 +12,10 @@ import zipfile
 from pathlib import Path
 from unittest.mock import patch
 
-from check_benchmark_profile import requirements
+from check_benchmark_profile import requirements, resolution_command
+from check_upgrade_rollback import DOCUMENTARY_A7_CORE_HASH, OLD_HASHES
 from measure_maturity import observed_filesystem
-from run_vm_lab import Recorder, sha, verify_kit, write_runtime_constraints
+from run_vm_lab import Recorder, python_at, sha, verify_kit, write_runtime_constraints
 from validate_vm_receipts import Review, member
 
 
@@ -43,6 +45,25 @@ class HandoffToolsTests(unittest.TestCase):
             if p.is_file()
         }
         return review
+
+    def test_upgrade_uses_reviewed_executable_a7_identity(self):
+        self.assertEqual(
+            OLD_HASHES["core"],
+            "5d435e75a79754ab45c8a27f7d30ff513c006034bdddbff170ec9506816b9ff0",
+        )
+        self.assertEqual(
+            DOCUMENTARY_A7_CORE_HASH,
+            "abab950c4bdbaf38056f493ca4efc97148b0d85d8d34322d2725437c9f2b42c9",
+        )
+        self.assertNotEqual(OLD_HASHES["core"], DOCUMENTARY_A7_CORE_HASH)
+
+    def test_python_at_supports_windows_and_posix_venv_layouts(self):
+        windows = self.file("windows/Scripts/python.exe", "synthetic")
+        posix = self.file("posix/bin/python", "synthetic")
+        self.assertEqual(python_at(self.root / "windows"), str(windows))
+        self.assertEqual(python_at(self.root / "posix"), str(posix))
+        with self.assertRaises(FileNotFoundError):
+            python_at(self.root / "missing")
 
     def test_member_rejects_traversal_even_when_target_exists(self):
         self.file("nested/value", "synthetic")
@@ -147,6 +168,74 @@ class HandoffToolsTests(unittest.TestCase):
             receipt["commands"][0]["log_sha256"],
         )
 
+    def test_recorder_environment_does_not_forward_credentials(self):
+        source = {
+            "PATH": os.environ.get("PATH", "test-path"),
+            "HOME": "test-home",
+            "AWS_ACCESS_KEY_ID": "must-not-leak",
+            "AWS_SECRET_ACCESS_KEY": "must-not-leak",
+            "GH_PAT": "must-not-leak",
+            "SSH_AUTH_SOCK": "must-not-leak",
+            "HTTPS_PROXY": "https://credential@example.invalid",
+            "PYTHONPATH": "must-not-influence-tests",
+        }
+        with patch.dict(os.environ, source, clear=True):
+            record = Recorder(self.root, {"commands": []})
+        self.assertEqual(record.environment["PATH"], source["PATH"])
+        self.assertEqual(record.environment["HOME"], "test-home")
+        for name in set(source) - {"PATH", "HOME"}:
+            self.assertNotIn(name, record.environment)
+
+    def test_consumer_case_requires_the_declared_optimization_mode(self):
+        dataset_hash = "a" * 64
+        case = {
+            "program": "reconciliation",
+            "variant": "good",
+            "direction": "pandas->duckdb",
+            "observed_exit_code": 0,
+            "expected_exit_code": 0,
+            "status": "PASS",
+            "accepted": True,
+            "published": True,
+            "evidence_integrity_verified": True,
+            "portable_verified_without_native_origin": True,
+            "frozen_data_unchanged": True,
+            "native_execution_count_complete": True,
+            "dataset_manifest_sha256": dataset_hash,
+            "native_result": {
+                "executions": [{"engine": "pandas"}, {"engine": "duckdb"}]
+            },
+            "environment": {
+                "python": "3.12.1",
+                "machine": "aarch64",
+                "isolated": 1,
+                "optimized": 1,
+            },
+        }
+        self.file("case.json", json.dumps(case))
+        review = self.review()
+        review.candidate = {
+            "files": {"consumer-data/manifest.json": {"sha256": dataset_hash}}
+        }
+        review.consumer_case(
+            "case.json",
+            "3.12",
+            "reconciliation",
+            "good",
+            "pandas",
+            "duckdb",
+            optimized=True,
+        )
+        with self.assertRaisesRegex(ValueError, "optimized execution"):
+            review.consumer_case(
+                "case.json",
+                "3.12",
+                "reconciliation",
+                "good",
+                "pandas",
+                "duckdb",
+            )
+
     def test_recorder_retains_unexpected_nonzero(self):
         receipt = {"commands": []}
         record = Recorder(self.root, receipt)
@@ -196,6 +285,27 @@ class HandoffToolsTests(unittest.TestCase):
             ["pyarrow>=20"],
         )
 
+    def test_benchmark_resolution_matches_binary_only_installation(self):
+        command = resolution_command(
+            ["uv", "--no-config", "--cache-dir", "cache"],
+            self.root / "runtime.in",
+            "/usr/bin/python3.13",
+            "minimum",
+            self.root / "runtime.lock",
+        )
+        self.assertIn("--generate-hashes", command)
+        self.assertEqual(command.count("--only-binary"), 1)
+        binary = command.index("--only-binary")
+        self.assertEqual(command[binary + 1], ":all:")
+        resolution = command.index("--resolution")
+        self.assertEqual(command[resolution + 1], "lowest-direct")
+
+    def test_benchmark_resolution_rejects_unknown_endpoint(self):
+        with self.assertRaisesRegex(ValueError, "unknown benchmark profile endpoint"):
+            resolution_command(
+                ["uv"], self.root / "runtime.in", sys.executable, "oldest", self.root / "lock"
+            )
+
     def test_cloud_validation_receipt_is_never_vm_evidence(self):
         review = self.review()
         review.candidate = {}
@@ -234,17 +344,19 @@ class HandoffToolsTests(unittest.TestCase):
             write_runtime_constraints(self.root / "constraints", {})
 
     def test_measurement_uses_deepest_observed_mount(self):
-        mounts = "1 0 0:1 / / rw - overlay overlay rw\n2 1 0:2 / /tmp rw - tmpfs tmpfs rw\n"
+        disk = str(self.root).replace("\\", r"\134").replace(" ", r"\040")
+        ram = str(self.root / "ram").replace("\\", r"\134").replace(" ", r"\040")
+        mounts = f"1 0 0:1 / {disk} rw - overlay overlay rw\n2 1 0:2 / {ram} rw - tmpfs tmpfs rw\n"
         with patch.object(Path, "read_text", return_value=mounts):
-            self.assertEqual(observed_filesystem(Path("/tmp/measurement")), "tmpfs")
-            self.assertEqual(observed_filesystem(Path("/workspace/measurement")), "overlay")
+            self.assertEqual(observed_filesystem(self.root / "ram/measurement"), "tmpfs")
+            self.assertEqual(observed_filesystem(self.root / "disk/measurement"), "overlay")
 
     def test_measurement_decodes_mount_path_escapes(self):
-        mounts = (
-            "1 0 0:1 / / rw - overlay overlay rw\n2 1 0:2 / /test\\040path rw - tmpfs tmpfs rw\n"
-        )
+        disk = str(self.root).replace("\\", r"\134").replace(" ", r"\040")
+        ram = str(self.root / "test path").replace("\\", r"\134").replace(" ", r"\040")
+        mounts = f"1 0 0:1 / {disk} rw - overlay overlay rw\n2 1 0:2 / {ram} rw - tmpfs tmpfs rw\n"
         with patch.object(Path, "read_text", return_value=mounts):
-            self.assertEqual(observed_filesystem(Path("/test path/measurement")), "tmpfs")
+            self.assertEqual(observed_filesystem(self.root / "test path/measurement"), "tmpfs")
 
     def test_unknown_measurement_mount_fails_closed(self):
         with (
@@ -282,7 +394,7 @@ class HandoffToolsTests(unittest.TestCase):
                 "python": "3.10.0 synthetic fixture",
                 "machine": "aarch64",
                 "isolated": 1,
-                "optimized": 1,
+                "optimized": 0,
             },
         }
 
@@ -293,7 +405,9 @@ class HandoffToolsTests(unittest.TestCase):
         return review
 
     def test_synthetic_case_validator_checks_positive_structure_only(self):
-        review = self.case_review(self.synthetic_consumer_case())
+        case = self.synthetic_consumer_case()
+        case["environment"]["optimized"] = 1
+        review = self.case_review(case)
         review.consumer_case(
             "case.json",
             "3.10",

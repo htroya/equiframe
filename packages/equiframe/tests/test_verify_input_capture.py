@@ -2,7 +2,8 @@
 
 import hashlib
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+from urllib.parse import urlparse
+from urllib.request import url2pathname
 
 import pytest
 
@@ -24,7 +25,7 @@ def test_unsupported_expected_capture_is_nonpublishable(tmp_path, unsupported):
     artifact = ef.capture_duckdb(
         "SELECT * FROM (VALUES (7::BIGINT),(3::BIGINT)) t(x)", work_dir=tmp_path / "capture"
     ).data
-    path = Path(unquote(urlparse(artifact.uri).path))
+    path = Path(url2pathname(urlparse(artifact.uri).path))
     original = path.read_bytes()
     baseline = ef.verify(
         {"result": artifact}, contract=contract, expected=artifact, work_dir=tmp_path / "valid"
