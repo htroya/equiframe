@@ -30,6 +30,11 @@ Run the root helper tests without installing packages with
 
 ## Core checks
 
+Before installing a privately supplied candidate, use the standard-library
+[offline wheel audit](docs/OFFLINE_WHEEL_AUDIT.md) with its separately supplied
+trusted SHA-256. This verifies artifact integrity and local Markdown destinations;
+it does not authenticate a self-supplied hash or approve public distribution.
+
 From `packages/equiframe`, with a selected supported Python and `uv` available:
 
 ```bash
