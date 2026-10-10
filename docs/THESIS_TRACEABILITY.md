@@ -459,3 +459,18 @@ distribución y 1041/454 pruebas de fuente repetidas desde instalaciones externa
 Tres casos de symlinks se omiten por privilegios Windows; no se extrapola a
 otras plataformas ni al corpus/servicio/DW reales. Los pendientes empíricos,
 humanos y de publicación conservan su responsable y aceptación propia.
+
+## Avance técnico A11 y alcance de la tesis — 2026-10-10
+
+La decisión de ingeniería `UV-TECH-A11-60-v1`, registrada en
+[DECISIONS.md](DECISIONS.md), introduce un índice propio de 60 comprobaciones
+para comunicar capacidades y validación técnica del producto integrado.
+El [corte A11](UNIVERSALITY_TECHNICAL_PROGRESS_20261010.md) registra 41 puntos
+y sus motivos; no presenta ese porcentaje como resultado empírico de la tesis
+ni como una certificación general de universalidad.
+
+No modifica objetivos, hipótesis, R/M/B/H/O, corpus científico, particiones,
+etiquetas, nueve estratos ni protocolo experimental. Los ejemplos sintéticos
+y la autorización de merge no acreditan aceptación humana, datos reales ni
+entregas del servicio/DW. El cierre histórico A9 y la nueva rúbrica permanecen
+identificados por separado; no se atribuye un incremento entre escalas.

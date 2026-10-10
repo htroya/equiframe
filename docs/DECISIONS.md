@@ -521,3 +521,25 @@ quality field prevents successful verdicts from concealing absent measurements.
 No unsupported platform, public release, human adoption or external-service load
 is implied. [Protocol](SCALING.md); measured candidate results are reported with
 exact artifact identities and their known limitations.
+
+## UV-TECH-A11-60-v1 — Índice de avance técnico (2026-10-10)
+
+Motivo: informar las capacidades y la validación parcial del A11 integrado sin
+confundirlas con los doce criterios íntegros del cierre histórico A9. Se adopta
+una rúbrica propia de doce áreas con cinco comprobaciones binarias cada una,
+con definiciones fijadas antes de asignar los resultados del corte. Demostrada
+suma uno; pendiente, desconocida o evidencia de otro candidato suma cero.
+
+El [informe y sus definiciones](UNIVERSALITY_TECHNICAL_PROGRESS_20261010.md)
+registran 41/60 = 68,3 %. La selección y ponderación son decisiones explícitas
+de ingeniería, no un estándar de universalidad ni un indicador científico.
+Los recibos privados se conservan fuera de Git; el JSON público reproduce
+definiciones, motivos y aritmética, no reemplaza los recibos de ejecución.
+
+Consecuencias: este índice no reemplaza ni recalifica UV01–UV12, no convierte
+la autorización de integrar en aceptación independiente y no acredita licencia,
+adopción real ni plataformas sin recibos A11. El 25 % histórico usa otra escala:
+no existe una comparación longitudinal hasta evaluar el corte anterior con
+estas mismas definiciones. Una revisión futura de la rúbrica requiere otra
+versión y conservar los resultados de esta. No se cambian los detectores,
+el oráculo, los nueve estratos ni los protocolos y resultados de la tesis.
