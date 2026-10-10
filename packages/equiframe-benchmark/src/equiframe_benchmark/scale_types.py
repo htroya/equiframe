@@ -20,6 +20,7 @@ STAGES = (
     "render",
     "verify",
 )
+SCALE_SAMPLE_INTERVAL_SECONDS = 0.25
 
 
 class ScaleSpec(Document):

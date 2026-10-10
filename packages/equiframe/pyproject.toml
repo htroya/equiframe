@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "equiframe"
-version = "0.12.0a9"
+version = "0.12.0a10"
 description = "Operational verification, native ETL migration and portable semantic evidence"
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
@@ -82,13 +82,18 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 extend-immutable-calls = ["typer.Option"]
 
 [tool.mypy]
-python_version = "3.10"
+# Use the interpreter selected by uv so stdlib and PEP 561 stubs share its syntax level.
 strict = true
 files = ["src", "tools"]
 
 [[tool.mypy.overrides]]
 module = ["pyarrow", "pyarrow.*", "sklearn", "sklearn.*"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["equiframe._report_io"]
+# This POSIX-only attribute is reached only when os.open supports directory file descriptors.
+disable_error_code = ["attr-defined"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

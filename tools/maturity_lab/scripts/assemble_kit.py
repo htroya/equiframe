@@ -10,6 +10,12 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
+from frozen_tests import (
+    PACKAGES,
+    candidate_manifests,
+    read_manifest,
+    verify_sdist_tests,
+)
 from manifest_scope import CANDIDATE_V2, UNIVERSALITY_PYTHONS
 from run_vm_lab import sha, verify_kit, write
 
@@ -34,8 +40,12 @@ def main() -> int:
     parser.add_argument("--core-tests", type=int, required=True)
     parser.add_argument("--benchmark-tests", type=int, required=True)
     parser.add_argument("--consumer-tests", type=int, required=True)
+    for label in PACKAGES:
+        parser.add_argument("--" + label + "-test-manifest", type=Path, required=True)
     parser.add_argument(
-        "--verified-base", required=True, help="Observed remote main commit; must be an ancestor"
+        "--verified-base",
+        required=True,
+        help="Observed remote main commit; must be an ancestor",
     )
     parser.add_argument(
         "--tooling-repository",
@@ -50,12 +60,13 @@ def main() -> int:
         raise ValueError("choose a new output; retain previous candidate identity")
     if any(count <= 0 for count in (args.core_tests, args.benchmark_tests, args.consumer_tests)):
         raise ValueError("freeze actual required suite counts, never zero")
-    for project in (repository, consumer):
+    for project in (repository, consumer, data):
         if git(project, "status", "--porcelain"):
             raise ValueError("commit reviewed source changes before assembling the kit")
     base = git(repository, "rev-parse", args.verified_base + "^{commit}")
     subprocess.run(
-        ["git", "-C", str(repository), "merge-base", "--is-ancestor", base, "HEAD"], check=True
+        ["git", "-C", str(repository), "merge-base", "--is-ancestor", base, "HEAD"],
+        check=True,
     )
     tooling = (args.tooling_repository or repository).resolve()
     if git(tooling, "status", "--porcelain"):
@@ -73,9 +84,17 @@ def main() -> int:
         bundle = output / "source" / (label + ".bundle")
         bundle.parent.mkdir(exist_ok=True)
         subprocess.run(
-            ["git", "-C", str(project), "bundle", "create", str(bundle), "HEAD"], check=True
+            ["git", "-C", str(project), "bundle", "create", str(bundle), "HEAD"],
+            check=True,
         )
         subprocess.run(["git", "-C", str(project), "bundle", "verify", str(bundle)], check=True)
+    source["consumer_data"] = {
+        "commit": git(data, "rev-parse", "HEAD"),
+        "tree": git(data, "rev-parse", "HEAD^{tree}"),
+        "branch": git(data, "branch", "--show-current"),
+        "worktree_clean": True,
+        "history": "observed committed frozen-data source; no remote publication implied",
+    }
     source["verified_remote_baseline"] = {
         "repository": "htroya/equiframe",
         "commit": base,
@@ -104,16 +123,36 @@ def main() -> int:
             relative = "artifacts/" + path.name
             copy(path, output / relative)
             artifacts[label + suffix], hashes[label + suffix] = relative, sha(path)
+    test_manifests = {}
+    for label in PACKAGES:
+        path = getattr(args, label + "_test_manifest").resolve()
+        frozen_tests = read_manifest(path, label, getattr(args, label + "_tests"))
+        verify_sdist_tests(output / artifacts[label + "_sdist"], frozen_tests)
+        relative = "test-manifests/" + label + ".json"
+        copy(path, output / relative)
+        test_manifests[label] = {
+            "path": relative,
+            "sha256": sha(path),
+            "size_bytes": path.stat().st_size,
+        }
     prepared = tooling / "tools/maturity_lab"
     for path in sorted((prepared / "scripts").glob("*.py")):
         copy(path, output / "scripts" / path.name)
     for path in sorted((prepared / "locks").iterdir()):
         if path.is_file():
             copy(path, output / "locks" / path.name)
-    for name in ("README_VM_ES.md", "OPERATOR_RECEIPT_TEMPLATE.json", "run_from_windows.ps1"):
+    for name in (
+        "README_VM_ES.md",
+        "OPERATOR_RECEIPT_TEMPLATE.json",
+        "run_from_windows.ps1",
+    ):
         copy(prepared / name, output / name)
     # The data inventory is a frozen explicit list, never a recursive copy of private input.
     frozen = json.loads((data / "manifest.json").read_text("utf-8"))
+    tracked_data = set(git(data, "ls-files").splitlines())
+    required_data = {"manifest.json", *(item["path"] for item in frozen["files"])}
+    if not required_data <= tracked_data:
+        raise ValueError("frozen data members must belong to the committed data source")
     for item in frozen["files"]:
         relative = Path(item["path"])
         if relative.is_absolute() or ".." in relative.parts:
@@ -139,6 +178,7 @@ def main() -> int:
         "source": source,
         "artifacts": artifacts,
         "artifact_hashes": hashes,
+        "test_manifests": test_manifests,
         "files": files,
         "suite_minimums": {
             "core": args.core_tests,
@@ -150,11 +190,13 @@ def main() -> int:
         "criteria_automatically_closed": [],
         "private_credentials_included": False,
     }
+    candidate_manifests(output, manifest, required=True)
     write(output / "candidate.json", manifest)
     (output / "SHA256SUMS").write_text(
         "".join(f"{item['sha256']}  {name}\n" for name, item in sorted(files.items()))
         + f"{sha(output / 'candidate.json')}  candidate.json\n",
         encoding="utf-8",
+        newline="\n",
     )
     verify_kit(output)
     print(

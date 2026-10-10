@@ -139,7 +139,9 @@ def artifact_metadata(path: Path) -> dict[str, Any]:
             if len(infos) > 30000:
                 fail("Archive member limit exceeded")
             for info in infos:
-                name = info.filename
+                # ZipInfo.filename is platform-normalized (notably ``\\`` to ``/``
+                # on Windows). Validate the raw archive name before that normalization.
+                name = info.orig_filename
                 if not safe_member(name) or name in seen:
                     fail("Unsafe or duplicate archive member")
                 seen.add(name)

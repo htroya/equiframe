@@ -1,4 +1,13 @@
-## 0.12.0a8 - Python compatibility maturity candidate (2026-10-08)
+## 0.12.0a10 — remediación del laboratorio de universalidad (2026-10-09)
+
+- Execute and close separate exact 72-case consumer matrices under normal Python
+  and the native interpreter's real `-O` mode in every universality cell.
+- Reuse the hash-locked dependency environment when reinstalling the exact core wheel;
+  the second phase uses `--no-deps --reinstall`, followed by `pip check`, installed
+  payload comparison and runtime binding checks.
+- Preserve all A9 runtime semantics and formats. The new identity is required because
+  the compatibility verifier is distributed in the sdist and its bytes changed.
+- Keep A9 receipts historical; they do not establish A10 support.
 
 ## 0.12.0a9 — candidato de universalidad (sin publicación pública)
 
@@ -12,6 +21,8 @@ Nueva identidad distribuida para herramientas/guías revisadas y dependencia dir
 
 - Match quick and installed-consumer strict type checks to the actual Python; preserve complete type-check scope
 - Extend the historical installer to the declared minors and keep all GitHub workflows manual and unexecuted
+
+## 0.12.0a8 - Python compatibility maturity candidate (2026-10-08)
 
 # Private A7 usability documentation revision — 2026-10-07
 

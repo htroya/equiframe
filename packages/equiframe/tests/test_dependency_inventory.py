@@ -26,7 +26,14 @@ def wheel(path: Path, metadata: str, extra: str | None = None) -> None:
     with zipfile.ZipFile(path, "w") as archive:
         archive.writestr("sample-1.0.dist-info/METADATA", metadata)
         if extra:
-            archive.writestr(extra, "invalid")
+            if "\\" in extra:
+                # ZipInfo.__init__ normalizes backslashes on Windows. Assigning the
+                # raw member afterward creates the same hostile ZIP bytes everywhere.
+                member = zipfile.ZipInfo("placeholder")
+                member.filename = extra
+                archive.writestr(member, "invalid")
+            else:
+                archive.writestr(extra, "invalid")
 
 
 def sdist(path: Path, metadata: str, link: bool = False) -> None:

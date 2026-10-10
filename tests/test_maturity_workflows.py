@@ -9,16 +9,24 @@ ROOT = Path(__file__).resolve().parents[1]
 class MaturityWorkflowTests(unittest.TestCase):
     def test_full_matrix_preserves_platforms_and_required_python_minors(self):
         text = (ROOT / '.github/workflows/equiframe.yml').read_text()
-        cells = set(re.findall(r'- os: ([^\n]+)\n\s+architecture: ([^\n]+)\n\s+python: \'([^\']+)\'', text))
+        entries = re.findall(
+            r'os: ([^\n]+)\n\s+system: [^\n]+\n\s+architecture: ([^\n]+)\n\s+python: \'([^\']+)\'',
+            text,
+        )
+        cells = set(entries)
         expected = {(os, arch, minor)
                     for os, arch in (("ubuntu-24.04", "x64"), ("ubuntu-24.04-arm", "arm64"),
                                      ("windows-2022", "x64"), ("macos-15-intel", "x64"),
                                      ("macos-15", "arm64"))
                     for minor in ("3.10", "3.11", "3.12", "3.13")}
         self.assertEqual(cells, expected)
+        self.assertEqual(len(entries), 20)
         self.assertIn('python-version: ${{ matrix.python }}', text)
-        self.assertEqual(text.count('mypy --python-version ${{ matrix.python }}'), 2)
-        self.assertEqual(text.count('uv sync --locked --all-extras --no-editable --python ${{ matrix.python }}'), 2)
+        self.assertIn('--expected-python "${{ matrix.python }}"', text)
+        self.assertIn('run_universality_cell.py', text)
+        self.assertEqual(text.count('uv sync --locked --all-extras --no-editable --python 3.12'), 2)
+        self.assertIn('--reinstall-package equiframe --python 3.12', text)
+        self.assertIn('Download the single immutable candidate', text)
         self.assertIn('workflow_dispatch:', text)
         self.assertIn('default: false', text)
         self.assertNotRegex(text, r'(?m)^\s*(push|pull_request|schedule):')

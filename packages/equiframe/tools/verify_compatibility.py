@@ -284,8 +284,71 @@ def extract_sdist(sdist: Path, destination: Path, wheel_files: dict[str, dict[st
     return source
 
 
-def inspect_junit(path: Path) -> dict[str, Any]:
-    """A skip/xfail is a non-support result, never an accepted matrix cell."""
+def core_skip_contract(system: str) -> set[tuple[str, str, str]]:
+    if system == "Windows":
+        return {
+            (
+                "tests.test_report_io",
+                "test_special_evidence_file_rejected_before_open",
+                "FIFO unavailable",
+            )
+        }
+    if system in ("Linux", "Darwin"):
+        return set()
+    raise ValueError(f"unsupported core skip-contract system: {system}")
+
+
+def skip_records(values: set[tuple[str, str, str]]) -> list[dict[str, str]]:
+    return [
+        {"class": classname, "name": name, "message": message}
+        for classname, name, message in sorted(values)
+    ]
+
+
+def expected_test_identities(path: Path) -> tuple[set[tuple[str, str]], dict[str, Any]]:
+    loaded: object = json.loads(path.read_text("utf-8"))
+    if not isinstance(loaded, dict):
+        raise TypeError("test manifest must be an object")
+    tests = loaded.get("tests")
+    if (
+        loaded.get("schema") != "equiframe-test-manifest-1"
+        or loaded.get("package") != "equiframe"
+        or loaded.get("plugin_autoload_disabled") is not True
+        or not isinstance(loaded.get("pytest_version"), str)
+        or not isinstance(loaded.get("hypothesis_version"), str)
+        or not isinstance(tests, list)
+        or loaded.get("test_count") != len(tests)
+        or not tests
+    ):
+        raise ValueError("core test manifest header differs")
+    identities: list[tuple[str, str]] = []
+    for item in tests:
+        if not isinstance(item, dict):
+            raise TypeError("core test manifest identity must be an object")
+        classname, name = item.get("classname"), item.get("name")
+        if not isinstance(classname, str) or not classname or not isinstance(name, str) or not name:
+            raise ValueError("core test manifest contains an empty JUnit identity")
+        identities.append((classname, name))
+    if len(set(identities)) != len(identities):
+        raise ValueError("core test manifest repeats a JUnit identity")
+    encoded = json.dumps(sorted(identities), separators=(",", ":")).encode("utf-8")
+    summary = {
+        "test_count": len(identities),
+        "junit_identities_sha256": hashlib.sha256(encoded).hexdigest(),
+        "record": artifact_record(path),
+        "pytest_version": loaded["pytest_version"],
+        "hypothesis_version": loaded["hypothesis_version"],
+    }
+    return set(identities), summary
+
+
+def inspect_junit(
+    path: Path,
+    expected_skips: set[tuple[str, str, str]] | None = None,
+    expected_tests: set[tuple[str, str]] | None = None,
+) -> dict[str, Any]:
+    """Accept only the exact declared native-platform skip contract."""
+    expected_skips = set() if expected_skips is None else expected_skips
     root = ET.parse(path).getroot()
     if root.tag not in ("testsuite", "testsuites"):
         raise ValueError("invalid JUnit root")
@@ -300,7 +363,13 @@ def inspect_junit(path: Path) -> dict[str, Any]:
         "xfail": 0,
         "cases": [],
     }
+    observed_skips: list[tuple[str, str, str]] = []
+    observed_tests: list[tuple[str, str]] = []
     for case in cases:
+        identity = (case.get("classname", ""), case.get("name", ""))
+        if expected_tests is not None and not all(identity):
+            raise ValueError("JUnit testcase identity is incomplete")
+        observed_tests.append(identity)
         outcomes = [child for child in case if child.tag in ("failure", "error", "skipped")]
         if len(outcomes) > 1:
             raise ValueError("contradictory JUnit testcase outcomes")
@@ -314,8 +383,26 @@ def inspect_junit(path: Path) -> dict[str, Any]:
             and "xfail" in (outcome.get("type", "") + " " + outcome.get("message", "")).lower()
         ):
             result["xfail"] += 1
+        if status == "skipped":
+            classname, name, message = (
+                case.get("classname"),
+                case.get("name"),
+                outcome.get("message") if outcome is not None else None,
+            )
+            if not classname or not name or message is None:
+                raise ValueError("JUnit skip identity is incomplete")
+            observed_skips.append((classname, name, message))
         result["cases"].append(
-            {"name": case.get("name", ""), "class": case.get("classname", ""), "status": status}
+            {
+                "name": case.get("name", ""),
+                "class": case.get("classname", ""),
+                "status": status,
+                **(
+                    {"message": outcome.get("message")}
+                    if status == "skipped" and outcome is not None
+                    else {}
+                ),
+            }
         )
     for suite in root.iter():
         if suite.tag not in ("testsuite", "testsuites"):
@@ -330,7 +417,21 @@ def inspect_junit(path: Path) -> dict[str, Any]:
         for key, actual in counts.items():
             if key in suite.attrib and int(suite.attrib[key]) != actual:
                 raise ValueError("JUnit summary disagrees with testcase outcomes")
-    result["accepted"] = not any(result[key] for key in ("failures", "errors", "skipped", "xfail"))
+    result["expected_skips"] = skip_records(expected_skips)
+    result["observed_skips"] = skip_records(set(observed_skips))
+    encoded = json.dumps(sorted(observed_tests), separators=(",", ":")).encode("utf-8")
+    result["junit_identities_sha256"] = hashlib.sha256(encoded).hexdigest()
+    result["identity_contract_matches"] = len(observed_tests) == len(set(observed_tests)) and (
+        expected_tests is None or set(observed_tests) == expected_tests
+    )
+    result["accepted"] = (
+        result["failures"] == 0
+        and result["errors"] == 0
+        and result["xfail"] == 0
+        and len(observed_skips) == len(set(observed_skips))
+        and set(observed_skips) == expected_skips
+        and result["identity_contract_matches"]
+    )
     return result
 
 
@@ -444,6 +545,23 @@ def compile_command(
         "--no-annotate",
         "--output-file",
         str(output),
+    ]
+
+
+def install_exact_wheel_command(uv: list[str], python: Path, wheel: Path) -> list[str]:
+    """Install the already-resolved candidate without resolving its dependencies again."""
+    return [
+        *uv,
+        "pip",
+        "install",
+        "--python",
+        str(python),
+        "--no-index",
+        "--no-deps",
+        "--reinstall",
+        "--link-mode",
+        "copy",
+        str(wheel),
     ]
 
 
@@ -617,12 +735,19 @@ def run_suite(
     runtime: dict[str, str],
     probe: Path,
     manifest: Path,
+    expected_tests: set[tuple[str, str]],
+    test_manifest_summary: dict[str, Any],
 ) -> None:
     config = tomllib.loads((source / "pyproject.toml").read_text("utf-8"))
     requirements = config.get("dependency-groups", {}).get("dev", [])
     if not requirements or not all(isinstance(value, str) for value in requirements):
         raise ValueError("sdist must declare a flat test/development dependency group")
     development = runner.directory / "test-tools.in"
+    requirements = [
+        *requirements,
+        f"pytest=={test_manifest_summary['pytest_version']}",
+        f"hypothesis=={test_manifest_summary['hypothesis_version']}",
+    ]
     development.write_text("\n".join(requirements) + "\n", "utf-8")
     test_lock = runner.directory / "test-tools.lock"
     command = compile_command(uv, python, [lock, development], test_lock, "latest")
@@ -682,7 +807,7 @@ def run_suite(
     )
     if not junit.is_file():
         raise ValueError("installed suite produced no JUnit receipt")
-    summary = inspect_junit(junit)
+    summary = inspect_junit(junit, core_skip_contract(platform.system()), expected_tests)
     runner.receipt["suite"] = summary
     runner.receipt["suite_junit"] = artifact_record(junit)
     after = runner.directory / "suite-runtime-after.json"
@@ -691,7 +816,7 @@ def run_suite(
     )
     verify_versions(runtime, json.loads(after.read_text("utf-8")))
     if completed.returncode != 0 or not summary["accepted"]:
-        raise ValueError("installed suite failed or contained skip/xfail; not a supported cell")
+        raise ValueError("installed suite failed or its exact skip contract differed")
 
 
 def execute_cell(
@@ -706,6 +831,8 @@ def execute_cell(
     probe: Path,
     timeout: int,
     cache: Path,
+    expected_tests: set[tuple[str, str]],
+    test_manifest_summary: dict[str, Any],
 ) -> dict[str, Any]:
     directory.mkdir()
     receipt: dict[str, Any] = {
@@ -725,6 +852,7 @@ def execute_cell(
         "remote_ci": False,
         "skips": [],
         "blockers": [],
+        "test_manifest": test_manifest_summary,
     }
     runner = CellRunner(directory, receipt, artifacts, timeout)
     runner.save()
@@ -780,18 +908,7 @@ def execute_cell(
             blocked=True,
         )
         runner.run(
-            [
-                *uv,
-                "pip",
-                "install",
-                "--python",
-                str(python),
-                "--no-index",
-                "--reinstall",
-                "--link-mode",
-                "copy",
-                str(artifacts["wheel"]),
-            ],
+            install_exact_wheel_command(uv, python, artifacts["wheel"]),
             stage="install-exact-wheel",
             blocked=True,
         )
@@ -807,7 +924,18 @@ def execute_cell(
         receipt["runtime_binding"] = loaded
         exercise_examples(runner, python, source, profile)
         if profile == "all":
-            run_suite(runner, uv, python, source, lock, runtime, probe, manifest)
+            run_suite(
+                runner,
+                uv,
+                python,
+                source,
+                lock,
+                runtime,
+                probe,
+                manifest,
+                expected_tests,
+                test_manifest_summary,
+            )
         after = directory / "runtime-binding-after.json"
         runner.run(
             probe_command(python, probe, manifest, profile, after, None), stage="binding-after"
@@ -867,6 +995,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--wheel", type=Path, required=True)
     parser.add_argument("--sdist", type=Path, required=True)
+    parser.add_argument("--test-manifest", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True, help="New external output directory")
     parser.add_argument("--python", action="append", required=True, help="Actual Python executable")
     parser.add_argument("--profile", choices=PROFILES, action="append")
@@ -884,7 +1013,11 @@ def main() -> None:
     uv = shutil.which(args.uv)
     if uv is None:
         parser.error("uv executable is unavailable")
-    inputs = {"wheel": args.wheel.absolute(), "sdist": args.sdist.absolute()}
+    inputs = {
+        "wheel": args.wheel.absolute(),
+        "sdist": args.sdist.absolute(),
+        "test_manifest": args.test_manifest.absolute(),
+    }
     expected = {name: artifact_record(path) for name, path in inputs.items()}
     metadata = wheel_metadata(inputs["wheel"])
     output.mkdir(parents=True)
@@ -896,6 +1029,7 @@ def main() -> None:
         shutil.copyfile(path, destination)
         artifacts[name] = destination
     ensure_artifacts(expected, artifacts)
+    expected_tests, test_manifest_summary = expected_test_identities(artifacts["test_manifest"])
     probe = output / "compatibility_probe.py"
     shutil.copyfile(Path(__file__).with_name("compatibility_probe.py"), probe)
     profiles = list(dict.fromkeys(args.profile or PROFILES))
@@ -931,6 +1065,8 @@ def main() -> None:
                     probe=probe,
                     timeout=args.timeout,
                     cache=output / "uv-cache",
+                    expected_tests=expected_tests,
+                    test_manifest_summary=test_manifest_summary,
                 )
                 matrix["cells"].append(
                     {

@@ -119,6 +119,11 @@ This is not pure worker CPU time. No component time is subtracted or inferred.
   on Linux) are separate;
   unavailable counters remain null with reasons. Cached reads may show zero
   physical I/O. [Counter units](https://psutil.readthedocs.io/stable/#psutil.Process.io_counters). Engine allocator peak memory is not available
+- A Linux child can exit between the live sample and its `/proc/PID/io` read.
+  After a confirmed owned-child exit, an access/disappearance error retains
+  previously observed complete I/O counters. It does not invent a final sample.
+  A live denial, an absent/incomplete earlier sample, or malformed counter data
+  remains a measurement failure.
 - Temporary/output disk includes the owned worker tree, logs and its private
   TMPDIR. Apparent and allocated peaks are sampled separately and hard links are
   counted once. Directory metadata is included; symlinks are not followed.

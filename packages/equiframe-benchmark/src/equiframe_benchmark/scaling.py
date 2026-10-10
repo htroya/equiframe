@@ -28,9 +28,30 @@ from typing_extensions import Self
 from equiframe_benchmark.models import Digest, Document, Text, digest
 from equiframe_benchmark.scale_io import save_scale_document
 from equiframe_benchmark.scale_process import ProcessObservation, supervise
-from equiframe_benchmark.scale_types import ScaleSpec, ScaleTrial, ScaleWorkerCompletion
+from equiframe_benchmark.scale_types import (
+    SCALE_SAMPLE_INTERVAL_SECONDS,
+    ScaleSpec,
+    ScaleTrial,
+    ScaleWorkerCompletion,
+)
 
 UTC = _timezone.utc
+
+_WINDOWS_UNAME_ENV = (
+    "EQUIFRAME_SUPERVISED_SYSTEM",
+    "EQUIFRAME_SUPERVISED_RELEASE",
+    "EQUIFRAME_SUPERVISED_VERSION",
+    "EQUIFRAME_SUPERVISED_MACHINE",
+)
+_WINDOWS_WORKER_BOOTSTRAP = (
+    "import os,platform,runpy;"
+    "platform._uname_cache=platform.uname_result("
+    "os.environ.pop('EQUIFRAME_SUPERVISED_SYSTEM'),'',"
+    "os.environ.pop('EQUIFRAME_SUPERVISED_RELEASE'),"
+    "os.environ.pop('EQUIFRAME_SUPERVISED_VERSION'),"
+    "os.environ.pop('EQUIFRAME_SUPERVISED_MACHINE'));"
+    "runpy.run_module('equiframe_benchmark._scale_workload',run_name='__main__')"
+)
 
 
 class ScaleRun(Document):
@@ -121,21 +142,7 @@ class ScaleRun(Document):
         return (
             len(self.trials) == self.spec.repetitions
             and all(trial.resources.state == "complete" for trial in self.trials)
-            and not self.process.monitoring_errors
-            and all(
-                value is not None
-                for value in (
-                    self.process.sampled_rss_peak_bytes,
-                    self.process.cpu_user_seconds,
-                    self.process.cpu_system_seconds,
-                    self.process.io_read_bytes,
-                    self.process.io_write_bytes,
-                    self.process.io_read_chars,
-                    self.process.io_write_chars,
-                    self.process.disk_apparent_peak_bytes,
-                    self.process.disk_allocated_peak_bytes,
-                )
-            )
+            and self.process.resource_contract_complete
         )
 
 
@@ -187,7 +194,8 @@ def _environment() -> dict[str, str]:
             result[package] = "not_installed"
     try:
         result["physical_memory_bytes"] = str(
-            os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
+            os.sysconf("SC_PAGE_SIZE")  # type: ignore[attr-defined]
+            * os.sysconf("SC_PHYS_PAGES")  # type: ignore[attr-defined]
         )
     except (ValueError, OSError, AttributeError):
         result["physical_memory_bytes"] = "not_available"
@@ -208,6 +216,41 @@ def _environment() -> dict[str, str]:
             hashed.update(path.relative_to(root).as_posix().encode() + b"\0" + path.read_bytes())
         result[label + "_python_sources_sha256"] = hashed.hexdigest()
     return result
+
+
+def _worker_launch(
+    spec_path: Path, worker: Path, environment: dict[str, str]
+) -> tuple[list[str], dict[str, str]]:
+    """Prepare a worker command without permitting a Windows platform probe child."""
+    command = [
+        sys.executable,
+        "-I",
+        "-m",
+        "equiframe_benchmark._scale_workload",
+        str(spec_path),
+        str(worker),
+    ]
+    if os.name != "nt":
+        return command, environment
+    facts = platform.uname()
+    prepared = {
+        key: value
+        for key, value in environment.items()
+        if key.casefold() not in {name.casefold() for name in _WINDOWS_UNAME_ENV}
+    }
+    # uname_result exposes five constructor inputs; processor is a lazy property.
+    prepared[_WINDOWS_UNAME_ENV[0]] = facts.system
+    prepared[_WINDOWS_UNAME_ENV[1]] = facts.release
+    prepared[_WINDOWS_UNAME_ENV[2]] = facts.version
+    prepared[_WINDOWS_UNAME_ENV[3]] = facts.machine
+    return [
+        sys.executable,
+        "-I",
+        "-c",
+        _WINDOWS_WORKER_BOOTSTRAP,
+        str(spec_path),
+        str(worker),
+    ], prepared
 
 
 def _verify_trial(directory: Path, trial: ScaleTrial) -> None:
@@ -322,25 +365,23 @@ def measure_scale(spec: ScaleSpec, *, work_dir: Path) -> ScaleRun:
     save_scale_document(spec, directory / "spec.json")
     started = datetime.now(UTC).isoformat()
     parent_environment = _environment()
+    launch_environment = {
+        **os.environ,
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "POLARS_MAX_THREADS": "1",
+    }
+    command, launch_environment = _worker_launch(
+        directory / "spec.json", worker, launch_environment
+    )
     process = supervise(
-        [
-            sys.executable,
-            "-I",
-            "-m",
-            "equiframe_benchmark._scale_workload",
-            str(directory / "spec.json"),
-            str(worker),
-        ],
+        command,
         directory=worker,
         timeout_seconds=spec.timeout_seconds,
         rss_budget_bytes=spec.rss_budget_bytes,
         disk_budget_bytes=spec.disk_budget_bytes,
-        env={
-            **os.environ,
-            "OMP_NUM_THREADS": "1",
-            "OPENBLAS_NUM_THREADS": "1",
-            "POLARS_MAX_THREADS": "1",
-        },
+        sample_interval_seconds=SCALE_SAMPLE_INTERVAL_SECONDS,
+        env=launch_environment,
     )
     trials, finalized, issues, worker_environment = _read_worker(spec, worker)
     binding = None if worker_environment is None else worker_environment == parent_environment
@@ -461,6 +502,11 @@ def summarize_scale(result: ScaleRun) -> dict[str, object]:
         "case_id": result.spec.case_id,
         "complete": result.complete,
         "resource_measurement_complete": result.resource_measurement_complete,
+        "resource_measurement_contract": {
+            "id": result.process.measurement_contract,
+            "platform": result.process.measurement_platform,
+            "metrics": [item.model_dump(mode="json") for item in result.process.metric_coverage],
+        },
         "requested_repetitions": result.spec.repetitions,
         "observed_repetitions": len(result.trials),
         "correct_complete_repetitions": len(valid),

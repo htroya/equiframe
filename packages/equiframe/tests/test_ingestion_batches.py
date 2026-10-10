@@ -295,8 +295,9 @@ def test_context_budgets_are_cumulative_across_batches(tmp_path, batch_rows, opt
 @pytest.mark.parametrize("limit", ["max_records", "max_source_bytes"])
 def test_ingestion_source_and_record_budgets_boundary(tmp_path, format, content, limit):
     path = tmp_path / "source"
-    path.write_text(content, encoding="utf-8")
-    allowed = 3 if limit == "max_records" else len(content.encode("utf-8"))
+    source_bytes = content.encode("utf-8")
+    path.write_bytes(source_bytes)
+    allowed = 3 if limit == "max_records" else len(source_bytes)
     with pytest.raises(ef.ResourceLimitError):
         ef.ingest_file(
             path, spec=int_spec(format, **{limit: allowed - 1}), work_dir=tmp_path, batch_rows=1
@@ -379,7 +380,7 @@ def test_file_input_uses_requested_batch_size(tmp_path, monkeypatch):
 
 def test_jsonl_unusual_splitlines_boundaries_keep_historical_positions(tmp_path):
     path = tmp_path / "source.jsonl"
-    path.write_text('{"n":1}\u0085{"n":2}\r\n\n{"n":3}', encoding="utf-8")
+    path.write_bytes('{"n":1}\u0085{"n":2}\r\n\n{"n":3}'.encode("utf-8"))
     result = ef.ingest_file(
         path, spec=int_spec("jsonl", invalid_records="quarantine"), work_dir=tmp_path, batch_rows=1
     )

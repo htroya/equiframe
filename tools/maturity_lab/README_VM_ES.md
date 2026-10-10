@@ -1,8 +1,10 @@
-# Kit ARM64 A9: guía vigente de ejecución y devolución
+# Kit ARM64 A10: guía vigente de ejecución y devolución
 
-Este kit privado contiene núcleo y benchmark **0.12.0a9**, consumidor externo **0.1.11**, sus seis artefactos y el corpus congelado. El benchmark A9 **ya declara typing-extensions directamente**; el lock conserva EquiFrame como fuente local y las versiones públicas del cierre A8. La corrección no está pendiente en este kit.
+Este kit privado contiene núcleo y benchmark **0.12.0a10**, consumidor externo **0.1.12**, sus seis artefactos y el corpus congelado. A10 conserva la dependencia directa de `typing-extensions`, reutiliza el entorno bloqueado al reinstalar la rueda exacta del núcleo y exige candidatos binarios desde la resolución de perfiles del benchmark.
 
-`candidate.json` identifica los commits/árboles de las fuentes, tooling_source, los seis artefactos, hashes y la lista obligatoria **3.10, 3.11, 3.12, 3.13**. `SHA256SUMS` identifica sus archivos. No sustituya artefactos o scripts ni mezcle manifests. El kit es intermedio: las matrices/celdas no ejecutadas siguen pendientes y no se declara 100 %.
+`candidate.json` identifica los commits/árboles de las fuentes, tooling_source, los seis artefactos, hashes y la lista obligatoria **3.10, 3.11, 3.12, 3.13**. También vincula `test-manifests/core.json`, `benchmark.json` y `consumer.json` con los archivos de pruebas de cada sdist, las identidades JUnit exactas y las versiones congeladas de pytest/Hypothesis. `SHA256SUMS` identifica sus archivos. No sustituya artefactos o scripts ni mezcle manifests. El kit es intermedio: las matrices/celdas no ejecutadas siguen pendientes y no se declara 100 %.
+
+Al preparar un kit nuevo, `assemble_kit.py` exige `--core-test-manifest`, `--benchmark-test-manifest` y `--consumer-test-manifest`, además de los recuentos reales. El runner rechaza kits sin estos tres manifiestos antes de crear entornos. La revisión histórica conserva el alcance original de kits anteriores.
 
 ## 1. Preparación
 
@@ -51,7 +53,7 @@ No use `--cloud-validation` para esta ejecución: el revisor lo rechaza como evi
 
 Para cada Python se instalan por ruta los wheels privados exactos y dependencias públicas de la celda, con hashes/locks y pip check. Se prueban base, arrow, pandas, polars, duckdb, engines, ml y all; benchmark base/engines/ml/resources/all. Cada perfil tiene extremos mínimo/reciente resueltos, sin presentar un rango completo como medido.
 
-Se incluyen API/CLI, motores y seis direcciones, suite instalada del núcleo, benchmark, consumidor externo y sus puertos/SQLite, casos negativos y -O, históricos, integridad, medición, recuperación, reconstrucción byte a byte e instalación desde sdist. El corpus público conserva 219 registros y 72 casos con esperados independientes; sus condiciones están en consumer-data/conditions.json. No se crean revisores, adopción humana ni resultados científicos.
+Se incluyen API/CLI, motores y seis direcciones, suite instalada del núcleo, benchmark, consumidor externo y sus puertos/SQLite, casos negativos y -O, históricos, integridad, medición, recuperación, reconstrucción byte a byte e instalación desde sdist. Todas las identidades de pruebas congeladas deben aparecer una sola vez. En Linux, núcleo y consumidor no admiten omisiones; benchmark exige exactamente las dos pruebas exclusivas de Windows con sus motivos declarados. Un fallo, xfail, cambio de motivo u omisión adicional invalida la suite. El corpus público conserva 219 registros y 72 casos con esperados independientes; sus condiciones están en consumer-data/conditions.json. No se crean revisores, adopción humana ni resultados científicos.
 
 Planifique varias horas. El transporte tiene timeout predeterminado de 24 h, configurable con -TimeoutSeconds. Presupuesto de planificación: hasta 2 CPU, objetivo 6 GiB de RAM y 10 GiB temporales; no es una reserva ni cuota dura. Revalide recursos y convivencia antes de iniciar. Se mantienen la guardia de 6 GiB libres del laboratorio, 4 GiB del consumidor y las del benchmark. Si no hay margen, conserve el bloqueo; no reduzca guardias ni borre entornos antiguos.
 

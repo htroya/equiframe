@@ -10,8 +10,9 @@ import json
 import re
 import xml.etree.ElementTree as ET
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
+from frozen_tests import candidate_manifests, identity_sha256, verify_linux_junit
 from manifest_scope import RECEIPT_V1, RECEIPT_V2, required_pythons, validate_cell_scope
 
 
@@ -37,6 +38,81 @@ def member(root: Path, name: str) -> Path:
     return path
 
 
+def command_for(commands: list[dict], identity: str, value: str) -> list[str]:
+    """Return one recorded argv after proving its stage/label identity is unique."""
+    matches = [entry for entry in commands if entry.get(identity) == value]
+    if len(matches) != 1:
+        raise ValueError(f"expected exactly one {identity} command: {value}")
+    command = matches[0].get("command")
+    if (
+        not isinstance(command, list)
+        or not command
+        or any(not isinstance(argument, str) or not argument for argument in command)
+    ):
+        raise ValueError(f"{value} command argv is absent or malformed")
+    return command
+
+
+def require_command_contract(
+    command: list[str],
+    operation: tuple[str, ...],
+    *,
+    flags: tuple[str, ...] = (),
+    pairs: tuple[tuple[str, str], ...] = (),
+    forbidden: tuple[str, ...] = (),
+) -> None:
+    """Prove security/reproducibility switches from the recorded argv itself."""
+    occurrences = sum(
+        command[index : index + len(operation)] == list(operation)
+        for index in range(len(command) - len(operation) + 1)
+    )
+    if occurrences != 1:
+        raise ValueError("recorded command does not contain the required operation")
+    for flag in flags:
+        if command.count(flag) != 1:
+            raise ValueError("recorded command lacks one unambiguous " + flag)
+    for flag, value in pairs:
+        positions = [index for index, argument in enumerate(command) if argument == flag]
+        if len(positions) != 1 or positions[0] + 1 >= len(command):
+            raise ValueError("recorded command lacks one unambiguous " + flag)
+        if command[positions[0] + 1] != value:
+            raise ValueError(f"recorded command requires {flag} {value}")
+    unexpected = sorted(set(command).intersection(forbidden))
+    if unexpected:
+        raise ValueError("recorded command contains forbidden option: " + ", ".join(unexpected))
+
+
+def validate_core_command_contract(commands: list[dict]) -> None:
+    """Bind a passing core profile to the exact-wheel, no-resolution reinstall."""
+    command = command_for(commands, "stage", "install-exact-wheel")
+    require_command_contract(
+        command,
+        ("pip", "install"),
+        flags=("--no-index", "--no-deps", "--reinstall"),
+        forbidden=("--index-url", "--extra-index-url"),
+    )
+
+
+def validate_benchmark_command_contract(commands: list[dict]) -> None:
+    """Bind a passing benchmark profile to binary-only hashed solve and sync."""
+    resolve = command_for(commands, "label", "resolve")
+    require_command_contract(
+        resolve,
+        ("pip", "compile"),
+        flags=("--generate-hashes",),
+        pairs=(("--only-binary", ":all:"),),
+        forbidden=("--no-binary",),
+    )
+    dependencies = command_for(commands, "label", "dependencies")
+    require_command_contract(
+        dependencies,
+        ("pip", "sync"),
+        flags=("--require-hashes",),
+        pairs=(("--only-binary", ":all:"),),
+        forbidden=("--no-binary",),
+    )
+
+
 class Review:
     def __init__(self, kit: Path, evidence: Path):
         self.kit, self.evidence = kit, evidence
@@ -46,6 +122,7 @@ class Review:
             path = member(kit, name)
             if sha(path) != record["sha256"] or path.stat().st_size != record["size_bytes"]:
                 raise ValueError("candidate kit changed: " + name)
+        self.test_manifests = candidate_manifests(kit, self.candidate)
         self.receipt = json.loads(member(evidence, "receipt.json").read_text("utf-8"))
         self.inventory = json.loads(member(evidence, "evidence-inventory.json").read_text("utf-8"))[
             "files"
@@ -54,7 +131,7 @@ class Review:
             raise ValueError("the top receipt is absent from its inventory")
         for name in self.inventory:
             self.file(name)
-        self.lab = Path(self.receipt["lab"])
+        self.lab = PurePosixPath(self.receipt["lab"])
         self.wheel_payloads = {}
         for key, module in [
             ("core_wheel", "equiframe"),
@@ -75,7 +152,10 @@ class Review:
                 }
 
     def relative(self, original: str) -> str:
-        path = Path(original)
+        # These paths were recorded by the Linux VM, regardless of the review host.
+        path = PurePosixPath(original)
+        if ".." in path.parts or "\\" in original:
+            raise ValueError("VM evidence path is not canonical POSIX")
         return path.relative_to(self.lab).as_posix() if path.is_absolute() else path.as_posix()
 
     def file(self, name: str, digest: str | None = None) -> Path:
@@ -102,12 +182,16 @@ class Review:
                 "expected_exit"
             ):
                 raise ValueError("failed/timed-out command cannot be counted as passing")
-            self.file((Path(base) / entry["log"]).as_posix(), entry["log_sha256"])
+            self.file((PurePosixPath(base) / entry["log"]).as_posix(), entry["log_sha256"])
 
-    def junit(self, path: str, minimum: int) -> None:
+    def junit(self, path: str, minimum: int, label: str | None = None) -> None:
         root = ET.parse(self.file(path)).getroot()
         if root.tag not in ("testsuite", "testsuites"):
             raise ValueError("unrecognized JUnit document")
+        frozen = getattr(self, "test_manifests", {}).get(label)
+        if frozen is not None:
+            verify_linux_junit(root, frozen, label)
+            return
         cases = list(root.iter("testcase"))
         if len(cases) < minimum or any(
             case.find(tag) is not None for case in cases for tag in ("failure", "error", "skipped")
@@ -162,6 +246,18 @@ class Review:
             raise ValueError("core matrix and cell labels differ")
         name = self.relative(outer["receipt"])
         inner = self.json(name, outer["receipt_artifact"]["sha256"])
+        if getattr(self, "test_manifests", {}):
+            frozen = self.test_manifests["core"]
+            summary = inner.get("test_manifest", {})
+            if (
+                summary.get("record", {}).get("sha256")
+                != self.candidate["test_manifests"]["core"]["sha256"]
+                or summary.get("test_count") != frozen["test_count"]
+                or summary.get("junit_identities_sha256") != identity_sha256(frozen)
+                or summary.get("pytest_version") != frozen["pytest_version"]
+                or summary.get("hypothesis_version") != frozen["hypothesis_version"]
+            ):
+                raise ValueError("core profile used a different frozen test manifest")
         if (
             inner["status"] != "passed"
             or inner.get("skips")
@@ -184,7 +280,10 @@ class Review:
             or inner["runtime_binding"]["machine"] != "aarch64"
         ):
             raise ValueError("installed runtime differs from interpreter probe")
-        stages = {item["stage"] for item in inner["commands"]}
+        stage_names = [item["stage"] for item in inner["commands"]]
+        if len(stage_names) != len(set(stage_names)):
+            raise ValueError("core profile repeated a command stage")
+        stages = set(stage_names)
         needed = {
             "interpreter",
             "resolve-runtime",
@@ -198,7 +297,13 @@ class Review:
         needed.update({"cli-help", "cli-invalid-contract"})
         needed.update(
             "cli-contract-" + name
-            for name in ("aggregations", "dates", "duplicates_order", "joins", "nulls_types")
+            for name in (
+                "aggregations",
+                "dates",
+                "duplicates_order",
+                "joins",
+                "nulls_types",
+            )
         )
         selected = profile["profile"]
         if selected not in ("base", "ml"):
@@ -224,7 +329,10 @@ class Review:
             needed.add("native-migration-six-directions")
         if not needed <= stages:
             raise ValueError("core profile omitted a required stage")
-        lock = self.file(str(Path(name).parent / "runtime.lock"), inner["runtime_lock"]["sha256"])
+        validate_core_command_contract(inner["commands"])
+        lock = self.file(
+            str(PurePosixPath(name).parent / "runtime.lock"), inner["runtime_lock"]["sha256"]
+        )
         pins = dict(re.findall(r"^([A-Za-z0-9_.-]+)==([^\s;]+)", lock.read_text("utf-8"), re.M))
         normalized = {key.lower().replace("_", "-"): value for key, value in pins.items()}
         if not normalized or normalized != inner["runtime_versions"]:
@@ -254,12 +362,17 @@ class Review:
             if command.get("exit_code") != command.get("expected_exit_code"):
                 raise ValueError("core command failed or timed out")
             for stream in ("stdout", "stderr"):
-                self.file(self.relative(command[stream]), command[stream + "_artifact"]["sha256"])
+                self.file(
+                    self.relative(command[stream]),
+                    command[stream + "_artifact"]["sha256"],
+                )
         if profile["profile"] == "all":
             if "full-installed-suite" not in stages or inner["suite"].get("accepted") is not True:
                 raise ValueError("all-profile suite not fully accepted")
             self.junit(
-                str(Path(name).parent / "pytest.xml"), self.candidate["suite_minimums"]["core"]
+                str(PurePosixPath(name).parent / "pytest.xml"),
+                self.candidate["suite_minimums"]["core"],
+                "core",
             )
 
     def benchmark_profile(self, profile: dict, minor: str) -> None:
@@ -267,7 +380,10 @@ class Review:
         inner = self.json(path, profile["receipt_sha256"])
         if inner.get("status") != "passed" or inner.get("errors"):
             raise ValueError("benchmark isolated profile did not pass")
-        if (inner["profile"], inner["endpoint"]) != (profile["profile"], profile["endpoint"]):
+        if (inner["profile"], inner["endpoint"]) != (
+            profile["profile"],
+            profile["endpoint"],
+        ):
             raise ValueError("benchmark profile identity mismatch")
         for key in ("core_wheel", "benchmark_wheel"):
             if inner["artifacts"][key] != self.candidate["artifact_hashes"][key]:
@@ -290,11 +406,15 @@ class Review:
         }
         if profile["profile"] in ("engines", "all"):
             needed.add("native-pilot")
-        self.commands(inner["commands"], needed, str(Path(path).parent))
+        self.commands(inner["commands"], needed, str(PurePosixPath(path).parent))
+        validate_benchmark_command_contract(inner["commands"])
         binding = self.json(
-            str(Path(path).parent / "runtime-binding.json"), inner["runtime_binding_sha256"]
+            str(PurePosixPath(path).parent / "runtime-binding.json"),
+            inner["runtime_binding_sha256"],
         )
-        lock = self.file(str(Path(path).parent / "runtime.lock"), inner["runtime_lock_sha256"])
+        lock = self.file(
+            str(PurePosixPath(path).parent / "runtime.lock"), inner["runtime_lock_sha256"]
+        )
         pins = dict(re.findall(r"^([A-Za-z0-9_.-]+)==([^\s;]+)", lock.read_text("utf-8"), re.M))
         installed = {
             key.lower().replace("_", "-"): version
@@ -348,7 +468,10 @@ class Review:
         if case.get("dataset_manifest_sha256") != expected_data:
             raise ValueError("consumer used a different frozen dataset")
         executions = case["native_result"]["executions"]
-        if len(executions) != 2 or {item["engine"] for item in executions} != {source, target}:
+        if len(executions) != 2 or {item["engine"] for item in executions} != {
+            source,
+            target,
+        }:
             raise ValueError("consumer must retain both independent native executions")
         env = case["environment"]
         if (
@@ -357,8 +480,8 @@ class Review:
             or env["isolated"] != 1
         ):
             raise ValueError("consumer execution has the wrong Python/platform/isolation")
-        if optimized and env.get("optimized") != 1:
-            raise ValueError("required optimized consumer execution was not observed")
+        if env.get("optimized") != int(optimized):
+            raise ValueError("consumer optimized execution differs from the required mode")
         return case
 
     def validate(self) -> dict:
@@ -374,6 +497,8 @@ class Review:
             or receipt.get("artifact_hashes") != candidate["artifact_hashes"]
         ):
             raise ValueError("VM source/artifact identity differs")
+        if self.test_manifests and receipt.get("test_manifests") != candidate["test_manifests"]:
+            raise ValueError("VM frozen test-manifest identity differs")
         if candidate["schema"] == "equiframe-maturity-candidate-2":
             expected_scripts = {
                 name: item["sha256"]
@@ -391,7 +516,13 @@ class Review:
             ):
                 raise ValueError("runtime tooling/lock/input identity differs or is unverified")
         host = receipt["actual_host"]
-        if (host["hostname"], host["user"], host["uid"], host["system"], host["machine"]) != (
+        if (
+            host["hostname"],
+            host["user"],
+            host["uid"],
+            host["system"],
+            host["machine"],
+        ) != (
             "maestria-vnic",
             "hernan",
             1003,
@@ -420,6 +551,7 @@ class Review:
                     "consumer-suite-",
                     "measure-bounded-",
                     "consumer-",
+                    "consumer-optimized-",
                     "consumer-recovery-",
                     "pair-binding-",
                     "sdist-venv-",
@@ -472,7 +604,16 @@ class Review:
             for key, names, function in [
                 (
                     "profiles",
-                    ("base", "arrow", "pandas", "polars", "duckdb", "engines", "ml", "all"),
+                    (
+                        "base",
+                        "arrow",
+                        "pandas",
+                        "polars",
+                        "duckdb",
+                        "engines",
+                        "ml",
+                        "all",
+                    ),
                     self.core_profile,
                 ),
                 (
@@ -488,10 +629,19 @@ class Review:
                 for item in cell[key]:
                     function(item, minor)
             root = f"py{minor}-all-latest/python-1-all-latest"
-            self.junit(root + "/benchmark-junit.xml", candidate["suite_minimums"]["benchmark"])
-            self.junit(root + "/consumer-junit.xml", candidate["suite_minimums"]["consumer"])
+            self.junit(
+                root + "/benchmark-junit.xml",
+                candidate["suite_minimums"]["benchmark"],
+                "benchmark",
+            )
+            self.junit(
+                root + "/consumer-junit.xml",
+                candidate["suite_minimums"]["consumer"],
+                "consumer",
+            )
             constraints = self.file(
-                root + "/pair-constraints.txt", cell["paired_runtime_constraints_sha256"]
+                root + "/pair-constraints.txt",
+                cell["paired_runtime_constraints_sha256"],
             )
             core_cell = self.json(root + "/receipt.json")
             expected_pins = (
@@ -549,11 +699,18 @@ class Review:
                 summary.get("all_expected_outcomes_observed"),
                 summary.get("recorded_native_executions"),
                 summary.get("cases_with_unavailable_native_count"),
-            ) != ("PASS", 72, 24, 48, True, 144, 0):
+                summary.get("optimization_required"),
+                summary.get("optimized"),
+            ) != ("PASS", 72, 24, 48, True, 144, 0, False, False):
                 raise ValueError("consumer actual/expected native outcomes incomplete")
             wanted = {
                 (program, variant, source, target)
-                for program in ("reconciliation", "refactor", "migration", "preparation")
+                for program in (
+                    "reconciliation",
+                    "refactor",
+                    "migration",
+                    "preparation",
+                )
                 for source, target in itertools.permutations(("pandas", "polars", "duckdb"), 2)
                 for variant in ("good", "defect", "not_evaluable")
             }
@@ -566,7 +723,7 @@ class Review:
                 raise ValueError(
                     "72 consumer records are missing, repeated or outside the frozen matrix"
                 )
-            base = Path(consumer["summary"]).parent
+            base = PurePosixPath(consumer["summary"]).parent
             for item in records:
                 expected = {"good": 0, "defect": 1, "not_evaluable": 3}[item["variant"]]
                 if (
@@ -589,6 +746,61 @@ class Review:
                     item["variant"],
                     item["source"],
                     item["target"],
+                )
+            optimized_consumer = cell["consumer_optimized"]
+            optimized_summary = self.json(
+                optimized_consumer["summary"], optimized_consumer["sha256"]
+            )
+            if (
+                optimized_summary.get("status"),
+                optimized_summary.get("distinct_cases"),
+                optimized_summary.get("accepted_cases"),
+                optimized_summary.get("rejected_cases"),
+                optimized_summary.get("all_expected_outcomes_observed"),
+                optimized_summary.get("recorded_native_executions"),
+                optimized_summary.get("cases_with_unavailable_native_count"),
+                optimized_summary.get("optimization_required"),
+                optimized_summary.get("optimized"),
+            ) != ("PASS", 72, 24, 48, True, 144, 0, True, True):
+                raise ValueError("optimized consumer actual/expected native outcomes incomplete")
+            optimized_records = optimized_summary["records"]
+            optimized_observed = [
+                (item["program"], item["variant"], item["source"], item["target"])
+                for item in optimized_records
+            ]
+            if len(optimized_observed) != 72 or set(optimized_observed) != wanted:
+                raise ValueError(
+                    "72 optimized consumer records are missing, repeated or outside the matrix"
+                )
+            optimized_base = PurePosixPath(optimized_consumer["summary"]).parent
+            for item in optimized_records:
+                expected = {"good": 0, "defect": 1, "not_evaluable": 3}[item["variant"]]
+                if (
+                    item.get("harness_pass") is not True
+                    or item.get("process_outcome") != "completed"
+                    or item.get("expected_exit") != expected
+                    or item.get("actual_exit") != expected
+                    or "-O" not in item.get("command", [])
+                    or any(
+                        item.get(key) is not None
+                        for key in ("process_error", "receipt_error", "logs_error")
+                    )
+                ):
+                    raise ValueError(
+                        "optimized consumer child failed or changed its expected execution"
+                    )
+                for stream in ("stdout", "stderr"):
+                    self.file(
+                        str(optimized_base / "logs" / (item["case_id"] + "." + stream + ".txt"))
+                    )
+                self.consumer_case(
+                    str(optimized_base / item["case_receipt"]),
+                    minor,
+                    item["program"],
+                    item["variant"],
+                    item["source"],
+                    item["target"],
+                    optimized=True,
                 )
         return {
             "technical_receipts_consistent": True,

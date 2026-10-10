@@ -118,6 +118,19 @@ def test_unknown_endpoint_cannot_silently_select_another_resolution(runner, endp
         runner["endpoint_resolution"](endpoint)
 
 
+def test_exact_wheel_reinstall_reuses_the_hash_locked_runtime(runner, tmp_path):
+    command = runner["install_exact_wheel_command"](
+        ["uv", "--no-config", "--cache-dir", "cache"],
+        tmp_path / "venv" / "python",
+        tmp_path / "candidate.whl",
+    )
+    assert command[:5] == ["uv", "--no-config", "--cache-dir", "cache", "pip"]
+    assert command[5:9] == ["install", "--python", str(tmp_path / "venv" / "python"), "--no-index"]
+    assert command.count("--no-deps") == 1
+    assert command.count("--reinstall") == 1
+    assert command[-3:] == ["--link-mode", "copy", str(tmp_path / "candidate.whl")]
+
+
 def test_matrix_processes_do_not_inherit_import_or_dependency_overrides(runner, monkeypatch):
     pollution = (
         "PYTHONPATH",
@@ -210,6 +223,20 @@ def test_junit_success_counts_actual_cases_in_multiple_suites(runner, tmp_path):
         "xfail": 0,
     }
     assert len(result["cases"]) == 2
+
+
+def test_junit_must_match_the_exact_frozen_test_identity_set(runner, tmp_path):
+    path = junit(
+        tmp_path,
+        '<testsuite tests="1" failures="0" errors="0" skipped="0">'
+        '<testcase classname="contracts" name="test_roundtrip"/>'
+        "</testsuite>",
+    )
+    expected = {("contracts", "test_roundtrip"), ("evidence", "test_hash")}
+    result = runner["inspect_junit"](path, set(), expected)
+    assert result["tests"] == 1
+    assert result["identity_contract_matches"] is False
+    assert result["accepted"] is False
 
 
 @pytest.mark.parametrize(
@@ -489,10 +516,15 @@ def test_all_profile_requires_the_complete_public_extra_surface(runner, tmp_path
 
 @pytest.mark.parametrize("outcome", ["skipped", "failure", "error"])
 def test_one_passing_case_does_not_hide_an_unexecuted_or_failing_case(runner, tmp_path, outcome):
+    testcase_attributes = ' classname="compatibility"' if outcome == "skipped" else ""
+    outcome_xml = (
+        '<skipped message="unexpected skip"/>' if outcome == "skipped" else f"<{outcome}/>"
+    )
     path = junit(
         tmp_path,
         '<testsuite tests="2"><testcase name="passed"/>'
-        f'<testcase name="incomplete"><{outcome}/></testcase></testsuite>',
+        f'<testcase name="incomplete"{testcase_attributes}>{outcome_xml}'
+        "</testcase></testsuite>",
     )
     result = runner["inspect_junit"](path)
     assert result["tests"] == 2

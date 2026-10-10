@@ -19,6 +19,7 @@ import os
 import signal
 import stat
 import subprocess
+import sys
 import time
 from dataclasses import dataclass, field
 from importlib import import_module
@@ -33,6 +34,55 @@ from equiframe_benchmark.models import Document, Text
 
 NonnegativeInt = Annotated[int, Field(ge=0)]
 NonnegativeFloat = Annotated[float, Field(ge=0)]
+MEASUREMENT_CONTRACT_ID: Literal["equiframe_process_resources_v1"] = (
+    "equiframe_process_resources_v1"
+)
+MeasurementPlatform = Literal["linux", "windows", "macos"]
+MeasurementMetric = Literal[
+    "sampled_rss_peak_bytes",
+    "cpu_user_seconds",
+    "cpu_system_seconds",
+    "io_read_bytes",
+    "io_write_bytes",
+    "io_read_chars",
+    "io_write_chars",
+    "disk_apparent_peak_bytes",
+    "disk_allocated_peak_bytes",
+]
+MeasurementSource = Literal[
+    "psutil_process_memory_info_rss",
+    "psutil_process_cpu_times_user",
+    "psutil_process_cpu_times_system",
+    "psutil_process_io_counters",
+    "linux_proc_pid_io",
+    "filesystem_tree_stat_size",
+    "filesystem_tree_stat_blocks_512",
+]
+_MEASUREMENT_METRICS: tuple[MeasurementMetric, ...] = (
+    "sampled_rss_peak_bytes",
+    "cpu_user_seconds",
+    "cpu_system_seconds",
+    "io_read_bytes",
+    "io_write_bytes",
+    "io_read_chars",
+    "io_write_chars",
+    "disk_apparent_peak_bytes",
+    "disk_allocated_peak_bytes",
+)
+_PLATFORM_UNAVAILABLE: dict[MeasurementPlatform, dict[MeasurementMetric, str]] = {
+    "linux": {},
+    "windows": {
+        "io_read_chars": "windows_psutil_process_io_read_chars_not_exposed",
+        "io_write_chars": "windows_psutil_process_io_write_chars_not_exposed",
+        "disk_allocated_peak_bytes": "windows_python_stat_result_st_blocks_not_exposed",
+    },
+    "macos": {
+        "io_read_bytes": "macos_psutil_process_io_counters_not_exposed",
+        "io_write_bytes": "macos_psutil_process_io_counters_not_exposed",
+        "io_read_chars": "macos_psutil_process_io_counters_not_exposed",
+        "io_write_chars": "macos_psutil_process_io_counters_not_exposed",
+    },
+}
 TerminationReason = Literal[
     "exited",
     "timeout",
@@ -42,6 +92,35 @@ TerminationReason = Literal[
     "launch_failed",
     "unsupported_descendant",
 ]
+
+
+def current_measurement_platform(value: str | None = None) -> MeasurementPlatform:
+    """Map only the three documented native measurement contracts."""
+    selected = sys.platform if value is None else value
+    if selected.startswith("linux"):
+        return "linux"
+    if selected.startswith("win"):
+        return "windows"
+    if selected == "darwin":
+        return "macos"
+    raise RuntimeError("unsupported operating system for process resource measurement")
+
+
+class ResourceMetricCoverage(Document):
+    """One metric's actual observation or its exact platform capability boundary."""
+
+    metric: MeasurementMetric
+    state: Literal["observed", "unavailable_on_platform", "measurement_failed"]
+    source: MeasurementSource | None
+    reason: Text | None
+
+    @model_validator(mode="after")
+    def consistent(self) -> Self:
+        if self.state == "observed" and (self.source is None or self.reason is not None):
+            raise ValueError("an observed metric requires its source and no absence reason")
+        if self.state != "observed" and (self.source is not None or self.reason is None):
+            raise ValueError("an unobserved metric requires a reason and cannot claim a source")
+        return self
 
 
 class ProcessObservation(Document):
@@ -64,8 +143,19 @@ class ProcessObservation(Document):
     io_write_bytes: NonnegativeInt | None
     io_read_chars: NonnegativeInt | None
     io_write_chars: NonnegativeInt | None
+    io_counter_source: Literal[
+        "psutil", "linux_proc_pid_io", "unavailable", "legacy_unspecified"
+    ] = "legacy_unspecified"
+    io_counter_fallback_reason: Text | None = None
     disk_apparent_peak_bytes: NonnegativeInt | None
     disk_allocated_peak_bytes: NonnegativeInt | None
+    measurement_contract: Literal["equiframe_process_resources_v1", "legacy_unspecified"] = (
+        "legacy_unspecified"
+    )
+    measurement_platform: Literal["linux", "windows", "macos", "legacy_unspecified"] = (
+        "legacy_unspecified"
+    )
+    metric_coverage: tuple[ResourceMetricCoverage, ...] = ()
     sample_interval_seconds: Annotated[float, Field(gt=0)]
     max_sample_gap_seconds: NonnegativeFloat | None
     sample_count: NonnegativeInt
@@ -108,7 +198,106 @@ class ProcessObservation(Document):
             and not self.observed_descendant_pids
         ):
             raise ValueError("unsupported descendants require an observed child identity")
+        io_values = (
+            self.io_read_bytes,
+            self.io_write_bytes,
+            self.io_read_chars,
+            self.io_write_chars,
+        )
+        if self.io_counter_source == "unavailable" and any(
+            value is not None for value in io_values
+        ):
+            raise ValueError("unavailable I/O counters cannot contain observations")
+        if self.io_counter_source in ("psutil", "linux_proc_pid_io") and not any(
+            value is not None for value in io_values
+        ):
+            raise ValueError("an observed I/O counter source requires actual observations")
+        if (self.io_counter_fallback_reason is not None) != (
+            self.io_counter_source == "linux_proc_pid_io"
+        ):
+            raise ValueError("Linux /proc I/O fallback must preserve its bounded reason")
+        if self.measurement_contract == "legacy_unspecified":
+            if self.measurement_platform != "legacy_unspecified" or self.metric_coverage:
+                raise ValueError("legacy observations cannot claim a current platform contract")
+            return self
+        if self.measurement_platform == "legacy_unspecified":
+            raise ValueError("the current measurement contract requires a platform")
+        if tuple(item.metric for item in self.metric_coverage) != _MEASUREMENT_METRICS:
+            raise ValueError("metric coverage must contain the exact ordered contract")
+        platform = self.measurement_platform
+        unavailable = _PLATFORM_UNAVAILABLE[platform]
+        for item in self.metric_coverage:
+            value = getattr(self, item.metric)
+            expected_reason = unavailable.get(item.metric)
+            if expected_reason is not None:
+                if (
+                    item.state != "unavailable_on_platform"
+                    or item.reason != expected_reason
+                    or value is not None
+                ):
+                    raise ValueError("platform-unavailable metrics require their exact reason")
+            elif item.state == "unavailable_on_platform":
+                raise ValueError("a supported platform metric cannot be declared unavailable")
+            if item.state == "observed" and value is None:
+                raise ValueError("observed metric coverage requires its actual value")
+            if item.state != "observed" and value is not None:
+                raise ValueError("an unobserved metric cannot contain a value")
+            if item.state == "measurement_failed" and item.reason not in self.monitoring_errors:
+                raise ValueError("measurement failures must bind to a monitoring error")
+            allowed_sources = _metric_sources(item.metric, platform)
+            if item.source is not None and item.source not in allowed_sources:
+                raise ValueError("metric source is not valid for this platform contract")
+        io_coverage = tuple(item for item in self.metric_coverage if item.metric.startswith("io_"))
+        observed_io_sources = {
+            item.source
+            for item in io_coverage
+            if item.state == "observed" and item.source is not None
+        }
+        if len(observed_io_sources) > 1:
+            raise ValueError("one process observation cannot mix I/O counter sources")
+        if observed_io_sources:
+            only_source = next(iter(observed_io_sources))
+            if only_source == "psutil_process_io_counters":
+                expected_io_source = "psutil"
+            elif only_source == "linux_proc_pid_io":
+                expected_io_source = "linux_proc_pid_io"
+            else:
+                raise ValueError("I/O coverage used a non-I/O metric source")
+            if self.io_counter_source != expected_io_source:
+                raise ValueError("I/O coverage source contradicts the counter source")
+        elif self.io_counter_source != "unavailable":
+            raise ValueError("missing I/O coverage cannot claim a counter source")
         return self
+
+    @property
+    def resource_contract_complete(self) -> bool:
+        """Whether every metric satisfies the declared native platform contract."""
+        return (
+            self.measurement_contract == MEASUREMENT_CONTRACT_ID
+            and self.measurement_platform != "legacy_unspecified"
+            and len(self.metric_coverage) == len(_MEASUREMENT_METRICS)
+            and not self.monitoring_errors
+            and all(item.state != "measurement_failed" for item in self.metric_coverage)
+        )
+
+
+def _metric_sources(
+    metric: MeasurementMetric, platform: MeasurementPlatform
+) -> frozenset[MeasurementSource]:
+    fixed: dict[MeasurementMetric, MeasurementSource] = {
+        "sampled_rss_peak_bytes": "psutil_process_memory_info_rss",
+        "cpu_user_seconds": "psutil_process_cpu_times_user",
+        "cpu_system_seconds": "psutil_process_cpu_times_system",
+        "disk_apparent_peak_bytes": "filesystem_tree_stat_size",
+        "disk_allocated_peak_bytes": "filesystem_tree_stat_blocks_512",
+    }
+    if metric in fixed:
+        return frozenset((fixed[metric],))
+    if platform == "linux":
+        return frozenset(("psutil_process_io_counters", "linux_proc_pid_io"))
+    if platform == "windows":
+        return frozenset(("psutil_process_io_counters",))
+    return frozenset()
 
 
 class _CpuTimes(Protocol):
@@ -135,6 +324,8 @@ class _Descendant(Protocol):
 
     def kill(self) -> None: ...
 
+    def is_running(self) -> bool: ...
+
 
 class _ProcessFactory(Protocol):
     def Process(self, pid: int) -> _Process: ...
@@ -142,6 +333,7 @@ class _ProcessFactory(Protocol):
 
 @dataclass
 class _Measurements:
+    measurement_platform: MeasurementPlatform = field(default_factory=current_measurement_platform)
     errors: list[str] = field(default_factory=list)
     sampled_rss_peak_bytes: int | None = None
     cpu_user_seconds: float | None = None
@@ -150,6 +342,8 @@ class _Measurements:
     io_write_bytes: int | None = None
     io_read_chars: int | None = None
     io_write_chars: int | None = None
+    io_counter_source: Literal["psutil", "linux_proc_pid_io", "unavailable"] = "unavailable"
+    io_counter_fallback_reason: str | None = None
     disk_apparent_peak_bytes: int | None = None
     disk_allocated_peak_bytes: int | None = None
     sample_count: int = 0
@@ -176,7 +370,8 @@ class _Measurements:
         apparent, allocated = _disk_usage(directory)
         self.disk_apparent_peak_bytes = max(self.disk_apparent_peak_bytes or 0, apparent)
         if allocated is None:
-            self.error("disk_allocated_bytes_unavailable")
+            if self.measurement_platform != "windows":
+                self.error("disk_allocated_bytes_unavailable")
         else:
             self.disk_allocated_peak_bytes = max(self.disk_allocated_peak_bytes or 0, allocated)
 
@@ -189,7 +384,8 @@ class _Measurements:
             self.sampled_rss_peak_bytes = max(self.sampled_rss_peak_bytes or 0, rss)
         except Exception as error:
             if _child_exited(process):
-                self.error("rss_unavailable_at_exit", error)
+                if self.sampled_rss_peak_bytes is None:
+                    self.error("rss_unavailable_at_exit", error)
                 return True
             self.error("rss_monitoring_failed", error)
             return False
@@ -200,17 +396,131 @@ class _Measurements:
             self.cpu_user_seconds, self.cpu_system_seconds = cpu.user, cpu.system
         except Exception as error:
             self.error("cpu_counters_unavailable", error)
+        if self.measurement_platform == "macos":
+            # psutil deliberately has no Process.io_counters implementation on macOS.
+            # The exact capability boundary is recorded in metric_coverage.
+            return True
         try:
-            counters = probe.io_counters()
-            for name in ("read_bytes", "write_bytes", "read_chars", "write_chars"):
-                value: object = getattr(counters, name, None)
-                if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
-                    setattr(self, "io_" + name, value)
+            counters: object = probe.io_counters()
+        except Exception as psutil_error:
+            if self.measurement_platform == "linux":
+                try:
+                    counters = _read_linux_proc_io(process.pid)
+                except Exception as proc_error:
+                    if (
+                        isinstance(
+                            proc_error, (PermissionError, FileNotFoundError, ProcessLookupError)
+                        )
+                        and self.io_counter_source in ("psutil", "linux_proc_pid_io")
+                        and all(
+                            value is not None
+                            for value in (
+                                self.io_read_bytes,
+                                self.io_write_bytes,
+                                self.io_read_chars,
+                                self.io_write_chars,
+                            )
+                        )
+                        and _child_exited(process)
+                    ):
+                        # A zombie may deny /proc/PID/io after valid live samples.
+                        # Retain the declared last-available counters; do not
+                        # invent a final sample or hide a denial while alive.
+                        return True
+                    self.error("io_counters_unavailable", psutil_error)
+                    self.error("linux_proc_io_unavailable", proc_error)
                 else:
-                    self.error("io_" + name + "_unavailable")
-        except Exception as error:
-            self.error("io_counters_unavailable", error)
+                    self._io(counters, "linux_proc_pid_io")
+                    self.io_counter_fallback_reason = (
+                        "psutil_io_counters_unavailable:" + type(psutil_error).__name__
+                    )
+            else:
+                self.error("io_counters_unavailable", psutil_error)
+        else:
+            self._io(counters, "psutil")
         return True
+
+    def _io(
+        self,
+        counters: object,
+        source: Literal["psutil", "linux_proc_pid_io"],
+    ) -> None:
+        observed = False
+        names = (
+            ("read_bytes", "write_bytes")
+            if self.measurement_platform == "windows"
+            else ("read_bytes", "write_bytes", "read_chars", "write_chars")
+        )
+        for name in names:
+            value: object = (
+                counters.get(name) if isinstance(counters, dict) else getattr(counters, name, None)
+            )
+            if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+                setattr(self, "io_" + name, value)
+                observed = True
+            else:
+                self.error("io_" + name + "_unavailable")
+        if observed:
+            self.io_counter_source = source
+            if source == "psutil":
+                self.io_counter_fallback_reason = None
+
+    def coverage(self) -> tuple[ResourceMetricCoverage, ...]:
+        """Bind every value or absence to the current platform contract."""
+        result: list[ResourceMetricCoverage] = []
+        unavailable = _PLATFORM_UNAVAILABLE[self.measurement_platform]
+        for metric in _MEASUREMENT_METRICS:
+            value = getattr(self, metric)
+            unavailable_reason = unavailable.get(metric)
+            if unavailable_reason is not None:
+                if value is not None:
+                    raise ValueError("a platform-unavailable metric unexpectedly has a value")
+                result.append(
+                    ResourceMetricCoverage(
+                        metric=metric,
+                        state="unavailable_on_platform",
+                        source=None,
+                        reason=unavailable_reason,
+                    )
+                )
+                continue
+            if value is None:
+                reason = metric + "_measurement_unavailable"
+                self.error(reason)
+                result.append(
+                    ResourceMetricCoverage(
+                        metric=metric,
+                        state="measurement_failed",
+                        source=None,
+                        reason=reason,
+                    )
+                )
+                continue
+            if metric == "sampled_rss_peak_bytes":
+                source: MeasurementSource = "psutil_process_memory_info_rss"
+            elif metric == "cpu_user_seconds":
+                source = "psutil_process_cpu_times_user"
+            elif metric == "cpu_system_seconds":
+                source = "psutil_process_cpu_times_system"
+            elif metric == "disk_apparent_peak_bytes":
+                source = "filesystem_tree_stat_size"
+            elif metric == "disk_allocated_peak_bytes":
+                source = "filesystem_tree_stat_blocks_512"
+            elif self.io_counter_source == "psutil":
+                source = "psutil_process_io_counters"
+            elif self.io_counter_source == "linux_proc_pid_io":
+                source = "linux_proc_pid_io"
+            else:
+                raise ValueError("an observed I/O value requires its actual source")
+            result.append(
+                ResourceMetricCoverage(
+                    metric=metric,
+                    state="observed",
+                    source=source,
+                    reason=None,
+                )
+            )
+        return tuple(result)
 
     def disk_exceeded(self, budget: int) -> bool:
         return max(self.disk_apparent_peak_bytes or 0, self.disk_allocated_peak_bytes or 0) > budget
@@ -225,6 +535,7 @@ class _Measurements:
     ) -> ProcessObservation:
         if self.max_sample_gap_seconds is not None and self.max_sample_gap_seconds > 2 * interval:
             self.error("sampling_gap_exceeded_twice_requested_interval")
+        coverage = self.coverage()
         return ProcessObservation(
             pid=process.pid if process is not None else None,
             exit_code=process.returncode if process is not None else None,
@@ -237,8 +548,13 @@ class _Measurements:
             io_write_bytes=self.io_write_bytes,
             io_read_chars=self.io_read_chars,
             io_write_chars=self.io_write_chars,
+            io_counter_source=self.io_counter_source,
+            io_counter_fallback_reason=self.io_counter_fallback_reason,
             disk_apparent_peak_bytes=self.disk_apparent_peak_bytes,
             disk_allocated_peak_bytes=self.disk_allocated_peak_bytes,
+            measurement_contract=MEASUREMENT_CONTRACT_ID,
+            measurement_platform=self.measurement_platform,
+            metric_coverage=coverage,
             sample_interval_seconds=interval,
             max_sample_gap_seconds=self.max_sample_gap_seconds,
             sample_count=self.sample_count,
@@ -247,6 +563,33 @@ class _Measurements:
             observed_descendant_pids=tuple(sorted({item.pid for item in self.descendants})),
             termination_scope="posix_process_group" if os.name == "posix" else "direct_child",
         )
+
+
+def _read_linux_proc_io(pid: int, *, proc_root: Path = Path("/proc")) -> dict[str, int]:
+    """Read Linux's kernel-provided cumulative counters for one known child PID."""
+    if isinstance(pid, bool) or not isinstance(pid, int) or pid <= 0:
+        raise ValueError("Linux process I/O counters require a positive PID")
+    required = {
+        "read_bytes": "read_bytes",
+        "write_bytes": "write_bytes",
+        "rchar": "read_chars",
+        "wchar": "write_chars",
+    }
+    observed: dict[str, int] = {}
+    for line in (proc_root / str(pid) / "io").read_text(encoding="ascii").splitlines():
+        name, separator, raw = line.partition(":")
+        if not separator or name not in required:
+            continue
+        target = required[name]
+        if target in observed:
+            raise ValueError("duplicate Linux process I/O counter")
+        value = raw.strip()
+        if not value.isdecimal():
+            raise ValueError("invalid Linux process I/O counter")
+        observed[target] = int(value)
+    if set(observed) != set(required.values()):
+        raise ValueError("incomplete Linux process I/O counters")
+    return observed
 
 
 def _disk_usage(directory: Path) -> tuple[int, int | None]:
@@ -295,12 +638,136 @@ def _child_exited(process: subprocess.Popen[bytes]) -> bool:
     if _nonreaping_wait_available():
         try:
             return (
-                os.waitid(os.P_PID, process.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT) is not None
+                os.waitid(  # type: ignore[attr-defined]
+                    os.P_PID,  # type: ignore[attr-defined]
+                    process.pid,
+                    os.WEXITED | os.WNOHANG | os.WNOWAIT,  # type: ignore[attr-defined]
+                )
+                is not None
             )
         except ChildProcessError:
             # A concurrent watchdog may already have reaped this owned child.
             return process.poll() is not None
     return process.poll() is not None
+
+
+def _windows_venv_base_launch(
+    command: list[str], environment: dict[str, str]
+) -> tuple[list[str], dict[str, str]]:
+    """Bypass only this process's validated Windows CPython venv redirector.
+
+    Windows CPython virtual environments may use a small ``Scripts/python.exe``
+    redirector which waits on the base interpreter.  Treating that implementation
+    detail as a workload descendant either rejects every supervised run or forces
+    the supervisor to aggregate two identities.  Launching the already-bound base
+    executable with CPython's launcher variable preserves ``sys.prefix`` and
+    ``sys.executable`` while making the real interpreter the owned ``Popen`` child.
+
+    The substitution is deliberately restricted to the currently running CPython
+    environment and to an internally consistent ``pyvenv.cfg``.  Any other command
+    is returned unchanged and remains subject to normal fail-closed descendant
+    detection.
+    """
+    if (
+        os.name != "nt"
+        or len(command) < 2
+        or command[1] != "-I"
+        or sys.implementation.name != "cpython"
+    ):
+        return command, environment
+    reported_base = getattr(sys, "_base_executable", None)
+    if not isinstance(reported_base, str) or not reported_base:
+        return command, environment
+    try:
+        launcher = Path(command[0]).resolve(strict=True)
+        current_launcher = Path(sys.executable).resolve(strict=True)
+        base = Path(reported_base).resolve(strict=True)
+        prefix = Path(sys.prefix).resolve(strict=True)
+        base_prefix = Path(sys.base_prefix).resolve(strict=True)
+    except (OSError, RuntimeError):
+        return command, environment
+    if (
+        launcher != current_launcher
+        or launcher == base
+        or launcher.parent.parent.resolve() != prefix
+    ):
+        return command, environment
+    if launcher.name.casefold() != "python.exe" or launcher.parent.name.casefold() != "scripts":
+        return command, environment
+    config_path = launcher.parent.parent / "pyvenv.cfg"
+    try:
+        if config_path.is_symlink() or not config_path.is_file():
+            return command, environment
+        if config_path.stat().st_size > 64 * 1024:
+            return command, environment
+        values: dict[str, str] = {}
+        for raw_line in config_path.read_text(encoding="utf-8-sig").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            raw_key, separator, raw_value = line.partition("=")
+            key = raw_key.strip().casefold()
+            if not separator or not key or key in values:
+                return command, environment
+            values[key] = raw_value.strip()
+        implementation = values.get("implementation")
+        if implementation is not None and implementation.casefold() != "cpython":
+            return command, environment
+        raw_home = values.get("home")
+        if not raw_home:
+            return command, environment
+        home = Path(raw_home)
+        if not home.is_absolute():
+            return command, environment
+        home = home.resolve(strict=True)
+        configured = Path(values.get("executable", str(home / launcher.name)))
+        if not configured.is_absolute():
+            return command, environment
+        configured = configured.resolve(strict=True)
+    except (OSError, RuntimeError, UnicodeError):
+        return command, environment
+    if (
+        configured != base
+        or home != base_prefix
+        or configured.parent != home
+        or configured.name.casefold() != launcher.name.casefold()
+        or not configured.is_file()
+    ):
+        return command, environment
+    prepared_environment = {
+        key: value for key, value in environment.items() if key.casefold() != "__pyvenv_launcher__"
+    }
+    prepared_environment["__PYVENV_LAUNCHER__"] = sys.executable
+    return [reported_base, *command[1:]], prepared_environment
+
+
+def _kill_observed_descendants(measurements: _Measurements) -> None:
+    """Best-effort cleanup using only the identities captured by psutil."""
+    for descendant in measurements.descendants:
+        try:
+            # psutil checks its cached PID/create-time identity before signaling.
+            descendant.kill()
+        except Exception as error:
+            measurements.error("observed_descendant_kill_unavailable", error)
+    pending = list(measurements.descendants)
+    deadline = time.monotonic() + 5.0
+    while pending:
+        remaining: list[_Descendant] = []
+        for descendant in pending:
+            try:
+                # Do not reopen or wait on a bare PID: is_running checks the
+                # captured psutil identity and treats PID reuse as stopped.
+                if descendant.is_running():
+                    remaining.append(descendant)
+            except Exception as error:
+                measurements.error("observed_descendant_status_unavailable", error)
+        if not remaining:
+            return
+        if time.monotonic() >= deadline:
+            measurements.error("observed_descendant_cleanup_incomplete")
+            return
+        pending = remaining
+        time.sleep(0.01)
 
 
 def _kill_and_wait(process: subprocess.Popen[bytes], measurements: _Measurements) -> bool:
@@ -319,7 +786,7 @@ def _kill_and_wait(process: subprocess.Popen[bytes], measurements: _Measurements
                     try:
                         # waitid(WNOWAIT) preserves this leader, including a zombie,
                         # so this session/group ID cannot have been reused.
-                        os.killpg(process.pid, signal.SIGKILL)
+                        os.killpg(process.pid, signal.SIGKILL)  # type: ignore[attr-defined]
                     except ProcessLookupError:
                         pass
                     except OSError as error:
@@ -327,12 +794,7 @@ def _kill_and_wait(process: subprocess.Popen[bytes], measurements: _Measurements
                         process.kill()
                 else:
                     process.kill()
-            for descendant in measurements.descendants:
-                try:
-                    # psutil checks the process identity before signaling a PID.
-                    descendant.kill()
-                except Exception as error:
-                    measurements.error("observed_descendant_kill_unavailable", error)
+            _kill_observed_descendants(measurements)
             process.wait(timeout=5.0)
         except Exception as error:
             measurements.error("child_cleanup_failed", error)
@@ -442,6 +904,7 @@ def supervise(
         environment = dict(os.environ)
         environment.update(env or {})
         environment.update({name: str(temporary) for name in ("TMPDIR", "TMP", "TEMP")})
+        launch_command, environment = _windows_venv_base_launch(command, environment)
         with (
             (directory / "stdout.log").open("xb") as stdout,
             (directory / "stderr.log").open("xb") as stderr,
@@ -454,7 +917,7 @@ def supervise(
             else:
                 reason = "launch_failed"
                 process = subprocess.Popen(
-                    command,
+                    launch_command,
                     stdin=subprocess.DEVNULL,
                     stdout=stdout,
                     stderr=stderr,
@@ -527,9 +990,12 @@ def _watch(
         measurements.tick()
         try:
             descendants = probe.children(recursive=True)
-        except Exception as error:
+        except Exception:
             if _child_exited(process):
-                measurements.error("descendant_probe_unavailable_at_exit", error)
+                # The owned process identity can disappear between the exit check
+                # and this final probe. Earlier rounds remain the declared sampled,
+                # non-atomic descendant coverage; this normal race is not a failed
+                # resource observation.
                 descendants = []
             else:
                 raise

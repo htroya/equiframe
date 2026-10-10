@@ -18,6 +18,7 @@ from equiframe_benchmark.costs import _Monitor, _PsutilProbe
 from equiframe_benchmark.models import digest
 from equiframe_benchmark.scale_io import save_scale_document
 from equiframe_benchmark.scale_types import (
+    SCALE_SAMPLE_INTERVAL_SECONDS,
     BaselineCost,
     ScaleSpec,
     ScaleTrial,
@@ -233,7 +234,7 @@ def _baseline(spec: ScaleSpec, paths: tuple[Path, Path], method: str) -> Baselin
 def run_trial(spec: ScaleSpec, directory: Path, repetition: int) -> ScaleTrial:
     directory.mkdir()
     stages: list[StageCost] = []
-    monitor = _Monitor(_PsutilProbe, 0.05)
+    monitor = _Monitor(_PsutilProbe, SCALE_SAMPLE_INTERVAL_SECONDS)
     monitor.start()
     start = time.perf_counter()
 

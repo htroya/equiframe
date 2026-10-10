@@ -2582,6 +2582,30 @@
           ],
           "title": "Exit Code"
         },
+        "io_counter_fallback_reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Io Counter Fallback Reason"
+        },
+        "io_counter_source": {
+          "default": "legacy_unspecified",
+          "enum": [
+            "psutil",
+            "linux_proc_pid_io",
+            "unavailable",
+            "legacy_unspecified"
+          ],
+          "title": "Io Counter Source",
+          "type": "string"
+        },
         "io_read_bytes": {
           "anyOf": [
             {
@@ -2641,6 +2665,34 @@
             }
           ],
           "title": "Max Sample Gap Seconds"
+        },
+        "measurement_contract": {
+          "default": "legacy_unspecified",
+          "enum": [
+            "equiframe_process_resources_v1",
+            "legacy_unspecified"
+          ],
+          "title": "Measurement Contract",
+          "type": "string"
+        },
+        "measurement_platform": {
+          "default": "legacy_unspecified",
+          "enum": [
+            "linux",
+            "windows",
+            "macos",
+            "legacy_unspecified"
+          ],
+          "title": "Measurement Platform",
+          "type": "string"
+        },
+        "metric_coverage": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ResourceMetricCoverage"
+          },
+          "title": "Metric Coverage",
+          "type": "array"
         },
         "monitoring_errors": {
           "items": {
@@ -2902,6 +2954,82 @@
         "issues"
       ],
       "title": "ResourceMeasurement",
+      "type": "object"
+    },
+    "ResourceMetricCoverage": {
+      "additionalProperties": false,
+      "description": "One metric's actual observation or its exact platform capability boundary.",
+      "properties": {
+        "metric": {
+          "enum": [
+            "sampled_rss_peak_bytes",
+            "cpu_user_seconds",
+            "cpu_system_seconds",
+            "io_read_bytes",
+            "io_write_bytes",
+            "io_read_chars",
+            "io_write_chars",
+            "disk_apparent_peak_bytes",
+            "disk_allocated_peak_bytes"
+          ],
+          "title": "Metric",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "enum": [
+                "psutil_process_memory_info_rss",
+                "psutil_process_cpu_times_user",
+                "psutil_process_cpu_times_system",
+                "psutil_process_io_counters",
+                "linux_proc_pid_io",
+                "filesystem_tree_stat_size",
+                "filesystem_tree_stat_blocks_512"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source"
+        },
+        "state": {
+          "enum": [
+            "observed",
+            "unavailable_on_platform",
+            "measurement_failed"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "metric",
+        "state",
+        "source",
+        "reason"
+      ],
+      "title": "ResourceMetricCoverage",
       "type": "object"
     },
     "ResourcePoint": {

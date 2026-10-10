@@ -118,7 +118,11 @@ def main() -> None:
             if not path.exists() or path.read_text(encoding="utf-8") != payload:
                 raise SystemExit("outdated schema: " + path.name)
         else:
-            path.write_text(payload, encoding="utf-8")
+            # Schema bytes are release artifacts and one historical schema has a
+            # byte-level compatibility guard.  Disable the host newline
+            # translation so generation is identical on Windows and POSIX.
+            with path.open("w", encoding="utf-8", newline="\n") as stream:
+                stream.write(payload)
     print(f"{len(MODELS)} benchmark schemas verified" if args.check else "schemas generated")
 
 
