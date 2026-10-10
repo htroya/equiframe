@@ -20,8 +20,9 @@ close those gates. [Release process](packages/equiframe/docs/releasing.md).
 adds interchangeable typed inputs, native windows, explicit source extensions
 and a complete installed six-input/three-engine example.
 
-[Avance técnico evaluado](docs/UNIVERSALITY_TECHNICAL_PROGRESS_20261010.md):
-41/60 comprobaciones (68,3 %) en una rúbrica propia para A11. El informe publica
+[Avance técnico evaluado](docs/UNIVERSALITY_80_RESULT_20261010.md):
+48/60 comprobaciones (80 %) en la misma rúbrica propia para A11; antes 41/60
+(68,3 %). El informe publica
 las definiciones y los pendientes; no certifica universalidad completa ni
 compara directamente ese resultado con el 25 % de cierre del corte histórico A9.
 
