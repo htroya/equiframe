@@ -2,6 +2,11 @@
 
 [Primer uso por perfil / First use](packages/equiframe/docs/first-use.md)
 
+[Pruebas con trazabilidad por opción del núcleo A12](docs/OPTION_TRACEABILITY_RESULT_20261010.md):
+4.296/8.383 obligaciones (51,25 %), con 3.443 casos sintéticos distintos.
+El recibo distingue validación de metadatos, rechazos esperados y opciones
+pendientes; no acredita por sí solo sus efectos en motores nativos.
+
 [Usabilidad técnica evaluada](docs/USABILITY_CURRENT_RESULT_20261010.md):
 11/12 criterios completos (91,67 %) para A12, con la misma rúbrica U01–U12.
 La evaluación con personas reales sigue pendiente; no es un porcentaje de

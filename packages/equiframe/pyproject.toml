@@ -74,6 +74,7 @@ include = ["/docs", "/src", "/tests", "/examples", "/schemas", "/tools", "/pypro
 # global data-file ignores; the closed fixture inventory validates every byte.
 [tool.hatch.build.targets.sdist.force-include]
 "tests/fixtures/versioned" = "tests/fixtures/versioned"
+"tests/fixtures/option_trace" = "tests/fixtures/option_trace"
 
 [tool.ruff]
 target-version = "py310"
