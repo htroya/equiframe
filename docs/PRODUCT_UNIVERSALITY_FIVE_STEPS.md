@@ -101,6 +101,7 @@ The final source binding additionally retains `source-binding/receipt.json` in
 that VM directory. The third-party CycloneDX LICENSE was restored to its exact
 tracked LF bytes; its text and terms were not changed. Only the core sdist hash
 changed, and native reconstruction still yields the same final core wheel.
+An explicit checkout attribute preserves those LF bytes on Windows as well.
 Every tracked distributed member is checked against the delivered Git commit.
 
 Mac native hosts and the full twenty-cell A11 matrix remain unexecuted. These five
