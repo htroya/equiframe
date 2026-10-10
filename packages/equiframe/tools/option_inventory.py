@@ -461,7 +461,7 @@ def installed_identity(
                     raise ValueError(f"Installed payload differs from selected wheel: {member}")
             expected_python = {name for name in members if name.endswith(".py")}
             observed_python = {
-                str(path.relative_to(purelib)) for path in location.parent.rglob("*.py")
+                path.relative_to(purelib).as_posix() for path in location.parent.rglob("*.py")
             }
             if expected_python != observed_python:
                 raise ValueError("Installed Python module inventory differs from selected wheel")

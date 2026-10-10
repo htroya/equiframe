@@ -18,3 +18,7 @@ packages/equiframe/tests/fixtures/versioned/** -text
 # This historical schema has an exact published byte hash. Keep its committed
 # LF bytes on Windows too; platform newline conversion is not a format revision.
 packages/equiframe-benchmark/schemas/SnapshotManifest-1.0.schema.json -text
+
+# Frozen option cases and manifest are identified by their exact archived bytes.
+packages/equiframe/tests/fixtures/option_trace/catalog-a12.json -text
+packages/equiframe/tests/fixtures/option_trace/manifest.json -text

@@ -2,6 +2,7 @@
 
 import importlib.util
 import inspect
+import zipfile
 from pathlib import Path
 from types import ModuleType
 from typing import Annotated, Literal, Protocol
@@ -81,6 +82,33 @@ def test_source_import_cannot_claim_installed_inventory(monkeypatch, tmp_path):
     )
     with pytest.raises(ValueError, match="outside this interpreter"):
         inventory.installed_identity(module, "not-a-real-distribution")
+
+
+@pytest.mark.parametrize("change", [None, "payload", "extra"])
+def test_installed_wheel_paths_are_portable_and_payload_checks_remain_strict(
+    monkeypatch, tmp_path, change
+):
+    purelib = tmp_path / "site-packages"
+    module_file = purelib / "fixture" / "__init__.py"
+    module_file.parent.mkdir(parents=True)
+    module_file.write_bytes(b"CANDIDATE = 'synthetic'\n")
+    wheel = tmp_path / "candidate.whl"
+    with zipfile.ZipFile(wheel, "w") as archive:
+        archive.writestr("fixture/__init__.py", module_file.read_bytes())
+    module = ModuleType("fixture")
+    module.__file__ = str(module_file)
+    monkeypatch.setattr(inventory.sysconfig, "get_paths", lambda: {"purelib": str(purelib)})
+    if change == "payload":
+        module_file.write_bytes(b"CHANGED = True\n")
+        with pytest.raises(ValueError, match="payload differs"):
+            inventory.installed_identity(module, "equiframe", wheel)
+    elif change == "extra":
+        (module_file.parent / "obsolete.py").write_bytes(b"STALE = True\n")
+        with pytest.raises(ValueError, match="module inventory differs"):
+            inventory.installed_identity(module, "equiframe", wheel)
+    else:
+        identity = inventory.installed_identity(module, "equiframe", wheel)
+        assert identity["artifact"]["verified_payload_files"] == 1
 
 
 def test_required_and_unbounded_options_do_not_invent_defaults_or_upper_bounds():
