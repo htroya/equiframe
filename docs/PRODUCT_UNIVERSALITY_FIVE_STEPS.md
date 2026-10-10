@@ -107,5 +107,7 @@ Every tracked distributed member is checked against the delivered Git commit.
 Mac native hosts and the full twenty-cell A11 matrix remain unexecuted. These five
 product steps do not close the UV01–UV12 score, licensing, independent human
 review, public release or real-domain adoption. No Actions were executed and no
-paid resources were created. Code is delivered on the review branch; main
-integration remains subject to the existing owner-review rule.
+paid resources were created. On 2026-10-10, after receiving the implementation,
+validation results and remaining limits, the owner explicitly authorized main
+integration of all completed work. This authorization does not close independent
+human validation, licensing or the UV01–UV12 criteria.
