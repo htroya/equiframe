@@ -87,7 +87,7 @@ Final artifact SHA-256:
 | Distribution | SHA-256 |
 |---|---|
 | Core wheel | `11cbae825f3b2ac4f6e9a6378d589bbb6f74be37587a3c40a591b64a7496a15e` |
-| Core sdist | `82527d8c9e9f33fe6d3d8b5df43d65f531c355a577f900a5257ee9a04a8fe5ca` |
+| Core sdist | `512ab8eb3e100f279aca4dfa2b6f65340817cf1c8ef620ccb9aa8b5a78c85831` |
 | Benchmark wheel | `f77d06012e92ea3bc72a1ada4d02938827880622d7560501ba0a251e132fc2b3` |
 | Benchmark sdist | `b775f5909c3122bb5313800ff49a22ab822b8bb922e55496289ae279ff903241` |
 
@@ -96,6 +96,12 @@ existing `157.137.227.1` host. It contains uploaded hash-checked distributions,
 source unpacking, an isolated offline dependency environment, JUnit, reports,
 example outputs and exact rebuilt wheels. Earlier A11 directories retain the
 pre-correction packaging observations. The A10 labs remain historical.
+
+The final source binding additionally retains `source-binding/receipt.json` in
+that VM directory. The third-party CycloneDX LICENSE was restored to its exact
+tracked LF bytes; its text and terms were not changed. Only the core sdist hash
+changed, and native reconstruction still yields the same final core wheel.
+Every tracked distributed member is checked against the delivered Git commit.
 
 Mac native hosts and the full twenty-cell A11 matrix remain unexecuted. These five
 product steps do not close the UV01–UV12 score, licensing, independent human
