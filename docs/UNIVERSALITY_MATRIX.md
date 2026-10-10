@@ -1,5 +1,13 @@
 # Matriz UV01–UV12
 
+**Corte histórico A9.** Los estados, plataformas y referencias a `main` de esta
+matriz corresponden al corte indicado, no al código A11 integrado posteriormente.
+El [avance técnico A11 del 2026-10-10](UNIVERSALITY_TECHNICAL_PROGRESS_20261010.md)
+evalúa 41/60 comprobaciones (68,3 %) con una rúbrica propia distinta; no cambia
+este cierre histórico de 3/12 ni acredita las obligaciones pendientes del plan.
+La [entrega A11](PRODUCT_UNIVERSALITY_FIVE_STEPS.md) conserva los resultados
+manuales y límites de los cinco pasos integrados.
+
 Universo fijado antes de las pruebas en [el plan](UNIVERSALITY_PLAN.md).
 Corte 2026-10-09 UTC de A9; evaluación intermedia, no cierre. Las referencias de
 recibos identifican evidencia privada conservada fuera de Git.

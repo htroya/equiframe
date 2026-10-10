@@ -1,0 +1,559 @@
+{
+  "rubric_id": "UV-TECH-A11-60-v1",
+  "assessed_utc": "2026-10-10T15:57:39.028710+00:00",
+  "source_commit": "eb3fd70ec1dc059c58d7c95699981231ba5e6f60",
+  "candidate": "0.12.0a11",
+  "label": "Índice propio de avance técnico de Universalidad",
+  "passed": 41,
+  "total": 60,
+  "percent": 68.33333333333333,
+  "rounded_percent": 68,
+  "historical_index_not_replaced": "3/12=25% de criterios cerrados en el corte A9; no es comparable numéricamente con este nuevo índice de avance.",
+  "comparability": "Este índice nuevo no demuestra un salto 25%→resultado; usa otra granularidad y una selección/ponderación propia de 60 comprobaciones. La comparación histórica requiere puntuar el corte anterior con esta misma lista.",
+  "limits": [
+    "La selección y ponderación de comprobaciones es una decisión de evaluación explícita; no existe un porcentaje universal estándar.",
+    "Implementación o evidencia acotada no significa soporte de todos los datos, valores, motores o entornos.",
+    "Una prueba omitida o no ejecutada no cuenta como aprobada; resultados históricos no se atribuyen a A11.",
+    "Los datos sintéticos no acreditan adopción humana ni resultados científicos.",
+    "La evidencia actual tiene pruebas focales finales y conserva una ejecución completa inicial con tres fallos de expectativas posteriormente corregidos; no se inventa una ejecución completa final sin fallos."
+  ],
+  "artifact_sha256": {
+    "equiframe-0.12.0a11-py3-none-any.whl": "11cbae825f3b2ac4f6e9a6378d589bbb6f74be37587a3c40a591b64a7496a15e",
+    "equiframe-0.12.0a11.tar.gz": "512ab8eb3e100f279aca4dfa2b6f65340817cf1c8ef620ccb9aa8b5a78c85831",
+    "equiframe_benchmark-0.12.0a11-py3-none-any.whl": "f77d06012e92ea3bc72a1ada4d02938827880622d7560501ba0a251e132fc2b3",
+    "equiframe_benchmark-0.12.0a11.tar.gz": "b775f5909c3122bb5313800ff49a22ab822b8bb922e55496289ae279ff903241"
+  },
+  "source_bindings": [
+    {
+      "package": "equiframe",
+      "tracked_members_checked": 477,
+      "differences": []
+    },
+    {
+      "package": "equiframe-benchmark",
+      "tracked_members_checked": 122,
+      "differences": []
+    }
+  ],
+  "method": "Cinco comprobaciones por cada una de doce áreas, igual peso por área y por comprobación. Demostrada=1; pendiente, desconocida o evidencia de otra versión=0. Porcentaje=100*suma/60. Se fija esta lista antes de asignar resultados; las reglas no se retocan para obtener una cifra deseada.",
+  "classification": "Engineering progress assessment; not a thesis scientific metric",
+  "evidence_policy": "The score records a manual assessment of code and retained private receipts. This file reproduces the definitions and arithmetic, not the execution receipts. Execution counts and artifact identities are summarized in PRODUCT_UNIVERSALITY_FIVE_STEPS.md. Independent reproduction requires the identified private distributions and receipts.",
+  "areas": [
+    {
+      "id": "UV01",
+      "name": "Núcleo, contratos y entradas",
+      "passed": 5,
+      "total": 5,
+      "checks": [
+        {
+          "id": "01.1",
+          "definition": "Núcleo separado de benchmark, proveedor de nube y esquema de dominio; admisión explícita de extras.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Arquitectura e imports opcionales: 10 controles aprobados; núcleo sin cloud/DW/benchmark."
+        },
+        {
+          "id": "01.2",
+          "definition": "Contratos configurables de columnas, tipos, claves, ausencias, unidades/monedas, duplicados y tiempo.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Contratos declarativos y controles de admisión; casos tipados y errores preservados."
+        },
+        {
+          "id": "01.3",
+          "definition": "Lectura CSV, JSON/JSONL, Parquet y Arrow bajo contratos explícitos.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "CSV/JSON/Parquet/Arrow ejercidos; ejemplo instalado de seis entradas y tres motores."
+        },
+        {
+          "id": "01.4",
+          "definition": "Consulta SQLite parametrizada de solo lectura con tipos explícitos y límites.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "SQLite de solo lectura parametrizado, rechazo de REAL para dinero, límites y cancelación."
+        },
+        {
+          "id": "01.5",
+          "definition": "Respuesta binaria de un cliente API externo con lectura acotada, digest y cierre; no exige un servicio remoto en el ejemplo.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Respuesta sintética/context manager; SHA y presupuesto verificados; el cliente real pertenece al consumidor."
+        }
+      ]
+    },
+    {
+      "id": "UV02",
+      "name": "Versiones Python",
+      "passed": 2,
+      "total": 5,
+      "checks": [
+        {
+          "id": "02.1",
+          "definition": "A11 instalado y ejecutado en CPython 3.10 con identidad conservada.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "No hay recibo de instalación y ejecución específicamente A11/CPython 3.10; A10 no se transfiere."
+        },
+        {
+          "id": "02.2",
+          "definition": "A11 instalado y ejecutado en CPython 3.11 con identidad conservada.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "No hay recibo A11/CPython 3.11."
+        },
+        {
+          "id": "02.3",
+          "definition": "A11 instalado y ejecutado en CPython 3.12 con identidad conservada.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "A11 ejecutado en Windows CPython 3.12.4 y Linux ARM64 CPython 3.12.15."
+        },
+        {
+          "id": "02.4",
+          "definition": "A11 instalado y ejecutado en CPython 3.13 con identidad conservada.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "No hay recibo A11/CPython 3.13."
+        },
+        {
+          "id": "02.5",
+          "definition": "Metadatos de compatibilidad y par de versiones coherentes; identidad real del intérprete registrada, sin heredar resultados entre versiones.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Wheels A11, >=3.10,<3.14 y pin exacto benchmark/core; identidad del intérprete registrada."
+        }
+      ]
+    },
+    {
+      "id": "UV03",
+      "name": "Plataformas nativas",
+      "passed": 2,
+      "total": 5,
+      "checks": [
+        {
+          "id": "03.1",
+          "definition": "Instalación y ejecución nativa de A11 en Linux x64, al menos en un Python declarado.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "Las ejecuciones Linux x64 históricas son A9; no existe recibo actual A11."
+        },
+        {
+          "id": "03.2",
+          "definition": "Instalación y ejecución nativa de A11 en Linux ARM64, al menos en un Python declarado.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "A11 instalado y ejecutado nativamente en Linux ARM64: 122 comprobaciones finales sin omisiones."
+        },
+        {
+          "id": "03.3",
+          "definition": "Instalación y ejecución nativa de A11 en Windows x64, al menos en un Python declarado.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "A11 instalado fuera del checkout en Windows y ejemplos nativos; no cierra las cuatro versiones."
+        },
+        {
+          "id": "03.4",
+          "definition": "Instalación y ejecución nativa de A11 en macOS Intel, al menos en un Python declarado.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "Sin ejecución nativa A11/macOS Intel."
+        },
+        {
+          "id": "03.5",
+          "definition": "Instalación y ejecución nativa de A11 en macOS Apple Silicon, al menos en un Python declarado.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "Sin ejecución nativa A11/macOS Apple Silicon."
+        }
+      ]
+    },
+    {
+      "id": "UV04",
+      "name": "Dependencias y perfiles",
+      "passed": 3,
+      "total": 5,
+      "checks": [
+        {
+          "id": "04.1",
+          "definition": "Dependencias directas y extras explícitos; motores opcionales sin importación eager al importar el núcleo.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Dependencias/extras explícitos e imports de motores diferidos; no es validación de todos los perfiles."
+        },
+        {
+          "id": "04.2",
+          "definition": "Locks y metadatos del par A11 coherentes y fijados.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Locks del par A11 y pin de dependencia coinciden con metadatos."
+        },
+        {
+          "id": "04.3",
+          "definition": "Comprobación de dependencias en el par A11 instalado y aislado.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "pip check del par instalado en Windows y VM aprobado."
+        },
+        {
+          "id": "04.4",
+          "definition": "Todos los perfiles individuales base/extras de A11 ejecutados con recibos completos.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "Todos los perfiles A11 base/extras individuales no están ejecutados."
+        },
+        {
+          "id": "04.5",
+          "definition": "Extremos mínimo/reciente de A11 y sus marcadores ejecutados en todas las celdas comprometidas.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "No existe matriz completa A11 de mínimos/recientes y marcadores."
+        }
+      ]
+    },
+    {
+      "id": "UV05",
+      "name": "Operaciones y motores",
+      "passed": 4,
+      "total": 5,
+      "checks": [
+        {
+          "id": "05.1",
+          "definition": "Pandas, Polars y DuckDB ejecutan implementaciones nativas propias.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Tres implementaciones nativas observadas, sin resultado común convertido."
+        },
+        {
+          "id": "05.2",
+          "definition": "Seis direcciones entre los tres motores comprobadas contra un esperado independiente.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Seis direcciones en migración y ventanas, con esperado literal independiente."
+        },
+        {
+          "id": "05.3",
+          "definition": "Filtros, proyecciones, conversiones admitidas, agregaciones, ordenamientos y seis joins implementados y comprobados.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "IR relacional implementado dentro de sus capacidades documentadas; no promete conversiones arbitrarias."
+        },
+        {
+          "id": "05.4",
+          "definition": "row_number, lag y lead deterministas ejecutados nativamente en los tres motores.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "row_number/lag/lead: 15 pruebas de ventanas, 12 de fronteras y ejemplos instalados."
+        },
+        {
+          "id": "05.5",
+          "definition": "Producto completo de operaciones/tipos/políticas/direcciones y entornos cerrado; las capacidades requeridas no se sustituyen por rechazo.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "Intersección completa no cerrada: división Decimal Polars/DuckDB y otras combinaciones siguen sin implementación."
+        }
+      ]
+    },
+    {
+      "id": "UV06",
+      "name": "Preservación semántica",
+      "passed": 4,
+      "total": 5,
+      "checks": [
+        {
+          "id": "06.1",
+          "definition": "Texto/identificadores, ausencia/NaN y multiplicidad preservados en casos con esperados independientes.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Identificadores, NULL/NaN y multiplicidad tienen esperados explícitos, incluidos C/D/E/F y ventanas."
+        },
+        {
+          "id": "06.2",
+          "definition": "Decimal exacto, precisión extrema y unidades/monedas preservados en operaciones admitidas.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Decimal(38,2), importes exactos y unidades ejercidos; operaciones incompatibles se rechazan."
+        },
+        {
+          "id": "06.3",
+          "definition": "Fechas y timestamps admitidos conservan unidades y zonas sin conversiones silenciosas.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Fechas y timestamps admitidos conservados; restricciones s/ms/us/ns/UTC declaradas."
+        },
+        {
+          "id": "06.4",
+          "definition": "Empates, overflow y errores intermedios tienen diagnósticos verificables y no se ocultan como éxito.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Empates/overflow/error-pruning comprobados y preservados como fallo."
+        },
+        {
+          "id": "06.5",
+          "definition": "Semántica común completa entre motores para todas las operaciones exigidas de Decimal y tiempo, incluidas división y localización.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "División Decimal y localización temporal no se implementan con semántica común en todos los motores."
+        }
+      ]
+    },
+    {
+      "id": "UV07",
+      "name": "Extensiones externas",
+      "passed": 4,
+      "total": 5,
+      "checks": [
+        {
+          "id": "07.1",
+          "definition": "DataSource/TableInput y composición de proveedores externos sin modificar el núcleo.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Proveedor externo compuesto, captura única, batches tipados y propagación de fallos comprobados."
+        },
+        {
+          "id": "07.2",
+          "definition": "PlanCompiler/EngineAdapter registrables explícitamente por instancia, con verificaciones de comportamiento.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Registros por instancia, compilers externos delegados y adapters externos ejecutados; no son motores nuevos."
+        },
+        {
+          "id": "07.3",
+          "definition": "ArtifactStore externo mediante un puerto pequeño con verificaciones de comportamiento.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "ArtifactStore inyectado con put/get; fallos y publicación parcial probados con implementaciones externas."
+        },
+        {
+          "id": "07.4",
+          "definition": "Reglas y destinos externos mediante registros/puertos pequeños con verificaciones de comportamiento.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Regla externa realmente invocada y destino delegado publica dos filas conservando el recibo."
+        },
+        {
+          "id": "07.5",
+          "definition": "Consumidor independiente del repositorio principal instalado y comprobado específicamente con A11 y el corpus congelado.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "No existe validación del consumidor independiente/corpus con A11; el recibo A9 conserva esa identidad."
+        }
+      ]
+    },
+    {
+      "id": "UV08",
+      "name": "Diversidad de dominios",
+      "passed": 3,
+      "total": 5,
+      "checks": [
+        {
+          "id": "08.1",
+          "definition": "Ejemplo financiero con contrato propio y esperado independiente ejecutado con A11.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Recorrido D financiero: correcto/diferente/no evaluable aprobados con Decimal y monedas."
+        },
+        {
+          "id": "08.2",
+          "definition": "Ejemplo de comercio con contrato propio y esperado independiente ejecutado con A11.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Recorrido C comercio: correcto/diferente/error, publicación y totales propios comprobados."
+        },
+        {
+          "id": "08.3",
+          "definition": "Ejemplo de telemetría/ciencia con contrato propio y esperado independiente ejecutado con A11.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Recorridos E/F telemetría/ciencia con expectativas, NULL/NaN y multiplicidad propias."
+        },
+        {
+          "id": "08.4",
+          "definition": "Variantes equivalentes, discrepantes e inválidas ejecutadas en los tres dominios con A11.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "C tiene datos inválidos; D/E no_evaluable agota presupuesto y no demuestra entradas inválidas de esos dominios. No se le asigna un punto por esa equivalencia."
+        },
+        {
+          "id": "08.5",
+          "definition": "Aceptación o adopción de A11 documentada por consumidores reales de dominios externos; no basta evidencia sintética.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "No se encontró aceptación/adopción real documentada; las pruebas son sintéticas."
+        }
+      ]
+    },
+    {
+      "id": "UV09",
+      "name": "Operación y recursos",
+      "passed": 4,
+      "total": 5,
+      "checks": [
+        {
+          "id": "09.1",
+          "definition": "Hashes, esquemas y errores de entrada impiden producir una comparación exitosa de datos inválidos.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Respuesta corrupta termina con código 3, sin comparación exitosa; comprobaciones de tipos/digests preservadas."
+        },
+        {
+          "id": "09.2",
+          "definition": "Presupuestos acumulados de filas/bytes, tiempo y cancelación con pruebas reales.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Límites acumulados, cierre de reader y cancelación/timeout SQLite antes del primer resultado."
+        },
+        {
+          "id": "09.3",
+          "definition": "Medición por plataforma y disponibilidad explícita de recursos; no se inventan contadores o cuotas duras.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Mediciones y capacidad por plataforma ejercidas en benchmark; omisiones POSIX/Windows se conservan."
+        },
+        {
+          "id": "09.4",
+          "definition": "Cierre/limpieza, transporte adversarial o fallos recuperables y controles relevantes bajo -O comprobados.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Cierre/limpieza y errores, bundles relocalizados H y corrupto bajo -O ejecutados."
+        },
+        {
+          "id": "09.5",
+          "definition": "Cambio de versión A11→anterior→A11 y recuperación fresca cerrados en los entornos requeridos.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "Rollback íntegro desde y hacia A11 en los entornos comprometidos no ejecutado."
+        }
+      ]
+    },
+    {
+      "id": "UV10",
+      "name": "API, documentación y primer uso",
+      "passed": 4,
+      "total": 5,
+      "checks": [
+        {
+          "id": "10.1",
+          "definition": "API y formatos históricos conservados; nuevos elementos experimentales identificados.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Registros de compatibilidad y fixtures históricos comprobados; APIs nuevas experimentales."
+        },
+        {
+          "id": "10.2",
+          "definition": "CLI y códigos de coincidencia, discrepancia y entrada inválida comprobados.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Ayuda/códigos observados en recorridos; ejemplo actual distingue 0/1/3."
+        },
+        {
+          "id": "10.3",
+          "definition": "Guía española, ejemplos completos y documentación distribuida coherentes con las capacidades.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Guía española y ejemplo distribuidos; incluye límites de SQL, cliente API, ventanas y memoria."
+        },
+        {
+          "id": "10.4",
+          "definition": "Primer uso instalado fuera del checkout con seis entradas y tres motores en Windows y Linux ARM64.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Seis entradas/tres motores en instalación externa Windows y Linux ARM64, con positivo y negativos."
+        },
+        {
+          "id": "10.5",
+          "definition": "Primer uso y recorridos completos de A11 en cinco plataformas por cuatro Python, con consumidor externo.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "Recorridos íntegros A11 veinte celdas y consumidor externo pendientes."
+        }
+      ]
+    },
+    {
+      "id": "UV11",
+      "name": "Procedencia, dependencias públicas y licencia",
+      "passed": 2,
+      "total": 5,
+      "checks": [
+        {
+          "id": "11.1",
+          "definition": "Dependencias declaradas y resueltas identificadas en metadatos y locks del candidato A11.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Declaraciones y resolución en locks A11 identificadas; no sustituye inventario de todos los binarios nativos."
+        },
+        {
+          "id": "11.2",
+          "definition": "Consultas completas de avisos para todas las dependencias efectivas de A11, sin desconocidos y con fechas/identidad de alcance.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "No se acreditan consultas completas para el candidato efectivo A11; las consultas A10 conservan sus fechas y alcance."
+        },
+        {
+          "id": "11.3",
+          "definition": "Instalación offline desde dependencias fijadas con hashes y procedencia registrada, sin atribuir consultas antiguas a una auditoría nueva.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "VM: sync offline --require-hashes con locks y cache identificados. No se presenta como auditoría nueva."
+        },
+        {
+          "id": "11.4",
+          "definition": "Titulares y licencia/condiciones de EquiFrame aprobados y registrados.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "Licencia/titulares aprobados pendientes según decisión registrada."
+        },
+        {
+          "id": "11.5",
+          "definition": "Condiciones de terceros y corpus resueltas para el alcance de redistribución, incluida la restricción Treasury.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "Restricción Treasury y condiciones de redistribución del corpus/terceros sin cierre aprobado."
+        }
+      ]
+    },
+    {
+      "id": "UV12",
+      "name": "Integración y reproducción",
+      "passed": 4,
+      "total": 5,
+      "checks": [
+        {
+          "id": "12.1",
+          "definition": "Todos los cambios de A11 integrados en main y cotejados por árbol.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "PR28 fusionado; main contiene el árbol autorizado y está limpio."
+        },
+        {
+          "id": "12.2",
+          "definition": "Wheels/sdists del par A11 identificados por SHA-256 y ligados a los bytes de Git.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Cuatro artefactos con hashes verificados; 477+122 miembros distribuidos coinciden con main."
+        },
+        {
+          "id": "12.3",
+          "definition": "Reconstrucción nativa desde sdists con wheels idénticos entre Windows y Linux ARM64.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "Ambos sdists reconstruyen los mismos wheels; fuente corregida core mantiene el hash del wheel."
+        },
+        {
+          "id": "12.4",
+          "definition": "Recibos de pruebas/ejemplos conservados y ligados al código integrado, incluidos fallos y omisiones reales.",
+          "points": 1,
+          "status": "DEMOSTRADA",
+          "reason": "JUnit/ejemplos/recibos preservan pases, fallos iniciales, omisiones y correcciones focales; paquetes coinciden con main."
+        },
+        {
+          "id": "12.5",
+          "definition": "Toda la matriz nativa y obligaciones anteriores cerradas, con reproducción/aceptación independiente documentada.",
+          "points": 0,
+          "status": "PENDIENTE_O_NO_ACREDITADA",
+          "reason": "No existen matriz completa ni aceptación independiente; autorización de merge no las reemplaza."
+        }
+      ]
+    }
+  ]
+}

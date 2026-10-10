@@ -20,6 +20,11 @@ close those gates. [Release process](packages/equiframe/docs/releasing.md).
 adds interchangeable typed inputs, native windows, explicit source extensions
 and a complete installed six-input/three-engine example.
 
+[Avance técnico evaluado](docs/UNIVERSALITY_TECHNICAL_PROGRESS_20261010.md):
+41/60 comprobaciones (68,3 %) en una rúbrica propia para A11. El informe publica
+las definiciones y los pendientes; no certifica universalidad completa ni
+compara directamente ese resultado con el 25 % de cierre del corte histórico A9.
+
 [Quick start](packages/equiframe/docs/quickstart.md) ·
 [Three installed recipes](packages/equiframe/docs/recipes.md) ·
 [English handbook](packages/equiframe/docs/index.md) ·
