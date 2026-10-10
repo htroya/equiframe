@@ -712,6 +712,74 @@ def test_failed_linux_proc_io_fallback_remains_explicitly_incomplete(monkeypatch
     }
 
 
+@pytest.mark.parametrize("source", ["psutil", "linux_proc_pid_io"])
+@pytest.mark.parametrize("failure", [PermissionError, FileNotFoundError, ProcessLookupError])
+def test_linux_io_exit_race_preserves_complete_live_samples(monkeypatch, source, failure):
+    class Probe:
+        def memory_info(self):
+            return SimpleNamespace(rss=1024)
+
+        def cpu_times(self):
+            return SimpleNamespace(user=0.1, system=0.2)
+
+        def io_counters(self):
+            raise PermissionError("synthetic psutil denial")
+
+    def disappeared(pid):
+        raise failure("synthetic unavailable exited process")
+
+    monkeypatch.setattr(scale_process, "_read_linux_proc_io", disappeared)
+    monkeypatch.setattr(scale_process, "_child_exited", lambda process: True)
+    observed = scale_process._Measurements(measurement_platform="linux")
+    observed._io({"read_bytes": 10, "write_bytes": 20, "read_chars": 30, "write_chars": 40}, source)
+    if source == "linux_proc_pid_io":
+        observed.io_counter_fallback_reason = "psutil_io_counters_unavailable:PermissionError"
+    assert observed.child(Probe(), SimpleNamespace(pid=419))
+    assert (
+        observed.io_read_bytes,
+        observed.io_write_bytes,
+        observed.io_read_chars,
+        observed.io_write_chars,
+    ) == (10, 20, 30, 40)
+    assert observed.io_counter_source == source
+    assert observed.errors == []
+
+
+@pytest.mark.parametrize(
+    "case", ["alive", "no_prior_sample", "incomplete_prior_sample", "invalid_counters"]
+)
+def test_linux_io_exit_race_cannot_hide_unavailable_or_invalid_live_measurement(monkeypatch, case):
+    class Probe:
+        def memory_info(self):
+            return SimpleNamespace(rss=1024)
+
+        def cpu_times(self):
+            return SimpleNamespace(user=0.1, system=0.2)
+
+        def io_counters(self):
+            raise PermissionError("synthetic psutil denial")
+
+    def denied(pid):
+        if case == "invalid_counters":
+            raise ValueError("synthetic malformed counters")
+        raise PermissionError("synthetic /proc denial")
+
+    monkeypatch.setattr(scale_process, "_read_linux_proc_io", denied)
+    monkeypatch.setattr(scale_process, "_child_exited", lambda process: case != "alive")
+    observed = scale_process._Measurements(measurement_platform="linux")
+    if case != "no_prior_sample":
+        observed._io(
+            {"read_bytes": 10, "write_bytes": 20, "read_chars": 30, "write_chars": 40},
+            "linux_proc_pid_io",
+        )
+    if case == "incomplete_prior_sample":
+        observed.io_write_chars = None
+    assert observed.child(Probe(), SimpleNamespace(pid=419))
+    assert "io_counters_unavailable:PermissionError" in observed.errors
+    expected = "ValueError" if case == "invalid_counters" else "PermissionError"
+    assert "linux_proc_io_unavailable:" + expected in observed.errors
+
+
 def test_windows_native_io_character_absence_is_not_zero_or_failure():
     class Probe:
         def memory_info(self):

@@ -407,6 +407,26 @@ class _Measurements:
                 try:
                     counters = _read_linux_proc_io(process.pid)
                 except Exception as proc_error:
+                    if (
+                        isinstance(
+                            proc_error, (PermissionError, FileNotFoundError, ProcessLookupError)
+                        )
+                        and self.io_counter_source in ("psutil", "linux_proc_pid_io")
+                        and all(
+                            value is not None
+                            for value in (
+                                self.io_read_bytes,
+                                self.io_write_bytes,
+                                self.io_read_chars,
+                                self.io_write_chars,
+                            )
+                        )
+                        and _child_exited(process)
+                    ):
+                        # A zombie may deny /proc/PID/io after valid live samples.
+                        # Retain the declared last-available counters; do not
+                        # invent a final sample or hide a denial while alive.
+                        return True
                     self.error("io_counters_unavailable", psutil_error)
                     self.error("linux_proc_io_unavailable", proc_error)
                 else:

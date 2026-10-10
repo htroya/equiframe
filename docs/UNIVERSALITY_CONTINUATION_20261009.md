@@ -31,6 +31,10 @@ Esta continuación conserva el denominador de doce criterios y veinte celdas de
   POSIX y mantener separadas las rutas del inventario y del disco local.
   Se rechazan rutas de otro laboratorio y traversal; no se normalizan los
   nombres de miembros para ocultar diferencias del inventario.
+- Contadores Linux: conservar la última muestra acumulada completa cuando
+  `/proc/PID/io` desaparece o deniega acceso tras confirmar la terminación del
+  hijo propio. Una denegación mientras vive, una muestra previa incompleta o
+  contadores malformados siguen siendo fallos explícitos.
 
 ## Evidencia inicial ejecutada
 
@@ -43,7 +47,7 @@ en Windows, con sus sustitutos Windows comprobados por la suite.
 
 Tras corregir la conexión de manifiestos del kit OCI, las herramientas de handoff
 tienen 86 tests y 35 subcasos aprobados en Windows. Una prueba adicional de enlaces
-de intérprete requiere POSIX y sigue pendiente de ejecución en esa plataforma.
+de intérprete requiere POSIX; su ejecución real se registra más abajo.
 Los manifiestos congelados de 4506, 617 y 16 casos coinciden con todos los bytes
 de las pruebas de los tres sdists entregados.
 
@@ -73,22 +77,76 @@ detenidos por inventario de tests desactualizado y diferencias del contrato
 entre el colector y el controlador local. Los intentos corregidos usan salidas
 nuevas y los mismos hashes de distribuciones, sin cambiar expectativas de datos.
 
-## Configuración externa pendiente para las veinte celdas
+## Corrección comprobada en la VM
 
-La lectura de GitHub encontró solamente `htroya/equiframe` como repositorio
-EquiFrame. No hay variables de universalidad ni el secreto de lectura requerido.
-La matriz requiere repositorios privados separados para el consumidor y el
-corpus congelado, sus commits exactos y:
+El laboratorio A10 con 617 casos benchmark conserva el fallo observado en
+CPython 3.10: 614 aprobados, dos omisiones exclusivas de Windows y un fallo al
+leer `/proc/PID/io` del hijo terminado. Una observación separada confirmó el
+estado zombie y la terminación del hijo propio mediante `waitid(WNOWAIT)`;
+existían cuatro contadores acumulados válidos medidos mientras vivía.
 
-| Configuración | Valor o condición |
+La corrección añade diez regresiones que distinguen esa carrera de una
+denegación real o datos inválidos. El módulo completo tiene 59 pruebas aprobadas
+y cinco omisiones POSIX/Linux en Windows; en un entorno nuevo de la VM ARM64,
+con el wheel corregido instalado, pasa 62 pruebas y las dos omisiones exclusivas
+de Windows. Se verificaron los bytes instalados de 120 archivos core y 35
+benchmark contra ambos wheels, y el archivo de tests contra el manifiesto.
+No se cambió el candidato de la ejecución histórica en curso.
+
+El benchmark corregido congela 627 casos; sus artefactos tienen hashes nuevos.
+La suite completa se ejecutó en un entorno nuevo Linux ARM64 CPython 3.10:
+625 aprobadas, dos omisiones exclusivas de Windows, cero fallos y cero errores.
+Las 627 identidades JUnit se compararon exactamente con el manifiesto; todos
+los archivos devueltos se verificaron por tamaño y SHA256. El siguiente kit
+incluirá ese manifiesto. Los 617 casos y 40 perfiles históricos no se atribuyen al wheel
+corregido. El inventario nuevo conserva las mismas dependencias públicas,
+declaraciones, locks y metadatos del entorno registrado; la relación con las
+respuestas originales mantiene sus fechas. Esto no es una auditoría del código
+modificado ni una nueva consulta de vulnerabilidades.
+
+## Diagnóstico de la ejecución manual Windows
+
+Los intentos completos CPython 3.10 y 3.11 registraron, cada uno, 4449 pruebas
+aprobadas, 32 fallos y 25 omisiones, sobre 4506 casos. El controlador privado
+omitía herramientas de desarrollo declaradas por el sdist. Tras instalarlas en
+esos entornos ya inactivos, el módulo completo de manifest de release pasó sus
+75 pruebas en cada intérprete. Esa verificación focal no convierte las suites
+anteriores en éxitos completos.
+
+La máquina Windows no permite crear enlaces simbólicos: 24 omisiones no están
+admitidas por el contrato de la celda; la otra requiere FIFO POSIX. El nuevo
+controlador comprueba esa capacidad antes de invertir tiempo en una suite
+completa. No se cambió la configuración global ni se amplió la lista de skips.
+Los intentos incompletos de 3.12 y 3.13 se interrumpieron conservando sus recibos.
+
+## Continuación manual sin costos adicionales contratados
+
+El usuario indicó ejecutar todo manualmente y evitar acciones que originen
+gastos. No se disparó Actions, no se creó un token y el workflow de matriz volvió
+a su estado `disabled_manually`. Las tres variables añadidas para Actions se
+retiraron. La validación continúa mediante SSH en la VM existente y comandos
+locales; no se contrataron runners, máquinas ni servicios nuevos.
+
+Los dos repositorios independientes autorizados se crearon privados y contienen
+los commits exactos ya comprobados:
+
+| Repositorio | Commit publicado en `main` |
 |---|---|
-| `UNIVERSALITY_CONSUMER_REPOSITORY` | Repositorio privado del consumidor independiente |
-| `UNIVERSALITY_DATA_REPOSITORY` | Repositorio privado del corpus congelado autorizado |
-| `UNIVERSALITY_VALIDATION_REF` | `refs/heads/universalidad/remediacion-100-20261009` |
-| `UNIVERSALITY_READ_TOKEN` | Acceso de lectura a contents de esos dos repositorios |
+| [htroya/equiframe-consumer-validation](https://github.com/htroya/equiframe-consumer-validation) | `5ac90c9fa2f196a11c178376653056d561e88699` |
+| [htroya/equiframe-universality-data](https://github.com/htroya/equiframe-universality-data) | `e8e17976dfa2c36a5cbcf4c2ec183469a73adbc7` |
 
-No se incorpora una credencial existente de alcance mayor. El workflow mantiene
-su preflight: la falta de configuración es un bloqueo, no una celda aprobada.
-La creación/publicación de esos repositorios y la provisión del acceso quedan
-separadas de las pruebas locales y de OCI. La revisión final registrará recibos
-efectivos y criterios cerrados; preparar YAML no acredita sus ejecuciones.
+El corpus conserva su manifest, procedencia y condiciones, incluida la limitación
+de Treasury; su publicación privada no resuelve esa limitación. No se transfieren
+llaves, credenciales, entornos ni recibos privados al repositorio principal.
+
+Los recursos disponibles acreditan pruebas nativas en Linux ARM64 y pruebas
+parciales en Windows x64. No se encontró un motor Linux x64 utilizable: la única
+distribución WSL registrada es `docker-desktop`, detenida y sin el CLI de Docker.
+No hay acceso disponible a macOS Intel o Apple Silicon. Esas celdas quedan
+pendientes y no se reemplazan por emulación ni se retiran del denominador.
+
+El usuario confirmó que todavía no existe una licencia aprobada. UV11 conserva
+ese bloqueo; no se elige una licencia ni se atribuye una aprobación a titulares
+no identificados. Se continuará con el trabajo técnico disponible sin nuevas
+preguntas. El cierre final deberá registrar evidencia efectiva de UV01–UV12;
+esta continuación no acredita universalidad al 100 %.
