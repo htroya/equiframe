@@ -2,6 +2,11 @@
 
 [Primer uso por perfil / First use](packages/equiframe/docs/first-use.md)
 
+[Usabilidad técnica evaluada](docs/USABILITY_CURRENT_RESULT_20261010.md):
+11/12 criterios completos (91,67 %) para A12, con la misma rúbrica U01–U12.
+La evaluación con personas reales sigue pendiente; no es un porcentaje de
+satisfacción ni modifica el índice separado de Universalidad A11.
+
 [Arquitecto](packages/equiframe/docs/arquitecto.md) · [Científico](packages/equiframe/docs/cientifico.md) · [Inicio en español](packages/equiframe/docs/inicio.md) · [Choose an API](packages/equiframe/docs/choosing-api.md) · [Eight journeys](packages/equiframe/docs/journeys.md)
 
 **Semantic comparison and reviewable evidence for tabular results in Python.**

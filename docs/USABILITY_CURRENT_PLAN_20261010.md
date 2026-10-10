@@ -2,6 +2,16 @@
 
 Fecha: 2026-10-10. Base: `dcb35d52d86a5dac0ead324824ed265ff729c8e2`.
 
+Los cinco pasos terminaron. El [resultado vigente](USABILITY_CURRENT_RESULT_20261010.md)
+acredita 11/12 (91,67 %) técnicos y conserva U12 humano bloqueado. El
+[JSON de evidencia](USABILITY_CURRENT_RESULT_20261010.json) conserva definiciones,
+artefactos y selecciones de pruebas. No se inventa una línea base A11 del 80 %.
+
+Ampliación registrada durante la validación: se obtuvo un intérprete temporal
+Windows x64 Python 3.13.16, sin coste ni instalación global, para repetir el
+primer uso instalado y ensayar actualización/reversión. Se retirará con los
+entornos descartables; no cambia criterios, pesos ni resultados históricos.
+
 La tabla del chat no identifica candidato, rúbrica ni recibos y no permite
 acreditar un 80 %. Git conserva una evaluación técnica A7 de **11/12 = 91,67 %**,
 con U12 humano pendiente. Ese resultado histórico no es automáticamente una
