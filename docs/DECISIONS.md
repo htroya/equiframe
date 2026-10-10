@@ -543,3 +543,24 @@ no existe una comparación longitudinal hasta evaluar el corte anterior con
 estas mismas definiciones. Una revisión futura de la rúbrica requiere otra
 versión y conservar los resultados de esta. No se cambian los detectores,
 el oráculo, los nueve estratos ni los protocolos y resultados de la tesis.
+
+## UV-TECH-A11-60-v1 — Avance comparable a 48/60 (2026-10-10)
+
+Por solicitud del propietario se ejecutó el [plan de cinco pasos](UNIVERSALITY_80_PLAN_20261010.md)
+sobre los mismos bytes A11 y la misma rúbrica. Se demuestran 02.1, 02.2,
+02.4, 04.4, 07.5, 08.4 y 11.2: **41/60 → 48/60 = 80 %**, incremento de siete
+puntos y 11,67 puntos porcentuales. No se alteran definiciones ni pesos, ni
+se traslada evidencia A9/A10 a A11. Se conserva el corte 68,3 % original.
+
+El [resultado y JSON](UNIVERSALITY_80_RESULT_20261010.md) ligan tres versiones
+Python nuevas, veintiséis perfiles, consumidor independiente de repositorio,
+corpus congelado, casos físicos inválidos de tres dominios y consultas de
+avisos completas a sus artefactos y recibos privados. La consulta es acotada
+a la base pública y fecha, no un dictamen general de seguridad. La integración
+a main se realiza bajo la autorización persistente del propietario; no es
+publicación PyPI, aprobación de licencia ni revisión humana independiente.
+
+Se mantienen doce comprobaciones pendientes, los cierres UV históricos,
+R/M/B/H/O, corpus científico, nueve estratos y protocolo experimental. Las
+mediciones de 1000 filas son conformance técnica de los extras y no resultados
+científicos de rendimiento. No se usa Actions ni se crean recursos de pago.

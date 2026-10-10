@@ -474,3 +474,15 @@ etiquetas, nueve estratos ni protocolo experimental. Los ejemplos sintéticos
 y la autorización de merge no acreditan aceptación humana, datos reales ni
 entregas del servicio/DW. El cierre histórico A9 y la nueva rúbrica permanecen
 identificados por separado; no se atribuye un incremento entre escalas.
+
+## Avance comparable al 80 % — 2026-10-10
+
+El [plan ejecutado](UNIVERSALITY_80_RESULT_20261010.md) pasa de 41 a 48
+comprobaciones demostradas sobre la misma rúbrica `UV-TECH-A11-60-v1` y los
+mismos bytes core/benchmark A11. Su 80 % se refiere exclusivamente a avance
+de ingeniería. Los escenarios sintéticos, el corpus público congelado del
+consumidor y los controles de recursos/avisos no son el corpus experimental
+de la tesis, aceptación humana, evaluación científica o prueba de validez
+de los detectores. No se modifican objetivos, hipótesis, R/M/B/H/O, etiquetas,
+particiones, nueve estratos ni protocolo. Los doce pendientes del índice y
+los criterios completos UV conservan sus condiciones propias.
