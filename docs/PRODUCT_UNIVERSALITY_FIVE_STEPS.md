@@ -40,3 +40,10 @@ JSON hash algorithm and the complete 22-check register was rerun successfully.
 Extreme integers, Decimal(38,2), NULL/NaN, dates, UTC microseconds, special names,
 global ordering/offsets, incompatible units and error-pruning boundaries are
 covered with independent expectations. Capability records now include windows.
+
+Step 4 validation: 40 source, extension and compatibility-register checks passed.
+External providers are captured once for genuine native migration. Batch schema
+drift, illegal NULLs, cumulative budgets, upstream errors, cleanup and SQLite
+interruption before the first result are exercised. New source code passes
+Ruff and strict mypy. Final materialization and cooperative (not hard RSS) limits
+remain documented.

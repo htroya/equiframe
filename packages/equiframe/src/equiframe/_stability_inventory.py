@@ -215,6 +215,8 @@ STABLE_API = (
 )
 
 EXPERIMENTAL_API = (
+    "CompositeDataSource",
+    "RecordBatchInput",
     "Window",
     "WindowMeasure",
     "SQLiteInput",

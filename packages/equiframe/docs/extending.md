@@ -63,6 +63,12 @@ not a claim of portable isolation semantics across arbitrary DB-API drivers.
 
 ## Choose an extension port
 
+For CSV/JSON/Parquet, read-only SQLite, API responses, typed Arrow batches and
+composition of multiple explicit providers, see [universal inputs](universal-sources.md).
+External inputs can implement `load(context) -> LoadedTable` and be passed to
+`LocalDataSource`. Existing `DataSource` providers can be bound through
+`CompositeDataSource` without changing core or discovering plugins at import.
+
 | Boundary | Implement or register | Responsibility |
 |---|---|---|
 | Captured input | `DataSource` (`table_names`, `resolve`) | Fixed table identity, faithful `LoadedTable`, explicit failure |

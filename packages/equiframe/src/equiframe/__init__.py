@@ -352,7 +352,7 @@ from equiframe.snapshot import (
     SnapshotTable,
     snapshot_fingerprint,
 )
-from equiframe.sources import SQLiteInput, StreamInput
+from equiframe.sources import CompositeDataSource, RecordBatchInput, SQLiteInput, StreamInput
 from equiframe.tables import (
     ArrowInput,
     ArtifactInput,
@@ -473,6 +473,7 @@ __all__ = [
     "CompilerRegistry",
     "ComponentDecision",
     "ComponentDetectionResult",
+    "CompositeDataSource",
     "Concatenate",
     "Conditional",
     "Contract",
@@ -619,6 +620,7 @@ __all__ = [
     "Project",
     "PublishedTable",
     "QuarantinedRecord",
+    "RecordBatchInput",
     "ReducedTable",
     "ReductionObservation",
     "ReductionOptions",
