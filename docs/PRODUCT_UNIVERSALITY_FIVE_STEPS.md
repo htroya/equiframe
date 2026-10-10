@@ -26,3 +26,9 @@ Step 1 validation (Windows, CPython 3.12, manual): source, ingestion, ingestion
 batch and compatibility checks: 194 passed, 3 existing symlink-capability skips.
 Ruff and strict mypy passed for the new source implementation. Private JUnit
 receipts stay outside version control.
+
+Step 2 validation (same manual environment): 291 native window/backend/product
+checks passed, including all six directed migrations with a literal independent
+expected. Migration code passed Ruff and strict mypy. The seven experimental
+IR-containing schemas and their registered digests were regenerated together;
+historical fixtures were not rewritten.

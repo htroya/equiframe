@@ -240,6 +240,33 @@ class Sort(FrozenModel):
     ties: Literal["unspecified", "identical_rows", "reject"]
 
 
+class WindowMeasure(FrozenModel):
+    name: Text
+    operation: Literal["row_number", "lag", "lead"]
+    column: Text | None = None
+    logical_type: LogicalType
+    unit: Text | None = None
+    offset: int = Field(default=1, ge=1, le=1_000_000)
+
+    @model_validator(mode="after")
+    def column_required(self) -> Self:
+        if (self.operation == "row_number") != (self.column is None):
+            raise ValueError("row_number has no column; lag/lead require a column")
+        if self.operation == "row_number" and self.offset != 1:
+            raise ValueError("offset applies only to lag/lead")
+        return self
+
+
+class Window(FrozenModel):
+    kind: Literal["window"] = "window"
+    node_id: Identifier
+    source: Identifier
+    partition_by: Annotated[tuple[Text, ...], Field(max_length=32)] = ()
+    by: Annotated[tuple[SortKey, ...], Field(min_length=1, max_length=32)]
+    measures: Annotated[tuple[WindowMeasure, ...], Field(min_length=1, max_length=128)]
+    ties: Literal["reject"] = "reject"
+
+
 class Concatenate(FrozenModel):
     kind: Literal["concatenate"] = "concatenate"
     node_id: Identifier
@@ -273,7 +300,16 @@ class Deduplicate(FrozenModel):
 
 
 Node = Annotated[
-    Scan | Project | Filter | Cast | EquiJoin | Aggregate | Sort | Concatenate | Deduplicate,
+    Scan
+    | Project
+    | Filter
+    | Cast
+    | EquiJoin
+    | Aggregate
+    | Sort
+    | Concatenate
+    | Deduplicate
+    | Window,
     Field(discriminator="kind"),
 ]
 

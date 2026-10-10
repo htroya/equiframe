@@ -38,6 +38,8 @@ from .types import (
     Scan,
     Sort,
     SortKey,
+    Window,
+    WindowMeasure,
 )
 from .validation import ValidatedIR, ir_fingerprint, validate_ir
 
@@ -79,6 +81,8 @@ __all__ = [
     "Sort",
     "SortKey",
     "ValidatedIR",
+    "Window",
+    "WindowMeasure",
     "check_migration",
     "ir_fingerprint",
     "migrate",

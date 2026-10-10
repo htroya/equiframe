@@ -215,6 +215,8 @@ STABLE_API = (
 )
 
 EXPERIMENTAL_API = (
+    "Window",
+    "WindowMeasure",
     "SQLiteInput",
     "StreamInput",
     "SnapshotClient",
@@ -512,17 +514,17 @@ SCHEMA_INVENTORY = (
     (
         "migration-request-1.0.schema.json",
         "experimental",
-        "a354b17e1afdb9bad449c3201f7a044cd6ab9ced6483900b2e5410c81980a832",
+        "d1ee84b890e743067946d9bae4f7497cf2f2f6828f8c6cb4f228755ef89b084d",
     ),
     (
         "migration-result-1.0.schema.json",
         "experimental",
-        "23b23e67398213a24f158814a0a786f64d853d6829764c416ada3b1f82485e1e",
+        "0136f6d1d060944874ddc1c5eb7fb3e3e27b12ecc117a16a88b15e6edc294e7a",
     ),
     (
         "migration-spec-1.0.schema.json",
         "experimental",
-        "34725962cffbd4d5c6a94049978ca882245240c58ab46dd4073fe18ff57ea258",
+        "8033e57351aac32a8d7eec3e5aa98e2f9a35c879f306395d74cc3db60ac3bd74",
     ),
     (
         "normal-calibration-profiles-1.0.schema.json",
@@ -582,7 +584,7 @@ SCHEMA_INVENTORY = (
     (
         "relational-plan-1.0.schema.json",
         "experimental",
-        "8f0dfb121d32da98ef5207cb9413bcdf8ed9a5c89895417db0c536e0e63e5cbe",
+        "8bcfe4720da5324cf53c6274f28a468f6a44ce52d4a0501a3f6d0d783507e006",
     ),
     (
         "report-evidence-manifest-1.0.schema.json",
@@ -632,17 +634,17 @@ SCHEMA_INVENTORY = (
     (
         "workflow-request-1.0.schema.json",
         "experimental",
-        "e05698ae0ed26e508931943343d043430b8841f4ed2f4378a74349c782a06662",
+        "797415b77cc6008172624bfd94fce3076e292ef7b41429c92c8de5c73652d476",
     ),
     (
         "workflow-result-1.0.schema.json",
         "experimental",
-        "ebf802676e5896d1d94014f053b74087f6a50d79b275296d5f8853f5a77e6eeb",
+        "8411da59335a5829ac95530e38518ef96c87ac52b5379c0660ab3e66c9630082",
     ),
     (
         "workflow-spec-1.0.schema.json",
         "experimental",
-        "246ce630cf6bc276e3af84f0fad595507fb027658c9646c906d055184b53dea5",
+        "b95cb5c4708885e8ec2c1e0b4732f54524fcf946f8600c8eaee554962eb47964",
     ),
 )
 # command, classification, CLI parameters, possible process exits (including parser errors).

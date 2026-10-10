@@ -48,6 +48,7 @@ from ..types import (
     Project,
     RelationalPlan,
     Scan,
+    Window,
 )
 from ..validation import (
     ValidatedIR,
@@ -417,7 +418,7 @@ class PolarsCompiler:
         identifier, ir_sha, contract_sha = compilation_identity(
             validated,
             self.engine,
-            implementation_version="migration-native-ir1.0/polars/product-semantics-v4",
+            implementation_version="migration-native-ir1.0/polars/product-semantics-v5",
         )
 
         def transform(tables: Mapping[str, pl.DataFrame], context: RunContext) -> pl.DataFrame:
@@ -496,6 +497,44 @@ class PolarsCompiler:
                                 "Join violates declared cardinality: " + node.cardinality
                             )
                     frame = _join(frames[node.left], frames[node.right], node)
+                elif isinstance(node, Window):
+                    names = frames[node.source].columns
+                    frame = _native_frame(frames[node.source])
+                    tie_keys = list(
+                        dict.fromkeys((*node.partition_by, *(key.column for key in node.by)))
+                    )
+                    if frame.select(
+                        pl.struct([_column(name, names) for name in tie_keys]).is_duplicated().any()
+                    ).item():
+                        raise CapabilityError("Window encountered forbidden order ties")
+                    frame = frame.sort(
+                        [_column(key.column, names) for key in node.by],
+                        descending=[key.direction == "descending" for key in node.by],
+                        nulls_last=[key.nulls == "last" for key in node.by],
+                        maintain_order=True,
+                    )
+                    window_expressions: list[pl.Expr] = []
+                    for window_measure in node.measures:
+                        if window_measure.operation == "row_number":
+                            value = pl.int_range(1, pl.len() + 1, dtype=pl.Int64)
+                        else:
+                            if window_measure.column is None:
+                                raise CapabilityError("lag/lead require an input column")
+                            offset = (
+                                window_measure.offset
+                                if window_measure.operation == "lag"
+                                else -window_measure.offset
+                            )
+                            value = _column(window_measure.column, names).shift(offset)
+                        if node.partition_by:
+                            value = value.over([_column(name, names) for name in node.partition_by])
+                        window_expressions.append(
+                            value.alias(f"_equiframe_window_{len(window_expressions)}")
+                        )
+                    frame = frame.with_columns(window_expressions)
+                    frame = _logical_frame(
+                        frame, [*names, *(window_measure.name for window_measure in node.measures)]
+                    )
                 elif isinstance(node, Aggregate):
                     frame = _aggregate(frames[node.source], node, validated)
                 elif isinstance(node, Concatenate):
@@ -548,7 +587,7 @@ class PolarsCompiler:
             return frames[plan.output]
 
         transformation = PolarsTransformation(
-            identifier, transform, "migration-native-ir1.0/polars/product-semantics-v4"
+            identifier, transform, "migration-native-ir1.0/polars/product-semantics-v5"
         )
         return CompiledPlan(
             self.engine, transformation, ir_sha, contract_sha, self.check(plan, contract)

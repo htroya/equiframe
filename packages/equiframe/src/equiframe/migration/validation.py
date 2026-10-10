@@ -57,6 +57,7 @@ from .types import (
     Project,
     RelationalPlan,
     Scan,
+    Window,
 )
 
 
@@ -435,6 +436,40 @@ def validate_ir(plan: RelationalPlan, contract: Contract) -> ValidatedIR:
             for name in (*node.keys, *(key.column for key in node.by)):
                 if isinstance(_column(name, columns).logical_type, FloatType):
                     raise CapabilityError("float deduplicate keys/tiebreak remain unsupported")
+        elif isinstance(node, Window):
+            source_columns = schemas[node.source]
+            _unique(node.partition_by)
+            _unique(tuple(key.column for key in node.by))
+            for name in (*node.partition_by, *(key.column for key in node.by)):
+                if isinstance(_column(name, source_columns).logical_type, FloatType):
+                    raise CapabilityError("float window partition/order keys are unsupported")
+            measures = []
+            for window_measure in node.measures:
+                if window_measure.operation == "row_number":
+                    if window_measure.logical_type != IntegerType(bits=64, signed=True):
+                        raise ValueError("row_number requires signed64 output")
+                    column = IRColumn(
+                        name=window_measure.name,
+                        logical_type=window_measure.logical_type,
+                        nullable=False,
+                        unit=window_measure.unit,
+                    )
+                else:
+                    if window_measure.column is None:
+                        raise ValueError("lag/lead require an input column")
+                    window_source = _column(window_measure.column, source_columns)
+                    if window_measure.logical_type != window_source.logical_type:
+                        raise ValueError("lag/lead preserve the exact input type")
+                    if (
+                        window_measure.unit is not None
+                        and window_measure.unit != window_source.unit
+                    ):
+                        raise ValueError("window units must preserve source units")
+                    column = window_source.model_copy(
+                        update={"name": window_measure.name, "nullable": True}
+                    )
+                measures.append(column)
+            columns = source_columns + tuple(measures)
         elif isinstance(node, Aggregate):
             _unique(node.group_by)
             groups = tuple(_column(name, schemas[node.source]) for name in node.group_by)

@@ -3630,7 +3630,8 @@
                 "join": "#/$defs/EquiJoin",
                 "project": "#/$defs/Project",
                 "scan": "#/$defs/Scan",
-                "sort": "#/$defs/Sort"
+                "sort": "#/$defs/Sort",
+                "window": "#/$defs/Window"
               },
               "propertyName": "kind"
             },
@@ -3661,6 +3662,9 @@
               },
               {
                 "$ref": "#/$defs/Deduplicate"
+              },
+              {
+                "$ref": "#/$defs/Window"
               }
             ]
           },
@@ -4382,6 +4386,166 @@
         "justification"
       ],
       "title": "Tolerance",
+      "type": "object"
+    },
+    "Window": {
+      "additionalProperties": false,
+      "properties": {
+        "by": {
+          "items": {
+            "$ref": "#/$defs/SortKey"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "title": "By",
+          "type": "array"
+        },
+        "kind": {
+          "const": "window",
+          "default": "window",
+          "title": "Kind",
+          "type": "string"
+        },
+        "measures": {
+          "items": {
+            "$ref": "#/$defs/WindowMeasure"
+          },
+          "maxItems": 128,
+          "minItems": 1,
+          "title": "Measures",
+          "type": "array"
+        },
+        "node_id": {
+          "minLength": 1,
+          "title": "Node Id",
+          "type": "string"
+        },
+        "partition_by": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Partition By",
+          "type": "array"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "ties": {
+          "const": "reject",
+          "default": "reject",
+          "title": "Ties",
+          "type": "string"
+        }
+      },
+      "required": [
+        "node_id",
+        "source",
+        "by",
+        "measures"
+      ],
+      "title": "Window",
+      "type": "object"
+    },
+    "WindowMeasure": {
+      "additionalProperties": false,
+      "properties": {
+        "column": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Column"
+        },
+        "logical_type": {
+          "discriminator": {
+            "mapping": {
+              "boolean": "#/$defs/BooleanType",
+              "date": "#/$defs/DateType",
+              "decimal": "#/$defs/DecimalType",
+              "float": "#/$defs/FloatType",
+              "integer": "#/$defs/IntegerType",
+              "string": "#/$defs/StringType",
+              "timestamp": "#/$defs/TimestampType"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/BooleanType"
+            },
+            {
+              "$ref": "#/$defs/IntegerType"
+            },
+            {
+              "$ref": "#/$defs/StringType"
+            },
+            {
+              "$ref": "#/$defs/DecimalType"
+            },
+            {
+              "$ref": "#/$defs/FloatType"
+            },
+            {
+              "$ref": "#/$defs/DateType"
+            },
+            {
+              "$ref": "#/$defs/TimestampType"
+            }
+          ],
+          "title": "Logical Type"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "offset": {
+          "default": 1,
+          "maximum": 1000000,
+          "minimum": 1,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "operation": {
+          "enum": [
+            "row_number",
+            "lag",
+            "lead"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "name",
+        "operation",
+        "logical_type"
+      ],
+      "title": "WindowMeasure",
       "type": "object"
     }
   },
