@@ -514,17 +514,17 @@ SCHEMA_INVENTORY = (
     (
         "migration-request-1.0.schema.json",
         "experimental",
-        "d1ee84b890e743067946d9bae4f7497cf2f2f6828f8c6cb4f228755ef89b084d",
+        "fe42af3c7eff94ab06ec3b358ffbe3049715656690f9cf44f10c51a11d42d1fb",
     ),
     (
         "migration-result-1.0.schema.json",
         "experimental",
-        "0136f6d1d060944874ddc1c5eb7fb3e3e27b12ecc117a16a88b15e6edc294e7a",
+        "e8fab4f562f45cdd52b6d3d07fea6315cb3c332b1fde301a352efdaa9b269fa3",
     ),
     (
         "migration-spec-1.0.schema.json",
         "experimental",
-        "8033e57351aac32a8d7eec3e5aa98e2f9a35c879f306395d74cc3db60ac3bd74",
+        "537797da0c99c27c441fa70931bbfc12bcb24d672da52ebac9fa48105d32fc28",
     ),
     (
         "normal-calibration-profiles-1.0.schema.json",
@@ -584,7 +584,7 @@ SCHEMA_INVENTORY = (
     (
         "relational-plan-1.0.schema.json",
         "experimental",
-        "8bcfe4720da5324cf53c6274f28a468f6a44ce52d4a0501a3f6d0d783507e006",
+        "3746a0d31fa221fd94b0fe8dfcd4ac53b74797993d95365493c47f7b5d1c1bca",
     ),
     (
         "report-evidence-manifest-1.0.schema.json",
@@ -634,17 +634,17 @@ SCHEMA_INVENTORY = (
     (
         "workflow-request-1.0.schema.json",
         "experimental",
-        "797415b77cc6008172624bfd94fce3076e292ef7b41429c92c8de5c73652d476",
+        "0766059752d5973a52fd828dd72bb316c328576bff0ef4e3794a2d0f51f2a89c",
     ),
     (
         "workflow-result-1.0.schema.json",
         "experimental",
-        "8411da59335a5829ac95530e38518ef96c87ac52b5379c0660ab3e66c9630082",
+        "54c871a59c7b16a85e54db4101aa2a6171070f90b1bbdf9853290a7b46e22410",
     ),
     (
         "workflow-spec-1.0.schema.json",
         "experimental",
-        "b95cb5c4708885e8ec2c1e0b4732f54524fcf946f8600c8eaee554962eb47964",
+        "af3c0ab51b5c598d54a6fce43c4a4368e8dcc4efba4a254e96003a42a1575096",
     ),
 )
 # command, classification, CLI parameters, possible process exits (including parser errors).

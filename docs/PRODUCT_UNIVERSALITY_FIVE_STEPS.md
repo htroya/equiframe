@@ -32,3 +32,11 @@ checks passed, including all six directed migrations with a literal independent
 expected. Migration code passed Ruff and strict mypy. The seven experimental
 IR-containing schemas and their registered digests were regenerated together;
 historical fixtures were not rewritten.
+
+Step 3 validation: 12 semantic boundary checks and 22 compatibility-register
+checks passed. The historical compatibility run passed its 386 corpus checks;
+its one new-schema register failure was corrected using the existing canonical
+JSON hash algorithm and the complete 22-check register was rerun successfully.
+Extreme integers, Decimal(38,2), NULL/NaN, dates, UTC microseconds, special names,
+global ordering/offsets, incompatible units and error-pruning boundaries are
+covered with independent expectations. Capability records now include windows.

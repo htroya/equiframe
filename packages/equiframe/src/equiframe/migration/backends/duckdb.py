@@ -403,7 +403,8 @@ class DuckDBCompiler:
                                 CompilationDiagnostic(
                                     code="eager_semantics_not_supported",
                                     message=(
-                                        "DuckDB error-bearing aggregate/sort/arithmetic nodes "
+                                        "DuckDB error-bearing aggregate/sort/arithmetic/"
+                                        "join/deduplicate/window nodes "
                                         "only support "
                                         "a final sort suffix; later relational nodes may "
                                         "prune errors"
