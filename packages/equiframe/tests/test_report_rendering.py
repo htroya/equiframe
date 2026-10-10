@@ -211,7 +211,13 @@ def test_all_views_use_the_same_facts_and_meaningful_type_columns():
         assert fact in full.text
     assert "Added rows (left relative to right) | unknown | unknown | rows" in text
     assert "Added rows (left relative to right) | 0" not in text
-    assert text.index("Verdict:") < text.index("Policies") < text.index("Example 1")
+    assert (
+        text.index("Verdict:")
+        < text.index("Reasons")
+        < text.index("Next action")
+        < text.index("Example 1")
+        < text.index("Policies")
+    )
     assert text.index("Next action") < text.index("Example 1")
     assert "Display complete: false" in text
     assert "Difference records need not be distinct rows" in text
