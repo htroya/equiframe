@@ -350,6 +350,7 @@ from equiframe.snapshot import (
     SnapshotTable,
     snapshot_fingerprint,
 )
+from equiframe.sources import SQLiteInput, StreamInput
 from equiframe.tables import (
     ArrowInput,
     ArtifactInput,
@@ -640,6 +641,7 @@ __all__ = [
     "RuleRegistry",
     "RuleSpec",
     "RunContext",
+    "SQLiteInput",
     "ScalarValue",
     "Scan",
     "SchemaCheck",
@@ -659,6 +661,7 @@ __all__ = [
     "StabilityRecord",
     "StageRecord",
     "StageTiming",
+    "StreamInput",
     "StringType",
     "StringValue",
     "TableArtifact",

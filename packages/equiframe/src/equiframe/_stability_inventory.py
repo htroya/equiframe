@@ -215,6 +215,8 @@ STABLE_API = (
 )
 
 EXPERIMENTAL_API = (
+    "SQLiteInput",
+    "StreamInput",
     "SnapshotClient",
     "SnapshotColumn",
     "SnapshotDataSource",
