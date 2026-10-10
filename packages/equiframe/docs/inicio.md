@@ -10,12 +10,17 @@ actual. No necesitas adoptar el benchmark ni desplegar un servicio.
 Para intercambiar CSV, SQL y otras entradas conservando un contrato, usa el
 [recorrido de universalidad en cinco pasos](universalidad-cinco-pasos.md).
 
-Este es un **candidato Alpha privado 0.12.0a11**. Identifica sus bytes por commit y
+Este es un **candidato Alpha privado 0.12.0a12**. Identifica sus bytes por commit y
 SHA-256 de wheel/sdist. No está publicado por el equipo en PyPI: un paquete con
 el mismo nombre encontrado allí no identifica este candidato. Licencia,
 publicación, adopción humana y aceptación del DW real siguen pendientes.
 
 ## 1. Instala una copia identificada
+
+Si prefieres ejecutar un ejemplo sin copiar código, usa
+[primer uso por perfil](first-use.md): comprueba el entorno con `doctor` y ejecuta
+`demo` para arquitectura SQL o preparación científica. Las guías largas siguen
+disponibles para integrar tus propias tablas, contratos y tests.
 
 Necesitas Python 3.12 o 3.13 y el wheel privado con sus dependencias revisadas.
 Los [comandos de instalación](quickstart.md#1-install-the-artifact-you-were-given)

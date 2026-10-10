@@ -1,5 +1,9 @@
 # Revisión de usabilidad verificable de EquiFrame
 
+Este informe conserva el corte A7 del 2026-10-07. La
+[revisión vigente](USABILITY_CURRENT_PLAN_20261010.md) contrasta ese resultado
+histórico con los nuevos bytes; no convierte sus recibos en ejecuciones A12.
+
 Fecha: 2026-10-07. Producto privado, Linux x86_64, Python 3.12/3.13;
 el alcance completo y las 72 subcomprobaciones están en
 [el plan](USABILITY_PLAN.md) y [la matriz](USABILITY_MATRIX.md).

@@ -35,15 +35,15 @@ CORE=packages/equiframe
 BENCH=packages/equiframe-benchmark
 
 $PY $TOOL generate --package "$CORE" \
-  --artifact "$CORE/dist/equiframe-0.12.0a10-py3-none-any.whl" \
-  --artifact "$CORE/dist/equiframe-0.12.0a10.tar.gz" \
+  --artifact "$CORE/dist/equiframe-0.12.0a12-py3-none-any.whl" \
+  --artifact "$CORE/dist/equiframe-0.12.0a12.tar.gz" \
   --output evidence/dependencies/core
 
 $PY $TOOL generate --package "$BENCH" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a10-py3-none-any.whl" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a10.tar.gz" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a12-py3-none-any.whl" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a12.tar.gz" \
   --environment-python "$BENCH/.venv/bin/python" \
-  --local-artifact "$CORE/dist/equiframe-0.12.0a10-py3-none-any.whl" \
+  --local-artifact "$CORE/dist/equiframe-0.12.0a12-py3-none-any.whl" \
   --output evidence/dependencies/benchmark
 ```
 
@@ -101,17 +101,17 @@ Reverify the final artifact bytes, lock, selected environment, BOMs and audit:
 
 ```sh
 $PY $TOOL verify --package "$CORE" \
-  --artifact "$CORE/dist/equiframe-0.12.0a10-py3-none-any.whl" \
-  --artifact "$CORE/dist/equiframe-0.12.0a10.tar.gz" \
+  --artifact "$CORE/dist/equiframe-0.12.0a12-py3-none-any.whl" \
+  --artifact "$CORE/dist/equiframe-0.12.0a12.tar.gz" \
   --inventory evidence/dependencies/core/inventory.json \
   --advisories evidence/dependencies/core-advisories/advisories.json \
   --max-age-hours 24 --require-clean
 
 $PY $TOOL verify --package "$BENCH" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a10-py3-none-any.whl" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a10.tar.gz" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a12-py3-none-any.whl" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.12.0a12.tar.gz" \
   --environment-python "$BENCH/.venv/bin/python" \
-  --local-artifact "$CORE/dist/equiframe-0.12.0a10-py3-none-any.whl" \
+  --local-artifact "$CORE/dist/equiframe-0.12.0a12-py3-none-any.whl" \
   --inventory evidence/dependencies/benchmark/inventory.json \
   --advisories evidence/dependencies/benchmark-advisories/advisories.json \
   --max-age-hours 24 --require-clean

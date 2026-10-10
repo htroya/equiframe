@@ -195,12 +195,6 @@ def _sections(report: ComparisonReport) -> Iterator[_Section]:
         ),
     )
     yield _Section(
-        "Policies",
-        ("Policy", "Value"),
-        tuple((policy.name, policy.value) for policy in report.policies)
-        or (("Policy entries", "none recorded"),),
-    )
-    yield _Section(
         "Reasons",
         ("Reason",),
         tuple((reason,) for reason in report.reasons) or (("No recorded reasons",),),
@@ -226,6 +220,12 @@ def _sections(report: ComparisonReport) -> Iterator[_Section]:
         ),
     )
     yield from _witness_sections(report)
+    yield _Section(
+        "Policies",
+        ("Policy", "Value"),
+        tuple((policy.name, policy.value) for policy in report.policies)
+        or (("Policy entries", "none recorded"),),
+    )
     evidence = report.evidence
     yield _Section(
         "Evidence and limitations",
@@ -288,6 +288,8 @@ _STYLE = (
     "background:#fff;max-width:1100px;padding:1rem;overflow-wrap:anywhere}"
     ".equiframe-report h1{font-size:1.5rem}.equiframe-report h2{font-size:1.1rem}"
     ".equiframe-report table{width:100%;border-collapse:collapse;margin:.6rem 0 1rem}"
+    ".equiframe-report .equiframe-facts{table-layout:fixed}"
+    ".equiframe-report .equiframe-facts th:first-child{width:25%}"
     ".equiframe-report th,.equiframe-report td{padding:.4rem;border:1px solid #ccd5df;"
     "text-align:left;vertical-align:top;white-space:pre-wrap}"
     ".equiframe-report thead{background:#f0f4f7}.equiframe-report summary{"
@@ -305,7 +307,11 @@ def _write_html(output: _Output, report: ComparisonReport, *, compact: bool) -> 
             output.write("<details><summary>" + _html_text(section.title) + "</summary>")
         else:
             output.write("<section><h2>" + _html_text(section.title) + "</h2>")
-        output.write("<table><thead><tr>")
+        output.write(
+            '<table class="equiframe-facts"><thead><tr>'
+            if len(section.headers) == 2
+            else "<table><thead><tr>"
+        )
         for header in section.headers:
             output.write('<th scope="col">' + _html_text(header) + "</th>")
         output.write("</tr></thead><tbody>")

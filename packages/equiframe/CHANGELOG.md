@@ -1,3 +1,25 @@
+## 0.12.0a12 — installed role onboarding (2026-10-10)
+
+- Add experimental `equiframe doctor --extra ... [--json]`: local Python,
+  code/metadata identity and dependency availability with actionable recovery.
+  It imports no optional engines, installs nothing and makes no network request;
+  metadata availability does not establish version-range or binary compatibility.
+- Add experimental `equiframe demo --role architect|scientist --case
+  good|different|not-evaluable --output NEW_DIRECTORY`. Synthetic SQL or
+  Decimal/UTC/NULL/ID preparation uses the existing comparator and independent
+  expected literals. Persist redacted and synthetic-detail reports before the
+  gate; reject differences, unavailable evaluation and occupied destinations,
+  also with Python `-O`. Existing API signatures and persisted formats remain.
+- Align current installation/handbook candidate references and add short
+  Spanish/English first use. Keep dated receipts and human adoption pending.
+- Present reasons, next action, counts and witnesses before technical policies
+  in text, HTML and notebooks. Give two-column HTML tables predictable label
+  width so long policy JSON cannot compress labels into individual characters.
+  Preserve every disclosed fact, redaction setting and evidence limit.
+- Advance the exact core/benchmark pair to A12 without changing dependency
+  ranges, engine implementations or the scientific R/M/B/H/O protocol. Previous
+  consumer pins and A11 universality receipts remain bound to their own bytes.
+
 ## 0.12.0a11 — universalidad del producto en cinco pasos (2026-10-09)
 
 - Add experimental read-only parameterized SQLite and caller-owned API/stream

@@ -693,6 +693,25 @@ CLI_INVENTORY = (
     ),
     ("contract validate", "stable", ("argument|path|path|required=True|default=None",), (0, 2, 3)),
     (
+        "doctor",
+        "experimental",
+        (
+            "option|extra|--extra|required=False|default=Extra.base",
+            "option|json_output|--json|required=False|default=False",
+        ),
+        (0, 2, 3),
+    ),
+    (
+        "demo",
+        "experimental",
+        (
+            "option|role|--role|required=True|default=None",
+            "option|case|--case|required=False|default=Case.good",
+            "option|output|--output|required=True|default=None",
+        ),
+        (0, 1, 2, 3),
+    ),
+    (
         "evidence verify",
         "experimental",
         ("argument|directory|directory|required=True|default=None",),

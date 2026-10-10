@@ -14,3 +14,7 @@ packages/equiframe/tools/cyclonedx/LICENSE text eol=lf
 # Historical compatibility fixtures are immutable byte corpora. Their recorded
 # sizes and SHA-256 values must survive checkout even when core.autocrlf is true.
 packages/equiframe/tests/fixtures/versioned/** -text
+
+# This historical schema has an exact published byte hash. Keep its committed
+# LF bytes on Windows too; platform newline conversion is not a format revision.
+packages/equiframe-benchmark/schemas/SnapshotManifest-1.0.schema.json -text

@@ -10,11 +10,17 @@ orquestador actual conserva transporte, secretos, reintentos y cuotas. No hace
 falta desplegar otro servicio, usar el benchmark o conocer todos los modelos.
 
 Instala el wheel privado identificado con `[duckdb]` para este ejemplo; usa
-`[engines]` para las seis direcciones y el consumidor 0.1.10. Sigue la receta
+`[engines]` para las seis direcciones. Los consumidores anteriores conservan
+su pin de candidato y sus propios recibos. Sigue la receta
 normal de pip y el ensayo separado con lock completo de [installed-private](installed-private.md).
-El candidato a8 declara Python 3.10–3.13. Usa el recibo real de tu minor y
+El candidato vigente declara Python 3.10–3.13. Usa el recibo real de tu minor y
 plataforma; el objetivo ARM64 no se acredita con un ensayo Linux x86_64.
 No uses el antiguo wheel 0.11.1 de la receta histórica ni un homónimo público.
+
+Para empezar sin copiar el script, sigue [primer uso por perfil](first-use.md):
+`python -I -m equiframe doctor --extra duckdb` y
+`python -I -m equiframe demo --role architect --output sql-good`.
+La guía completa siguiente sirve para integrar tu propio código y pytest.
 
 ## Python y SQL: evidencia antes de rechazar
 
