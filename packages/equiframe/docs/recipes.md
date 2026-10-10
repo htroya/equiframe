@@ -6,7 +6,7 @@ The a8 builder supplies interpreter-specific private kits. The retained 0.11.1
 first-use receipts remain historical; they do not validate this candidate. For
 current artifact delivery also see the private wheelhouse installation guide.
 
-These recipes use the private EquiFrame **0.12.0a12** first-use kit and **the Python minor selected in the kit manifest (3.10-3.13)**. The kit contains the exact wheel, three recipe scripts and their
+These recipes use the private EquiFrame **0.12.0a13** first-use kit and **the Python minor selected in the kit manifest (3.10-3.13)**. The kit contains the exact wheel, three recipe scripts and their
 pytest fixture, pinned dependencies with hashes, an integrity verifier and
 English guides. No checkout, real dataset, credential, remote SQL, notebook or
 service is required. Inputs are small synthetic fixtures defined in the scripts.
@@ -47,7 +47,7 @@ Install into the new environment:
 
 ```bash
 python -m pip install --require-hashes --only-binary=:all: -r requirements.lock
-python -m pip install --no-index wheels/equiframe-0.12.0a12-py3-none-any.whl
+python -m pip install --no-index wheels/equiframe-0.12.0a13-py3-none-any.whl
 python -m pip check
 python -I -c "import equiframe, sys; print(sys.version); print(equiframe.__file__)"
 ```

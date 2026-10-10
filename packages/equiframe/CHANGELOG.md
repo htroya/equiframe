@@ -1,3 +1,18 @@
+## 0.12.0a13 — package quality and producer identity (2026-10-10)
+
+- Correct detector producer identity: new evidence identifies A13 instead of
+  retaining A11 when executed from A12. Preserve explicit historical producer
+  records and admit A12/A13 without changing `equiframe-if-mad-1.0`, R/M/B/H/O,
+  model parameters, training support or expected outputs.
+- Regenerate current producer-containing schemas and their asset hashes;
+  preserve all historical fixture and receipt bytes. Keep the exact paired
+  core dependency and align current installation guides.
+- Add the source-carried standard-library offline wheel integrity audit and
+  tests for corruption, unsafe paths, Unicode metadata and occupied receipts.
+  Fix strict typing of heterogeneous observations in the option-trace tool.
+- Public distribution, license approval, ecosystem adoption and full platform
+  acceptance remain independent pending gates; no Actions or paid resources.
+
 ## 0.12.0a12 — installed role onboarding (2026-10-10)
 
 - Add experimental `equiframe doctor --extra ... [--json]`: local Python,

@@ -1,6 +1,6 @@
 # Arquitectura de EquiFrame
 
-Actualización 2026-10-10: pareja privada core/benchmark A12. Añade diagnóstico de
+Actualización 2026-10-10: pareja privada core/benchmark A13. A13 corrige el productor de nuevos detectores y admite identidades históricas A12/A13 sin cambiar algoritmos ni evidencias anteriores. Añade diagnóstico de
 instalación y ejercicios por rol sobre la API existente; no cambia la propiedad
 de componentes, los motores ni R/M/B/H/O. Las secciones A7/A8 siguientes son
 históricas. La admisión actual es Python 3.10–3.13; las matrices fechadas y sus

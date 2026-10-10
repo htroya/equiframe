@@ -62,3 +62,18 @@ externos siguen en el denominador, no se omiten para aumentar la nota.
 
 La evidencia ausente se registra como pendiente. Un fallo no se reclasifica
 como éxito por mantener la meta del 80 %.
+
+## Ampliación de candidato tras el control completo
+
+La ejecución completa detectó un defecto real en A12: `fit_detectors` emitía
+`versions.equiframe=0.12.0a11`, aunque el paquete observado era A12. La prueba
+de identidad también tenía una referencia literal antigua. Se prepara A13
+para corregir el emisor y conservar todos los productores históricos. No se
+cambia el algoritmo `equiframe-if-mad-1.0`, las reglas, etiquetas o métodos de
+la tesis. Se regeneran sólo esquemas actuales; fixtures y recibos fechados
+conservan sus bytes originales.
+
+La meta y los veinte controles permanecen. La evaluación final se aplica a
+A13; Q03 incluye además su instalación en ambos entornos y Q18 añade el ciclo
+A12–A13–A12–A13. Los controles ya ejecutados de A12 se mantienen como evidencia
+histórica y de diagnóstico, sin acreditarlos como pruebas del nuevo artefacto.

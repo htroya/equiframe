@@ -3,7 +3,7 @@
 [Install the private candidate](installed-private.md) · [Arquitecto](arquitecto.md) ·
 [Científico](cientifico.md) · [API](api.md)
 
-Private candidate **0.12.0a12**. Use the identified wheel and its reviewed
+Private candidate **0.12.0a13**. Use the identified wheel and its reviewed
 dependencies. Run these commands with the Python of that environment, outside
 the source checkout. On Windows, replace `python` with `.venv\Scripts\python.exe`;
 on Linux use `.venv/bin/python`. Activation is optional.

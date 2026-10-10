@@ -49,6 +49,9 @@ def bundle(fitted=None):
 def test_same_matrix_native_sklearn_reference_and_exact_restore(tmp_path):
     profiles = tuple(vector(i, 16) for i in range(16))
     fitted = fit(*profiles)
+    # Producer identity is the executing distribution, independently of the
+    # unchanged model algorithm and historically readable explicit records.
+    assert fitted.versions.equiframe == ef.__version__
     matrix = ef.transform_profiles(fitted.preprocessor, profiles)
     assert fitted.training_matrix_sha256 == profile_digest(matrix.model_dump(mode="json"))
     reference = IsolationForest(

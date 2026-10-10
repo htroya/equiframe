@@ -15,17 +15,17 @@ El auditor no resuelve la licencia ni garantiza ausencia de vulnerabilidades.
 Desde la raíz del checkout, con Python ya instalado:
 
 ```powershell
-python packages/equiframe/tools/audit_wheel.py C:/ruta/equiframe-0.12.0a12-py3-none-any.whl --sha256 SHA256_RECIBIDO --name equiframe --version 0.12.0a12 --output C:/ruta/recibo-nuevo.json
+python packages/equiframe/tools/audit_wheel.py C:/ruta/equiframe-0.12.0a13-py3-none-any.whl --sha256 SHA256_RECIBIDO --name equiframe --version 0.12.0a13 --output C:/ruta/recibo-nuevo.json
 ```
 
 En Linux o la VM existente:
 
 ```bash
-python3 packages/equiframe/tools/audit_wheel.py /ruta/equiframe-0.12.0a12-py3-none-any.whl --sha256 SHA256_RECIBIDO --name equiframe --version 0.12.0a12 --output /ruta/recibo-nuevo.json
+python3 packages/equiframe/tools/audit_wheel.py /ruta/equiframe-0.12.0a13-py3-none-any.whl --sha256 SHA256_RECIBIDO --name equiframe --version 0.12.0a13 --output /ruta/recibo-nuevo.json
 ```
 
 Para el benchmark cambie el archivo a
-`equiframe_benchmark-0.12.0a12-py3-none-any.whl` y el nombre a
+`equiframe_benchmark-0.12.0a13-py3-none-any.whl` y el nombre a
 `equiframe-benchmark`; use **su propio hash** y otro recibo. Cada salida necesita
 un directorio padre existente y un nombre de archivo nuevo.
 
