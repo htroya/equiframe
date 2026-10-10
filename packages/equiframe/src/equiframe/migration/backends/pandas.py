@@ -47,6 +47,7 @@ from ..types import (
     Project,
     RelationalPlan,
     Scan,
+    Window,
 )
 from ..validation import (
     ValidatedIR,
@@ -62,7 +63,7 @@ if TYPE_CHECKING:
 
     from equiframe.execution import RunContext
 
-_COMPILER_VERSION = "migration-native-ir1.0/pandas/product-semantics-v2"
+_COMPILER_VERSION = "migration-native-ir1.0/pandas/product-semantics-v3"
 
 
 def _dtype(dtype: LogicalType) -> Any:
@@ -450,6 +451,46 @@ class PandasCompiler:
                                     pd.NA, index=extra.index, dtype=_dtype(column.logical_type)
                                 )
                         frame = pd.concat([frame, extra[frame.columns]], ignore_index=True)
+                elif isinstance(node, Window):
+                    frame = frames[node.source].copy(deep=True)
+                    tie_keys = list(
+                        dict.fromkeys((*node.partition_by, *(key.column for key in node.by)))
+                    )
+                    if frame.duplicated(subset=tie_keys).any():
+                        raise CapabilityError("Window encountered forbidden order ties")
+                    for key in reversed(node.by):
+                        frame = frame.sort_values(
+                            key.column,
+                            ascending=key.direction == "ascending",
+                            na_position=key.nulls,
+                            kind="stable",
+                        )
+                    groups = (
+                        frame.groupby(list(node.partition_by), dropna=False, sort=False)
+                        if node.partition_by
+                        else None
+                    )
+                    for window_measure in node.measures:
+                        if window_measure.operation == "row_number":
+                            value = (
+                                groups.cumcount() + 1
+                                if groups is not None
+                                else pd.Series(range(1, len(frame) + 1), index=frame.index)
+                            )
+                        else:
+                            if window_measure.column is None:
+                                raise CapabilityError("lag/lead require an input column")
+                            offset = (
+                                window_measure.offset
+                                if window_measure.operation == "lag"
+                                else -window_measure.offset
+                            )
+                            value = (
+                                groups[window_measure.column].shift(offset)
+                                if groups is not None
+                                else frame[window_measure.column].shift(offset)
+                            )
+                        frame[window_measure.name] = value
                 elif isinstance(node, Aggregate):
                     frame = _aggregate(frames[node.source], node, validated)
                 elif isinstance(node, Concatenate):

@@ -55,6 +55,7 @@ from ..types import (
     RelationalPlan,
     Scan,
     Sort,
+    Window,
 )
 from ..validation import (
     ValidatedIR,
@@ -65,7 +66,7 @@ from ..validation import (
     references,
 )
 
-_COMPILER_VERSION = "migration-native-ir1.0/duckdb/product-semantics-v2"
+_COMPILER_VERSION = "migration-native-ir1.0/duckdb/product-semantics-v3"
 
 
 def quote(name: str) -> str:
@@ -373,7 +374,7 @@ class DuckDBCompiler:
                         ),
                     )
                 if not (
-                    isinstance(node, Aggregate)
+                    isinstance(node, (Aggregate, Window))
                     or (isinstance(node, EquiJoin) and node.cardinality != "many_to_many")
                     or (isinstance(node, Deduplicate) and node.keep == "first")
                     or (isinstance(node, Sort) and node.ties == "reject")
@@ -402,7 +403,8 @@ class DuckDBCompiler:
                                 CompilationDiagnostic(
                                     code="eager_semantics_not_supported",
                                     message=(
-                                        "DuckDB error-bearing aggregate/sort/arithmetic nodes "
+                                        "DuckDB error-bearing aggregate/sort/arithmetic/"
+                                        "join/deduplicate/window nodes "
                                         "only support "
                                         "a final sort suffix; later relational nodes may "
                                         "prune errors"
@@ -467,6 +469,36 @@ class DuckDBCompiler:
                     f"SELECT {', '.join(join_columns)} FROM {names[node.left]} l "
                     f"{node.how.upper()} JOIN {names[node.right]} r ON {predicate}"
                 )
+            elif isinstance(node, Window):
+                partition = (
+                    ("PARTITION BY " + ", ".join(quote(name) for name in node.partition_by) + " ")
+                    if node.partition_by
+                    else ""
+                )
+                order = ", ".join(
+                    quote(key.column)
+                    + (" ASC" if key.direction == "ascending" else " DESC")
+                    + " NULLS "
+                    + key.nulls.upper()
+                    for key in node.by
+                )
+                window = f"OVER ({partition}ORDER BY {order})"
+                expressions = [quote(column.name) for column in validated.schema(node.source)]
+                for window_measure in node.measures:
+                    if window_measure.operation == "row_number":
+                        raw = "row_number()"
+                    else:
+                        if window_measure.column is None:
+                            raise CapabilityError("lag/lead require an input column")
+                        raw = (
+                            f"{window_measure.operation}("
+                            f"{quote(window_measure.column)}, {window_measure.offset})"
+                        )
+                    expressions.append(
+                        f"CAST({raw} {window} AS {_dtype(window_measure.logical_type)}) "
+                        f"AS {quote(window_measure.name)}"
+                    )
+                body = f"SELECT {', '.join(expressions)} FROM {names[node.source]}"
             elif isinstance(node, Aggregate):
                 aggregate_columns = [quote(name) for name in node.group_by]
                 for measure in node.measures:
@@ -528,6 +560,13 @@ class DuckDBCompiler:
                     for key in node.by
                 )
             guards = []
+            if isinstance(node, Window):
+                keys = tuple(dict.fromkeys((*node.partition_by, *(key.column for key in node.by))))
+                grouped = ", ".join(quote(key) for key in keys)
+                guards.append(
+                    f"EXISTS (SELECT 1 FROM {names[node.source]} "
+                    f"GROUP BY {grouped} HAVING count(*) > 1)"
+                )
             if isinstance(node, EquiJoin) and node.cardinality != "many_to_many":
                 for ref, keys, unique in (
                     (
@@ -565,6 +604,8 @@ class DuckDBCompiler:
                 message = (
                     "Join violates declared cardinality"
                     if isinstance(node, EquiJoin)
+                    else "Window encountered forbidden order ties"
+                    if isinstance(node, Window)
                     else "Deduplicate encountered forbidden tiebreak ties"
                 )
                 failure = ", ".join(

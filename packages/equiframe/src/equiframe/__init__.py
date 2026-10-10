@@ -230,6 +230,8 @@ from equiframe.migration import (
     Sort,
     SortKey,
     ValidatedIR,
+    Window,
+    WindowMeasure,
     check_migration,
     ir_fingerprint,
     migrate,
@@ -350,6 +352,7 @@ from equiframe.snapshot import (
     SnapshotTable,
     snapshot_fingerprint,
 )
+from equiframe.sources import CompositeDataSource, RecordBatchInput, SQLiteInput, StreamInput
 from equiframe.tables import (
     ArrowInput,
     ArtifactInput,
@@ -417,7 +420,7 @@ from equiframe.workflow import (
 )
 from equiframe.workflow_request import WorkflowExpected, WorkflowRequest
 
-__version__ = "0.12.0a10"
+__version__ = "0.12.0a11"
 
 __all__ = [
     "CANONICALIZATION",
@@ -470,6 +473,7 @@ __all__ = [
     "CompilerRegistry",
     "ComponentDecision",
     "ComponentDetectionResult",
+    "CompositeDataSource",
     "Concatenate",
     "Conditional",
     "Contract",
@@ -616,6 +620,7 @@ __all__ = [
     "Project",
     "PublishedTable",
     "QuarantinedRecord",
+    "RecordBatchInput",
     "ReducedTable",
     "ReductionObservation",
     "ReductionOptions",
@@ -640,6 +645,7 @@ __all__ = [
     "RuleRegistry",
     "RuleSpec",
     "RunContext",
+    "SQLiteInput",
     "ScalarValue",
     "Scan",
     "SchemaCheck",
@@ -659,6 +665,7 @@ __all__ = [
     "StabilityRecord",
     "StageRecord",
     "StageTiming",
+    "StreamInput",
     "StringType",
     "StringValue",
     "TableArtifact",
@@ -685,6 +692,8 @@ __all__ = [
     "VerificationReview",
     "VerificationState",
     "VersionInfo",
+    "Window",
+    "WindowMeasure",
     "WorkflowCheckpoint",
     "WorkflowExpected",
     "WorkflowInputBinding",

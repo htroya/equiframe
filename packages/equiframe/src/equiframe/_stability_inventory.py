@@ -215,6 +215,12 @@ STABLE_API = (
 )
 
 EXPERIMENTAL_API = (
+    "CompositeDataSource",
+    "RecordBatchInput",
+    "Window",
+    "WindowMeasure",
+    "SQLiteInput",
+    "StreamInput",
     "SnapshotClient",
     "SnapshotColumn",
     "SnapshotDataSource",
@@ -415,12 +421,12 @@ SCHEMA_INVENTORY = (
     (
         "detector-bundle-1.0.schema.json",
         "experimental",
-        "094b666a99fdb4767b6e8cf2ce58c558fa53ea2750db895970f3062e4d84d4d0",
+        "e3458030b1502d70aa374c297c616ff7e71a26103571bebed57753cfb480d6d2",
     ),
     (
         "detector-fit-1.0.schema.json",
         "experimental",
-        "c9909ee10ef8940c7a4be9534755c1082f36622241309348dea79dcfd361bff5",
+        "41dc0668b477bf589c8f6ae9e14432c9c58c9b804733898745bcc4460946f56b",
     ),
     (
         "detector-score-result-1.0.schema.json",
@@ -510,17 +516,17 @@ SCHEMA_INVENTORY = (
     (
         "migration-request-1.0.schema.json",
         "experimental",
-        "a354b17e1afdb9bad449c3201f7a044cd6ab9ced6483900b2e5410c81980a832",
+        "fe42af3c7eff94ab06ec3b358ffbe3049715656690f9cf44f10c51a11d42d1fb",
     ),
     (
         "migration-result-1.0.schema.json",
         "experimental",
-        "23b23e67398213a24f158814a0a786f64d853d6829764c416ada3b1f82485e1e",
+        "e8fab4f562f45cdd52b6d3d07fea6315cb3c332b1fde301a352efdaa9b269fa3",
     ),
     (
         "migration-spec-1.0.schema.json",
         "experimental",
-        "34725962cffbd4d5c6a94049978ca882245240c58ab46dd4073fe18ff57ea258",
+        "537797da0c99c27c441fa70931bbfc12bcb24d672da52ebac9fa48105d32fc28",
     ),
     (
         "normal-calibration-profiles-1.0.schema.json",
@@ -580,7 +586,7 @@ SCHEMA_INVENTORY = (
     (
         "relational-plan-1.0.schema.json",
         "experimental",
-        "8f0dfb121d32da98ef5207cb9413bcdf8ed9a5c89895417db0c536e0e63e5cbe",
+        "3746a0d31fa221fd94b0fe8dfcd4ac53b74797993d95365493c47f7b5d1c1bca",
     ),
     (
         "report-evidence-manifest-1.0.schema.json",
@@ -630,17 +636,17 @@ SCHEMA_INVENTORY = (
     (
         "workflow-request-1.0.schema.json",
         "experimental",
-        "e05698ae0ed26e508931943343d043430b8841f4ed2f4378a74349c782a06662",
+        "0766059752d5973a52fd828dd72bb316c328576bff0ef4e3794a2d0f51f2a89c",
     ),
     (
         "workflow-result-1.0.schema.json",
         "experimental",
-        "ebf802676e5896d1d94014f053b74087f6a50d79b275296d5f8853f5a77e6eeb",
+        "54c871a59c7b16a85e54db4101aa2a6171070f90b1bbdf9853290a7b46e22410",
     ),
     (
         "workflow-spec-1.0.schema.json",
         "experimental",
-        "246ce630cf6bc276e3af84f0fad595507fb027658c9646c906d055184b53dea5",
+        "af3c0ab51b5c598d54a6fce43c4a4368e8dcc4efba4a254e96003a42a1575096",
     ),
 )
 # command, classification, CLI parameters, possible process exits (including parser errors).

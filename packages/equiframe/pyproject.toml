@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "equiframe"
-version = "0.12.0a10"
+version = "0.12.0a11"
 description = "Operational verification, native ETL migration and portable semantic evidence"
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
@@ -44,6 +44,9 @@ dev = [
 [tool.hatch.build.targets.wheel]
 packages = ["src/equiframe"]
 
+[tool.hatch.build.targets.wheel.hooks.custom]
+path = "tools/reproducible_wheel.py"
+
 [tool.hatch.build.targets.wheel.force-include]
 "docs" = "equiframe/docs"
 "examples/journeys/README.md" = "equiframe/examples/journeys/README.md"
@@ -62,6 +65,7 @@ packages = ["src/equiframe"]
 "examples/integrations/outcome_gates.py" = "equiframe/examples/integrations/outcome_gates.py"
 "examples/integrations/sqlite_snapshot.py" = "equiframe/examples/integrations/sqlite_snapshot.py"
 "examples/integrations/sqlite_snapshot_demo.py" = "equiframe/examples/integrations/sqlite_snapshot_demo.py"
+"examples/integrations/universal_first_use.py" = "equiframe/examples/integrations/universal_first_use.py"
 
 [tool.hatch.build.targets.sdist]
 include = ["/docs", "/src", "/tests", "/examples", "/schemas", "/tools", "/pyproject.toml", "/uv.lock", "/README.md", "/CHANGELOG.md"]

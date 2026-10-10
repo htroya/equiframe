@@ -256,10 +256,11 @@ _COMPARISON = CapabilityStage(
 )
 _COMMON_MIGRATION = (
     "Closed IR: Scan, Project, Filter, widening Cast, inner/left/right/full/semi/anti EquiJoin "
-    "with matchable-key cardinality, Aggregate, Sort, Concatenate and deterministic Deduplicate",
+    "with matchable-key cardinality, Aggregate, Sort, Concatenate, deterministic Deduplicate "
+    "and deterministic Window (row_number, exact-type lag/lead)",
     "Decimal precision <=38; exact multiply declares summed scales; DecimalRound declares "
     "precision/scale and rounding; division/localization have per-engine capability boundaries",
-    "Timestamp transport preserves declared unit/zone; float join/group/sort/dedup keys and "
+    "Timestamp transport preserves declared unit/zone; float join/group/sort/dedup/window keys and "
     "floating sum/min/max remain rejected; count_valid may consume float",
     "No arbitrary Python/SQL translation, remote execution, implicit casts or cross-engine "
     "fallback; validate_ir and both compiler checks remain authoritative",
@@ -271,6 +272,8 @@ _MIGRATION_TESTS = (
     "tests/test_migration_product_semantics.py::test_join_cardinality_composite_key_option_matrix",
     "tests/test_migration_product_semantics.py::test_timestamp_ir_exact_unit_zone_transport",
     "tests/test_migration_product_semantics.py::test_decimal_multiply_exact_scale_and_round",
+    "tests/test_migration_windows.py::test_six_migration_directions_verify_windows_against_literal_expected",
+    "tests/test_window_semantics.py::test_native_lag_preserves_values_and_literal_column_names",
 )
 
 
@@ -434,7 +437,7 @@ def get_adapter_capabilities() -> tuple[AdapterCapability, ...]:
                 "retain a conservative bound and localization declares DST policies",
                 "duckdb": "DuckDB timestamp IR requires naive s/ms/us/ns or zoned UTC us; "
                 "Decimal division and DST localization rejected; exact rounding supports "
-                "half_away_from_zero; checked arithmetic/aggregate/sort/cardinality/dedup "
+                "half_away_from_zero; checked arithmetic/aggregate/sort/cardinality/dedup/window "
                 "nodes require only a final Sort suffix to prevent optimizer pruning",
             }
             migration = CapabilityStage(

@@ -7,7 +7,10 @@ EquiFrame compara resultados tabulares completos y deja evidencia para explicar
 las diferencias. Puedes usarlo desde tu Python, notebook, pytest u orquestador
 actual. No necesitas adoptar el benchmark ni desplegar un servicio.
 
-Este es un **candidato Alpha privado 0.12.0a10**. Identifica sus bytes por commit y
+Para intercambiar CSV, SQL y otras entradas conservando un contrato, usa el
+[recorrido de universalidad en cinco pasos](universalidad-cinco-pasos.md).
+
+Este es un **candidato Alpha privado 0.12.0a11**. Identifica sus bytes por commit y
 SHA-256 de wheel/sdist. No está publicado por el equipo en PyPI: un paquete con
 el mismo nombre encontrado allí no identifica este candidato. Licencia,
 publicación, adopción humana y aceptación del DW real siguen pendientes.

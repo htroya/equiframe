@@ -25,6 +25,53 @@ uniqueness and engine-specific identifier limits still apply: for example,
 DuckDB rejects NUL names and case-insensitively colliding names. This contract
 does not relax those boundaries or the separate table-identifier restrictions.
 
+## Deterministic windows
+
+The experimental `Window` node appends `WindowMeasure` outputs to every input
+row. `row_number` starts at 1 in each partition, or in the entire input when
+`partition_by=()`. `lag` and `lead` select the preceding/following row at a
+positive `offset` (default 1), retaining its exact logical type and unit.
+They return NULL outside the partition and preserve NULL values inside it.
+No arithmetic, rounding, default fill or NULL skipping occurs.
+
+```python
+window = ef.Window(
+    node_id="history",
+    source="events",
+    partition_by=("account",),
+    by=(ef.SortKey(column="sequence", direction="ascending", nulls="last"),),
+    measures=(
+        ef.WindowMeasure(
+            name="position",
+            operation="row_number",
+            logical_type=ef.IntegerType(bits=64, signed=True),
+            unit="rows",
+        ),
+        ef.WindowMeasure(
+            name="previous_amount",
+            operation="lag",
+            column="amount",
+            logical_type=ef.DecimalType(precision=12, scale=2),
+        ),
+    ),
+)
+```
+
+NULL partition components group together. Every ordering term declares its
+direction and NULL position; partition-plus-order tuples must be unique.
+`ties="reject"` rejects even identical tied rows, so input order cannot choose
+an arbitrary predecessor. Float partition/order keys remain unsupported.
+`row_number` requires signed64, nonnullable output; lag/lead output is nullable
+even for a nonnullable input. Row multiplicity remains unchanged. Output bag
+order is unspecified until a final `Sort` requests it.
+
+Each compiler uses its own native operations. DuckDB permits a window only as
+the output or followed by final sorts, because later filters/projections can
+prune its error guard. `check_migration` reports this limitation before execution.
+Arbitrary frames, rank/dense_rank and window aggregates remain unsupported.
+These additions change only the experimental IR schemas and their nested
+migration/workflow schemas; historical node defaults remain unchanged.
+
 ## Outer joins and cardinality
 
 ```python

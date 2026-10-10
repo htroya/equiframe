@@ -27,6 +27,15 @@ scans are partial observations. `difference_records` counts diagnostic records,
 not necessarily distinct affected rows. Missing files, failed finalization,
 resource exhaustion and exceptions never imply a pass.
 
+Native [windows](migration-ir.md#deterministic-windows) preserve every input row.
+Lag/lead retain Decimal precision/scale and units, integer width, timestamp
+unit/zone, and the separate NULL/NaN meaning of the input. They introduce NULL
+only at partition boundaries; input NULL values also remain NULL. Row-number
+output is signed64 and nonnullable. Partition/order ties fail rather than select
+an arbitrary original position. Explicit final sorting remains necessary for a
+sequence contract. The compiler rejects incompatible declared types/units and
+unsupported native plans before execution; comparison does not repair them.
+
 Use `assert_equivalent`, which requires complete/final `observed_contract`
 equivalence and any additional policy/evidence requirements. `ComparisonResult`
 and `EquivalenceDecision` reject truth testing; use the assertion or the explicit

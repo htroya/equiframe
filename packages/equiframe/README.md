@@ -1,8 +1,12 @@
-# EquiFrame 0.12.0a10
+# EquiFrame 0.12.0a11
 
 [Arquitecto](docs/arquitecto.md) · [Científico](docs/cientifico.md) · [Inicio en español](docs/inicio.md) · [Choose an API](docs/choosing-api.md) · [Eight journeys](docs/journeys.md)
 
 **Semantic comparison and reviewable evidence for tabular results in Python.**
+
+[Universalidad en cinco pasos](docs/universalidad-cinco-pasos.md) provides an
+installed CSV/SQLite/JSON/API-response/Parquet/Arrow-batch example using one exact
+contract and three native engines, including discrepancies and failed inputs.
 
 EquiFrame compares captured outputs under explicit contracts for values, types,
 keys, multiplicity, order, missing data and time. It integrates with eager pandas,
@@ -12,7 +16,7 @@ APIs with explicit capabilities and failure states.
 
 ## Private Alpha status
 
-This is the **private Alpha candidate 0.12.0a10**, identified by its commit and
+This is the **private Alpha candidate 0.12.0a11**, identified by its commit and
 artifact hashes. The team's package is **not publicly released on PyPI**.
 Do not install an unrelated package with this name from an arbitrary index.
 License and name/ownership remain owner decisions; access is not permission to
@@ -30,7 +34,7 @@ pending ownership decisions.
 ## Install the private candidate
 
 Use the [private wheelhouse installation guide](docs/installed-private.md) with
-`equiframe[engines,ml]==0.12.0a10`, a fresh environment outside the checkout,
+`equiframe[engines,ml]==0.12.0a11`, a fresh environment outside the checkout,
 normal pip dependency resolution and the separately supplied artifact hashes.
 It includes Linux and PowerShell commands and a separate hash-locked trial.
 This is private installation by name, not publication in PyPI or TestPyPI.

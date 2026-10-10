@@ -1,3 +1,12 @@
+## 0.12.0a11 — exact core candidate pairing (2026-10-09)
+
+- Require the exact new private core A11 candidate for all Arrow/engine/ML extras.
+- Use the same sdist-shipped wheel ZIP creator convention on Windows and Linux.
+- Regenerate schemas containing the new producer identity. Scientific algorithms,
+  independent detector paths and historical expected results remain unchanged.
+- This metadata pairing does not establish a new native universality matrix or
+  independent human acceptance; manual artifact-specific validation is required.
+
 ## 0.12.0a10 — remediación del laboratorio de universalidad (2026-10-09)
 
 - Require binary-compatible candidates during minimum/latest benchmark resolution,

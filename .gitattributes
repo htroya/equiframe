@@ -9,6 +9,7 @@
 *.ps1 text eol=crlf
 *.lock text eol=lf
 .github/controller-requirements.txt text eol=lf
+packages/equiframe/tools/cyclonedx/LICENSE text eol=lf
 
 # Historical compatibility fixtures are immutable byte corpora. Their recorded
 # sizes and SHA-256 values must survive checkout even when core.autocrlf is true.
