@@ -2,7 +2,7 @@
 
 [API](api.md) · [Semantics](semantics.md) · [Compatibility](compatibility.md)
 
-These experimental additions, introduced in 0.12.0a1 and retained in 0.12.0a10, extend the existing `RelationalPlan`
+These experimental additions, introduced in 0.12.0a1 and retained in 0.12.0a12, extend the existing `RelationalPlan`
 and `migrate` APIs. They do not infer business rules, change comparison policy,
 translate arbitrary code, or calculate one output for conversion into other
 engines. Every supported compiler executes its own native transformation.

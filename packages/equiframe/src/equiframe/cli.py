@@ -9,6 +9,8 @@ from typing import cast
 import typer
 
 from equiframe._cli_support import exit_with_failure
+from equiframe._doctor import Extra, diagnose, diagnostic_text
+from equiframe._first_use import Case, Role, run_demo
 from equiframe.assertion_types import EquivalencePolicy
 from equiframe.assertions import equivalence_decision
 from equiframe.bundle import export_bundle, import_bundle, inspect_bundle
@@ -53,6 +55,42 @@ ingestion_app = typer.Typer(no_args_is_help=True)
 app.add_typer(ingestion_app, name="ingestion", help="Parse explicit CSV/JSON/JSONL contracts.")
 workflow_app = typer.Typer(no_args_is_help=True)
 app.add_typer(workflow_app, name="workflow", help="Run dependent native ETL checkpoints.")
+
+
+@app.command("doctor")
+def doctor_command(
+    extra: Extra = typer.Option(Extra.base, help="Check only the dependencies your task needs."),
+    json_output: bool = typer.Option(False, "--json", help="Print a machine-readable diagnosis."),
+) -> None:
+    """Check local metadata without imports, installs or network. Exit 0 ready, 3 unavailable."""
+    try:
+        result = diagnose(extra)
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(json.dumps(result, sort_keys=True) if json_output else diagnostic_text(result))
+    raise typer.Exit(code=0 if result["ready_metadata"] else 3)
+
+
+@app.command("demo")
+def demo_command(
+    role: Role = typer.Option(..., help="Choose a synthetic SQL or data-preparation exercise."),
+    case: Case = typer.Option(Case.good, help="Exercise acceptance, difference or a row limit."),
+    output: Path = typer.Option(..., help="New private directory; existing evidence is preserved."),
+) -> None:
+    """Save a role diagnosis before the gate. Exit 0 accepted, 1 different, 3 unavailable."""
+    try:
+        result = run_demo(role, case, output)
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(result["synthetic_detail"])
+    typer.echo("Report HTML: " + result["report_html"])
+    typer.echo("Synthetic detail HTML: " + result["synthetic_detail_html"])
+    typer.echo(
+        json.dumps({key: result[key] for key in ("role", "case", "state", "complete", "accepted")})
+    )
+    raise typer.Exit(code=0 if result["accepted"] else 1 if result["state"] == "different" else 3)
 
 
 @ingestion_app.command("run")

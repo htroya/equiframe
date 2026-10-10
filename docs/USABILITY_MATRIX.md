@@ -1,5 +1,9 @@
 # Matriz de usabilidad U01–U12
 
+La tabla siguiente conserva el corte A7. El
+[plan vigente](USABILITY_CURRENT_PLAN_20261010.md) mantiene los doce criterios y
+sus subcomprobaciones y separa la evidencia por candidato/entorno.
+
 Revisión 2026-10-07. Alcance fijado en [USABILITY_PLAN](USABILITY_PLAN.md).
 Cada criterio es indivisible y vale un punto. Se muestran sus 72 subcomprobaciones.
 La evidencia E01–E10 se describe en [USABILITY_REVIEW](USABILITY_REVIEW.md#evidencia-sanitizada).

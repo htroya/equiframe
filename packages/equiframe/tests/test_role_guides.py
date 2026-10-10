@@ -90,7 +90,19 @@ def test_architect_pytest_recipe_is_a_real_local_test(tmp_path):
     (tmp_path / "integracion.py").write_text(snippet("arquitecto.md"), encoding="utf-8")
     (tmp_path / "test_integracion.py").write_text(snippet("arquitecto.md", 1), encoding="utf-8")
     completed = subprocess.run(
-        [sys.executable, "-I", "-m", "pytest", "-q", "-o", "addopts=", "-p", "no:cacheprovider"],
+        [
+            sys.executable,
+            "-I",
+            "-m",
+            "pytest",
+            "-q",
+            "-o",
+            "addopts=",
+            "-p",
+            "no:cacheprovider",
+            "--basetemp",
+            str(tmp_path / "pytest-work"),
+        ],
         cwd=tmp_path,
         capture_output=True,
         text=True,

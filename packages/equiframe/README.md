@@ -1,4 +1,6 @@
-# EquiFrame 0.12.0a11
+# EquiFrame 0.12.0a12
+
+[Primer uso por perfil / First use](docs/first-use.md)
 
 [Arquitecto](docs/arquitecto.md) · [Científico](docs/cientifico.md) · [Inicio en español](docs/inicio.md) · [Choose an API](docs/choosing-api.md) · [Eight journeys](docs/journeys.md)
 
@@ -16,7 +18,7 @@ APIs with explicit capabilities and failure states.
 
 ## Private Alpha status
 
-This is the **private Alpha candidate 0.12.0a11**, identified by its commit and
+This is the **private Alpha candidate 0.12.0a12**, identified by its commit and
 artifact hashes. The team's package is **not publicly released on PyPI**.
 Do not install an unrelated package with this name from an arbitrary index.
 License and name/ownership remain owner decisions; access is not permission to
@@ -34,7 +36,7 @@ pending ownership decisions.
 ## Install the private candidate
 
 Use the [private wheelhouse installation guide](docs/installed-private.md) with
-`equiframe[engines,ml]==0.12.0a11`, a fresh environment outside the checkout,
+`equiframe[engines,ml]==0.12.0a12`, a fresh environment outside the checkout,
 normal pip dependency resolution and the separately supplied artifact hashes.
 It includes Linux and PowerShell commands and a separate hash-locked trial.
 This is private installation by name, not publication in PyPI or TestPyPI.

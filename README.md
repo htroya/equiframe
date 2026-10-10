@@ -1,5 +1,7 @@
 # EquiFrame
 
+[Primer uso por perfil / First use](packages/equiframe/docs/first-use.md)
+
 [Arquitecto](packages/equiframe/docs/arquitecto.md) · [Científico](packages/equiframe/docs/cientifico.md) · [Inicio en español](packages/equiframe/docs/inicio.md) · [Choose an API](packages/equiframe/docs/choosing-api.md) · [Eight journeys](packages/equiframe/docs/journeys.md)
 
 **Semantic comparison and reviewable evidence for tabular results in Python.**
@@ -9,7 +11,7 @@ locate differences in values, types, keys, multiplicity and order. Use EquiFrame
 inside an existing pandas, Polars, Arrow or CI workflow, or use its separate
 native execution, verification and bounded migration APIs.
 
-**Status: private Alpha pair: core 0.12.0a11 / benchmark 0.12.0a11.** Identify artifacts by commit and
+**Status: private Alpha pair: core 0.12.0a12 / benchmark 0.12.0a12.** Identify artifacts by commit and
 wheel/sdist SHA-256, not the version string alone. The team's package is **not
 publicly released on PyPI**. License and name/ownership decisions remain pending.
 Public release requires STEP10, the global review and specific owner approval.
@@ -36,12 +38,12 @@ compara directamente ese resultado con el 25 % de cierre del corte histórico A9
 ## Install the private candidate
 
 Use the [private wheelhouse installation guide](packages/equiframe/docs/installed-private.md) with
-`equiframe[engines,ml]==0.12.0a10`, a fresh environment outside the checkout,
+`equiframe[engines,ml]==0.12.0a12`, a fresh environment outside the checkout,
 normal pip dependency resolution and the separately supplied artifact hashes.
 It includes Linux and PowerShell commands and a separate hash-locked trial.
 This is private installation by name, not publication in PyPI or TestPyPI.
-The separate benchmark is `equiframe-benchmark[engines,ml,resources]==0.12.0a10`
-and requires exactly core `0.12.0a10`. The prior a6 package artifacts and
+The separate benchmark is `equiframe-benchmark[engines,ml,resources]==0.12.0a12`
+and requires exactly core `0.12.0a12`. The prior a6 package artifacts and
 observations remain historical; current receipts identify corrected minimum-Polars
 expression composition.
 Python metadata targets 3.10/3.11/3.12/3.13; the maturity matrix remains open until every required cell is reviewed; only actual artifact-specific receipts establish

@@ -1,3 +1,10 @@
+## 0.12.0a12 — exact core onboarding candidate pairing (2026-10-10)
+
+- Pair the benchmark with exactly core A12 after adding core installation
+  diagnosis and role demos. Dependency ranges and scientific algorithms remain.
+- Previous universality/benchmark receipts retain their A11 identities; this
+  release does not claim new scientific or human-adoption results.
+
 ## 0.12.0a11 — exact core candidate pairing (2026-10-09)
 
 - Require the exact new private core A11 candidate for all Arrow/engine/ML extras.

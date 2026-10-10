@@ -308,6 +308,20 @@ A5 artifacts and receipts, and use the exact A6 package hashes for new validatio
 No output-model contract or scientific methodology changed.
 
 
+## 0.12.0a12 first use and environment diagnosis
+
+Two new experimental commands use existing public comparison/report APIs:
+`python -I -m equiframe doctor --extra arrow` checks local metadata;
+`python -I -m equiframe demo --role scientist --output NEW_DIRECTORY` runs a
+small synthetic preparation and saves reports before the gate. See
+[first use](first-use.md) for both roles and all three states. Dependency ranges,
+existing API signatures and persisted format versions are unchanged.
+
+Core and benchmark must both be A12. External consumers with an exact older
+core pin continue to require their identified older artifact; do not bypass
+dependency checks to force an upgrade. Reinstall the correct artifact in the
+selected interpreter if doctor reports code/metadata identity disagreement.
+
 ## 0.12.0a7 minimum-Polars expression composition
 
 The A5/A6 literal-name selector compiles to escaped regex expressions on admitted

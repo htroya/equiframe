@@ -12,7 +12,13 @@ Equivalencia no demuestra ausencia de sesgo, calidad del modelo o validez cient�
 Este script necesita el wheel privado identificado con el extra `[arrow]`.
 La [instalación vigente](installed-private.md) usa resolución normal y `pip check`;
 no requiere pandas, ML, benchmark ni otro orquestador. Las rutas A–H y el
-consumidor 0.1.9 amplían el ejercicio a motores nativos y datos permitidos.
+consumidores identificados por sus propios pins y recibos amplían el ejercicio
+a motores nativos y datos permitidos.
+
+Puedes empezar sin copiar código: [primer uso por perfil](first-use.md) explica
+`python -I -m equiframe doctor --extra arrow` y
+`python -I -m equiframe demo --role scientist --output prep-good`.
+El script siguiente permite integrar y modificar una preparación propia.
 
 ## Preparación pequeña, precisa e inspeccionable
 
