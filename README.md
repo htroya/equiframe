@@ -38,10 +38,14 @@ compara directamente ese resultado con el 25 % de cierre del corte histórico A9
 ## Install the private candidate
 
 Use the [private wheelhouse installation guide](packages/equiframe/docs/installed-private.md) with
-`equiframe[engines,ml]==0.12.0a12`, a fresh environment outside the checkout,
+`equiframe[arrow]==0.12.0a12`, a fresh environment outside the checkout,
 normal pip dependency resolution and the separately supplied artifact hashes.
 It includes Linux and PowerShell commands and a separate hash-locked trial.
 This is private installation by name, not publication in PyPI or TestPyPI.
+Choose `[duckdb]` for the architect's SQL exercise, `[arrow]` for the scientist's
+preparation, or `[engines]` for native migration across all three engines. Add
+`ml` only when using the optional detector fitting APIs. The
+[role first-use guide](packages/equiframe/docs/first-use.md) needs no ML package.
 The separate benchmark is `equiframe-benchmark[engines,ml,resources]==0.12.0a12`
 and requires exactly core `0.12.0a12`. The prior a6 package artifacts and
 observations remain historical; current receipts identify corrected minimum-Polars
