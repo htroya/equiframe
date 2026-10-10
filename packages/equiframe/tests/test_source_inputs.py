@@ -137,3 +137,26 @@ def test_sql_enforces_cumulative_rows(tmp_path):
         SQLiteInput(path, "SELECT * FROM values_table", spec(), batch_rows=1).load(
             context(tmp_path, max_input_rows=1)
         )
+
+
+def test_sql_reads_when_python_omits_extension_loading_api(tmp_path, monkeypatch):
+    path = tmp_path / "portable.db"
+    connect = sqlite3.connect
+    with connect(path) as db:
+        db.execute("CREATE TABLE input (id TEXT, amount TEXT)")
+        db.execute("INSERT INTO input VALUES ('001', '12.30')")
+
+    class WithoutExtensionLoading:
+        def __init__(self, connection):
+            self.connection = connection
+
+        def __getattr__(self, name):
+            if name == "enable_load_extension":
+                raise AttributeError(name)
+            return getattr(self.connection, name)
+
+    monkeypatch.setattr(
+        sqlite3, "connect", lambda *a, **kw: WithoutExtensionLoading(connect(*a, **kw))
+    )
+    loaded = SQLiteInput(path, "SELECT * FROM input", spec()).load(context(tmp_path))
+    assert loaded.table.to_pylist() == [{"id": "001", "amount": Decimal("12.30")}]

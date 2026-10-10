@@ -36,13 +36,23 @@ No arithmetic, rounding, default fill or NULL skipping occurs.
 
 ```python
 window = ef.Window(
-    node_id="history", source="events", partition_by=("account",),
+    node_id="history",
+    source="events",
+    partition_by=("account",),
     by=(ef.SortKey(column="sequence", direction="ascending", nulls="last"),),
     measures=(
-        ef.WindowMeasure(name="position", operation="row_number",
-                         logical_type=ef.IntegerType(bits=64, signed=True), unit="rows"),
-        ef.WindowMeasure(name="previous_amount", operation="lag", column="amount",
-                         logical_type=ef.DecimalType(precision=12, scale=2)),
+        ef.WindowMeasure(
+            name="position",
+            operation="row_number",
+            logical_type=ef.IntegerType(bits=64, signed=True),
+            unit="rows",
+        ),
+        ef.WindowMeasure(
+            name="previous_amount",
+            operation="lag",
+            column="amount",
+            logical_type=ef.DecimalType(precision=12, scale=2),
+        ),
     ),
 )
 ```

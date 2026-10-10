@@ -12,6 +12,13 @@ You can use it inside an existing pandas, Polars, Arrow or CI workflow without
 adopting its execution runner. Native execution, bounded declarative migration,
 operational verification and experimental anomaly detection are separate services.
 
+## Nuevas fuentes y ventanas
+
+El [recorrido de universalidad en cinco pasos](universalidad-cinco-pasos.md)
+ejecuta seis entradas bajo un contrato y tres motores nativos desde el wheel.
+Consulta [fuentes](universal-sources.md), [ventanas](migration-ir.md) y
+[extensiones](extending.md) para sus interfaces y límites.
+
 ## Release status
 
 This handbook describes the **private Alpha candidate 0.12.0a10**. The version string

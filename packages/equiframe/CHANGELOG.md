@@ -1,3 +1,22 @@
+## 0.12.0a11 — universalidad del producto en cinco pasos (2026-10-09)
+
+- Add experimental read-only parameterized SQLite and caller-owned API/stream
+  inputs reusing explicit typed ingestion and its retained original/conversion receipts.
+- Add native deterministic `Window` with row_number/lag/lead, partitions, declared
+  ordering and offsets in pandas, Polars and DuckDB; reject remaining ties and
+  incompatible types/units instead of silently selecting or casting.
+- Add explicit external-source composition, exact-schema Arrow record batches,
+  cumulative budgets, cleanup and cooperative SQLite progress interruption.
+- Ship a complete installed six-source/three-engine example with independent
+  literal expectations, discrepancies, integrity failures and explanatory reports.
+- Canonicalize only wheel ZIP creator metadata using a shipped build hook;
+  preserve payload/RECORD bytes and normalized modes for cross-host reconstruction.
+- Regenerate experimental IR-containing and detector-producer schemas and their
+  canonical registry hashes. Retain historical defaults, receipts and readers;
+  identify new detector evidence as A11 without changing scientific algorithms.
+- Keep new APIs experimental and distinguish cooperative final materialization
+  from hard memory limits. No Actions, paid resources or public publication.
+
 ## 0.12.0a10 — remediación del laboratorio de universalidad (2026-10-09)
 
 - Execute and close separate exact 72-case consumer matrices under normal Python

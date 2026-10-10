@@ -5,6 +5,14 @@
 
 ## Before changing a dependency or candidate
 
+A11 adds experimental source inputs and deterministic windows; see the
+[five-step guide](universalidad-cinco-pasos.md). Existing plans keep their node
+defaults. Consumers of the experimental IR/migration/workflow schemas should
+use the regenerated A11 schemas and rerun compilation/validation; older
+readers do not understand a new `window` kind. Detector producer identity is
+A11, and historical producer records remain readable. No historical expected
+output or receipt is rewritten. Core/benchmark versions are paired exactly.
+
 1. Keep the current wheel/sdist, trusted receipt, dependency pins/hashes and
    environment details. `0.11.1` alone cannot identify private candidate bytes
 2. Preserve contracts, their revisions, reviewed expected outputs and finalized

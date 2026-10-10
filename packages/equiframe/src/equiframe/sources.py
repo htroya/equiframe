@@ -222,7 +222,10 @@ class SQLiteInput:
 
         try:
             connection.set_progress_handler(progress, 1000)
-            connection.enable_load_extension(False)
+            # Some Python builds omit extension-loading support entirely.
+            # Fresh SQLite connections keep it disabled; never require that API.
+            if hasattr(connection, "enable_load_extension"):
+                connection.enable_load_extension(False)
             connection.execute("PRAGMA query_only = ON")
             connection.execute("BEGIN")
             cursor = connection.execute(self.query, self.parameters)

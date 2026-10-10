@@ -9,12 +9,16 @@ locate differences in values, types, keys, multiplicity and order. Use EquiFrame
 inside an existing pandas, Polars, Arrow or CI workflow, or use its separate
 native execution, verification and bounded migration APIs.
 
-**Status: private Alpha pair: core 0.12.0a10 / benchmark 0.12.0a10.** Identify artifacts by commit and
+**Status: private Alpha pair: core 0.12.0a11 / benchmark 0.12.0a11.** Identify artifacts by commit and
 wheel/sdist SHA-256, not the version string alone. The team's package is **not
 publicly released on PyPI**. License and name/ownership decisions remain pending.
 Public release requires STEP10, the global review and specific owner approval.
 A local install, passing test, prepared metadata or configured CI job does not
 close those gates. [Release process](packages/equiframe/docs/releasing.md).
+
+[Universalidad en cinco pasos](packages/equiframe/docs/universalidad-cinco-pasos.md)
+adds interchangeable typed inputs, native windows, explicit source extensions
+and a complete installed six-input/three-engine example.
 
 [Quick start](packages/equiframe/docs/quickstart.md) ·
 [Three installed recipes](packages/equiframe/docs/recipes.md) ·
