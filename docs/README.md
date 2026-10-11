@@ -47,7 +47,7 @@ en VM no equivale a su despliegue o aceptación.
 
 | Aspecto | Recibo y artefacto al que se aplica | Medición |
 |---|---|---|
-| Documentación de este repositorio | [Plan DOC-PRO-20-v1](DOCUMENTATION_PLAN_20261010.md), [resultado](DOCUMENTATION_RESULT_20261010.md) | Controles documentales; independiente de los siguientes índices |
+| Documentación de este repositorio | [Plan DOC-PRO-20-v1](DOCUMENTATION_PLAN_20261010.md), [resultado inicial](DOCUMENTATION_RESULT_20261010.md), [verificación vigente](DOCUMENTATION_RECHECK_20261010.md) | 18/20 = 90 %; lectura humana independiente y documentación pública pendientes |
 | Preparación de PyPI | [Plan PYPI-PREP-20-v1](PYPI_PREPARATION_PLAN_20261010.md), [resultado](PYPI_PREPARATION_RESULT_20261010.md) | 16/20 = 80 %; preparación manual, cuatro requisitos externos pendientes |
 | Calidad de paquete | [A13, PACKAGE-QUALITY-RP-20-v1](PACKAGE_QUALITY_RESULT_20261010.md) | 16/20 = 80 %; inspiración cualitativa de Real Python |
 | Pruebas por opción | [A13 en recibo de calidad](PACKAGE_QUALITY_RESULT_20261010.md), [recibo histórico A12](OPTION_TRACEABILITY_RESULT_20261010.md) | A13: 4.298/8.385 = 51,26 % de obligaciones, no cobertura de líneas |

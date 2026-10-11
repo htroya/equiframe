@@ -1,5 +1,5 @@
 {
-  "scope": "DOC-PRO-20-v1 current repository portal, contribution guide, architecture/API/integration and complete source handbook; dated evaluation reports excluded from navigation traversal",
+  "scope": "DOC-PRO-20-v1 current repository portal, contribution guide, architecture/API/integration and complete source handbook; explicitly listed assessment pages traversed for navigation only; other dated reports checked as link destinations without recursive traversal",
   "documents": [
     "README.md", "CONTRIBUTING.md", "docs/README.md",
     "packages/equiframe/README.md", "packages/equiframe-benchmark/README.md",
@@ -8,7 +8,8 @@
     "docs/DOCUMENTATION_MAINTENANCE.md", "docs/DOCUMENTATION_PLAN_20261010.md",
     "docs/DOCUMENTATION_RESULT_20261010.md",
     "docs/PYPI_PREPARATION_PLAN_20261010.md", "docs/PYPI_MANUAL_RELEASE.md",
-    "docs/PYPI_README_DRAFT.md", "docs/PYPI_PREPARATION_RESULT_20261010.md"
+    "docs/PYPI_README_DRAFT.md", "docs/PYPI_PREPARATION_RESULT_20261010.md",
+    "docs/DOCUMENTATION_RECHECK_20261010.md"
   ],
   "directories": ["packages/equiframe/docs"],
   "version_checks": [
@@ -21,6 +22,8 @@
     {"document": "packages/equiframe/docs/index.md", "metadata": "packages/equiframe/pyproject.toml", "pattern": "private Alpha candidate ([0-9.a-z]+)"},
     {"document": "README.md", "metadata": "packages/equiframe-benchmark/pyproject.toml", "pattern": " / benchmark ([0-9]+\\.[0-9]+\\.[0-9]+[a-z0-9]*)"},
     {"document": "packages/equiframe/README.md", "metadata": "packages/equiframe/pyproject.toml", "pattern": "^# EquiFrame ([0-9.a-z]+)"},
-    {"document": "packages/equiframe-benchmark/README.md", "metadata": "packages/equiframe-benchmark/pyproject.toml", "pattern": "^# EquiFrame Benchmark ([0-9.a-z]+)"}
+    {"document": "packages/equiframe-benchmark/README.md", "metadata": "packages/equiframe-benchmark/pyproject.toml", "pattern": "^# EquiFrame Benchmark ([0-9.a-z]+)"},
+    {"document": "docs/DOCUMENTATION_RECHECK_20261010.md", "metadata": "packages/equiframe/pyproject.toml", "pattern": "Candidato observado: `equiframe ([0-9.a-z]+)`"},
+    {"document": "docs/DOCUMENTATION_RECHECK_20261010.md", "metadata": "packages/equiframe-benchmark/pyproject.toml", "pattern": "y `equiframe-benchmark ([0-9.a-z]+)`"}
   ]
 }

@@ -51,8 +51,11 @@ The [scope manifest](../tools/documentation_scope.json) covers the root portal,
 current architecture/API/integration, contribution/assessment pages and the
 complete source handbook. The checker inventories physical UTF-8 bytes, local
 inline/reference links, heading anchors and explicit current-version statements.
-Links to dated reports must resolve; the historical reports themselves are not
-traversed or rewritten. HTTP/HTTPS/mailto targets are listed without fetching.
+Assessment pages explicitly named in the manifest are traversed for navigation
+only, including dated documentation and PyPI reports. Other historical reports
+are checked as link destinations without recursively traversing their contents.
+Navigation checks never revise historical results, hashes or approvals.
+HTTP/HTTPS/mailto targets are listed without fetching.
 This is a check of the declared Markdown syntax, not a general rendering engine:
 HTML hrefs, generated-site routing, remote availability and visual accessibility
 are outside its claims. Add targeted fixtures if new Markdown syntax is adopted.
