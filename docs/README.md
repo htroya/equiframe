@@ -45,6 +45,10 @@ en VM no equivale a su despliegue o aceptación.
 
 ## Informes y alcance de los porcentajes
 
+La [matriz de las nueve áreas](PROJECT_STATUS_MATRIX_20261010.md) reúne los
+resultados medidos y distingue madurez, tesis y seguridad sin evaluación vigente.
+Identifica el candidato de cada porcentaje; no calcula un promedio global.
+
 | Aspecto | Recibo y artefacto al que se aplica | Medición |
 |---|---|---|
 | Documentación de este repositorio | [Plan DOC-PRO-20-v1](DOCUMENTATION_PLAN_20261010.md), [resultado inicial](DOCUMENTATION_RESULT_20261010.md), [verificación vigente](DOCUMENTATION_RECHECK_20261010.md) | 18/20 = 90 %; lectura humana independiente y documentación pública pendientes |

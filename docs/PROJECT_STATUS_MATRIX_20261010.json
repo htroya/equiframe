@@ -1,0 +1,489 @@
+{
+  "schema": "equiframe.project-status-matrix.v1",
+  "status": "CONSOLIDATED_WITH_UNMEASURED_AREAS",
+  "assessment_date_local": "2026-10-10",
+  "timezone": "America/Guayaquil",
+  "recorded_at_utc": "2026-10-11T03:32:27.433783+00:00",
+  "assessed_checkout_base_commit": "3cc7c72fc7c0f76e810289f0e09514b1b0aad6ab",
+  "current_package_versions": {
+    "equiframe": "0.12.0a13",
+    "equiframe-benchmark": "0.12.0a13"
+  },
+  "scope": "Latest artifact-bound records and honest unmeasured areas; no new nine-area assessment",
+  "measured_areas": 6,
+  "unmeasured_current_areas": 3,
+  "overall_percentage": null,
+  "overall_percentage_reason": "Different rubrics, denominators, weights and candidate versions; three areas unmeasured. No aggregate metric has been defined.",
+  "metrics": [
+    {
+      "key": "usability",
+      "aspect": "Usabilidad para arquitecto/científico de datos",
+      "screenshot_percent_unverified": 80,
+      "status": "LATEST_RECORDED_MEASUREMENT",
+      "numerator": 11,
+      "denominator": 12,
+      "percent": 91.66666666666667,
+      "rounded_percent": 91.67,
+      "rubric": "USABILITY-U01-U12-20261007-preserved",
+      "assessed_candidate": "0.12.0a12",
+      "record_targets_current_a13": false,
+      "source": "docs/USABILITY_CURRENT_RESULT_20261010.json",
+      "source_sha256": "d8b51775c2746ce2f05b7e7cd43df036363c2954e2de47fd45df2ef6aeaa04a9",
+      "scope": "Technical criteria, not human satisfaction or adoption; A12 record is not transferred to A13",
+      "remaining": [
+        "U12"
+      ],
+      "new_area_assessment_executed": false,
+      "comparable_gain_from_screenshot": null,
+      "artifact_inventory": [
+        {
+          "file": "equiframe-0.12.0a12-py3-none-any.whl",
+          "bytes": 461339,
+          "sha256": "1d769926f3003686a0b728cebc6163c939e5b33f7278b86182877b816b8a3c88"
+        },
+        {
+          "file": "equiframe-0.12.0a12.tar.gz",
+          "bytes": 1180795,
+          "sha256": "225e83f8c0ce2dd90cd615c2b38c0f4e206d519eae570abfa578478235be5c2a"
+        },
+        {
+          "file": "equiframe_benchmark-0.12.0a12-py3-none-any.whl",
+          "bytes": 127143,
+          "sha256": "735a18025177d839a7097eb34a4f9665e7fe8dd26ac97310f134d1a9ea526503"
+        },
+        {
+          "file": "equiframe_benchmark-0.12.0a12.tar.gz",
+          "bytes": 437098,
+          "sha256": "971a182214738cb5a1de4954ba484e89b0de1712678e2edaa6626f450dfddfff"
+        },
+        {
+          "file": "equiframe_consumer_lab-0.1.14-py3-none-any.whl",
+          "bytes": 28254,
+          "sha256": "b996f64dce8ec80d7aaa21f3ef8e633cb6313a6ff4e67a12711b731cfcf52b58"
+        },
+        {
+          "file": "equiframe_consumer_lab-0.1.14.tar.gz",
+          "bytes": 28229,
+          "sha256": "01c52d6619f55b0b52ad77c1defc6ddbaec9a434931f537cefefc5bb13a99b5f"
+        }
+      ]
+    },
+    {
+      "key": "maturity",
+      "aspect": "Madurez",
+      "screenshot_percent_unverified": 80,
+      "status": "NOT_MEASURED_CURRENT",
+      "percent": null,
+      "numerator": null,
+      "denominator": null,
+      "assessed_candidate": null,
+      "sources": [
+        "docs/MATURITY_MATRIX.md",
+        "docs/MATURITY_REVIEW.md"
+      ],
+      "explanation": "Latest formal M01-M16 review is A8 on 2026-10-08, not a current A13 review. Later evidence must be assessed against each original criterion before assigning a current score.",
+      "missing_measurement_is_zero": false,
+      "historical_strict_plan_closure": {
+        "candidate": "0.12.0a8",
+        "candidate_commit": "c4f6a903f580f5e98d63db6e225e0a042221f4ec",
+        "assessment_date": "2026-10-08",
+        "numerator": 1,
+        "denominator": 16,
+        "percent": 6.25,
+        "criterion_counts": {
+          "CUMPLIDO": 1,
+          "PARCIAL": 9,
+          "BLOQUEADO": 6
+        },
+        "scope": "Strict closure of that historical plan; not A13 maturity or library functionality"
+      }
+    },
+    {
+      "key": "universality",
+      "aspect": "Universalidad",
+      "screenshot_percent_unverified": 55,
+      "status": "LATEST_RECORDED_MEASUREMENT",
+      "numerator": 48,
+      "denominator": 60,
+      "percent": 80.0,
+      "rounded_percent": 80.0,
+      "rubric": "UV-TECH-A11-60-v1",
+      "assessed_candidate": "0.12.0a11",
+      "record_targets_current_a13": false,
+      "source": "docs/UNIVERSALITY_80_RESULT_20261010.json",
+      "source_sha256": "c8456a492b8832ba350d81d01fffbeeb06bc1ad99cdababfe63d5f16485b0fad",
+      "scope": "Engineering progress on frozen A11 artifacts; not a thesis scientific metric or an A13 re-evaluation",
+      "remaining": [
+        "03.1",
+        "03.4",
+        "03.5",
+        "04.5",
+        "05.5",
+        "06.5",
+        "08.5",
+        "09.5",
+        "10.5",
+        "11.4",
+        "11.5",
+        "12.5"
+      ],
+      "new_area_assessment_executed": false,
+      "comparable_gain_from_screenshot": null,
+      "artifact_sha256": {
+        "equiframe-0.12.0a11-py3-none-any.whl": "11cbae825f3b2ac4f6e9a6378d589bbb6f74be37587a3c40a591b64a7496a15e",
+        "equiframe-0.12.0a11.tar.gz": "512ab8eb3e100f279aca4dfa2b6f65340817cf1c8ef620ccb9aa8b5a78c85831",
+        "equiframe_benchmark-0.12.0a11-py3-none-any.whl": "f77d06012e92ea3bc72a1ada4d02938827880622d7560501ba0a251e132fc2b3",
+        "equiframe_benchmark-0.12.0a11.tar.gz": "b775f5909c3122bb5313800ff49a22ab822b8bb922e55496289ae279ff903241"
+      },
+      "comparable_historical_progress_same_a11": {
+        "initial_passed": 41,
+        "current_passed": 48,
+        "denominator": 60,
+        "initial_percent": 68.33333333333333,
+        "current_percent": 80,
+        "percentage_point_gain": 11.666666666666666
+      }
+    },
+    {
+      "key": "pypi_preparation",
+      "aspect": "Preparación para publicar en PyPI",
+      "screenshot_percent_unverified": 60,
+      "status": "LATEST_RECORDED_MEASUREMENT",
+      "numerator": 16,
+      "denominator": 20,
+      "percent": 80.0,
+      "rounded_percent": 80.0,
+      "rubric": "PYPI-PREP-20-v1",
+      "assessed_candidate": "0.12.0a13",
+      "record_targets_current_a13": true,
+      "source": "docs/PYPI_PREPARATION_RESULT_20261010.json",
+      "source_sha256": "7da65e6f90904c42ff7a3ed4f6b078838cac566353a11a43c3423e6f0bc46159",
+      "scope": "Private artifact-pair preparation; public publication remains disabled",
+      "remaining": [
+        "P17",
+        "P18",
+        "P19",
+        "P20"
+      ],
+      "new_area_assessment_executed": false,
+      "comparable_gain_from_screenshot": null,
+      "artifact_inventory": [
+        {
+          "file": "equiframe-0.12.0a13-py3-none-any.whl",
+          "bytes": 461570,
+          "sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23"
+        },
+        {
+          "file": "equiframe-0.12.0a13.tar.gz",
+          "bytes": 1524480,
+          "sha256": "164b70270344343094dc0a688bf8dbfe20a27112f7227e2f7fe318f085b71935"
+        },
+        {
+          "file": "equiframe_benchmark-0.12.0a13-py3-none-any.whl",
+          "bytes": 127142,
+          "sha256": "fb843318d044a36a7ba4efab7d7d997d45798e12d16df7a9aa1b472b2c6359d8"
+        },
+        {
+          "file": "equiframe_benchmark-0.12.0a13.tar.gz",
+          "bytes": 434163,
+          "sha256": "4f8c47a00a8724b234e87c0a7147e193092122c77772e9169bd954744dd6e9c7"
+        }
+      ]
+    },
+    {
+      "key": "thesis",
+      "aspect": "Cumplimiento de la tesis",
+      "screenshot_percent_unverified": 40,
+      "status": "NOT_MEASURED_CURRENT",
+      "percent": null,
+      "numerator": null,
+      "denominator": null,
+      "assessed_candidate": null,
+      "sources": [
+        "docs/THESIS_TRACEABILITY.md"
+      ],
+      "explanation": "T01-T22 describe requirements and acceptance evidence, not 22 approved outcomes. Corpus, blind labels, frozen experiments, independent reproduction and academic approval are not inferred from technical tests or page count.",
+      "missing_measurement_is_zero": false
+    },
+    {
+      "key": "documentation",
+      "aspect": "Documentación profesional",
+      "screenshot_percent_unverified": 85,
+      "status": "LATEST_RECORDED_MEASUREMENT",
+      "numerator": 18,
+      "denominator": 20,
+      "percent": 90.0,
+      "rounded_percent": 90.0,
+      "rubric": "DOC-PRO-20-v1",
+      "assessed_candidate": "0.12.0a13",
+      "record_targets_current_a13": true,
+      "source": "docs/DOCUMENTATION_RECHECK_20261010.json",
+      "source_sha256": "24e6c43c5b6f3af78a29113f6d21a8ef9f432cf43aa4477d308ff1ff7a7f09e8",
+      "scope": "Repository documentation over A13; human independent reader and approved public documentation pending",
+      "remaining": [
+        "D19",
+        "D20"
+      ],
+      "new_area_assessment_executed": false,
+      "comparable_gain_from_screenshot": null,
+      "historical_example_binding": {
+        "examples": [
+          {
+            "id": "root-comparison",
+            "document": "README.md",
+            "code_sha256": "6ac2087fb7336ea2758ab33c2e52573a91a6fc7350620657d31a93ab8aa1fdcf",
+            "historical_attempts_verified": 2,
+            "current_code_matches": true
+          },
+          {
+            "id": "quickstart",
+            "document": "packages/equiframe/docs/quickstart.md",
+            "code_sha256": "79febc903940cca52c76bcb0876388fc84e5160d3bd36d552bbef3f052b6fa52",
+            "historical_attempts_verified": 2,
+            "current_code_matches": true
+          },
+          {
+            "id": "pipeline-three-states",
+            "document": "docs/DOCUMENTATION_WORKFLOW.md",
+            "code_sha256": "a29992f7abab0dc31ee5fffd735109116dcfcf25eed1eed4c0fc5da7cbc87304",
+            "historical_attempts_verified": 2,
+            "current_code_matches": true
+          },
+          {
+            "id": "installed-handbook",
+            "document": "packages/equiframe/docs/index.md",
+            "code_sha256": "a9deed567052cae3359aa2298d3813d4304118b5c1a18d5065bc8fd77b533a06",
+            "historical_attempts_verified": 2,
+            "current_code_matches": true
+          }
+        ],
+        "new_example_executions": 0,
+        "historical_pass_attempts_bound": 8,
+        "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+        "retained_wheel_verified": true,
+        "archive_sha256": "bc2a914e22d3c140e68cc36662d3c8d8f63cdc7342cf3539d8524acfb79e73e8",
+        "archive_crc_members_verified": 322,
+        "private_execution_receipt_sha256": "e7c46f771c8c93be7574a5cc94962f2c43e034c4c02ce9c7f903cf6efc554434",
+        "scope": "Current fence/registry/wheel byte identity against preserved installed execution receipts; not a fresh installation or execution replay."
+      }
+    },
+    {
+      "key": "security",
+      "aspect": "Preparación en seguridad",
+      "screenshot_percent_unverified": 50,
+      "status": "NOT_MEASURED_CURRENT",
+      "percent": null,
+      "numerator": null,
+      "denominator": null,
+      "assessed_candidate": null,
+      "sources": [
+        "SECURITY.md",
+        "packages/equiframe/docs/security.md"
+      ],
+      "explanation": "Source-security assessment remains explicitly incomplete. No applied numeric rubric establishes 50%; functional tests and artifact inventories do not complete a security audit.",
+      "missing_measurement_is_zero": false
+    },
+    {
+      "key": "option_traceability",
+      "aspect": "Pruebas con trazabilidad por opción",
+      "screenshot_percent_unverified": 5.16,
+      "status": "LATEST_RECORDED_MEASUREMENT",
+      "numerator": 4298,
+      "denominator": 8385,
+      "percent": 51.25819916517591,
+      "rounded_percent": 51.26,
+      "rubric": "Core option obligation inventory identified by SHA-256",
+      "assessed_candidate": "0.12.0a13",
+      "record_targets_current_a13": true,
+      "source": "docs/PACKAGE_QUALITY_RESULT_20261010.json",
+      "source_sha256": "a4a69cb8ea6956df9972b297f601529528079aeaff66e66b2646c02529737044",
+      "scope": "Core inventory only; metadata receipts do not prove native execution or interactions; expected rejections count; not line coverage or native-operation coverage",
+      "remaining": {
+        "not_run": 4087
+      },
+      "new_area_assessment_executed": false,
+      "comparable_gain_from_screenshot": null,
+      "record": {
+        "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+        "source_commit": "96769ad15d0807a501e6141725c8d4198d7715b0",
+        "catalog_sha256": "9eaa56aa71b803d901b07b56da0a89eb3cb610a44dc67a78513b553288ab59e1",
+        "obligation_ids_sha256": "22308238f613b50aefc0d5bb876e743443b3585c69f5f92d2ce9c22a5c2c3de1",
+        "total": 8385,
+        "verified": 4298,
+        "percent": 51.25819916517591,
+        "counts": {
+          "EXPECTED_REJECTION": 2555,
+          "NOT_RUN": 4087,
+          "PASS": 1743
+        },
+        "case_counts": {
+          "EXPECTED_REJECTION": 1777,
+          "PASS": 1668
+        },
+        "unique_cases": 3445,
+        "scope": "Core inventory only; metadata receipts do not prove native execution or interactions"
+      }
+    },
+    {
+      "key": "package_quality",
+      "aspect": "Calidad según criterios de Real Python",
+      "screenshot_percent_unverified": 45,
+      "status": "LATEST_RECORDED_MEASUREMENT",
+      "numerator": 16,
+      "denominator": 20,
+      "percent": 80.0,
+      "rounded_percent": 80.0,
+      "rubric": "PACKAGE-QUALITY-RP-20-v1",
+      "assessed_candidate": "0.12.0a13",
+      "record_targets_current_a13": true,
+      "source": "docs/PACKAGE_QUALITY_RESULT_20261010.json",
+      "source_sha256": "a4a69cb8ea6956df9972b297f601529528079aeaff66e66b2646c02529737044",
+      "scope": "Own rubric inspired by Real Python; not an official Real Python score or a security audit",
+      "remaining": [
+        "Q08",
+        "Q11",
+        "Q12",
+        "Q20"
+      ],
+      "new_area_assessment_executed": false,
+      "comparable_gain_from_screenshot": null,
+      "artifact_inventory": [
+        {
+          "file": "equiframe-0.12.0a13-py3-none-any.whl",
+          "bytes": 461570,
+          "sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23"
+        },
+        {
+          "file": "equiframe-0.12.0a13.tar.gz",
+          "bytes": 1524480,
+          "sha256": "164b70270344343094dc0a688bf8dbfe20a27112f7227e2f7fe318f085b71935"
+        },
+        {
+          "file": "equiframe_benchmark-0.12.0a13-py3-none-any.whl",
+          "bytes": 127142,
+          "sha256": "fb843318d044a36a7ba4efab7d7d997d45798e12d16df7a9aa1b472b2c6359d8"
+        },
+        {
+          "file": "equiframe_benchmark-0.12.0a13.tar.gz",
+          "bytes": 434163,
+          "sha256": "4f8c47a00a8724b234e87c0a7147e193092122c77772e9169bd954744dd6e9c7"
+        },
+        {
+          "file": "equiframe_consumer_lab-0.1.15-py3-none-any.whl",
+          "bytes": 28249,
+          "sha256": "be82d4f7422dc98bbfbd978746eca5051280b1935b1191cb6fb566c61337838e"
+        },
+        {
+          "file": "equiframe_consumer_lab-0.1.15.tar.gz",
+          "bytes": 28302,
+          "sha256": "ebecd34b85d9922bc015421842f64ff980329660f33b41af1a93e7408f087393"
+        }
+      ],
+      "source_url": "https://realpython.com/python-package-quality/",
+      "official_real_python_score": false
+    }
+  ],
+  "source_inventory": [
+    {
+      "path": "SECURITY.md",
+      "bytes": 1462,
+      "sha256": "03aac139ab9f542829c357ce6f0e6bd9cd8b2a7d0939c6b43158c9b6329fc7e2"
+    },
+    {
+      "path": "docs/DOCUMENTATION_RECHECK_20261010.json",
+      "bytes": 11629,
+      "sha256": "24e6c43c5b6f3af78a29113f6d21a8ef9f432cf43aa4477d308ff1ff7a7f09e8"
+    },
+    {
+      "path": "docs/MATURITY_MATRIX.md",
+      "bytes": 8121,
+      "sha256": "4a0907ecd644851a105235d3ca829773a45699bdaa2df2596966be1cdd545f1a"
+    },
+    {
+      "path": "docs/MATURITY_REVIEW.md",
+      "bytes": 12900,
+      "sha256": "3f30b98aa87a0d19bf027e2cc83d9cda15cb7d20a9ecfccf4e4aac5c81684460"
+    },
+    {
+      "path": "docs/PACKAGE_QUALITY_RESULT_20261010.json",
+      "bytes": 30721,
+      "sha256": "a4a69cb8ea6956df9972b297f601529528079aeaff66e66b2646c02529737044"
+    },
+    {
+      "path": "docs/PYPI_PREPARATION_RESULT_20261010.json",
+      "bytes": 20733,
+      "sha256": "7da65e6f90904c42ff7a3ed4f6b078838cac566353a11a43c3423e6f0bc46159"
+    },
+    {
+      "path": "docs/THESIS_TRACEABILITY.md",
+      "bytes": 33204,
+      "sha256": "f4f7b0e915add05be98a3c964d85234908973817a5a69de71b095acf93ffda55"
+    },
+    {
+      "path": "docs/UNIVERSALITY_80_RESULT_20261010.json",
+      "bytes": 39905,
+      "sha256": "c8456a492b8832ba350d81d01fffbeeb06bc1ad99cdababfe63d5f16485b0fad"
+    },
+    {
+      "path": "docs/USABILITY_CURRENT_RESULT_20261010.json",
+      "bytes": 36626,
+      "sha256": "d8b51775c2746ce2f05b7e7cd43df036363c2954e2de47fd45df2ef6aeaa04a9"
+    },
+    {
+      "path": "packages/equiframe-benchmark/pyproject.toml",
+      "bytes": 2141,
+      "sha256": "b3242845e495d1faf118106f98c7f3c5d729819cc038f86eb7f5b44a04eaf11b"
+    },
+    {
+      "path": "packages/equiframe/docs/security.md",
+      "bytes": 7732,
+      "sha256": "2d818a21f3125b299a9d0e6c2e9bb1de8c5aba7752bc8488ee11c7215fe3ab50"
+    },
+    {
+      "path": "packages/equiframe/pyproject.toml",
+      "bytes": 4508,
+      "sha256": "e3445b6d79b9b62df6ab3717761f18c9dac2982e5a40161fe4877e7a7578385a"
+    }
+  ],
+  "fresh_consolidation_checks": {
+    "arithmetic_and_criterion_counts": "PASS",
+    "traceability_mode_identity": "PASS",
+    "same_a13_artifacts_across_quality_pypi_documentation_traceability": "PASS",
+    "four_retained_original_a13_distributions_verified": "PASS",
+    "preexisting_source_identity_at_base_commit": "PASS",
+    "new_area_assessments": 0,
+    "documentation_navigation": {
+      "status": "PASS",
+      "check_date_local": "2026-10-10",
+      "document_count": 50,
+      "local_destinations_checked": 498,
+      "local_anchors_checked": 19,
+      "version_checks": 14,
+      "failures": 0,
+      "manifest_sha256": "1f9b12e675f85c2ce5d923abbc78d33c9cc1d460ee0aeddbcd2cc42f23582e32",
+      "receipt_sha256": "1ee8e11dab0ca74e2f8e97d9493e8735dc791967a6d0dffe1452c939ef04d8a2",
+      "limits": "Offline explicit scope; inline/reference Markdown links and ATX/setext heading IDs. No general renderer equivalence, HTML href audit, remote availability or human review."
+    },
+    "documentation_regressions": {
+      "status": "PASS",
+      "check_date_local": "2026-10-10",
+      "distinct_methods": 16,
+      "normal_attempts": 16,
+      "optimized_attempts": 16,
+      "failures": 0,
+      "normal_receipt_sha256": "edd4ed7f776285aca451d56ccc29b13c8ff7007300850880b10f2acb8940af21",
+      "optimized_receipt_sha256": "1d8ef1bcffd9d257b9895db3169764088928e3ed203fb154c8201c70d5402d51",
+      "tests_source_sha256": "367e9455319e42aa951c4a42fcbda462094dda35d9584187dc90a9bc753d9881",
+      "checked_files_unchanged_at_resume": true,
+      "scope": "Existing documentation tooling regressions; not new complete SDK/benchmark suites"
+    },
+    "arithmetic_receipt_sha256": "15ed53b7d3cf8535fa2ee3bc9051cf0363aed4d040a5f3132aa408bda390a8ae"
+  },
+  "github_actions_executed": false,
+  "new_paid_resources": false,
+  "vm_modified": false,
+  "public_publication_performed": false,
+  "sdk_benchmark_workflows_modified": false,
+  "delivery_resumed_date_local": "2026-10-11",
+  "consolidation_checked_at_resume_utc": "2026-10-11T15:14:33.977133+00:00"
+}
