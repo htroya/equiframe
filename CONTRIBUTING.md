@@ -73,6 +73,10 @@ remote job ran, and a push/PR does not automatically run the platform matrix.
 
 ## Review expectations
 
+For manual release preparation use the [PyPI runbook](docs/PYPI_MANUAL_RELEASE.md)
+and its offline four-artifact audit. A successful packet returns 3 because
+publication remains closed; no publishing credential or Actions job is used.
+
 For documentation changes, follow the [documentation maintenance policy](docs/DOCUMENTATION_MAINTENANCE.md)
 and run its manual navigation/example checks. The repository portal is distinct
 from the handbook carried by an already-built wheel; changing root guides does
