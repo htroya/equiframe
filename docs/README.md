@@ -45,24 +45,29 @@ en VM no equivale a su despliegue o aceptación.
 
 ## Informes y alcance de los porcentajes
 
-La [matriz de las nueve áreas](PROJECT_STATUS_MATRIX_20261010.md) reúne los
+La [matriz de las nueve áreas](PROJECT_STATUS_MATRIX_20261011.md) reúne los
 resultados medidos y distingue madurez, tesis y seguridad sin evaluación vigente.
 Identifica el candidato de cada porcentaje; no calcula un promedio global.
 
 El [plan hacia el 95 %](IMPLEMENTATION_95_PLAN_20261011.md) conserva las nueve
 rúbricas y sus dependencias. La [revisión de tesis](THESIS_CONTRIBUTIONS_REVIEW_20261011.md)
 documenta los aportes incorporados y la actualización preparatoria del Word.
-El [diagnóstico de seguridad](SECURITY_SCAN_BLOCKER_20261011.md) explica por qué
-el intento de análisis aún no acredita cobertura de código.
+El [seguimiento de seguridad](SECURITY_FOLLOWUP_20261011.md) identifica la
+auditoría de snapshot y sus límites; el [diagnóstico anterior](SECURITY_SCAN_BLOCKER_20261011.md)
+conserva el fallo histórico del launcher.
 El [resultado de implementación y validación](IMPLEMENTATION_95_RESULT_20261011.md)
 conserva los controles nuevos y las condiciones todavía abiertas.
+El [seguimiento técnico posterior](FOLLOWUP_95_RESULT_20261011.md) añade
+validación ARM64 3.10/3.12, [corpus y piloto SERCOP](SERCOP_PUBLIC_PILOT_20261011.md),
+[revisión IA «mi dot»](AUTOMATED_REVIEW_20261011.md) y
+[propuesta de licencia pendiente](LICENSE_PROPOSAL_20261011.md), sin cambiar el Word.
 
 | Aspecto | Recibo y artefacto al que se aplica | Medición |
 |---|---|---|
 | Documentación de este repositorio | [Plan DOC-PRO-20-v1](DOCUMENTATION_PLAN_20261010.md), [resultado inicial](DOCUMENTATION_RESULT_20261010.md), [verificación vigente](DOCUMENTATION_RECHECK_20261010.md) | 18/20 = 90 %; lectura humana independiente y documentación pública pendientes |
 | Preparación de PyPI | [Plan PYPI-PREP-20-v1](PYPI_PREPARATION_PLAN_20261010.md), [resultado](PYPI_PREPARATION_RESULT_20261010.md) | 16/20 = 80 %; preparación manual, cuatro requisitos externos pendientes |
 | Calidad de paquete | [A13, PACKAGE-QUALITY-RP-20-v1](PACKAGE_QUALITY_RESULT_20261010.md) | 16/20 = 80 %; inspiración cualitativa de Real Python |
-| Pruebas por opción | [A13 en recibo de calidad](PACKAGE_QUALITY_RESULT_20261010.md), [recibo histórico A12](OPTION_TRACEABILITY_RESULT_20261010.md) | A13: 4.298/8.385 = 51,26 % de obligaciones, no cobertura de líneas |
+| Pruebas por opción | [A13 incremental](OPTION_TRACE_INCREMENTAL_20261011.json), [A13 anterior](PACKAGE_QUALITY_RESULT_20261010.md), [recibo histórico A12](OPTION_TRACEABILITY_RESULT_20261010.md) | A13: 4.444/8.385 = 53,00 % de obligaciones, no cobertura de líneas |
 | Usabilidad técnica | [A12, U01–U12](USABILITY_CURRENT_RESULT_20261010.md) | 11/12 = 91,67 %; observación humana pendiente |
 | Universalidad técnica | [A11, UV-TECH-A11-60-v1](UNIVERSALITY_80_RESULT_20261010.md) | 48/60 = 80 %; no se traslada automáticamente a otro wheel |
 

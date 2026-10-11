@@ -4,16 +4,19 @@
 tarea, glosario, integración y controles manuales. Las guías empaquetadas y los
 informes históricos tienen alcances separados.
 
-[Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261010.md): las
+[Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261011.md): las
 nueve áreas, su última medición identificada y las evaluaciones aún pendientes.
 
 [Plan de cierre hacia el 95 %](docs/IMPLEMENTATION_95_PLAN_20261011.md):
 umbrales de las rúbricas originales, validación y dependencias externas.
 [Revisión de aportes de tesis](docs/THESIS_CONTRIBUTIONS_REVIEW_20261011.md)
-y [estado del intento de seguridad](docs/SECURITY_SCAN_BLOCKER_20261011.md).
+y [seguimiento de seguridad](docs/SECURITY_FOLLOWUP_20261011.md).
 La meta permanece pendiente de evidencia; no sustituye las mediciones anteriores.
 [Resultado de esta entrega](docs/IMPLEMENTATION_95_RESULT_20261011.md):
 pruebas nuevas, identidad de los paquetes y pendientes que impiden acreditar la meta.
+[Seguimiento técnico posterior](docs/FOLLOWUP_95_RESULT_20261011.md): corpus y
+piloto público SERCOP, segunda revisión IA, obligaciones adicionales y validación
+ARM64 3.10/3.12, conservando el Word.
 
 [Documentación profesional](docs/DOCUMENTATION_RESULT_20261010.md):
 **18/20 controles = 90 %** bajo DOC-PRO-20-v1, una rúbrica propia fijada antes
@@ -41,8 +44,9 @@ adopción externa, comunidad y licencia permanecen pendientes. Se comprobó el
 par privado en Windows y Linux ARM64; no se declara toda la matriz de OS/Python.
 El informe identifica artefactos, suites completas, fallos corregidos y límites.
 
-Trazabilidad del wheel A13, medida aparte: **4.298/8.385 = 51,26 %**,
-con 3.445 casos distintos y 0 FAIL en ejecución normal y optimizada.
+[Trazabilidad incremental del wheel A13](docs/OPTION_TRACE_INCREMENTAL_20261011.json):
+**4.444/8.385 = 53,00 %**, con 3.584 casos distintos entre el catálogo anterior
+y los casos nuevos. Las regresiones y repeticiones no añaden cobertura.
 Los recibos A11/A12 siguientes conservan sus artefactos históricos.
 
 [Pruebas con trazabilidad por opción del núcleo A12](docs/OPTION_TRACEABILITY_RESULT_20261010.md):

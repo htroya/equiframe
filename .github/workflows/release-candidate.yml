@@ -13,6 +13,16 @@ on:
         type: boolean
         required: true
         default: false
+      core_public_allowlist:
+        description: 'Repository path to the reviewed exact public name/version allowlist for core; required when run_advisories is true'
+        type: string
+        required: false
+        default: ''
+      benchmark_public_allowlist:
+        description: 'Repository path to the reviewed exact public name/version allowlist for benchmark; required when run_advisories is true'
+        type: string
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -71,13 +81,31 @@ jobs:
             --inventory packages/equiframe-benchmark/dist/dependencies/inventory.json
       - name: Query current dependency advisories (explicit networked check)
         if: inputs.run_advisories
+        env:
+          CORE_PUBLIC_ALLOWLIST: ${{ inputs.core_public_allowlist }}
+          BENCHMARK_PUBLIC_ALLOWLIST: ${{ inputs.benchmark_public_allowlist }}
         run: |
           PY=packages/equiframe/.venv/bin/python
           TOOL=packages/equiframe/tools/dependency_inventory.py
+          if [ -z "$CORE_PUBLIC_ALLOWLIST" ] || [ ! -f "$CORE_PUBLIC_ALLOWLIST" ] || \
+             [ -z "$BENCHMARK_PUBLIC_ALLOWLIST" ] || [ ! -f "$BENCHMARK_PUBLIC_ALLOWLIST" ]; then
+            echo 'Both reviewed public allowlist files are required before advisory queries.' >&2
+            exit 1
+          fi
+          "$PY" "$TOOL" prepare-scan --inventory packages/equiframe/dist/dependencies/inventory.json \
+            --public-allowlist "$CORE_PUBLIC_ALLOWLIST" \
+            --output packages/equiframe/dist/core-public-requests.json
+          "$PY" "$TOOL" prepare-scan --inventory packages/equiframe-benchmark/dist/dependencies/inventory.json \
+            --public-allowlist "$BENCHMARK_PUBLIC_ALLOWLIST" \
+            --output packages/equiframe-benchmark/dist/benchmark-public-requests.json
           status=0
           "$PY" "$TOOL" scan --inventory packages/equiframe/dist/dependencies/inventory.json \
+            --public-allowlist "$CORE_PUBLIC_ALLOWLIST" \
+            --request-plan packages/equiframe/dist/core-public-requests.json \
             --output packages/equiframe/dist/advisories || status=$?
           "$PY" "$TOOL" scan --inventory packages/equiframe-benchmark/dist/dependencies/inventory.json \
+            --public-allowlist "$BENCHMARK_PUBLIC_ALLOWLIST" \
+            --request-plan packages/equiframe-benchmark/dist/benchmark-public-requests.json \
             --output packages/equiframe-benchmark/dist/advisories || status=$?
           if [ "$status" -eq 0 ]; then
             "$PY" "$TOOL" verify --package packages/equiframe \

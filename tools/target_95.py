@@ -218,7 +218,7 @@ def main() -> int:
     try:
         matrix = args.matrix or args.root / "docs/PROJECT_STATUS_MATRIX_20261010.json"
         result = assess(args.root, matrix, args.target)
-        with args.output.open("x", encoding="utf-8") as stream:
+        with args.output.open("x", encoding="utf-8", newline="\n") as stream:
             json.dump(result, stream, ensure_ascii=False, indent=2, allow_nan=False)
             stream.write("\n")
     except (OSError, ValueError, KeyError, TypeError) as error:
