@@ -582,6 +582,29 @@ def main() -> None:
             path.write_bytes(data)
     if failures:
         parser.exit(1, "Assets differ: " + ", ".join(failures) + "\n")
+    if args.check:
+        # Current experimental schemas can change with a reviewed producer
+        # release. Their explicit inventory must change in the same patch;
+        # never automatically bless a new shape or rewrite historical evidence.
+        from equiframe._stability_inventory import SCHEMA_INVENTORY
+
+        generated = {
+            path.name: hashlib.sha256(
+                json.dumps(
+                    json.loads(data), ensure_ascii=False, sort_keys=True, separators=(",", ":")
+                ).encode()
+            ).hexdigest()
+            for path, data in assets.items()
+            if path.parent == ROOT / "schemas"
+        }
+        declared = {name: digest for name, _, digest in SCHEMA_INVENTORY}
+        changed = sorted(
+            name
+            for name in generated.keys() | declared.keys()
+            if generated.get(name) != declared.get(name)
+        )
+        if changed:
+            parser.exit(1, "Schema inventory differs: " + ", ".join(changed) + "\n")
     print("Checked" if args.check else "Generated", len(assets), "synthetic fixtures/schemas")
 
 
