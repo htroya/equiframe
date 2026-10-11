@@ -256,23 +256,34 @@ def assert_descendant_stopped(pid, created):
     pytest.fail("observed descendant survived supervisor cleanup")
 
 
-def test_descendant_workload_is_rejected_and_observed_child_stopped(tmp_path):
+def test_descendant_workload_is_rejected_and_observed_child_stopped(tmp_path, monkeypatch):
+    identities = []
+    cleanup = scale_process._kill_observed_descendants
+
+    def capture_before_cleanup(measurements):
+        # Detection can stop the worker before it writes a child-identity file.
+        # Observe each owned OS identity before real cleanup, without postponing
+        # detection or changing the supervisor's termination behavior.
+        identities.extend((child.pid, child.create_time()) for child in measurements.descendants)
+        cleanup(measurements)
+
+    monkeypatch.setattr(scale_process, "_kill_observed_descendants", capture_before_cleanup)
     observed = run_child(
         tmp_path,
-        "import json, os, psutil, subprocess, sys, time; from pathlib import Path; "
+        "import os, subprocess, sys, time; from pathlib import Path; "
         "Path('worker.pid').write_text(str(os.getpid())); "
         "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(2)']); "
-        "Path('descendant.json').write_text(json.dumps("
-        "[child.pid, psutil.Process(child.pid).create_time()])); time.sleep(2)",
+        "time.sleep(2)",
         sample_interval_seconds=0.1,
     )
     assert_reaped(observed)
     assert observed.termination_reason == "unsupported_descendant"
     assert observed.pid == int((tmp_path / "worker.pid").read_text())
     assert observed.observed_descendant_pids
-    identity = json.loads((tmp_path / "descendant.json").read_text())
-    assert identity[0] in observed.observed_descendant_pids
-    assert_descendant_stopped(*identity)
+    assert identities
+    assert {pid for pid, _ in identities} == set(observed.observed_descendant_pids)
+    for identity in identities:
+        assert_descendant_stopped(*identity)
 
 
 @pytest.mark.skipif(

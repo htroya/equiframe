@@ -1,5 +1,9 @@
 ## 0.12.0a13 — package quality and producer identity (2026-10-10)
 
+- Remove a process-test race by capturing OS descendant identities before real
+  cleanup instead of requiring the terminated worker to finish writing a file.
+  Check every captured descendant stops; supervisor behavior remains unchanged.
+
 - Correct detector producer identity: new evidence identifies A13 instead of
   retaining A11 when executed from A12. Preserve explicit historical producer
   records and admit A12/A13 without changing `equiframe-if-mad-1.0`, R/M/B/H/O,
