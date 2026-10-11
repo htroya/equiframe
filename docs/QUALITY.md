@@ -1,6 +1,13 @@
 # Calidad, pruebas y operación
 
-Requisitos de desarrollo y verificación. Estado actual 2026-10-03: CI manual `workflow_dispatch`, matriz de plataformas opcional y candidato 0.11.0 validado localmente en Windows x64/Python 3.12.4. No se ejecutaron jobs remotos nuevos ni se cambió cuota/facturación. Los pasos 1 y 2 incorporaron pruebas de contratos, serialización, propiedades, tiempo y CLI; sus descripciones de CI abajo son históricas. [Comandos del paquete](../packages/equiframe/README.md). Las áreas de pasos posteriores de la matriz siguen siendo requisitos pendientes, no controles ya implementados.
+Evaluación manual 2026-10-10 del par privado `0.12.0a13`:
+[16/20 controles = 80 % en la rúbrica propia inspirada en Real Python](PACKAGE_QUALITY_RESULT_20261010.md).
+El [resultado estructurado](PACKAGE_QUALITY_RESULT_20261010.json) identifica wheels,
+sdists, entornos Windows/Python 3.12.4 y Linux ARM64/Python 3.10.12, suites completas,
+omisiones y fallos conservados. La publicación pública, adopción externa, comunidad
+y licencia siguen pendientes. No se ejecutó Actions ni se crearon recursos de pago.
+
+Requisitos de desarrollo y verificación. Corte histórico 2026-10-03: CI manual `workflow_dispatch`, matriz de plataformas opcional y candidato 0.11.0 validado localmente en Windows x64/Python 3.12.4. No se ejecutaron jobs remotos nuevos ni se cambió cuota/facturación. Los pasos 1 y 2 incorporaron pruebas de contratos, serialización, propiedades, tiempo y CLI; sus descripciones de CI abajo son históricas. [Comandos del paquete](../packages/equiframe/README.md). Las áreas de pasos posteriores de la matriz siguen siendo requisitos pendientes, no controles ya implementados.
 
 ## 1. Contrato de entrega por incremento
 

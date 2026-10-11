@@ -2,6 +2,17 @@
 
 [Primer uso por perfil / First use](packages/equiframe/docs/first-use.md)
 
+[Calidad verificable de paquete A13](docs/PACKAGE_QUALITY_RESULT_20261010.md):
+**16/20 controles = 80 %**, con la rúbrica propia PACKAGE-QUALITY-RP-20-v1,
+inspirada en Real Python. El artículo no define una nota oficial. Publicación,
+adopción externa, comunidad y licencia permanecen pendientes. Se comprobó el
+par privado en Windows y Linux ARM64; no se declara toda la matriz de OS/Python.
+El informe identifica artefactos, suites completas, fallos corregidos y límites.
+
+Trazabilidad del wheel A13, medida aparte: **4.298/8.385 = 51,26 %**,
+con 3.445 casos distintos y 0 FAIL en ejecución normal y optimizada.
+Los recibos A11/A12 siguientes conservan sus artefactos históricos.
+
 [Pruebas con trazabilidad por opción del núcleo A12](docs/OPTION_TRACEABILITY_RESULT_20261010.md):
 4.296/8.383 obligaciones (51,25 %), con 3.443 casos sintéticos distintos.
 Este porcentaje identifica el wheel A12; no se atribuye automáticamente a A13.
