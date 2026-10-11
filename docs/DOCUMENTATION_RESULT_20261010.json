@@ -1,0 +1,357 @@
+{
+  "rubric": "DOC-PRO-20-v1",
+  "basis": "Own fixed equal-weight engineering documentation criteria; not an external certification",
+  "date": "2026-10-10",
+  "baseline_commit": "cc6b168a9e6c0fd0c48fe1d4d6e037b0b2b24069",
+  "implementation_commit": "3a10ac4238555bb8acaf9f201dd80fb2034b7fcb",
+  "receipt_followup": "Documentation/result and version-pattern-only correction after implementation commit",
+  "denominator": 20,
+  "initial_pass": 12,
+  "initial_percentage": 60,
+  "final_pass": 18,
+  "percentage": 90,
+  "blocked": [
+    "D19",
+    "D20"
+  ],
+  "criteria": [
+    {
+      "id": "D01",
+      "definition": "Entrada única que distingue uso, desarrollo, investigación e informes históricos",
+      "initial": "GAP",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "README tiene enlaces dispersos; falta índice de `docs/`"
+    },
+    {
+      "id": "D02",
+      "definition": "Rutas de lectura para arquitecto y científico",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`packages/equiframe/docs/first-use.md`, `arquitecto.md`, `cientifico.md`"
+    },
+    {
+      "id": "D03",
+      "definition": "Encabezados actuales de README, arquitectura y API coinciden con metadatos del par",
+      "initial": "GAP",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "API anuncia A7 y `__version__` A12; arquitectura mezcla estados actuales A13/A7"
+    },
+    {
+      "id": "D04",
+      "definition": "Instalación privada Windows/POSIX, extras y comprobación de identidad",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`installed-private.md`, `quickstart.md`, `dependencies.md`"
+    },
+    {
+      "id": "D05",
+      "definition": "Primer uso sintético completo con resultados esperados",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`first-use.md`, `quickstart.md`, `recipes.md`"
+    },
+    {
+      "id": "D06",
+      "definition": "Referencia de API y criterios para elegir servicio",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`api.md`, `choosing-api.md`, README"
+    },
+    {
+      "id": "D07",
+      "definition": "CLI con códigos de salida y rechazo explícito",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`api.md`, `first-use.md`, README del benchmark"
+    },
+    {
+      "id": "D08",
+      "definition": "Semántica de tipos, claves, multiplicidad, ausencias y estados",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`semantics.md`, `outcome-gates.md`, `API_CONTRACTS.md`"
+    },
+    {
+      "id": "D09",
+      "definition": "Interfaces de extensión y ejemplo con límites y propiedad de recursos",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`extending.md`, `sqlite-snapshots.md`, `universal-sources.md`"
+    },
+    {
+      "id": "D10",
+      "definition": "Separación de benchmark, controles técnicos y evidencia científica",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "README del benchmark, `THESIS_TRACEABILITY.md`"
+    },
+    {
+      "id": "D11",
+      "definition": "Diagnóstico y recuperación de fallos sin ocultar diferencias",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`upgrading.md`, `maintenance.md`, `first-use.md`"
+    },
+    {
+      "id": "D12",
+      "definition": "Glosario bilingüe con referencias canónicas",
+      "initial": "GAP",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "Conceptos repartidos, sin glosario enlazado"
+    },
+    {
+      "id": "D13",
+      "definition": "Contribución con comandos concretos, revisión y propiedad",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`CONTRIBUTING.md`, `contributing.md`, `TEAM_INTEGRATION.md`"
+    },
+    {
+      "id": "D14",
+      "definition": "Compatibilidad, cambios y recuperación por artefacto",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`compatibility.md`, `upgrading.md`, `releasing.md`, changelogs"
+    },
+    {
+      "id": "D15",
+      "definition": "Integración distingue par actual, componentes implementados y entregas pendientes",
+      "initial": "GAP",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`TEAM_INTEGRATION.md` presenta A7 como estado actual"
+    },
+    {
+      "id": "D16",
+      "definition": "Privacidad, seguridad, límites de confianza y recursos explicados",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`security.md`, `performance.md`, `OFFLINE_WHEEL_AUDIT.md`"
+    },
+    {
+      "id": "D17",
+      "definition": "Control manual repetible de archivos y anclas Markdown, con inventario y límites",
+      "initial": "GAP",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "Auditor del wheel comprueba archivos; excluye anclas y documentación raíz"
+    },
+    {
+      "id": "D18",
+      "definition": "Ejemplos extraídos del texto actual ejecutados contra wheel identificado, normal y `-O`",
+      "initial": "GAP",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "Hay pruebas de scripts/CLI; falta registro que vincule bloques exactos del texto a ejecuciones"
+    },
+    {
+      "id": "D19",
+      "definition": "Un lector humano distinto del autor completa la guía y registra dificultades",
+      "initial": "BLOCKED",
+      "status": "BLOCKED",
+      "weight": 5,
+      "initial_evidence": "`adoption.md`: no hay observación humana verificable"
+    },
+    {
+      "id": "D20",
+      "definition": "Documentación pública de esta distribución accesible con derechos aprobados",
+      "initial": "BLOCKED",
+      "status": "BLOCKED",
+      "weight": 5,
+      "initial_evidence": "Repositorio privado; licencia y publicación pendientes de titulares"
+    }
+  ],
+  "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+  "identity": {
+    "python": "3.12.4 | packaged by Anaconda, Inc. | (main, Jun 18 2024, 15:03:56) [MSC v.1929 64 bit (AMD64)]",
+    "utf8_mode": 1,
+    "sdk": "0.12.0a13",
+    "arrow": "25.0.1",
+    "payload_members": 127
+  },
+  "unique_examples": 4,
+  "attempt_count": 8,
+  "attempts": [
+    {
+      "id": "root-comparison",
+      "document": "README.md",
+      "python_fence": 1,
+      "optimized": false,
+      "code_sha256": "6ac2087fb7336ea2758ab33c2e52573a91a6fc7350620657d31a93ab8aa1fdcf",
+      "status": "PASS",
+      "exit_code": 0,
+      "missing_markers": [],
+      "stdout_sha256": "6fda9cc8121516253943b5d03c7acaf9f2cd726b7b49948456c3f341e28d4643",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "root-comparison",
+      "document": "README.md",
+      "python_fence": 1,
+      "optimized": true,
+      "code_sha256": "6ac2087fb7336ea2758ab33c2e52573a91a6fc7350620657d31a93ab8aa1fdcf",
+      "status": "PASS",
+      "exit_code": 0,
+      "missing_markers": [],
+      "stdout_sha256": "6fda9cc8121516253943b5d03c7acaf9f2cd726b7b49948456c3f341e28d4643",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "quickstart",
+      "document": "packages/equiframe/docs/quickstart.md",
+      "python_fence": 1,
+      "optimized": false,
+      "code_sha256": "79febc903940cca52c76bcb0876388fc84e5160d3bd36d552bbef3f052b6fa52",
+      "status": "PASS",
+      "exit_code": 0,
+      "missing_markers": [],
+      "stdout_sha256": "06a5ebadd29f35233d6ecbf0f7725f8db19f34a69f2ed67953aee7c0c2f58bf8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "quickstart",
+      "document": "packages/equiframe/docs/quickstart.md",
+      "python_fence": 1,
+      "optimized": true,
+      "code_sha256": "79febc903940cca52c76bcb0876388fc84e5160d3bd36d552bbef3f052b6fa52",
+      "status": "PASS",
+      "exit_code": 0,
+      "missing_markers": [],
+      "stdout_sha256": "06a5ebadd29f35233d6ecbf0f7725f8db19f34a69f2ed67953aee7c0c2f58bf8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pipeline-three-states",
+      "document": "docs/DOCUMENTATION_WORKFLOW.md",
+      "python_fence": 1,
+      "optimized": false,
+      "code_sha256": "a29992f7abab0dc31ee5fffd735109116dcfcf25eed1eed4c0fc5da7cbc87304",
+      "status": "PASS",
+      "exit_code": 0,
+      "missing_markers": [],
+      "stdout_sha256": "7f01fd16cc107fc5323e9cf819038388831104bf3778949e0f79d920826c1d0a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pipeline-three-states",
+      "document": "docs/DOCUMENTATION_WORKFLOW.md",
+      "python_fence": 1,
+      "optimized": true,
+      "code_sha256": "a29992f7abab0dc31ee5fffd735109116dcfcf25eed1eed4c0fc5da7cbc87304",
+      "status": "PASS",
+      "exit_code": 0,
+      "missing_markers": [],
+      "stdout_sha256": "7f01fd16cc107fc5323e9cf819038388831104bf3778949e0f79d920826c1d0a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "installed-handbook",
+      "document": "packages/equiframe/docs/index.md",
+      "python_fence": 1,
+      "optimized": false,
+      "code_sha256": "a9deed567052cae3359aa2298d3813d4304118b5c1a18d5065bc8fd77b533a06",
+      "status": "PASS",
+      "exit_code": 0,
+      "missing_markers": [],
+      "stdout_sha256": "bcf08c538f318da46eabba4a4eceb2bcc91fd68a3cfd29a60d86f9e375829649",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "installed-handbook",
+      "document": "packages/equiframe/docs/index.md",
+      "python_fence": 1,
+      "optimized": true,
+      "code_sha256": "a9deed567052cae3359aa2298d3813d4304118b5c1a18d5065bc8fd77b533a06",
+      "status": "PASS",
+      "exit_code": 0,
+      "missing_markers": [],
+      "stdout_sha256": "bcf08c538f318da46eabba4a4eceb2bcc91fd68a3cfd29a60d86f9e375829649",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "initial_attempt_statuses": {
+    "PASS": 4,
+    "FAIL": 4
+  },
+  "registry_sha256": "46ad5f17592241e40643d8e8ddceb550ae9dc801ab321bd916cdd664fdfdc917",
+  "plan_sha256": "c2682aeed6d29dcb6afa3fc333835297d2cac6ad824da289b2a1cf68d8c22e43",
+  "private_example_receipt_sha256": "e7c46f771c8c93be7574a5cc94962f2c43e034c4c02ce9c7f903cf6efc554434",
+  "unique_documentation_tests": 16,
+  "test_modes": [
+    "normal",
+    "optimized"
+  ],
+  "checks": [
+    {
+      "name": "tests-normal",
+      "status": "PASS",
+      "exit_code": 0,
+      "output_sha256": "d192024f210118692e16e11dab66076ef741674284d6073f8f5f4d819f0dd9a3"
+    },
+    {
+      "name": "tests-optimized",
+      "status": "PASS",
+      "exit_code": 0,
+      "output_sha256": "eaf558283446577e4213b52f020cbc14363951ab520e0eee92fc4ca8de50542f"
+    },
+    {
+      "name": "ruff",
+      "status": "PASS",
+      "exit_code": 0,
+      "output_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "exit_code": 0,
+      "output_sha256": "eee76f865de5a9f2456950f710ae5d5f9b5bd0ea02aa54f614c5eed6642a0bfd"
+    },
+    {
+      "name": "pip-check",
+      "status": "PASS",
+      "exit_code": 0,
+      "output_sha256": "9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09"
+    },
+    {
+      "name": "diff-check",
+      "status": "PASS",
+      "exit_code": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "packages_changed": false,
+  "navigation": {
+    "status": "PASS",
+    "document_count": 44,
+    "local_destinations_checked": 449,
+    "local_anchors_checked": 19,
+    "current_version_checks": 10,
+    "failures": 0,
+    "remote_targets_not_fetched": 12,
+    "scope_manifest_sha256": "48f164fe5167060da81c5c39084e0c507641ac076199017c4f51325b7f420279",
+    "private_receipt_sha256": "665b3b2c0024d1f4507fe1bf463cb307a10bf7ea33159afdc35e354678d02d2e"
+  },
+  "limits": [
+    "Only declared current Markdown scope and four registered Python fences",
+    "Remote targets not fetched; no full renderer/HTML href/visual accessibility audit",
+    "Windows Python 3.12.4 observed; no new VM or other platform acceptance",
+    "No human reader study; no approved public documentation rights/channel",
+    "No runtime/package/algorithm/dependency/schema/golden changes or new full-suite claim",
+    "Prior percentages and identified artifact receipts retained independently"
+  ]
+}
