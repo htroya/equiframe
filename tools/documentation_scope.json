@@ -6,7 +6,9 @@
     "docs/ARCHITECTURE.md", "docs/API_CONTRACTS.md", "docs/TEAM_INTEGRATION.md",
     "docs/DOCUMENTATION_GLOSSARY.md", "docs/DOCUMENTATION_WORKFLOW.md",
     "docs/DOCUMENTATION_MAINTENANCE.md", "docs/DOCUMENTATION_PLAN_20261010.md",
-    "docs/DOCUMENTATION_RESULT_20261010.md"
+    "docs/DOCUMENTATION_RESULT_20261010.md",
+    "docs/PYPI_PREPARATION_PLAN_20261010.md", "docs/PYPI_MANUAL_RELEASE.md",
+    "docs/PYPI_README_DRAFT.md", "docs/PYPI_PREPARATION_RESULT_20261010.md"
   ],
   "directories": ["packages/equiframe/docs"],
   "version_checks": [

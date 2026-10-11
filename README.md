@@ -13,6 +13,12 @@ pendientes. No equivale al 85 % histórico sin una fórmula identificada.
 
 [Primer uso por perfil / First use](packages/equiframe/docs/first-use.md)
 
+[Preparación manual de PyPI](docs/PYPI_PREPARATION_RESULT_20261010.md):
+**16/20 controles = 80 %** bajo PYPI-PREP-20-v1. Se auditó el par privado A13
+y se probó el procedimiento local. Licencia, cuentas/roles, documentación
+pública y ensayo real en TestPyPI siguen pendientes. El indicador no autoriza
+publicación; la guía identifica los pasos restantes para el 90 % solicitado.
+
 [Calidad verificable de paquete A13](docs/PACKAGE_QUALITY_RESULT_20261010.md):
 **16/20 controles = 80 %**, con la rúbrica propia PACKAGE-QUALITY-RP-20-v1,
 inspirada en Real Python. El artículo no define una nota oficial. Publicación,
