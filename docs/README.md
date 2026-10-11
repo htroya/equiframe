@@ -45,9 +45,14 @@ en VM no equivale a su despliegue o aceptación.
 
 ## Informes y alcance de los porcentajes
 
-La [matriz de las nueve áreas](PROJECT_STATUS_MATRIX_20261011_VM.md) reúne los
+La [matriz de las nueve áreas](PROJECT_STATUS_MATRIX_20261011_RECALCULATED.md) reúne los
 resultados medidos e incorpora las nuevas evaluaciones de madurez, tesis y seguridad.
 Identifica el candidato de cada porcentaje; no calcula un promedio global.
+
+La [ampliación declarativa](OPTION_DECLARATIVE_FOLLOWUP_20261011.md) añade 270
+obligaciones con esperados completos y ejecución normal/optimizada: trazabilidad
+69,00 %, con 922 obligaciones pendientes para el 80 %. Las mediciones previas
+y las versiones históricas permanecen identificadas.
 
 El [plan de las metas revisadas](IMPLEMENTATION_PLAN_TARGETS_20261011.md) conserva
 las rúbricas y sus dependencias; el [plan inicial del 95 %](IMPLEMENTATION_95_PLAN_20261011.md)

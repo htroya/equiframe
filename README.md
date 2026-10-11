@@ -4,8 +4,12 @@
 tarea, glosario, integración y controles manuales. Las guías empaquetadas y los
 informes históricos tienen alcances separados.
 
-[Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261011_VM.md): las
+[Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261011_RECALCULATED.md): las
 nueve áreas, su última medición identificada y las evaluaciones aún pendientes.
+
+[Ampliación declarativa comprobada](docs/OPTION_DECLARATIVE_FOLLOWUP_20261011.md):
+270 obligaciones adicionales; trazabilidad **5.786/8.385 = 69,00 %**,
+con 922 pendientes para el 80 %. Las otras ocho cifras conservan sus mediciones.
 
 [Plan de las metas revisadas](docs/IMPLEMENTATION_PLAN_TARGETS_20261011.md):
 umbrales de las rúbricas originales, validación y dependencias externas.
