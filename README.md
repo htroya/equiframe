@@ -4,6 +4,9 @@
 tarea, glosario, integración y controles manuales. Las guías empaquetadas y los
 informes históricos tienen alcances separados.
 
+[Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261010.md): las
+nueve áreas, su última medición identificada y las evaluaciones aún pendientes.
+
 [Documentación profesional](docs/DOCUMENTATION_RESULT_20261010.md):
 **18/20 controles = 90 %** bajo DOC-PRO-20-v1, una rúbrica propia fijada antes
 de los cambios. Incluye navegación manual comprobada y cuatro bloques de código

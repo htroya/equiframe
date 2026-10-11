@@ -9,7 +9,8 @@
     "docs/DOCUMENTATION_RESULT_20261010.md",
     "docs/PYPI_PREPARATION_PLAN_20261010.md", "docs/PYPI_MANUAL_RELEASE.md",
     "docs/PYPI_README_DRAFT.md", "docs/PYPI_PREPARATION_RESULT_20261010.md",
-    "docs/DOCUMENTATION_RECHECK_20261010.md"
+    "docs/DOCUMENTATION_RECHECK_20261010.md",
+    "docs/PROJECT_STATUS_MATRIX_20261010.md"
   ],
   "directories": ["packages/equiframe/docs"],
   "version_checks": [
@@ -24,6 +25,8 @@
     {"document": "packages/equiframe/README.md", "metadata": "packages/equiframe/pyproject.toml", "pattern": "^# EquiFrame ([0-9.a-z]+)"},
     {"document": "packages/equiframe-benchmark/README.md", "metadata": "packages/equiframe-benchmark/pyproject.toml", "pattern": "^# EquiFrame Benchmark ([0-9.a-z]+)"},
     {"document": "docs/DOCUMENTATION_RECHECK_20261010.md", "metadata": "packages/equiframe/pyproject.toml", "pattern": "Candidato observado: `equiframe ([0-9.a-z]+)`"},
-    {"document": "docs/DOCUMENTATION_RECHECK_20261010.md", "metadata": "packages/equiframe-benchmark/pyproject.toml", "pattern": "y `equiframe-benchmark ([0-9.a-z]+)`"}
+    {"document": "docs/DOCUMENTATION_RECHECK_20261010.md", "metadata": "packages/equiframe-benchmark/pyproject.toml", "pattern": "y `equiframe-benchmark ([0-9.a-z]+)`"},
+    {"document": "docs/PROJECT_STATUS_MATRIX_20261010.md", "metadata": "packages/equiframe/pyproject.toml", "pattern": "Versión actual: `equiframe ([0-9.a-z]+)`"},
+    {"document": "docs/PROJECT_STATUS_MATRIX_20261010.md", "metadata": "packages/equiframe-benchmark/pyproject.toml", "pattern": "y `equiframe-benchmark ([0-9.a-z]+)`"}
   ]
 }
