@@ -17,10 +17,11 @@ spec = importlib.util.spec_from_file_location(
 )
 m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
-binding = m.runtime_binding(json.loads(a.manifest.read_text()))
+manifest = json.loads(a.manifest.read_text())
+binding = m.runtime_binding(manifest)
 import equiframe_benchmark as eb
 
-if eb.__version__ != "0.12.0a11":
+if eb.__version__ != manifest["version"]:
     raise ValueError("Wrong benchmark candidate")
 if any(name in sys.modules for name in m.OPTIONAL):
     raise ValueError("Eager optional import")

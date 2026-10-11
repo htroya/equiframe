@@ -1,12 +1,12 @@
-# Validación manual de perfiles A11
+# Validación manual de perfiles identificados
 
 `validate_profiles.py` comprueba instalaciones aisladas del núcleo y benchmark
-`0.12.0a11`, ocho perfiles del núcleo y cinco del benchmark. Usa los wheels
+de la versión declarada, ocho perfiles del núcleo y cinco del benchmark. Usa los wheels
 privados y los ejemplos/probe del sdist correspondiente. No modifica el núcleo,
 activa Actions, publica paquetes ni crea infraestructura.
 
 El controlador necesita Python 3.10–3.13 y `uv` ya instalado. Se deben entregar
-un intérprete explícito, los dos wheels A11, fuentes extraídas de ambos sdists,
+un intérprete explícito, los dos wheels del candidato, fuentes extraídas de ambos sdists,
 una caché de uv y un archivo de versiones públicas fijadas. `--output` debe
 ser una carpeta nueva fuera del checkout. No emplear un venv con el paquete
 editable ni copiar resultados históricos. Los paquetes opcionales se instalan
@@ -14,11 +14,17 @@ mediante resolución normal, con las constraints indicadas; no `--no-deps`.
 
 ```bash
 python tools/universality/validate_profiles.py \
+  --candidate-version 0.12.0a13 \
   --uv "$UV" --base-python "$PYTHON" --cache "$CACHE" --pins "$PUBLIC_PINS" \
   --artifacts "$A11_WHEELS" --source "$CORE_SDIST_SOURCE" \
   --benchmark-source "$BENCHMARK_SDIST_SOURCE" \
   --benchmark-probe tools/universality/benchmark_probe.py --output "$NEW_OUTPUT"
 ```
+
+El valor predeterminado conserva el recorrido histórico A11. Para reevaluar
+otra versión hay que declararla: el controlador rechaza un par de wheels cuya
+identidad no coincida y los probes verifican los bytes instalados. Un recibo A11
+no se convierte en A13 al cambiar ese argumento.
 
 En PowerShell se pasan los mismos argumentos y se invoca el ejecutable con `&`.
 Los argumentos admiten rutas con espacios. El archivo de constraints se copia

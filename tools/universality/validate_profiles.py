@@ -1,4 +1,4 @@
-"""Finite profile conformance on unchanged A11 archives, not full platform matrix."""
+"""Finite profile conformance on an identified archive pair, not a full platform matrix."""
 
 import argparse
 import hashlib
@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import time
 import zipfile
+from email.parser import BytesParser
 from pathlib import Path
 
 p = argparse.ArgumentParser()
@@ -23,6 +24,7 @@ for name in (
 ):
     p.add_argument("--" + name, required=True, type=Path)
 p.add_argument("--offline", action="store_true")
+p.add_argument("--candidate-version", default="0.12.0a11")
 p.add_argument("--package", choices=("core", "benchmark", "all"), default="all")
 p.add_argument(
     "--profile",
@@ -61,9 +63,22 @@ source = a.source.resolve()
 bsource = a.benchmark_source.resolve()
 core = next(a.artifacts.resolve().glob("equiframe-*.whl"))
 bench = next(a.artifacts.resolve().glob("equiframe_benchmark-*.whl"))
+for wheel, distribution in ((core, "equiframe"), (bench, "equiframe-benchmark")):
+    with zipfile.ZipFile(wheel) as archive:
+        entries = [
+            name for name in archive.namelist() if name.endswith(".dist-info/METADATA")
+        ]
+        if len(entries) != 1:
+            raise ValueError("Candidate wheel has ambiguous metadata")
+        metadata = BytesParser().parsebytes(archive.read(entries[0]))
+        if (
+            metadata["Name"].lower().replace("_", "-") != distribution
+            or metadata["Version"] != a.candidate_version
+        ):
+            raise ValueError("Candidate archive pair differs from requested identity")
 manifest = {
     "checkout": str(source),
-    "version": "0.12.0a11",
+    "version": a.candidate_version,
     "runtime_files": {},
     "artifact_sha256": {
         w.name: hashlib.sha256(w.read_bytes()).hexdigest() for w in (core, bench)
@@ -82,7 +97,7 @@ shutil.copyfile(a.pins.resolve(), out / "pins.txt")
 shutil.copyfile(source / "tools/compatibility_probe.py", out / "compatibility_probe.py")
 shutil.copyfile(a.benchmark_probe.resolve(), out / "benchmark_probe.py")
 summary = {
-    "candidate": "0.12.0a11",
+    "candidate": a.candidate_version,
     "state": "running",
     "manual": True,
     "cells": [],

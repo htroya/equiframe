@@ -45,12 +45,14 @@ en VM no equivale a su despliegue o aceptación.
 
 ## Informes y alcance de los porcentajes
 
-La [matriz de las nueve áreas](PROJECT_STATUS_MATRIX_20261011.md) reúne los
-resultados medidos y distingue madurez, tesis y seguridad sin evaluación vigente.
+La [matriz de las nueve áreas](PROJECT_STATUS_MATRIX_20261011_FOLLOWUP.md) reúne los
+resultados medidos e incorpora las nuevas evaluaciones de madurez, tesis y seguridad.
 Identifica el candidato de cada porcentaje; no calcula un promedio global.
 
-El [plan hacia el 95 %](IMPLEMENTATION_95_PLAN_20261011.md) conserva las nueve
-rúbricas y sus dependencias. La [revisión de tesis](THESIS_CONTRIBUTIONS_REVIEW_20261011.md)
+El [plan de las metas revisadas](IMPLEMENTATION_PLAN_TARGETS_20261011.md) conserva
+las rúbricas y sus dependencias; el [plan inicial del 95 %](IMPLEMENTATION_95_PLAN_20261011.md)
+permanece histórico. El [nuevo seguimiento](TARGET_FOLLOWUP_RESULT_20261011.md)
+documenta implementación, pruebas y límites. La [revisión de tesis](THESIS_CONTRIBUTIONS_REVIEW_20261011.md)
 documenta los aportes incorporados y la actualización preparatoria del Word.
 El [seguimiento de seguridad](SECURITY_FOLLOWUP_20261011.md) identifica la
 auditoría de snapshot y sus límites; el [diagnóstico anterior](SECURITY_SCAN_BLOCKER_20261011.md)
@@ -67,7 +69,10 @@ validación ARM64 3.10/3.12, [corpus y piloto SERCOP](SERCOP_PUBLIC_PILOT_202610
 | Documentación de este repositorio | [Plan DOC-PRO-20-v1](DOCUMENTATION_PLAN_20261010.md), [resultado inicial](DOCUMENTATION_RESULT_20261010.md), [verificación vigente](DOCUMENTATION_RECHECK_20261010.md) | 18/20 = 90 %; lectura humana independiente y documentación pública pendientes |
 | Preparación de PyPI | [Plan PYPI-PREP-20-v1](PYPI_PREPARATION_PLAN_20261010.md), [resultado](PYPI_PREPARATION_RESULT_20261010.md) | 16/20 = 80 %; preparación manual, cuatro requisitos externos pendientes |
 | Calidad de paquete | [A13, PACKAGE-QUALITY-RP-20-v1](PACKAGE_QUALITY_RESULT_20261010.md) | 16/20 = 80 %; inspiración cualitativa de Real Python |
-| Pruebas por opción | [A13 incremental](OPTION_TRACE_INCREMENTAL_20261011.json), [A13 anterior](PACKAGE_QUALITY_RESULT_20261010.md), [recibo histórico A12](OPTION_TRACEABILITY_RESULT_20261010.md) | A13: 4.444/8.385 = 53,00 % de obligaciones, no cobertura de líneas |
+| Pruebas por opción | [A13 límites/omisiones](OPTION_BOUNDARY_RESULT_20261011.json), [A13 incremental anterior](OPTION_TRACE_INCREMENTAL_20261011.json) | A13: 5.516/8.385 = 65,78 % de obligaciones, no cobertura de líneas |
+| Madurez | [M01–M16 actuales](MATURITY_CURRENT_RESULT_20261011.json) | 3/16 = 18,75 % de cierre estricto del alcance original |
+| Cumplimiento de requisitos de tesis | [T01–T22 actuales](THESIS_CURRENT_RESULT_20261011.json) | 9/22 = 40,91 %; no calidad editorial ni aprobación científica |
+| Preparación técnica en seguridad | [SEC-PREP-20-v1 aplicada](SECURITY_READINESS_RESULT_20261011.json) | 7/20 = 35 %; auditoría parcial y hallazgo bajo abierto |
 | Usabilidad técnica | [A12, U01–U12](USABILITY_CURRENT_RESULT_20261010.md) | 11/12 = 91,67 %; observación humana pendiente |
 | Universalidad técnica | [A11, UV-TECH-A11-60-v1](UNIVERSALITY_80_RESULT_20261010.md) | 48/60 = 80 %; no se traslada automáticamente a otro wheel |
 

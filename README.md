@@ -4,11 +4,15 @@
 tarea, glosario, integración y controles manuales. Las guías empaquetadas y los
 informes históricos tienen alcances separados.
 
-[Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261011.md): las
+[Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261011_FOLLOWUP.md): las
 nueve áreas, su última medición identificada y las evaluaciones aún pendientes.
 
-[Plan de cierre hacia el 95 %](docs/IMPLEMENTATION_95_PLAN_20261011.md):
+[Plan de las metas revisadas](docs/IMPLEMENTATION_PLAN_TARGETS_20261011.md):
 umbrales de las rúbricas originales, validación y dependencias externas.
+[Seguimiento de las metas revisadas](docs/TARGET_FOLLOWUP_RESULT_20261011.md):
+1.072 obligaciones nuevas y mediciones actuales de madurez, tesis y seguridad,
+con metas pendientes. El [plan inicial del 95 %](docs/IMPLEMENTATION_95_PLAN_20261011.md)
+se conserva como histórico.
 [Revisión de aportes de tesis](docs/THESIS_CONTRIBUTIONS_REVIEW_20261011.md)
 y [seguimiento de seguridad](docs/SECURITY_FOLLOWUP_20261011.md).
 La meta permanece pendiente de evidencia; no sustituye las mediciones anteriores.

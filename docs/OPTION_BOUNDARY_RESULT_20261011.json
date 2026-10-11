@@ -1,0 +1,70 @@
+{
+  "schema": "equiframe.option-boundary-assessment.v1",
+  "recorded_at_utc": "2026-10-11T21:04:55.554096+00:00",
+  "candidate": "0.12.0a13",
+  "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+  "denominator": 8385,
+  "verified": 5516,
+  "percent": 65.78413834227787,
+  "target_percent": 80,
+  "target_verified": 6708,
+  "additional_required": 1192,
+  "counts": {
+    "EXPECTED_REJECTION": 3409,
+    "NOT_RUN": 2869,
+    "PASS": 2107
+  },
+  "new_cases": 1054,
+  "new_obligations": 1072,
+  "new_case_counts": {
+    "EXPECTED_REJECTION": 721,
+    "PASS": 333
+  },
+  "prior_verified": 4444,
+  "unique_catalog_union_cases": 4638,
+  "regression_cases": 2,
+  "executed_incremental_cases": 1195,
+  "unique_new_incremental_case_attempts": 1193,
+  "seed_catalog_sha256": "9eaa56aa71b803d901b07b56da0a89eb3cb610a44dc67a78513b553288ab59e1",
+  "catalog_sha256": "d83a7389205852de4c10eb699885f83e6cfd892bef7116fb2a70ac750499b0fd",
+  "obligation_ids_sha256": "22308238f613b50aefc0d5bb876e743443b3585c69f5f92d2ce9c22a5c2c3de1",
+  "baseline_sha256": "2b8691cb9c3d0633d309a95fa471ca7df0414af2a3c31f203c60a12cdbe419b2",
+  "previous_sha256": "4c7702cd398d4c0196ec163820b51a115734f59f3c73e21bb140de793bae1b0c",
+  "inventory_sha256": "556a3534dcc204c16742fe30ca32843438cb46782e91bb566054a2a0d32014d3",
+  "tool": "tools/option_boundary_followup.py",
+  "tool_sha256": "56822972540c405a1a5c05315575d4b87b21e5919ee0910747c9680564ed1bff",
+  "receipts": [
+    {
+      "private_path": "metas_90_80_85_50_20261011/boundaries-final-normal-strict-fields/result.json",
+      "sha256": "2692f3b9605b7334fd2a439d3022808c64b817cc35a5d0ff5973f59043c9c476",
+      "python": "3.12.4 | packaged by Anaconda, Inc. | (main, Jun 18 2024, 15:03:56) [MSC v.1929 64 bit (AMD64)]",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "optimized": false,
+      "verified": 5516,
+      "case_counts": {
+        "EXPECTED_REJECTION": 721,
+        "PASS": 333
+      }
+    },
+    {
+      "private_path": "metas_90_80_85_50_20261011/boundaries-final-optimized-strict-fields/result.json",
+      "sha256": "2eee71ea26d0c39c17584ec5365ef43e2f4af8615fa4acc53b42385a949270a4",
+      "python": "3.12.4 | packaged by Anaconda, Inc. | (main, Jun 18 2024, 15:03:56) [MSC v.1929 64 bit (AMD64)]",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "optimized": true,
+      "verified": 5516,
+      "case_counts": {
+        "EXPECTED_REJECTION": 721,
+        "PASS": 333
+      }
+    }
+  ],
+  "scope": "Conservative metadata boundaries/finite values plus actual required-argument binding; no native behavior or scientific evidence",
+  "limitations": [
+    "Field receipts validate declared metadata and selected finite values; they do not establish native operations or option interactions.",
+    "Binding receipts prove actual missing-argument rejection with body entry prohibited; other arguments use inert placeholders.",
+    "FAIL, NOT_RUN and unobserved surfaces add no verified obligations.",
+    "Repeated runs across Python, platforms or optimized modes add no coverage.",
+    "The v3 original receipts had an ambiguous incremental-case label; they remain unchanged. This assessment distinguishes 1195 attempts,1193 new case attempts and2 regressions."
+  ]
+}
