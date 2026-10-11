@@ -4,6 +4,13 @@
 tarea, glosario, integración y controles manuales. Las guías empaquetadas y los
 informes históricos tienen alcances separados.
 
+[Documentación profesional](docs/DOCUMENTATION_RESULT_20261010.md):
+**18/20 controles = 90 %** bajo DOC-PRO-20-v1, una rúbrica propia fijada antes
+de los cambios. Incluye navegación manual comprobada y cuatro bloques de código
+ejecutados desde el texto contra el wheel A13 identificado. Lectura por una
+persona independiente y documentación pública con derechos aprobados siguen
+pendientes. No equivale al 85 % histórico sin una fórmula identificada.
+
 [Primer uso por perfil / First use](packages/equiframe/docs/first-use.md)
 
 [Calidad verificable de paquete A13](docs/PACKAGE_QUALITY_RESULT_20261010.md):
