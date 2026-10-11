@@ -102,7 +102,7 @@ def execute_case(case: dict[str, Any], seeds: dict[str, Any], module: Any) -> di
     if case["model"] not in module.__all__:
         raise ValueError("Case target must be a public core export")
     data = copy.deepcopy(seeds[case["model"]]["input"])
-    field = case.get("field")
+    field: Any = case.get("field")
     operation = case["operation"]
     if operation in {"default", "required_omission"}:
         data.pop(field, None)
@@ -113,7 +113,7 @@ def execute_case(case: dict[str, Any], seeds: dict[str, Any], module: Any) -> di
         output = model.model_validate_json(json.dumps(data, allow_nan=False)).model_dump(
             mode="json"
         )
-        observed = (
+        observed: Any = (
             output
             if operation == "model"
             else {"present": field in output, "value": output.get(field)}

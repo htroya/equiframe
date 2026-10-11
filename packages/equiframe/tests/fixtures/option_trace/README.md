@@ -28,3 +28,10 @@ preservation of unsuccessful attempts and a new identified catalog. Never change
 the denominator, relax a contract or generate expectations from fresh outputs
 to reach a desired percentage. Run the standalone installed audit as described
 in the repository's `docs/OPTION_TRACEABILITY_20261010.md`.
+
+A13 corrects detector producer identity. This original A12 catalog remains byte
+identical: its `DetectorVersions.equiframe.default` case must detect the deliberate
+default change from A11 to A13. The current regression suite asserts that historical
+drift as a failure of the old expectation; it does not count the old receipt as
+passing A13 coverage. A current installed inventory/catalog must bind new artifact
+hashes and state the new default explicitly before any new percentage is credited.

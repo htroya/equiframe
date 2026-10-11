@@ -421,12 +421,12 @@ SCHEMA_INVENTORY = (
     (
         "detector-bundle-1.0.schema.json",
         "experimental",
-        "e3458030b1502d70aa374c297c616ff7e71a26103571bebed57753cfb480d6d2",
+        "2cb9ddbc2206be4407cfaf088d4f083277afb043854de15b371af91d45b391ea",
     ),
     (
         "detector-fit-1.0.schema.json",
         "experimental",
-        "41dc0668b477bf589c8f6ae9e14432c9c58c9b804733898745bcc4460946f56b",
+        "f461f8caa361537676fe065a3c1948480d3924429c19c0bb78622f250a8f9cb1",
     ),
     (
         "detector-score-result-1.0.schema.json",

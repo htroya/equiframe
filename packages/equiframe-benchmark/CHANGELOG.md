@@ -1,3 +1,22 @@
+## 0.12.0a13 — package quality and producer identity (2026-10-10)
+
+- Remove a process-test race by capturing OS descendant identities before real
+  cleanup instead of requiring the terminated worker to finish writing a file.
+  Check every captured descendant stops; supervisor behavior remains unchanged.
+
+- Correct detector producer identity: new evidence identifies A13 instead of
+  retaining A11 when executed from A12. Preserve explicit historical producer
+  records and admit A12/A13 without changing `equiframe-if-mad-1.0`, R/M/B/H/O,
+  model parameters, training support or expected outputs.
+- Regenerate current producer-containing schemas and their asset hashes;
+  preserve all historical fixture and receipt bytes. Keep the exact paired
+  core dependency and align current installation guides.
+- Add the source-carried standard-library offline wheel integrity audit and
+  tests for corruption, unsafe paths, Unicode metadata and occupied receipts.
+  Fix strict typing of heterogeneous observations in the option-trace tool.
+- Public distribution, license approval, ecosystem adoption and full platform
+  acceptance remain independent pending gates; no Actions or paid resources.
+
 ## 0.12.0a12 — exact core onboarding candidate pairing (2026-10-10)
 
 - Pair the benchmark with exactly core A12 after adding core installation

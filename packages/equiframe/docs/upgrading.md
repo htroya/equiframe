@@ -9,8 +9,8 @@ A11 adds experimental source inputs and deterministic windows; see the
 [five-step guide](universalidad-cinco-pasos.md). Existing plans keep their node
 defaults. Consumers of the experimental IR/migration/workflow schemas should
 use the regenerated A11 schemas and rerun compilation/validation; older
-readers do not understand a new `window` kind. Detector producer identity is
-A11, and historical producer records remain readable. No historical expected
+readers do not understand a new `window` kind. A11 introduced its detector
+producer identity; historical producer records remain readable. No historical expected
 output or receipt is rewritten. Core/benchmark versions are paired exactly.
 
 1. Keep the current wheel/sdist, trusted receipt, dependency pins/hashes and
@@ -35,6 +35,17 @@ Do not edit lock hashes, reference outputs or capability fingerprints to silence
 a failure. Escalate the smallest reproducible semantic difference instead.
 
 ## Observable changes in this private candidate
+
+### A13 corrects new detector producer identity
+
+A12 incorrectly inherited the A11 default when fitting a new detector. A13
+records `0.12.0a13` for newly fitted detector evidence and admits explicit A12
+and A13 producer records. This changes provenance metadata, not fitting,
+thresholds, labels or the `equiframe-if-mad-1.0` algorithm identity. Existing
+bundles retain their recorded producer; readers never relabel old evidence.
+Recreate affected A12 fits when accurate producer provenance is required.
+The frozen A12 option catalog remains bound to its original artifact and does
+not establish a current A13 coverage percentage.
 
 ### Truth testing is intentionally rejected
 
@@ -308,7 +319,7 @@ A5 artifacts and receipts, and use the exact A6 package hashes for new validatio
 No output-model contract or scientific methodology changed.
 
 
-## 0.12.0a12 first use and environment diagnosis
+## 0.12.0a13 first use and environment diagnosis
 
 Two new experimental commands use existing public comparison/report APIs:
 `python -I -m equiframe doctor --extra arrow` checks local metadata;
@@ -317,7 +328,7 @@ small synthetic preparation and saves reports before the gate. See
 [first use](first-use.md) for both roles and all three states. Dependency ranges,
 existing API signatures and persisted format versions are unchanged.
 
-Core and benchmark must both be A12. External consumers with an exact older
+Core and benchmark must both be A13. External consumers with an exact older
 core pin continue to require their identified older artifact; do not bypass
 dependency checks to force an upgrade. Reinstall the correct artifact in the
 selected interpreter if doctor reports code/metadata identity disagreement.
