@@ -4,7 +4,7 @@
 tarea, glosario, integración y controles manuales. Las guías empaquetadas y los
 informes históricos tienen alcances separados.
 
-[Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261011_FOLLOWUP.md): las
+[Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261011_VM.md): las
 nueve áreas, su última medición identificada y las evaluaciones aún pendientes.
 
 [Plan de las metas revisadas](docs/IMPLEMENTATION_PLAN_TARGETS_20261011.md):
@@ -13,6 +13,10 @@ umbrales de las rúbricas originales, validación y dependencias externas.
 1.072 obligaciones nuevas y mediciones actuales de madurez, tesis y seguridad,
 con metas pendientes. El [plan inicial del 95 %](docs/IMPLEMENTATION_95_PLAN_20261011.md)
 se conserva como histórico.
+[Validación VM autorizada](docs/VM_TARGET_FOLLOWUP_20261011.md): 32 pruebas POSIX
+y catálogo ARM64 3.10/3.12 normal/optimizado aprobados; madurez estricta 4/16 = 25 %.
+La ampliación Linux pasa las 8.077 pruebas del núcleo y las 625 aplicables del
+benchmark, con los dos casos de Windows separados.
 [Revisión de aportes de tesis](docs/THESIS_CONTRIBUTIONS_REVIEW_20261011.md)
 y [seguimiento de seguridad](docs/SECURITY_FOLLOWUP_20261011.md).
 La meta permanece pendiente de evidencia; no sustituye las mediciones anteriores.
