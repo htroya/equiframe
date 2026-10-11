@@ -164,8 +164,7 @@ def cli_inventory(command, prefix=()):
             if isinstance(default, Enum):
                 default = default.value
             parameters.append(
-                f"{kind}|{parameter.name}|{options}|required={parameter.required}"
-                f"|default={default}"
+                f"{kind}|{parameter.name}|{options}|required={parameter.required}|default={default}"
             )
         yield "equiframe " + " ".join(prefix), tuple(parameters)
 
