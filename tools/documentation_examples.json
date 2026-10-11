@@ -1,0 +1,9 @@
+{
+  "sdk_version": "0.12.0a13",
+  "examples": [
+    {"id": "root-comparison", "document": "README.md", "python_fence": 1, "expected_stdout": ["different True", "Expected regression: equivalence rejected"]},
+    {"id": "quickstart", "document": "packages/equiframe/docs/quickstart.md", "python_fence": 1, "expected_stdout": ["The regression was correctly rejected", "equivalent True"]},
+    {"id": "pipeline-three-states", "document": "docs/DOCUMENTATION_WORKFLOW.md", "python_fence": 1, "expected_stdout": ["equivalent equivalent True", "different different True", "not_evaluable not_evaluable", "ACCEPT equivalent", "REJECT different", "REJECT not_evaluable"]},
+    {"id": "installed-handbook", "document": "packages/equiframe/docs/index.md", "python_fence": 1, "expected_stdout": ["# EquiFrame user handbook", "private Alpha candidate 0.12.0a13"]}
+  ]
+}

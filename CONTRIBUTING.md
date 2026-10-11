@@ -73,6 +73,11 @@ remote job ran, and a push/PR does not automatically run the platform matrix.
 
 ## Review expectations
 
+For documentation changes, follow the [documentation maintenance policy](docs/DOCUMENTATION_MAINTENANCE.md)
+and run its manual navigation/example checks. The repository portal is distinct
+from the handbook carried by an already-built wheel; changing root guides does
+not change or revalidate those historical artifact bytes.
+
 - Preserve contract semantics, typed states, safe failure and historical evidence
 - Keep R/M/B/H/O independent; execute each engine natively
 - Add independently expected positive, different, invalid and incomplete fixtures

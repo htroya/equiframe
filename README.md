@@ -1,5 +1,9 @@
 # EquiFrame
 
+[Portal de documentación / Documentation portal](docs/README.md): rutas por
+tarea, glosario, integración y controles manuales. Las guías empaquetadas y los
+informes históricos tienen alcances separados.
+
 [Primer uso por perfil / First use](packages/equiframe/docs/first-use.md)
 
 [Calidad verificable de paquete A13](docs/PACKAGE_QUALITY_RESULT_20261010.md):

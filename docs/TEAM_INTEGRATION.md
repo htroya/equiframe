@@ -2,12 +2,19 @@
 
 Este documento define entregas técnicas propuestas. Las tareas ya asignadas por el equipo son: José crea la VM y el acceso Python compartido; Jhair construye el DW; Hernán desarrolla y evalúa EquiFrame. Los detalles de sus componentes se acuerdan con sus responsables.
 
-Estado actual (2026-10-07): candidatos `equiframe 0.12.0a7` y `equiframe-benchmark 0.12.0a7`,
+Estado actual (2026-10-10): candidatos `equiframe 0.12.0a13` y `equiframe-benchmark 0.12.0a13`,
 con Verify, ETL, migración y destino local. Las herramientas locales y las interfaces consumidoras están
-implementadas; el servicio/DW real, el corpus y la aceptación científica siguen
+implementadas; el servicio/DW real, las etiquetas/revisión del corpus y la aceptación científica siguen
 pendientes. Las propuestas de despliegue de este documento no acreditan entregas
 de José o Jhair. Los controles de distribución y sus pendientes se registran en
 la [revisión del migrador](MIGRATION_REVIEW.md).
+
+Las validaciones manuales del par A13 en Windows/Linux ARM64 y el consumidor
+externo están delimitados en el [recibo de calidad](PACKAGE_QUALITY_RESULT_20261010.md).
+La VM se usó para validación del artefacto privado; ese uso no despliega ni
+demuestra el gateway de José o el DW de Jhair. El corpus técnico congelado no
+es una evaluación científica aceptada. Las responsabilidades de la tabla siguen
+vigentes. Consulta el [portal](README.md) para separar guías y evidencias fechadas.
 
 ## 1. Propiedad y dependencias
 
