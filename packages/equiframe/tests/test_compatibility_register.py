@@ -12,6 +12,7 @@ if sys.version_info >= (3, 11):
     import tomllib
 else:
     import tomli as tomllib
+from enum import Enum
 from functools import reduce
 from operator import or_
 from pathlib import Path
@@ -159,16 +160,33 @@ def cli_inventory(command, prefix=()):
                 continue
             kind = "option" if isinstance(parameter, TyperOption) else "argument"
             options = ",".join([*parameter.opts, *getattr(parameter, "secondary_opts", [])])
+            default = parameter.default
+            if isinstance(default, Enum):
+                default = default.value
             parameters.append(
                 f"{kind}|{parameter.name}|{options}|required={parameter.required}"
-                f"|default={parameter.default}"
+                f"|default={default}"
             )
         yield "equiframe " + " ".join(prefix), tuple(parameters)
 
 
+def declared_cli_parameter(parameter):
+    # These two reviewed enum members denote CLI choice values. Typer/Python
+    # can expose an Enum or its value; an invalid raw "Extra.base" CLI default
+    # stays invalid because only actual Enum instances are unwrapped above.
+    stem, separator, default = parameter.rpartition("|default=")
+    values = {"Extra.base": "base", "DemoCase.good": "good"}
+    return stem + separator + values.get(default, default)
+
+
 def test_every_cli_command_option_requiredness_and_default_is_classified():
     records = [r for r in ef.get_stability_register() if r.surface == "cli"]
-    assert dict(cli_inventory(get_command(app))) == {r.name: r.parameters for r in records}
+    assert dict(cli_inventory(get_command(app))) == {
+        r.name: tuple(declared_cli_parameter(p) for p in r.parameters) for r in records
+    }
+    assert declared_cli_parameter("option|extra|--extra|required=False|default=Extra.invalid").endswith(
+        "default=Extra.invalid"
+    )
     for record in records:
         assert record.exit_codes and set(record.exit_codes) <= {0, 1, 2, 3}
     assert next(r for r in records if r.name == "equiframe compare").exit_codes == (0, 1, 2, 3)
