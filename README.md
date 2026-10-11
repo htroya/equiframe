@@ -11,6 +11,10 @@ ejecutados desde el texto contra el wheel A13 identificado. Lectura por una
 persona independiente y documentación pública con derechos aprobados siguen
 pendientes. No equivale al 85 % histórico sin una fórmula identificada.
 
+[Verificación documental vigente](docs/DOCUMENTATION_RECHECK_20261010.md):
+mantiene el 90 % con controles actuales y evidencia de ejemplos ligada a los
+mismos bytes de A13. El recibo original conserva sus resultados históricos.
+
 [Primer uso por perfil / First use](packages/equiframe/docs/first-use.md)
 
 [Preparación manual de PyPI](docs/PYPI_PREPARATION_RESULT_20261010.md):

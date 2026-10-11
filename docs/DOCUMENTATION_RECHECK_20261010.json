@@ -1,0 +1,305 @@
+{
+  "schema": "documentation-recheck-v1",
+  "status": "PASS",
+  "rubric": "DOC-PRO-20-v1",
+  "basis": "Same fixed equal-weight internal documentation controls; not external certification or human usability evidence",
+  "assessment_date_local": "2026-10-10",
+  "timezone": "America/Guayaquil",
+  "recorded_at_utc": "2026-10-11T03:20:01.952285+00:00",
+  "assessed_checkout_base_commit": "75c7de1bf81208bfa351be148f0944644cf14bbe",
+  "original_documentation_pr": "https://github.com/htroya/equiframe/pull/34",
+  "original_documentation_main": "a5a2f9812812118159c57f93615c4345e0adb096",
+  "original_result_sha256": "6e848341e86af1ab4311e1bed74c24a0611d8f777e8aaf8dc09b22776479a044",
+  "definition_sha256": "c2682aeed6d29dcb6afa3fc333835297d2cac6ad824da289b2a1cf68d8c22e43",
+  "definition_changed": false,
+  "denominator": 20,
+  "previous_pass": 18,
+  "current_pass": 18,
+  "previous_percentage": 90,
+  "percentage": 90,
+  "additional_percentage_point_gain": 0,
+  "requested_target_percentage": 90,
+  "target_achieved": true,
+  "old_chat_percentage": 85,
+  "old_chat_percentage_verified": false,
+  "claimed_85_to_90_measured_delta": false,
+  "criteria": [
+    {
+      "id": "D01",
+      "definition": "Entrada única que distingue uso, desarrollo, investigación e informes históricos",
+      "initial": "GAP",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "README tiene enlaces dispersos; falta índice de `docs/`"
+    },
+    {
+      "id": "D02",
+      "definition": "Rutas de lectura para arquitecto y científico",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`packages/equiframe/docs/first-use.md`, `arquitecto.md`, `cientifico.md`"
+    },
+    {
+      "id": "D03",
+      "definition": "Encabezados actuales de README, arquitectura y API coinciden con metadatos del par",
+      "initial": "GAP",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "API anuncia A7 y `__version__` A12; arquitectura mezcla estados actuales A13/A7"
+    },
+    {
+      "id": "D04",
+      "definition": "Instalación privada Windows/POSIX, extras y comprobación de identidad",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`installed-private.md`, `quickstart.md`, `dependencies.md`"
+    },
+    {
+      "id": "D05",
+      "definition": "Primer uso sintético completo con resultados esperados",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`first-use.md`, `quickstart.md`, `recipes.md`"
+    },
+    {
+      "id": "D06",
+      "definition": "Referencia de API y criterios para elegir servicio",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`api.md`, `choosing-api.md`, README"
+    },
+    {
+      "id": "D07",
+      "definition": "CLI con códigos de salida y rechazo explícito",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`api.md`, `first-use.md`, README del benchmark"
+    },
+    {
+      "id": "D08",
+      "definition": "Semántica de tipos, claves, multiplicidad, ausencias y estados",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`semantics.md`, `outcome-gates.md`, `API_CONTRACTS.md`"
+    },
+    {
+      "id": "D09",
+      "definition": "Interfaces de extensión y ejemplo con límites y propiedad de recursos",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`extending.md`, `sqlite-snapshots.md`, `universal-sources.md`"
+    },
+    {
+      "id": "D10",
+      "definition": "Separación de benchmark, controles técnicos y evidencia científica",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "README del benchmark, `THESIS_TRACEABILITY.md`"
+    },
+    {
+      "id": "D11",
+      "definition": "Diagnóstico y recuperación de fallos sin ocultar diferencias",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`upgrading.md`, `maintenance.md`, `first-use.md`"
+    },
+    {
+      "id": "D12",
+      "definition": "Glosario bilingüe con referencias canónicas",
+      "initial": "GAP",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "Conceptos repartidos, sin glosario enlazado"
+    },
+    {
+      "id": "D13",
+      "definition": "Contribución con comandos concretos, revisión y propiedad",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`CONTRIBUTING.md`, `contributing.md`, `TEAM_INTEGRATION.md`"
+    },
+    {
+      "id": "D14",
+      "definition": "Compatibilidad, cambios y recuperación por artefacto",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`compatibility.md`, `upgrading.md`, `releasing.md`, changelogs"
+    },
+    {
+      "id": "D15",
+      "definition": "Integración distingue par actual, componentes implementados y entregas pendientes",
+      "initial": "GAP",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`TEAM_INTEGRATION.md` presenta A7 como estado actual"
+    },
+    {
+      "id": "D16",
+      "definition": "Privacidad, seguridad, límites de confianza y recursos explicados",
+      "initial": "PASS",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "`security.md`, `performance.md`, `OFFLINE_WHEEL_AUDIT.md`"
+    },
+    {
+      "id": "D17",
+      "definition": "Control manual repetible de archivos y anclas Markdown, con inventario y límites",
+      "initial": "GAP",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "Auditor del wheel comprueba archivos; excluye anclas y documentación raíz"
+    },
+    {
+      "id": "D18",
+      "definition": "Ejemplos extraídos del texto actual ejecutados contra wheel identificado, normal y `-O`",
+      "initial": "GAP",
+      "status": "PASS",
+      "weight": 5,
+      "initial_evidence": "Hay pruebas de scripts/CLI; falta registro que vincule bloques exactos del texto a ejecuciones"
+    },
+    {
+      "id": "D19",
+      "definition": "Un lector humano distinto del autor completa la guía y registra dificultades",
+      "initial": "BLOCKED",
+      "status": "BLOCKED",
+      "weight": 5,
+      "initial_evidence": "`adoption.md`: no hay observación humana verificable"
+    },
+    {
+      "id": "D20",
+      "definition": "Documentación pública de esta distribución accesible con derechos aprobados",
+      "initial": "BLOCKED",
+      "status": "BLOCKED",
+      "weight": 5,
+      "initial_evidence": "Repositorio privado; licencia y publicación pendientes de titulares"
+    }
+  ],
+  "blocked": [
+    "D19",
+    "D20"
+  ],
+  "candidate": {
+    "equiframe": "0.12.0a13",
+    "equiframe-benchmark": "0.12.0a13"
+  },
+  "navigation": {
+    "status": "PASS",
+    "document_count": 49,
+    "local_destinations_checked": 484,
+    "local_anchors_checked": 19,
+    "failures": [],
+    "manifest_sha256": "400b8c39d8104bbd9d8e2d6cb692ec5197cb38f85706fcab432dd572901e5c47",
+    "limits": "Offline explicit scope; inline/reference Markdown links and ATX/setext heading IDs. No general renderer equivalence, HTML href audit, remote availability or human review.",
+    "version_checks_passed": 12
+  },
+  "checks_executed_now": [
+    {
+      "id": "navigation",
+      "status": "PASS",
+      "exit_code": 0,
+      "executed_at": "2026-10-11T03:18:56.149331+00:00"
+    },
+    {
+      "id": "tests-normal",
+      "status": "PASS",
+      "exit_code": 0,
+      "executed_at": "2026-10-11T03:18:56.750348+00:00"
+    },
+    {
+      "id": "tests-optimized",
+      "status": "PASS",
+      "exit_code": 0,
+      "executed_at": "2026-10-11T03:18:57.391472+00:00"
+    },
+    {
+      "id": "diff-check",
+      "status": "PASS",
+      "exit_code": 0,
+      "executed_at": "2026-10-11T03:18:57.524763+00:00"
+    },
+    {
+      "id": "packages-workflows-unchanged",
+      "status": "PASS",
+      "exit_code": 0,
+      "executed_at": "2026-10-11T03:18:57.652349+00:00"
+    }
+  ],
+  "documentation_tests_distinct": 16,
+  "documentation_test_attempts_normal": 16,
+  "documentation_test_attempts_optimized": 16,
+  "documentation_test_failures": 0,
+  "historical_example_binding": {
+    "examples": [
+      {
+        "id": "root-comparison",
+        "document": "README.md",
+        "code_sha256": "6ac2087fb7336ea2758ab33c2e52573a91a6fc7350620657d31a93ab8aa1fdcf",
+        "historical_attempts_verified": 2,
+        "current_code_matches": true
+      },
+      {
+        "id": "quickstart",
+        "document": "packages/equiframe/docs/quickstart.md",
+        "code_sha256": "79febc903940cca52c76bcb0876388fc84e5160d3bd36d552bbef3f052b6fa52",
+        "historical_attempts_verified": 2,
+        "current_code_matches": true
+      },
+      {
+        "id": "pipeline-three-states",
+        "document": "docs/DOCUMENTATION_WORKFLOW.md",
+        "code_sha256": "a29992f7abab0dc31ee5fffd735109116dcfcf25eed1eed4c0fc5da7cbc87304",
+        "historical_attempts_verified": 2,
+        "current_code_matches": true
+      },
+      {
+        "id": "installed-handbook",
+        "document": "packages/equiframe/docs/index.md",
+        "code_sha256": "a9deed567052cae3359aa2298d3813d4304118b5c1a18d5065bc8fd77b533a06",
+        "historical_attempts_verified": 2,
+        "current_code_matches": true
+      }
+    ],
+    "new_example_executions": 0,
+    "historical_pass_attempts_bound": 8,
+    "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+    "retained_wheel_verified": true,
+    "archive_sha256": "bc2a914e22d3c140e68cc36662d3c8d8f63cdc7342cf3539d8524acfb79e73e8",
+    "archive_crc_members_verified": 322,
+    "private_execution_receipt_sha256": "e7c46f771c8c93be7574a5cc94962f2c43e034c4c02ce9c7f903cf6efc554434",
+    "scope": "Current fence/registry/wheel byte identity against preserved installed execution receipts; not a fresh installation or execution replay."
+  },
+  "packages_changed": false,
+  "workflows_changed": false,
+  "publication_policy_changed": false,
+  "new_installation_created": false,
+  "github_actions_executed": false,
+  "vm_modified": false,
+  "new_paid_resources": false,
+  "public_documentation_published": false,
+  "correction": "Scope text and maintenance policy now acknowledge explicitly enumerated dated assessment pages are traversed for navigation; other historical reports are checked as destinations only.",
+  "raw_receipt_sha256": {
+    "verification.json": "82b92491e258cd3575c96adf5096a63595004af79e51e4d8e668bc77ba1cb50f",
+    "navigation.json": "7146b642edf958af1d23054e225a1e7a1f135014bfd1e8d7da7bd6e8f185e136",
+    "tests-normal-execution.json": "f165f7ed7e041257f27b6145931f6416db3ba92be4826e3438c3ed0aa5ab6985",
+    "tests-optimized-execution.json": "daa8065779fdfd24c9e38568aba948276b1978a353ea72a3802409a55d3349a9",
+    "diff-check-execution.json": "1163ddd5fb819455aff0d52a582dd118c705f73678ab3c3b586828d8b002831d",
+    "packages-workflows-unchanged-execution.json": "246d4c25cdc97cd68264b19624d6633a874988ac338a35075d00136f3bd4917b"
+  },
+  "limits": [
+    "Current navigation and regression checks are new executions; eight installed examples are retained historical executions verified against identical current blocks and wheel",
+    "HTTP/HTTPS/mailto targets are recorded but not fetched; no visual/browser or accessibility claim",
+    "Independent human reader D19 and owner-approved public documentation D20 remain blocked",
+    "No new full SDK/benchmark suite, artifact build, VM validation, PyPI publication or deployment of a service is claimed"
+  ]
+}
