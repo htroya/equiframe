@@ -564,3 +564,23 @@ Se mantienen doce comprobaciones pendientes, los cierres UV históricos,
 R/M/B/H/O, corpus científico, nueve estratos y protocolo experimental. Las
 mediciones de 1000 filas son conformance técnica de los extras y no resultados
 científicos de rendimiento. No se usa Actions ni se crean recursos de pago.
+
+## Meta del 95 % y conservación de evidencias — 2026-10-11
+
+El [plan general](IMPLEMENTATION_95_PLAN_20261011.md) mantiene pesos, denominadores
+y candidatos de las nueve áreas. El validador `tools/target_95.py` comprueba
+aritmética, hashes, conteos de fuentes y presencia de todas las áreas; calcula
+umbrales por redondeo hacia arriba sin emitir nuevas puntuaciones. Un registro
+histórico o un área no medida no pasan el gate del candidato actual. La revisión
+de tesis es editorial y preparatoria; no produce resultados científicos.
+
+Licencia/titulares y revisión independiente/resultados aprobados siguen
+pendientes por confirmación del usuario. El intento de seguridad no inició
+auditoría de fuente y se documenta con su diagnóstico. No se modifican R/M/B/H/O,
+las tres parejas, tres familias principales, nueve estratos ni protocolo.
+
+La comprobación de workflows encontró nombres A10 obsoletos en el workflow
+manual de release: se actualizan a A13 conservando los gates optativos, permisos
+de lectura y ausencia de publicación. No se ejecuta Actions. Los wheels/sdist
+originales A13 conservan sus bytes y versiones; los cambios de repositorio no
+se presentan como un paquete nuevo ni como documentación instalada nueva.

@@ -7,6 +7,14 @@ informes históricos tienen alcances separados.
 [Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261010.md): las
 nueve áreas, su última medición identificada y las evaluaciones aún pendientes.
 
+[Plan de cierre hacia el 95 %](docs/IMPLEMENTATION_95_PLAN_20261011.md):
+umbrales de las rúbricas originales, validación y dependencias externas.
+[Revisión de aportes de tesis](docs/THESIS_CONTRIBUTIONS_REVIEW_20261011.md)
+y [estado del intento de seguridad](docs/SECURITY_SCAN_BLOCKER_20261011.md).
+La meta permanece pendiente de evidencia; no sustituye las mediciones anteriores.
+[Resultado de esta entrega](docs/IMPLEMENTATION_95_RESULT_20261011.md):
+pruebas nuevas, identidad de los paquetes y pendientes que impiden acreditar la meta.
+
 [Documentación profesional](docs/DOCUMENTATION_RESULT_20261010.md):
 **18/20 controles = 90 %** bajo DOC-PRO-20-v1, una rúbrica propia fijada antes
 de los cambios. Incluye navegación manual comprobada y cuatro bloques de código

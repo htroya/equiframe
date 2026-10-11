@@ -486,3 +486,21 @@ de la tesis, aceptación humana, evaluación científica o prueba de validez
 de los detectores. No se modifican objetivos, hipótesis, R/M/B/H/O, etiquetas,
 particiones, nueve estratos ni protocolo. Los doce pendientes del índice y
 los criterios completos UV conservan sus condiciones propias.
+
+## Edición preparatoria de la tesis y meta del 95 % — 2026-10-11
+
+La [revisión de aportes](THESIS_CONTRIBUTIONS_REVIEW_20261011.md) identifica
+los dos Word originales y el documento entregado mediante SHA-256. Se conserva
+el formato de la base, capítulos 1–2, protocolo de tres parejas/tres familias y
+nueve estratos. Se precisan pruebas y mutaciones, se amplían estado del arte y
+fundamentos de extensibilidad, trazabilidad, distribución y seguridad, y se
+actualiza la memoria preparatoria B para A13. No se importa desarrollo ni
+resultados de la alternativa, ni se duplican aportes ya presentes.
+
+El usuario confirmó pendientes licencia/titulares y revisión independiente o
+resultados científicos aprobados. T01–T22 conservan sus criterios de aceptación:
+esta edición de 148 páginas no acredita 95 % de cumplimiento científico.
+Los controles de estilo, artefactos, suites técnicas y metadatos no sustituyen
+corpus, perfiles reales, etiquetas, congelación, experimentos pareados,
+reproducción independiente ni aprobación académica. El
+[plan técnico](IMPLEMENTATION_95_PLAN_20261011.md) no altera hipótesis ni soportes.

@@ -49,6 +49,14 @@ La [matriz de las nueve áreas](PROJECT_STATUS_MATRIX_20261010.md) reúne los
 resultados medidos y distingue madurez, tesis y seguridad sin evaluación vigente.
 Identifica el candidato de cada porcentaje; no calcula un promedio global.
 
+El [plan hacia el 95 %](IMPLEMENTATION_95_PLAN_20261011.md) conserva las nueve
+rúbricas y sus dependencias. La [revisión de tesis](THESIS_CONTRIBUTIONS_REVIEW_20261011.md)
+documenta los aportes incorporados y la actualización preparatoria del Word.
+El [diagnóstico de seguridad](SECURITY_SCAN_BLOCKER_20261011.md) explica por qué
+el intento de análisis aún no acredita cobertura de código.
+El [resultado de implementación y validación](IMPLEMENTATION_95_RESULT_20261011.md)
+conserva los controles nuevos y las condiciones todavía abiertas.
+
 | Aspecto | Recibo y artefacto al que se aplica | Medición |
 |---|---|---|
 | Documentación de este repositorio | [Plan DOC-PRO-20-v1](DOCUMENTATION_PLAN_20261010.md), [resultado inicial](DOCUMENTATION_RESULT_20261010.md), [verificación vigente](DOCUMENTATION_RECHECK_20261010.md) | 18/20 = 90 %; lectura humana independiente y documentación pública pendientes |

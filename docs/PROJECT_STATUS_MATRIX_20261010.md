@@ -102,3 +102,14 @@ El resultado se entrega en `main` mediante el repo privado. SDK, artefactos,
 criterios y recibos anteriores conservan sus bytes; no hay Actions, publicación
 pública, recursos nuevos de pago ni cambios en la VM `157.137.227.1`. Solo se
 archivan y retiran los temporales propios de esta consolidación.
+
+## Actualización técnica y editorial del 11 de octubre de 2026
+
+El [plan hacia el 95 %](IMPLEMENTATION_95_PLAN_20261011.md) conserva estas
+rúbricas, cifras y candidatos. El
+[resultado adicional](IMPLEMENTATION_95_RESULT_20261011.md) identifica las
+comprobaciones nuevas, corrección del workflow manual y Word preparatorio.
+El [informe de brechas](TARGET_95_GAP_20261011.json) verifica las fuentes y
+calcula umbrales; no emite nuevas puntuaciones. La licencia/titulares y revisión
+independiente/resultados científicos aprobados siguen pendientes por confirmación
+del usuario. La meta general aún no está acreditada.

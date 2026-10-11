@@ -10,7 +10,13 @@
     "docs/PYPI_PREPARATION_PLAN_20261010.md", "docs/PYPI_MANUAL_RELEASE.md",
     "docs/PYPI_README_DRAFT.md", "docs/PYPI_PREPARATION_RESULT_20261010.md",
     "docs/DOCUMENTATION_RECHECK_20261010.md",
-    "docs/PROJECT_STATUS_MATRIX_20261010.md"
+    "docs/PROJECT_STATUS_MATRIX_20261010.md",
+    "docs/IMPLEMENTATION_95_PLAN_20261011.md",
+    "docs/THESIS_CONTRIBUTIONS_REVIEW_20261011.md",
+    "docs/SECURITY_SCAN_BLOCKER_20261011.md",
+    "docs/IMPLEMENTATION_95_RESULT_20261011.md",
+    "docs/THESIS_TRACEABILITY.md",
+    "docs/DECISIONS.md"
   ],
   "directories": ["packages/equiframe/docs"],
   "version_checks": [
