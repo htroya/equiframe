@@ -20,6 +20,8 @@ from manifest_scope import (
     requires_runtime_identity,
     validate_cell_scope,
 )
+from normalize_consumer_wheel import POLICY as CONSUMER_REBUILD_POLICY
+from normalize_consumer_wheel import canonical_bytes
 
 
 def sha(path: Path) -> str:
@@ -122,6 +124,20 @@ def validate_benchmark_command_contract(commands: list[dict]) -> None:
         pairs=(("--only-binary", ":all:"),),
         forbidden=("--no-binary",),
     )
+
+
+def validate_normalization_paths(command, normalization, relative):
+    """Bind normalized bytes to the actual raw, output and receipt argv paths."""
+    for flag, field in (
+        ("--wheel", "raw_wheel"),
+        ("--output", "canonical_wheel"),
+        ("--receipt", "receipt"),
+    ):
+        positions = [index for index, value in enumerate(command) if value == flag]
+        if len(positions) != 1 or positions[0] + 1 >= len(command):
+            raise ValueError("ambiguous normalization path: " + flag)
+        if relative(command[positions[0] + 1]) != relative(normalization[field]):
+            raise ValueError("normalization command refers to another file: " + flag)
 
 
 class Review:
@@ -777,6 +793,83 @@ class Review:
                     != candidate["artifact_hashes"][name + "_sdist"]
                 ):
                     raise ValueError("sdist rebuild byte identity differs")
+            policy = candidate.get("consumer_wheel_rebuild_policy")
+            if policy not in (None, CONSUMER_REBUILD_POLICY):
+                raise ValueError("unsupported consumer rebuild policy")
+            if policy:
+                normalization = cell["consumer_wheel_rebuild_normalization"]
+                if normalization["policy"] != policy:
+                    raise ValueError("consumer normalization policy differs")
+                raw = self.file(
+                    normalization["raw_wheel"], normalization["raw_wheel_sha256"]
+                )
+                canonical = self.file(
+                    normalization["canonical_wheel"],
+                    candidate["artifact_hashes"]["consumer_wheel"],
+                )
+                result = self.json(
+                    normalization["receipt"], normalization["receipt_sha256"]
+                )
+                expected_bytes, positions, members = canonical_bytes(raw.read_bytes())
+                if (
+                    canonical.read_bytes() != expected_bytes
+                    or result.get("schema")
+                    != "equiframe.consumer-wheel-rebuild-normalization.v1"
+                    or result.get("policy") != policy
+                    or type(result.get("creator_system")) is not int
+                    or result.get("creator_system") != 0
+                    or normalization.get("canonical_wheel_sha256")
+                    != candidate["artifact_hashes"]["consumer_wheel"]
+                    or result.get("changed_central_directory_positions") != positions
+                    or result.get("changed_bytes") != len(positions)
+                    or result.get("members") != members
+                    or result.get("size_bytes") != raw.stat().st_size
+                    or result.get("raw_wheel_sha256") != sha(raw)
+                    or result.get("canonical_wheel_sha256")
+                    != candidate["artifact_hashes"]["consumer_wheel"]
+                    or result.get("expected_wheel_sha256")
+                    != candidate["artifact_hashes"]["consumer_wheel"]
+                    or result.get("raw_wheel_preserved") is not True
+                    or result.get("payload_or_other_header_bytes_changed") is not False
+                    or result.get("creator_system_is_build_host_claim") is not False
+                ):
+                    raise ValueError(
+                        "consumer byte reconstruction or raw preservation differs"
+                    )
+                command = command_for(
+                    self.receipt["commands"],
+                    "label",
+                    "consumer-wheel-normalize-" + minor,
+                )
+                scripts = [
+                    value
+                    for value in command
+                    if value.endswith("/scripts/normalize_consumer_wheel.py")
+                ]
+                remote_kit = PurePosixPath(receipt.get("kit", ""))
+                if (
+                    not remote_kit.is_absolute()
+                    or ".." in remote_kit.parts
+                    or "\\" in str(remote_kit)
+                    or scripts
+                    != [str(remote_kit / "scripts/normalize_consumer_wheel.py")]
+                ):
+                    raise ValueError("consumer normalization script command differs")
+                require_command_contract(
+                    command,
+                    ("-I", scripts[0]),
+                    pairs=(
+                        (
+                            "--expected-sha256",
+                            candidate["artifact_hashes"]["consumer_wheel"],
+                        ),
+                    ),
+                )
+                validate_normalization_paths(command, normalization, self.relative)
+            elif "consumer_wheel_rebuild_normalization" in cell:
+                raise ValueError(
+                    "consumer normalization was not declared before execution"
+                )
             consumer = cell["consumer"]
             summary = self.json(consumer["summary"], consumer["sha256"])
             if (

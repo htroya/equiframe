@@ -22,6 +22,7 @@ import sys
 import tarfile
 import tempfile
 import time
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -29,10 +30,13 @@ from frozen_tests import candidate_manifests
 
 try:
     import resource
-except ImportError:  # Windows imports shared receipt helpers for the offline lifecycle check.
+except (
+    ImportError
+):  # Windows imports shared receipt helpers for the offline lifecycle check.
     resource = None  # type: ignore[assignment]
 
 from manifest_scope import receipt_schema, required_pythons
+from normalize_consumer_wheel import POLICY as CONSUMER_REBUILD_POLICY
 
 PROFILES = ("base", "arrow", "pandas", "polars", "duckdb", "engines", "ml", "all")
 PROBE = (
@@ -57,13 +61,19 @@ def now() -> str:
 
 def write(path: Path, data: object) -> None:
     temporary = path.with_suffix(path.suffix + ".partial")
-    temporary.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    temporary.write_text(
+        json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     os.replace(temporary, path)
 
 
 def checked_member(root: Path, name: str) -> Path:
     path = root / name
-    if path.is_symlink() or not path.resolve().is_relative_to(root.resolve()) or not path.is_file():
+    if (
+        path.is_symlink()
+        or not path.resolve().is_relative_to(root.resolve())
+        or not path.is_file()
+    ):
         raise ValueError("manifest member missing, linked or outside kit: " + name)
     return path
 
@@ -90,10 +100,25 @@ def verify_kit(kit: Path) -> dict:
             name not in manifest["files"]
             or manifest["files"][name]["sha256"] != manifest["artifact_hashes"][key]
         ):
-            raise ValueError("artifact identity disagrees with the candidate file manifest")
+            raise ValueError(
+                "artifact identity disagrees with the candidate file manifest"
+            )
     if not manifest.get("source"):
         raise ValueError("candidate source identity is required")
     candidate_manifests(kit, manifest)
+    policy = manifest.get("consumer_wheel_rebuild_policy")
+    if policy not in (None, CONSUMER_REBUILD_POLICY):
+        raise ValueError("unsupported consumer wheel rebuild policy")
+    if policy:
+        if "scripts/normalize_consumer_wheel.py" not in manifest["files"]:
+            raise ValueError("declared consumer rebuild policy helper is missing")
+        with zipfile.ZipFile(kit / manifest["artifacts"]["consumer_wheel"]) as wheel:
+            if not wheel.infolist() or any(
+                item.create_system != 0 for item in wheel.infolist()
+            ):
+                raise ValueError(
+                    "original consumer wheel does not use declared ZIP creator format"
+                )
     return manifest
 
 
@@ -106,9 +131,12 @@ def write_runtime_constraints(path: Path, versions: dict) -> None:
         or re.fullmatch(r"[0-9][A-Za-z0-9.!+_-]*", version) is None
         for name, version in versions.items()
     ):
-        raise ValueError("runtime constraints must be exact registry name/version pairs")
+        raise ValueError(
+            "runtime constraints must be exact registry name/version pairs"
+        )
     path.write_text(
-        "\n".join(f"{name}=={version}" for name, version in sorted(versions.items())) + "\n",
+        "\n".join(f"{name}=={version}" for name, version in sorted(versions.items()))
+        + "\n",
         encoding="utf-8",
     )
 
@@ -204,7 +232,9 @@ class Recorder:
             available = shutil.disk_usage(self.directory).free
             record["disk_free_before_bytes"] = available
             if available < 1024**3:
-                record.update(status="blocked_resource", error="Less than 1 GiB free disk")
+                record.update(
+                    status="blocked_resource", error="Less than 1 GiB free disk"
+                )
                 log.write_text(
                     "Stopped before command: less than 1 GiB free disk\n",
                     encoding="utf-8",
@@ -230,8 +260,7 @@ class Recorder:
                     # Terminate its owned tree so it cannot retain pipes/cwd.
                     subprocess.run(
                         ["taskkill", "/PID", str(process.pid), "/T", "/F"],
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
+                        capture_output=True,
                         timeout=5,
                         check=False,
                     )
@@ -248,7 +277,9 @@ class Recorder:
                 raise subprocess.TimeoutExpired(
                     command, timeout, output=stdout, stderr=stderr
                 ) from None
-            result = subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
+            result = subprocess.CompletedProcess(
+                command, process.returncode, stdout, stderr
+            )
             log.write_text(result.stdout + result.stderr, encoding="utf-8")
             record.update(
                 exit_code=result.returncode,
@@ -366,7 +397,9 @@ def main() -> int:
             not isinstance(cgroup.get("memory.current"), str)
             or not cgroup["memory.current"].isdigit()
         ):
-            raise RuntimeError("Finite cgroup memory limit without readable current usage")
+            raise RuntimeError(
+                "Finite cgroup memory limit without readable current usage"
+            )
         headroom = int(cgroup["memory.max"]) - int(cgroup["memory.current"])
         if headroom < 2 * 1024**3:
             raise RuntimeError("Need at least 2 GiB effective cgroup memory headroom")
@@ -396,13 +429,16 @@ def main() -> int:
         "source": manifest["source"],
         "tooling_source": manifest.get("tooling_source"),
         "script_hashes": {
-            name: sha(kit / name) for name in manifest["files"] if name.startswith("scripts/")
+            name: sha(kit / name)
+            for name in manifest["files"]
+            if name.startswith("scripts/")
         },
         "controller_lock_sha256": sha(kit / "locks/controller.lock"),
         "data_manifest_sha256": sha(kit / "consumer-data/manifest.json"),
         "candidate_manifest_sha256": sha(kit / "candidate.json"),
         "artifact_hashes": manifest["artifact_hashes"],
         "test_manifests": manifest["test_manifests"],
+        "kit": str(kit),
         "lab": str(lab),
         "preflight_disk_free_bytes": shutil.disk_usage(parent).free,
         "commands": [],
@@ -461,7 +497,9 @@ def main() -> int:
             receipt["python_cells"].append(cell)
             try:
                 info = json.loads(
-                    record.run("python-" + minor, [interpreter, "-I", "-c", PROBE]).stdout
+                    record.run(
+                        "python-" + minor, [interpreter, "-I", "-c", PROBE]
+                    ).stdout
                 )
                 if (
                     not info["python"].startswith(minor + ".")
@@ -485,7 +523,9 @@ def main() -> int:
                                     "--sdist",
                                     str(artifacts["core_sdist"]),
                                     "--test-manifest",
-                                    str(kit / manifest["test_manifests"]["core"]["path"]),
+                                    str(
+                                        kit / manifest["test_manifests"]["core"]["path"]
+                                    ),
                                     "--python",
                                     interpreter,
                                     "--profile",
@@ -501,10 +541,12 @@ def main() -> int:
                                 ],
                                 timeout=3600,
                             )
-                            matrix = json.loads((output / "matrix.json").read_text("utf-8"))
+                            matrix = json.loads(
+                                (output / "matrix.json").read_text("utf-8")
+                            )
                             if matrix["status"] != "passed":
                                 raise RuntimeError("core matrix cell did not pass")
-                        except Exception as error:
+                        except Exception as error:  # noqa: BLE001 - preserve unexpected profile failures
                             cell["profiles"].append(
                                 {
                                     "profile": profile,
@@ -530,7 +572,9 @@ def main() -> int:
                             {
                                 "profile": profile,
                                 "endpoint": endpoint,
-                                "matrix": str((output / "matrix.json").relative_to(lab)),
+                                "matrix": str(
+                                    (output / "matrix.json").relative_to(lab)
+                                ),
                                 "matrix_sha256": sha(output / "matrix.json"),
                                 "status": "passed",
                             }
@@ -539,9 +583,13 @@ def main() -> int:
                         receipt["created_environments"].append(str(env))
                         if profile == "all" and endpoint == "latest":
                             all_python = python_at(env)
-                            solved_core = json.loads((inner / "receipt.json").read_text("utf-8"))
+                            solved_core = json.loads(
+                                (inner / "receipt.json").read_text("utf-8")
+                            )
                             constraints = inner / "pair-constraints.txt"
-                            write_runtime_constraints(constraints, solved_core["runtime_versions"])
+                            write_runtime_constraints(
+                                constraints, solved_core["runtime_versions"]
+                            )
                             cell["paired_runtime_constraints_sha256"] = sha(constraints)
                             record.run(
                                 "all-pip-" + minor,
@@ -576,7 +624,8 @@ def main() -> int:
                                     str(inner / "pair-install-report.json"),
                                     "--constraint",
                                     str(constraints),
-                                    str(artifacts["benchmark_wheel"]) + "[engines,ml,resources]",
+                                    str(artifacts["benchmark_wheel"])
+                                    + "[engines,ml,resources]",
                                     str(artifacts["consumer_wheel"]),
                                 ],
                             )
@@ -722,7 +771,9 @@ def main() -> int:
                                 (inner / "consumer/summary.json").read_text("utf-8")
                             )
                             optimized_summary = json.loads(
-                                (inner / "consumer-optimized/summary.json").read_text("utf-8")
+                                (inner / "consumer-optimized/summary.json").read_text(
+                                    "utf-8"
+                                )
                             )
                             if (
                                 summary["status"] != "PASS"
@@ -731,21 +782,30 @@ def main() -> int:
                                 or summary.get("optimized") is not False
                                 or optimized_summary["status"] != "PASS"
                                 or optimized_summary["distinct_cases"] != 72
-                                or optimized_summary.get("optimization_required") is not True
+                                or optimized_summary.get("optimization_required")
+                                is not True
                                 or optimized_summary.get("optimized") is not True
                             ):
-                                raise RuntimeError("consumer did not execute all 72 required cases")
+                                raise RuntimeError(
+                                    "consumer did not execute all 72 required cases"
+                                )
                             cell["consumer"] = {
-                                "summary": str((inner / "consumer/summary.json").relative_to(lab)),
+                                "summary": str(
+                                    (inner / "consumer/summary.json").relative_to(lab)
+                                ),
                                 "sha256": sha(inner / "consumer/summary.json"),
                                 "accepted": summary["accepted_cases"],
                                 "rejected": summary["rejected_cases"],
                             }
                             cell["consumer_optimized"] = {
                                 "summary": str(
-                                    (inner / "consumer-optimized/summary.json").relative_to(lab)
+                                    (
+                                        inner / "consumer-optimized/summary.json"
+                                    ).relative_to(lab)
                                 ),
-                                "sha256": sha(inner / "consumer-optimized/summary.json"),
+                                "sha256": sha(
+                                    inner / "consumer-optimized/summary.json"
+                                ),
                                 "accepted": optimized_summary["accepted_cases"],
                                 "rejected": optimized_summary["rejected_cases"],
                             }
@@ -778,17 +838,76 @@ def main() -> int:
                                     cwd=rebuild_source,
                                     timeout=600,
                                 )
-                                rebuilt = rebuild_source / "dist" / artifacts[name + "_wheel"].name
+                                rebuilt = (
+                                    rebuild_source
+                                    / "dist"
+                                    / artifacts[name + "_wheel"].name
+                                )
+                                if name == "consumer" and manifest.get(
+                                    "consumer_wheel_rebuild_policy"
+                                ):
+                                    canonical = (
+                                        inner
+                                        / "consumer-rebuilt-canonical"
+                                        / rebuilt.name
+                                    )
+                                    normalization_file = (
+                                        inner / "consumer-rebuild-normalization.json"
+                                    )
+                                    record.run(
+                                        "consumer-wheel-normalize-" + minor,
+                                        [
+                                            cp,
+                                            "-I",
+                                            str(
+                                                kit
+                                                / "scripts/normalize_consumer_wheel.py"
+                                            ),
+                                            "--wheel",
+                                            str(rebuilt),
+                                            "--expected-sha256",
+                                            manifest["artifact_hashes"][
+                                                "consumer_wheel"
+                                            ],
+                                            "--output",
+                                            str(canonical),
+                                            "--receipt",
+                                            str(normalization_file),
+                                        ],
+                                        timeout=120,
+                                    )
+                                    cell["consumer_wheel_rebuild_normalization"] = {
+                                        "policy": manifest[
+                                            "consumer_wheel_rebuild_policy"
+                                        ],
+                                        "receipt": str(
+                                            normalization_file.relative_to(lab)
+                                        ),
+                                        "receipt_sha256": sha(normalization_file),
+                                        "raw_wheel": str(rebuilt.relative_to(lab)),
+                                        "raw_wheel_sha256": sha(rebuilt),
+                                        "canonical_wheel": str(
+                                            canonical.relative_to(lab)
+                                        ),
+                                        "canonical_wheel_sha256": sha(canonical),
+                                    }
+                                    rebuilt = canonical
                                 if sha(rebuilt) != sha(artifacts[name + "_wheel"]):
                                     raise RuntimeError(
-                                        name + " sdist did not reproduce the exact wheel"
+                                        name
+                                        + " sdist did not reproduce the exact wheel"
                                     )
                                 rebuilt_sdist = (
-                                    rebuild_source / "dist" / artifacts[name + "_sdist"].name
+                                    rebuild_source
+                                    / "dist"
+                                    / artifacts[name + "_sdist"].name
                                 )
-                                if sha(rebuilt_sdist) != sha(artifacts[name + "_sdist"]):
+                                if sha(rebuilt_sdist) != sha(
+                                    artifacts[name + "_sdist"]
+                                ):
                                     raise RuntimeError(
-                                        name + " sdist did not reproduce the exact sdist"
+                                        name
+                                        + " sdist did not reproduce the exact sdist"
                                     )
                                 cell["sdist_rebuilds"][name] = {
                                     "wheel_sha256": sha(rebuilt),
@@ -840,7 +959,9 @@ def main() -> int:
                                 ],
                                 timeout=1800,
                             )
-                            record.run("sdist-pip-check-" + minor, [sp, "-m", "pip", "check"])
+                            record.run(
+                                "sdist-pip-check-" + minor, [sp, "-m", "pip", "check"]
+                            )
                             record.run(
                                 "sdist-consumer-" + minor,
                                 [
@@ -900,7 +1021,9 @@ def main() -> int:
                                     or case.get("accepted") is not (variant == "good")
                                     or case.get("published") is not (variant == "good")
                                 ):
-                                    raise RuntimeError("sdist native consumer outcome differs")
+                                    raise RuntimeError(
+                                        "sdist native consumer outcome differs"
+                                    )
                                 cell["sdist_consumer_cases"].append(
                                     {
                                         "variant": variant,
@@ -927,7 +1050,9 @@ def main() -> int:
                             cell["sdist_verified"] = True
                             if not args.keep_successful_venvs:
                                 shutil.rmtree(sdvenv)
-                                receipt["removed_successful_environments"].append(str(sdvenv))
+                                receipt["removed_successful_environments"].append(
+                                    str(sdvenv)
+                                )
                         if not args.keep_successful_venvs:
                             shutil.rmtree(env)
                             receipt["removed_successful_environments"].append(str(env))
@@ -935,13 +1060,15 @@ def main() -> int:
                             cache = output / "uv-cache"
                             if cache.is_dir() and not cache.is_symlink():
                                 shutil.rmtree(cache)
-                                receipt.setdefault("removed_reconstructible_caches", []).append(
-                                    str(cache)
-                                )
+                                receipt.setdefault(
+                                    "removed_reconstructible_caches", []
+                                ).append(str(cache))
                         record.save()
-            except Exception as error:
+            except Exception as error:  # noqa: BLE001 - retain every failed Python cell
                 cell["status"] = "failed"
-                cell["errors"].append({"type": type(error).__name__, "message": str(error)})
+                cell["errors"].append(
+                    {"type": type(error).__name__, "message": str(error)}
+                )
             if "interpreter" in cell:
                 for profile in ("base", "engines", "ml", "resources", "all"):
                     for endpoint in ("minimum", "latest"):
@@ -975,7 +1102,9 @@ def main() -> int:
                                 ],
                                 timeout=1800,
                             )
-                            checked = json.loads((out / "receipt.json").read_text("utf-8"))
+                            checked = json.loads(
+                                (out / "receipt.json").read_text("utf-8")
+                            )
                             if checked.get("status") != "passed":
                                 raise RuntimeError("benchmark profile did not pass")
                             item.update(
@@ -992,7 +1121,7 @@ def main() -> int:
                                             "removed_reconstructible_profile_directories",
                                             [],
                                         ).append(str(target))
-                        except Exception as error:
+                        except Exception as error:  # noqa: BLE001 - preserve independent benchmark failures
                             item.update(
                                 status="failed",
                                 error={
@@ -1005,11 +1134,16 @@ def main() -> int:
                 cell["status"] = (
                     "passed"
                     if not cell["errors"]
-                    and all(profile["status"] == "passed" for profile in cell["profiles"])
+                    and all(
+                        profile["status"] == "passed" for profile in cell["profiles"]
+                    )
                     and len(cell["profiles"]) == 16
                     and cell.get("sdist_verified")
                     and len(cell["benchmark_profiles"]) == 10
-                    and all(profile["status"] == "passed" for profile in cell["benchmark_profiles"])
+                    and all(
+                        profile["status"] == "passed"
+                        for profile in cell["benchmark_profiles"]
+                    )
                     else "failed"
                 )
             record.save()
@@ -1019,17 +1153,19 @@ def main() -> int:
             and all(cell["status"] == "passed" for cell in receipt["python_cells"])
             else "failed"
         )
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001 - unexpected failures must produce a failed receipt
         receipt["status"] = "failed"
         receipt["errors"].append({"type": type(error).__name__, "message": str(error)})
     finally:
         try:
             verify_kit(kit)
             receipt["kit_unchanged_after_run"] = True
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001 - kit verification errors always fail the run
             receipt["kit_unchanged_after_run"] = False
             receipt["status"] = "failed"
-            receipt["errors"].append({"stage": "final-kit-integrity", "type": type(error).__name__})
+            receipt["errors"].append(
+                {"stage": "final-kit-integrity", "type": type(error).__name__}
+            )
         receipt["finished_at"] = now()
         receipt["final_disk_free_bytes"] = shutil.disk_usage(parent).free
         record.save()

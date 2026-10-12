@@ -22,6 +22,7 @@ from manifest_scope import (
     LEGACY_PYTHONS,
     UNIVERSALITY_PYTHONS,
 )
+from normalize_consumer_wheel import POLICY as CONSUMER_REBUILD_POLICY
 from run_vm_lab import sha, verify_kit, write
 
 
@@ -76,6 +77,11 @@ def main() -> int:
     parser.add_argument("--core-tests", type=int, required=True)
     parser.add_argument("--benchmark-tests", type=int, required=True)
     parser.add_argument("--consumer-tests", type=int, required=True)
+    parser.add_argument(
+        "--consumer-wheel-rebuild-policy",
+        choices=(CONSUMER_REBUILD_POLICY,),
+        help="Explicit ZIP creator-format policy; preserves all artifact bytes and raw builds.",
+    )
     for label in PACKAGES:
         parser.add_argument("--" + label + "-test-manifest", type=Path, required=True)
     parser.add_argument(
@@ -234,6 +240,8 @@ def main() -> int:
         "private_credentials_included": False,
     }
     candidate_manifests(output, manifest, required=True)
+    if args.consumer_wheel_rebuild_policy:
+        manifest["consumer_wheel_rebuild_policy"] = args.consumer_wheel_rebuild_policy
     write(output / "candidate.json", manifest)
     (output / "SHA256SUMS").write_text(
         "".join(f"{item['sha256']}  {name}\n" for name, item in sorted(files.items()))
