@@ -12,6 +12,15 @@ con pesos iguales, elegido por el usuario. **66,43 % actual**, con madurez
 **5/16 = 31,25 %** tras cerrar M10. El escenario de 75,01 % es condicionado;
 los candidatos históricos y las puertas externas conservan su alcance.
 
+[Áreas rezagadas hacia el 60 %](docs/RUBRIC_FLOOR60_PLAN_20261011.md):
+madurez, tesis y seguridad necesitan cinco criterios completos adicionales
+cada una; el escenario de 75,20 % global sigue condicionado a esa evidencia.
+
+[SERCOP anual verificado y dimensionado](docs/SERCOP_ANNUAL_ENGINEERING_20261011.md):
+corpus completo leído; 54 comparaciones SDK hasta 10.000 filas aprobadas,
+límite de disco observado en el conjunto anual y 18 comprobaciones nativas
+complementarias sobre las 183.891 adjudicaciones. Los porcentajes se conservan.
+
 [Ampliación declarativa comprobada](docs/OPTION_DECLARATIVE_FOLLOWUP_20261011.md):
 270 obligaciones adicionales; trazabilidad **5.786/8.385 = 69,00 %**,
 con 922 pendientes para el 80 %. Las otras ocho cifras conservan sus mediciones.
