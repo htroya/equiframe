@@ -47,7 +47,7 @@ en VM no equivale a su despliegue o aceptación.
 
 La [matriz vigente de ocho áreas](PROJECT_STATUS_MATRIX_20261011_EIGHT.md) reúne
 las mediciones y el candidato de cada porcentaje. El propietario retiró un área
-del tablero; el promedio actual es **70,63 %**, sin reescribir el
+del tablero; el promedio actual es **70,74 %**, sin reescribir el
 [resultado histórico de nueve áreas](GLOBAL_75_RESULT_20261011.json).
 El cambio de alcance no constituye un incremento técnico. El agregado conserva
 los criterios individuales y los candidatos históricos.
@@ -57,17 +57,23 @@ tesis al menos al 80 %, y trazabilidad al menos al 85 %. Conserva las evidencias
 externas requeridas y el Word intacto. El
 [plan del 60 %](RUBRIC_FLOOR60_PLAN_20261011.md) queda como historia.
 
-La [lectura de propiedades públicas](OPTION_PROPERTIES_RESULT_20261012.md)
-acredita 32 obligaciones nuevas, además de las
+Las [llamadas con oráculos originales](OPTION_TEST_CALLS_RESULT_20261012.md)
+acreditan 71 obligaciones nuevas. La
+[lectura de propiedades públicas](OPTION_PROPERTIES_RESULT_20261012.md)
+acreditó 32, además de las
 [40 de configuración opcional](OPTION_CONFIGURATION_RESULT_20261012.md), las
 [42 fronteras sobre fixtures originales](OPTION_SEED_BOUNDS_RESULT_20261012.md) y las
 [74 obligaciones de tipos públicos](OPTION_PUBLIC_TYPES_RESULT_20261011.md).
-La medición actual es **5.974/8.385 = 71,25 %**; faltan 1.154 IDs para el 85 %.
+La medición actual es **6.045/8.385 = 72,09 %**; faltan 1.083 IDs para el 85 %.
 Las repeticiones y las guardias sin ID no incrementan la cobertura.
 
-La [preparación del kit M13](M13_PREPARATION_20261012.md) conserva seis
-artefactos originales y manifiestos exactos. Transferencia y ejecución siguen
-pendientes de la autorización específica; la colección local no añade puntos.
+La [preparación original de M13](M13_PREPARATION_20261012.md) conserva su corte
+histórico. Después se recibió autorización, se verificó la transferencia y
+comenzó el ensayo ARM64. El fallo de reconstrucción del wheel consumidor se
+conserva. El [candidato nuevo local](M13_LOCAL_CORRECTION_RESULT_20261012.json)
+usa una [regla de reconstrucción explícita](M13_REBUILD_POLICY_20261012.md);
+aún no está transferido ni ejecutado. La VM está dando timeouts SSH y M13
+continúa pendiente de evidencias finales completas y revisadas.
 
 La [comparación anual completa en la VM](SERCOP_ANNUAL_VM_20261011.md) aprueba
 81 comprobaciones SDK, incluidas 27 del corpus completo, y conserva ambas
@@ -107,7 +113,7 @@ casos específicos de Windows y los primeros recorridos como evidencia separada.
 | Documentación de este repositorio | [Plan DOC-PRO-20-v1](DOCUMENTATION_PLAN_20261010.md), [resultado inicial](DOCUMENTATION_RESULT_20261010.md), [verificación vigente](DOCUMENTATION_RECHECK_20261010.md) | 18/20 = 90 %; lectura humana independiente y documentación pública pendientes |
 | Preparación de PyPI | [Plan PYPI-PREP-20-v1](PYPI_PREPARATION_PLAN_20261010.md), [resultado](PYPI_PREPARATION_RESULT_20261010.md) | 16/20 = 80 %; preparación manual, cuatro requisitos externos pendientes |
 | Calidad de paquete | [A13, PACKAGE-QUALITY-RP-20-v1](PACKAGE_QUALITY_RESULT_20261010.md) | 16/20 = 80 %; inspiración cualitativa de Real Python |
-| Pruebas por opción | [Configuración A13](OPTION_CONFIGURATION_RESULT_20261012.md), [recibo vigente](OPTION_CONFIGURATION_RESULT_20261012.json) | A13: 5.942/8.385 = 70,86 % de obligaciones, no cobertura de líneas |
+| Pruebas por opción | [Llamadas con oráculos originales A13](OPTION_TEST_CALLS_RESULT_20261012.md), [recibo vigente](OPTION_TEST_CALLS_RESULT_20261012.json) | A13: 6.045/8.385 = 72,09 % de obligaciones, no cobertura de líneas |
 | Madurez | [M01–M16 tras M10](MATURITY_RESOURCE_RESULT_20261011.json) | 5/16 = 31,25 % de cierre estricto del alcance original |
 | Cumplimiento de requisitos de tesis | [T01–T22 actuales](THESIS_CURRENT_RESULT_20261011.json) | 9/22 = 40,91 %; no calidad editorial ni aprobación científica |
 | Usabilidad técnica | [A12, U01–U12](USABILITY_CURRENT_RESULT_20261010.md) | 11/12 = 91,67 %; observación humana pendiente |

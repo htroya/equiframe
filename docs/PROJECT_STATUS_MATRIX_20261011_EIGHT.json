@@ -5,7 +5,7 @@
     "sha256": "31aa05d69753df435948f971c742cde89dc627d430e15ff8a0ca19654fdd8bba",
     "source": "docs/SERCOP_ANNUAL_VM_RESULT_20261011.json"
   },
-  "assessed_checkout_base_commit": "7c9b3e9d8ed5d2156fb3cc5a941bc8ba873ce2b9",
+  "assessed_checkout_base_commit": "ab508e443eeb5576348fa62c5cbf9efab9de2a19",
   "assessment_date_local": "2026-10-12",
   "current_package_versions": {
     "equiframe": "0.12.0a13",
@@ -305,7 +305,7 @@
       "status": "LATEST_RECORDED_MEASUREMENT"
     },
     {
-      "additional_required": 1154,
+      "additional_required": 1083,
       "aspect": "Pruebas con trazabilidad por opción",
       "assessed_candidate": "0.12.0a13",
       "denominator": 8385,
@@ -314,22 +314,22 @@
       "native_followup": "docs/VM_TARGET_FOLLOWUP_20261011.json",
       "native_followup_scope": "Four ARM64 repeats in3.10/3.12 normal/-O;1054 identical cases per run; no coverage added.",
       "new_area_assessment_executed": true,
-      "new_current_evidence": "32 public-property obligations on16 frozen cases; exact values, builtin types and complete model JSON pass normal/-O;3 guardrails carry0 IDs.",
-      "numerator": 5974,
-      "percent": 71.24627310673823,
+      "new_current_evidence": "71 unique IDs bound to actual complete public calls and frozen original literal oracles;375 selected tests PASS normal and optimized;10 harness guards PASS in each mode.",
+      "numerator": 6045,
+      "percent": 72.09302325581395,
       "previous_record_source": "docs/OPTION_BOUNDARY_RESULT_20261011.json",
       "recalculated_now": true,
       "recalculation_scope": "Arithmetic and source/hash binding; existing area evaluation retains its candidate and scope.",
       "record_targets_current_a13": true,
       "remaining": [
-        "2411 NOT_RUN",
-        "1154 additional verified IDs required for >=85%"
+        "2340 NOT_RUN",
+        "1083 additional verified IDs required for >=85%"
       ],
-      "rounded_percent": 71.25,
+      "rounded_percent": 72.09,
       "rubric": "Frozen A13 core option obligation inventory",
-      "scope": "Exact getter values/types, whole literal model JSON, and cancellation state; no protocol stubs, unavailable output classes, exit-code binding, native execution or scientific acceptance",
-      "source": "docs/OPTION_PROPERTIES_RESULT_20261012.json",
-      "source_sha256": "ba8c6c1c7aebb7bbab3b16ef76f0ef9ba2deeb63b1941e7fdc594211e2029b58",
+      "scope": "Original literal semantic tests, actual public arguments and Python binding; not exhaustive API semantics or scientific acceptance",
+      "source": "docs/OPTION_TEST_CALLS_RESULT_20261012.json",
+      "source_sha256": "b2b8dcf0f7d5d2db53c9c1a4d378bd4fc14a0accf4704858bc1fdba26807344b",
       "status": "CURRENT_INTERNAL_MEASUREMENT_TARGET_NOT_MET",
       "target_met": false,
       "target_percent": 85,
@@ -407,7 +407,7 @@
     "source": "docs/PROJECT_STATUS_MATRIX_20261011_GLOBAL75.json"
   },
   "public_publication_performed": false,
-  "recorded_at_utc": "2026-10-12T06:47:39.912386+00:00",
+  "recorded_at_utc": "2026-10-12T16:41:43.174447+00:00",
   "schema": "equiframe.project-status.v1",
   "scope": "Owner-selected eight-area board; original per-area denominators and candidate identities retained.",
   "scope_change_is_technical_progress": false,
