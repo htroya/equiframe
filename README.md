@@ -5,7 +5,7 @@ tarea, glosario, integración y controles manuales. Las guías empaquetadas y lo
 informes históricos tienen alcances separados.
 
 [Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261011_EIGHT.md):
-ocho áreas vigentes, fuentes, candidatos y **70,53 % de promedio**. El cambio de
+ocho áreas vigentes, fuentes, candidatos y **70,63 % de promedio**. El cambio de
 alcance solicitado y el avance técnico se identifican por separado.
 
 [Metas vigentes](docs/TARGET_80_85_PLAN_20261011.md): madurez y requisitos de
@@ -13,10 +13,18 @@ tesis **≥80 %**, trazabilidad **≥85 %**, con criterios originales y pendient
 externos explícitos. El [promedio anterior de nueve áreas](docs/GLOBAL_75_RESULT_20261011.json)
 y el [plan anterior del 60 %](docs/RUBRIC_FLOOR60_PLAN_20261011.md) son históricos.
 
-[Trazabilidad actual](docs/OPTION_SEED_BOUNDS_RESULT_20261012.md):
-42 fronteras/miembros nuevos sobre fixtures originales, además de las
+[Trazabilidad actual](docs/OPTION_PROPERTIES_RESULT_20261012.md):
+32 obligaciones de propiedades, además de las
+[40 de configuración](docs/OPTION_CONFIGURATION_RESULT_20261012.md), las
+[42 fronteras/miembros](docs/OPTION_SEED_BOUNDS_RESULT_20261012.md) y las
 [74 obligaciones de tipos públicos](docs/OPTION_PUBLIC_TYPES_RESULT_20261011.md);
-**5.902/8.385 = 70,39 %**. Faltan **1.226 IDs verificados** para al menos 85 %.
+**5.974/8.385 = 71,25 %**. Faltan **1.154 IDs verificados** para al menos 85 %.
+El [recibo de custodia](docs/TRACE_INCREMENT_CUSTODY_20261012.json) identifica
+el respaldo privado de los últimos dos lotes y del intento fallido conservado.
+
+[Kit de madurez M13 preparado](docs/M13_PREPARATION_20261012.md): seis
+artefactos originales y manifiestos sellados. Su transferencia específica
+requiere la respuesta a la autorización pendiente; no se inició el ensayo.
 
 [SERCOP anual completo en la VM](docs/SERCOP_ANNUAL_VM_20261011.md):
 81 comprobaciones SDK completas aprobadas, incluidas 27 sobre las 183.891

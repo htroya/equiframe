@@ -96,12 +96,12 @@
       "assessed_candidate": "0.12.0a13",
       "denominator": 8385,
       "key": "option_traceability",
-      "numerator": 5902,
-      "percent": 70.3875968992248,
+      "numerator": 5974,
+      "percent": 71.24627310673823,
       "record_targets_current_a13": true,
-      "rounded_percent": 70.39,
-      "source": "docs/OPTION_SEED_BOUNDS_RESULT_20261012.json",
-      "source_sha256": "50651b738ecdd754d39a8642e85ff6d155bb7aefe83e3f257376d2fe2704b50d",
+      "rounded_percent": 71.25,
+      "source": "docs/OPTION_PROPERTIES_RESULT_20261012.json",
+      "source_sha256": "ba8c6c1c7aebb7bbab3b16ef76f0ef9ba2deeb63b1941e7fdc594211e2029b58",
       "weight": {
         "denominator": 8,
         "numerator": 1
@@ -124,8 +124,8 @@
     }
   ],
   "exact_fraction": {
-    "denominator": 45408,
-    "numerator": 3202475
+    "denominator": 590304,
+    "numerator": 41695535
   },
   "excluded_areas": [
     "security"
@@ -136,7 +136,7 @@
     "universality"
   ],
   "input_matrix": "PROJECT_STATUS_MATRIX_20261011_EIGHT.json",
-  "input_matrix_sha256": "1ec8ed0114e0997ee82c4f0d6eac831f1dba58916a1c0143d6ae9a473d2cacb5",
+  "input_matrix_sha256": "118500d69b7ba5250b8fbfdc5b1c606787bb9ba9447fa8d79e6e3b1637fc9c7c",
   "input_selection_rule": "Explicit reviewed consolidated matrix; no automatic chronological retrieval",
   "limitations": [
     "Equal weighting was explicitly selected; it is not an external or standardized quality assessment.",
@@ -145,15 +145,15 @@
     "Repeated tests, proposed scenarios, unknown inputs and partial criteria earn no additional area points."
   ],
   "owner_selected_method": "Mean of eight areas with equal weights; security explicitly excluded by owner2026-10-11",
-  "percent": 70.52666930937279,
-  "percentage_points_remaining": 4.473330690627202,
-  "recorded_at_utc": "2026-10-12T05:06:46.275305+00:00",
-  "rounded_percent": 70.53,
+  "percent": 70.63400383531197,
+  "percentage_points_remaining": 4.365996164688025,
+  "recorded_at_utc": "2026-10-12T06:47:39.978868+00:00",
+  "rounded_percent": 70.63,
   "rubric": "GLOBAL-EIGHT-EQUAL-v1",
   "schema": "equiframe.global-progress.v1",
   "scope": "Tracking average of latest recorded area measurements; candidate-specific area scores and external requirements remain unchanged",
   "scope_change_is_technical_progress": false,
-  "sum_of_area_percentage_point_gains_required": 35.78664552501762,
+  "sum_of_area_percentage_point_gains_required": 34.9279693175042,
   "target_met": false,
   "target_percent": 75,
   "tool_sha256": "2793d68af12eb3044c6f836ef30e6c15a873a32d25e139053e76e06effdd65e3"

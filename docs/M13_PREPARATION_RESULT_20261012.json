@@ -1,0 +1,138 @@
+{
+  "archive": "m13-kit.zip",
+  "archive_members_readback_verified": 50,
+  "artifact_hashes": {
+    "benchmark_sdist": "4f8c47a00a8724b234e87c0a7147e193092122c77772e9169bd954744dd6e9c7",
+    "benchmark_wheel": "fb843318d044a36a7ba4efab7d7d997d45798e12d16df7a9aa1b472b2c6359d8",
+    "consumer_sdist": "ebecd34b85d9922bc015421842f64ff980329660f33b41af1a93e7408f087393",
+    "consumer_wheel": "be82d4f7422dc98bbfbd978746eca5051280b1935b1191cb6fb566c61337838e",
+    "core_sdist": "164b70270344343094dc0a688bf8dbfe20a27112f7227e2f7fe318f085b71935",
+    "core_wheel": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23"
+  },
+  "candidate": {
+    "benchmark": "0.12.0a13",
+    "consumer": "0.1.15",
+    "core": "0.12.0a13"
+  },
+  "candidate_manifest_sha256": "aec98a6729f436767dc0ac98980d416da6d3a1e19a062c375ac60a5f856ccc0e",
+  "collected_tests_are_not_pass_results": true,
+  "collection_is_execution": false,
+  "criteria_closed": [],
+  "declared_file_hashes_readback_verified": 48,
+  "new_maturity_points": 0,
+  "original_artifacts_rebuilt": false,
+  "recorded_at_utc": "2026-10-12T06:40:57.883417+00:00",
+  "regular_members": 50,
+  "required_python_versions": [
+    "3.10",
+    "3.12"
+  ],
+  "required_runtime_identity": true,
+  "schema": "equiframe.m13-local-preparation-assessment.v1",
+  "scope_id": "M13-ARM-ORIGINAL-v1",
+  "scope_limits": [
+    "Original M13 ARM64 Python3.10/3.12 only; no universality matrix reduction.",
+    "No other platform, M14 full consumer matrix or scientific thesis requirement is closed.",
+    "Collected identities are not passing tests.",
+    "No Word, credentials, PyPI/TestPyPI publication or Actions execution."
+  ],
+  "sha256": "c33e581011bae4077aafccb478a7e678af9ea2cf8ff381d5f3a3bec4d6adab03",
+  "size_bytes": 6420417,
+  "source": {
+    "consumer": {
+      "branch": "main",
+      "commit": "3f17c8c5398b02ec2c97c09b2ac4eac1c36e3143",
+      "history": "observed committed source; integration status is recorded separately",
+      "tree": "2fed18cd7614d916be292e4283e51aa976d3feca",
+      "worktree_clean": true
+    },
+    "consumer_data": {
+      "branch": "main",
+      "commit": "e8e17976dfa2c36a5cbcf4c2ec183469a73adbc7",
+      "history": "observed committed frozen-data source; no remote publication implied",
+      "tree": "02b41f05f5fc14e779cdb85219a020bef7f060a6",
+      "worktree_clean": true
+    },
+    "equiframe": {
+      "branch": "main",
+      "commit": "f9b4348e3ff51218f3a63494d7f13121cbda3a7d",
+      "history": "observed committed source; integration status is recorded separately",
+      "tree": "aff829273da67946584fc099b5f89413a3624ea6",
+      "worktree_clean": true
+    },
+    "verified_remote_baseline": {
+      "commit": "7c9b3e9d8ed5d2156fb3cc5a941bc8ba873ce2b9",
+      "note": "Caller-observed remote main; source is a verified descendant, not a claim of final integration",
+      "repository": "htroya/equiframe",
+      "tree": "08a3aaaede23133fe0237de6cd7f41a2d96580ed"
+    }
+  },
+  "status": "PREPARED_LOCALLY_AWAITING_EXPLICIT_TRANSFER_APPROVAL",
+  "suites_collected_locally": {
+    "benchmark": {
+      "hypothesis_version": "6.168.3",
+      "package": "equiframe-benchmark",
+      "pytest_version": "9.1.1",
+      "test_count": 627,
+      "test_files": 31
+    },
+    "consumer": {
+      "hypothesis_version": "6.168.3",
+      "package": "equiframe-consumer-lab",
+      "pytest_version": "9.1.1",
+      "test_count": 19,
+      "test_files": 3
+    },
+    "core": {
+      "hypothesis_version": "6.168.3",
+      "package": "equiframe",
+      "pytest_version": "9.1.1",
+      "test_count": 8077,
+      "test_files": 230
+    }
+  },
+  "test_manifests": {
+    "benchmark": {
+      "path": "test-manifests/benchmark.json",
+      "sha256": "a9add614694e13d586f9ec279d61df9a79fc0542a32afb83f301bdd7164aa049",
+      "size_bytes": 97180
+    },
+    "consumer": {
+      "path": "test-manifests/consumer.json",
+      "sha256": "5e6846208e489598424825228276233fcefcb2af2e6246d1691e6b0ebed0e081",
+      "size_bytes": 4074
+    },
+    "core": {
+      "path": "test-manifests/core.json",
+      "sha256": "a4ac1f96dbc60da827d4ccfd09211f25fc2f2e47d8175aa05426af7a3453b4eb",
+      "size_bytes": 1305645
+    }
+  },
+  "tooling_harness": {
+    "normal": {
+      "passed": 54,
+      "skipped": 1,
+      "subtests": 26
+    },
+    "optimized": {
+      "passed": 54,
+      "skipped": 1,
+      "subtests": 26
+    },
+    "scope": "Local handoff tool controls; not M13 SDK matrix execution"
+  },
+  "vm_transport": {
+    "archive_transferred": false,
+    "automatic_approval_review": "REJECTED",
+    "denied_transfer_not_retried": true,
+    "explicit_payload_approval_received": false,
+    "explicit_payload_approval_requested": true,
+    "host": "157.137.227.1",
+    "input_directory_prepared": true,
+    "m13_execution_started": false,
+    "reason": "Previous reliable authorization covered a smaller and different transfer with four artifacts; this expanded private kit has six artifacts, sources and validation data.",
+    "target_directory": "/home/hernan/equiframe-m13-kit-20261012-aec98a67",
+    "user": "hernan"
+  },
+  "word_and_credentials_included": false
+}
