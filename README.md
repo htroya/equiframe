@@ -4,22 +4,26 @@
 tarea, glosario, integración y controles manuales. Las guías empaquetadas y los
 informes históricos tienen alcances separados.
 
-[Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261011_GLOBAL75.md): las
-nueve áreas, su última medición identificada y las evaluaciones aún pendientes.
+[Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261011_EIGHT.md):
+ocho áreas vigentes, fuentes, candidatos y **70,53 % de promedio**. El cambio de
+alcance solicitado y el avance técnico se identifican por separado.
 
-[Meta global del 75 %](docs/GLOBAL_75_PLAN_20261011.md): promedio de nueve áreas
-con pesos iguales, elegido por el usuario. **66,43 % actual**, con madurez
-**5/16 = 31,25 %** tras cerrar M10. El escenario de 75,01 % es condicionado;
-los candidatos históricos y las puertas externas conservan su alcance.
+[Metas vigentes](docs/TARGET_80_85_PLAN_20261011.md): madurez y requisitos de
+tesis **≥80 %**, trazabilidad **≥85 %**, con criterios originales y pendientes
+externos explícitos. El [promedio anterior de nueve áreas](docs/GLOBAL_75_RESULT_20261011.json)
+y el [plan anterior del 60 %](docs/RUBRIC_FLOOR60_PLAN_20261011.md) son históricos.
 
-[Áreas rezagadas hacia el 60 %](docs/RUBRIC_FLOOR60_PLAN_20261011.md):
-madurez, tesis y seguridad necesitan cinco criterios completos adicionales
-cada una; el escenario de 75,20 % global sigue condicionado a esa evidencia.
+[Trazabilidad actual](docs/OPTION_SEED_BOUNDS_RESULT_20261012.md):
+42 fronteras/miembros nuevos sobre fixtures originales, además de las
+[74 obligaciones de tipos públicos](docs/OPTION_PUBLIC_TYPES_RESULT_20261011.md);
+**5.902/8.385 = 70,39 %**. Faltan **1.226 IDs verificados** para al menos 85 %.
 
-[SERCOP anual verificado y dimensionado](docs/SERCOP_ANNUAL_ENGINEERING_20261011.md):
-corpus completo leído; 54 comparaciones SDK hasta 10.000 filas aprobadas,
-límite de disco observado en el conjunto anual y 18 comprobaciones nativas
-complementarias sobre las 183.891 adjudicaciones. Los porcentajes se conservan.
+[SERCOP anual completo en la VM](docs/SERCOP_ANNUAL_VM_20261011.md):
+81 comprobaciones SDK completas aprobadas, incluidas 27 sobre las 183.891
+adjudicaciones. Se conservaron las capturas, ambos intentos ARM64 y el
+[límite anterior de Windows](docs/SERCOP_ANNUAL_ENGINEERING_20261011.md).
+
+Los siguientes seguimientos conservan sus cortes históricos:
 
 [Ampliación declarativa comprobada](docs/OPTION_DECLARATIVE_FOLLOWUP_20261011.md):
 270 obligaciones adicionales; trazabilidad **5.786/8.385 = 69,00 %**,
@@ -28,7 +32,7 @@ con 922 pendientes para el 80 %. Las otras ocho cifras conservan sus mediciones.
 [Plan de las metas revisadas](docs/IMPLEMENTATION_PLAN_TARGETS_20261011.md):
 umbrales de las rúbricas originales, validación y dependencias externas.
 [Seguimiento de las metas revisadas](docs/TARGET_FOLLOWUP_RESULT_20261011.md):
-1.072 obligaciones nuevas y mediciones actuales de madurez, tesis y seguridad,
+1.072 obligaciones nuevas y las mediciones de ese corte,
 con metas pendientes. El [plan inicial del 95 %](docs/IMPLEMENTATION_95_PLAN_20261011.md)
 se conserva como histórico.
 [Validación VM autorizada](docs/VM_TARGET_FOLLOWUP_20261011.md): 32 pruebas POSIX

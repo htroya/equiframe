@@ -1,8 +1,19 @@
-# Kit ARM64 A10: guía vigente de ejecución y devolución
+# Kit ARM64: ejecución y devolución de un candidato identificado
 
-Este kit privado contiene núcleo y benchmark **0.12.0a10**, consumidor externo **0.1.12**, sus seis artefactos y el corpus congelado. A10 conserva la dependencia directa de `typing-extensions`, reutiliza el entorno bloqueado al reinstalar la rueda exacta del núcleo y exige candidatos binarios desde la resolución de perfiles del benchmark.
+El manifiesto de cada kit privado identifica sus seis artefactos y el corpus
+congelado. El candidato actual propuesto usa núcleo/benchmark **0.12.0a13** y
+consumidor **0.1.15**; conservar el nombre no acredita haber ensamblado o
+ejecutado un kit nuevo. La edición anterior A10/0.1.12 conserva sus recibos.
 
-`candidate.json` identifica los commits/árboles de las fuentes, tooling_source, los seis artefactos, hashes y la lista obligatoria **3.10, 3.11, 3.12, 3.13**. También vincula `test-manifests/core.json`, `benchmark.json` y `consumer.json` con los archivos de pruebas de cada sdist, las identidades JUnit exactas y las versiones congeladas de pytest/Hypothesis. `SHA256SUMS` identifica sus archivos. No sustituya artefactos o scripts ni mezcle manifests. El kit es intermedio: las matrices/celdas no ejecutadas siguen pendientes y no se declara 100 %.
+`candidate.json` identifica commits/árboles, tooling_source, seis artefactos,
+hashes y versiones requeridas. El ensamblador mantiene por defecto el esquema
+de universalidad v2, con **3.10, 3.11, 3.12, 3.13**. La opción explícita
+`--scope original-m13-arm` produce una expedición separada v1 para el requisito
+original M13: **ARM64 3.10 y 3.12**, con todos los controles y tres paquetes.
+No reduce la matriz v2 ni cierra otras plataformas o M14 automáticamente.
+Ambos alcances vinculan los tres `test-manifests` con los archivos originales
+de sus sdists, identidades JUnit exactas y versiones de pytest/Hypothesis.
+`SHA256SUMS` identifica los miembros; los kits anteriores no se sobrescriben.
 
 Al preparar un kit nuevo, `assemble_kit.py` exige `--core-test-manifest`, `--benchmark-test-manifest` y `--consumer-test-manifest`, además de los recuentos reales. El runner rechaza kits sin estos tres manifiestos antes de crear entornos. La revisión histórica conserva el alcance original de kits anteriores.
 
@@ -12,7 +23,11 @@ Use exclusivamente el Codex local que ya dispone del acceso SSH autorizado. La n
 
 Verifique el SHA-256 externo del ZIP suministrado con esta edición, antes de cualquier extracción. Extraiga a un directorio nuevo mediante un procedimiento que rechace rutas absolutas/traversal, enlaces y miembros inesperados. El helper revisado `transport_vm.py` realiza además una inspección cerrada antes del transporte y la extracción en VM. Un hash incluido dentro del propio ZIP no establece confianza externa.
 
-El servidor esperado es maestria-vnic, usuario hernan/uid 1003, Linux aarch64. El pin Ed25519 confiado es `SHA256:f8cEqNHs2kOMivOwAqSawhz7JyEm59LkLpFT6b8fB7M`. Deben existir `/usr/bin/python3.10`, `/usr/bin/python3.11`, `/usr/bin/python3.12` y `/usr/bin/python3.13`, con venv funcional. No se cambia el Python global, usuarios, servicios, firewall ni DW.
+El servidor esperado es maestria-vnic, usuario hernan/uid 1003, Linux aarch64.
+El pin Ed25519 confiado es `SHA256:f8cEqNHs2kOMivOwAqSawhz7JyEm59LkLpFT6b8fB7M`.
+Cada versión requerida por el manifiesto debe tener un intérprete real con venv
+funcional; se admiten rutas privadas explícitas. No se cambia el Python global,
+usuarios, servicios, firewall ni DW.
 
 ## 2. Transporte desde Windows
 
@@ -30,7 +45,11 @@ $ZipSha256 = 'SHA256_EXTERNO_DE_ESTA_EDICION'
   -SshHost 'HOST_YA_AUTORIZADO' -SshUser 'hernan' -PythonPath 'python'
 ```
 
-El launcher verifica el ZIP/pin, transfiere, ejecuta **las cuatro versiones**, recoge evidencia y devuelve un código no cero ante fallo. KeyPath solo se usa por SSH local y nunca se copia. Usa BatchMode, IdentitiesOnly, ForwardAgent=no y StrictHostKeyChecking=yes; solo copia temporalmente el archivo público de confianza. No instala componentes globales ni desactiva TLS/confianza del host. Los tests simulados de transporte no equivalen a una ejecución Windows/SSH real.
+El launcher verifica el ZIP/pin, transfiere, ejecuta **las versiones exigidas
+por ese manifiesto**, recoge evidencia y devuelve un código no cero ante fallo.
+KeyPath solo se usa por SSH local y nunca se copia. Conserva la confianza del
+host y no instala componentes globales. Los tests simulados de transporte no
+equivalen a una ejecución Windows/SSH real.
 
 ## 3. Ejecución directa en la VM, si el Codex autorizado realiza el transporte
 

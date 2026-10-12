@@ -1,6 +1,9 @@
 """Equal-weight tracking average explicitly requested by the project owner.
 
-Nine original area rubrics keep their denominators, sources and candidates.
+Original area rubrics keep their denominators, sources and candidates.
+The default retains nine areas. An explicit eight-area matrix and CLI switch
+implement the owner's later exclusion of the security area without changing
+historical results or removing requirements inside other area rubrics.
 This is a project tracking index; it is not certification, a scientific result,
 or evidence that any individual area met its target. Unknown inputs are errors.
 """
@@ -49,12 +52,15 @@ def read(path):
     )
 
 
-def calculate(metrics):
+def calculate(metrics, *, exclude_security=False):
     """Use exact unrounded fractions and reject missing or repeated areas."""
+    require(type(exclude_security) is bool, "Explicit scope selection required")
+    expected_keys = set(BINDINGS) - ({"security"} if exclude_security else set())
+    area_count = len(expected_keys)
     keys = [metric["key"] for metric in metrics]
     require(
-        len(keys) == len(set(keys)) == 9 and set(keys) == set(BINDINGS),
-        "All nine original areas are required",
+        len(keys) == len(set(keys)) == area_count and set(keys) == expected_keys,
+        "All selected original areas are required",
     )
     total = Fraction(0)
     historical = []
@@ -85,7 +91,7 @@ def calculate(metrics):
                 "denominator": denominator,
                 "percent": float(percentage),
                 "rounded_percent": round(float(percentage), 2),
-                "weight": {"numerator": 1, "denominator": 9},
+                "weight": {"numerator": 1, "denominator": area_count},
                 "assessed_candidate": metric["assessed_candidate"],
                 "record_targets_current_a13": metric["record_targets_current_a13"],
                 "source": metric["source"],
@@ -94,13 +100,19 @@ def calculate(metrics):
         )
         if not metric["record_targets_current_a13"]:
             historical.append(key)
-    average = total / 9
+    average = total / area_count
     return {
         "schema": "equiframe.global-progress.v1",
-        "rubric": RUBRIC,
-        "owner_selected_method": "Mean of all nine areas with equal weights; user confirmed2026-10-11",
-        "formula": "sum(100 * verified_i / original_denominator_i) / 9",
-        "area_count": 9,
+        "rubric": "GLOBAL-EIGHT-EQUAL-v1" if exclude_security else RUBRIC,
+        "owner_selected_method": (
+            "Mean of eight areas with equal weights; security explicitly excluded by owner2026-10-11"
+            if exclude_security
+            else "Mean of all nine areas with equal weights; user confirmed2026-10-11"
+        ),
+        "formula": f"sum(100 * verified_i / original_denominator_i) / {area_count}",
+        "area_count": area_count,
+        "excluded_areas": ["security"] if exclude_security else [],
+        "scope_change_is_technical_progress": False,
         "areas": areas,
         "percent": float(average),
         "rounded_percent": round(float(average), 2),
@@ -112,7 +124,7 @@ def calculate(metrics):
         "target_met": average >= 75,
         "percentage_points_remaining": float(max(Fraction(0), 75 - average)),
         "sum_of_area_percentage_point_gains_required": float(
-            max(Fraction(0), 675 - total)
+            max(Fraction(0), 75 * area_count - total)
         ),
         "historical_candidate_areas": historical,
         "all_area_measurements_are_current_a13": not historical,
@@ -126,7 +138,7 @@ def calculate(metrics):
     }
 
 
-def measure(matrix_path, repo):
+def measure(matrix_path, repo, *, exclude_security=False):
     matrix = read(matrix_path)
     metrics = matrix["metrics"]
     # Check every source before accepting its numbers; the matrix is a view,
@@ -171,7 +183,7 @@ def measure(matrix_path, repo):
             source["candidate"] == expected_candidate,
             "Source candidate differs",
         )
-    result = calculate(metrics)
+    result = calculate(metrics, exclude_security=exclude_security)
     result["recorded_at_utc"] = datetime.now(timezone.utc).isoformat()
     result["input_matrix"] = matrix_path.name
     result["input_selection_rule"] = (
@@ -187,8 +199,13 @@ def main():
     parser.add_argument("--matrix", type=Path, required=True)
     parser.add_argument("--repo", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--exclude-security",
+        action="store_true",
+        help="Require the explicit eight-area matrix selected by the owner",
+    )
     args = parser.parse_args()
-    result = measure(args.matrix, args.repo)
+    result = measure(args.matrix, args.repo, exclude_security=args.exclude_security)
     with args.output.open("x", encoding="utf-8", newline="\n") as stream:
         json.dump(
             result,

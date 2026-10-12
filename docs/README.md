@@ -45,24 +45,32 @@ en VM no equivale a su despliegue o aceptación.
 
 ## Informes y alcance de los porcentajes
 
-La [matriz de las nueve áreas](PROJECT_STATUS_MATRIX_20261011_GLOBAL75.md) reúne los
-resultados medidos e incorpora las nuevas evaluaciones de madurez, tesis y seguridad.
-Identifica el candidato de cada porcentaje. El usuario eligió ahora un promedio
-de las nueve áreas con pesos iguales: [método](GLOBAL_75_METHOD_20261011.md) y
-[ruta al 75 %](GLOBAL_75_PLAN_20261011.md). El promedio vigente es **66,43 %**;
-M10 comprobado lleva madurez a **31,25 %**. El agregado no sustituye los criterios
-individuales, certificación, evidencia científica ni sus candidatos históricos.
+La [matriz vigente de ocho áreas](PROJECT_STATUS_MATRIX_20261011_EIGHT.md) reúne
+las mediciones y el candidato de cada porcentaje. El propietario retiró un área
+del tablero; el promedio actual es **70,53 %**, sin reescribir el
+[resultado histórico de nueve áreas](GLOBAL_75_RESULT_20261011.json).
+El cambio de alcance no constituye un incremento técnico. El agregado conserva
+los criterios individuales y los candidatos históricos.
 
-El [plan para elevar las áreas rezagadas al 60 %](RUBRIC_FLOOR60_PLAN_20261011.md)
-conserva los criterios originales: cinco cierres completos adicionales en
-madurez, tesis y seguridad. Su escenario de 75,20 % global no es una medición.
+El [plan vigente](TARGET_80_85_PLAN_20261011.md) fija madurez y requisitos de
+tesis al menos al 80 %, y trazabilidad al menos al 85 %. Conserva las evidencias
+externas requeridas y el Word intacto. El
+[plan del 60 %](RUBRIC_FLOOR60_PLAN_20261011.md) queda como historia.
 
-La [verificación anual SERCOP](SERCOP_ANNUAL_ENGINEERING_20261011.md) conserva
+Las [fronteras exactas de fixtures originales](OPTION_SEED_BOUNDS_RESULT_20261012.md)
+acreditan 42 obligaciones nuevas sobre 22 entradas originales, además de las
+[74 obligaciones de tipos públicos](OPTION_PUBLIC_TYPES_RESULT_20261011.md).
+La medición actual es **5.902/8.385 = 70,39 %**; faltan 1.226 IDs para el 85 %.
+Las repeticiones y las guardias sin ID no incrementan la cobertura.
+
+La [comparación anual completa en la VM](SERCOP_ANNUAL_VM_20261011.md) aprueba
+81 comprobaciones SDK, incluidas 27 del corpus completo, y conserva ambas
+repeticiones ARM64. La [verificación anual anterior](SERCOP_ANNUAL_ENGINEERING_20261011.md) conserva
 54 comparaciones SDK completas hasta 10.000 filas, el límite de disco del
 conjunto anual y 18 comprobaciones nativas complementarias sobre todas sus
 adjudicaciones. Registra recursos y distingue resultados científicos pendientes.
 
-La [ampliación declarativa](OPTION_DECLARATIVE_FOLLOWUP_20261011.md) añade 270
+En el corte anterior, la [ampliación declarativa](OPTION_DECLARATIVE_FOLLOWUP_20261011.md) añadió 270
 obligaciones con esperados completos y ejecución normal/optimizada: trazabilidad
 69,00 %, con 922 obligaciones pendientes para el 80 %. Las mediciones previas
 y las versiones históricas permanecen identificadas.
@@ -93,10 +101,9 @@ casos específicos de Windows y los primeros recorridos como evidencia separada.
 | Documentación de este repositorio | [Plan DOC-PRO-20-v1](DOCUMENTATION_PLAN_20261010.md), [resultado inicial](DOCUMENTATION_RESULT_20261010.md), [verificación vigente](DOCUMENTATION_RECHECK_20261010.md) | 18/20 = 90 %; lectura humana independiente y documentación pública pendientes |
 | Preparación de PyPI | [Plan PYPI-PREP-20-v1](PYPI_PREPARATION_PLAN_20261010.md), [resultado](PYPI_PREPARATION_RESULT_20261010.md) | 16/20 = 80 %; preparación manual, cuatro requisitos externos pendientes |
 | Calidad de paquete | [A13, PACKAGE-QUALITY-RP-20-v1](PACKAGE_QUALITY_RESULT_20261010.md) | 16/20 = 80 %; inspiración cualitativa de Real Python |
-| Pruebas por opción | [A13 ampliación declarativa](OPTION_DECLARATIVE_FOLLOWUP_20261011.md), [recibo vigente](OPTION_LITERAL_FIELD_RESULT_20261011.json) | A13: 5.786/8.385 = 69,00 % de obligaciones, no cobertura de líneas |
+| Pruebas por opción | [Fronteras A13](OPTION_SEED_BOUNDS_RESULT_20261012.md), [recibo vigente](OPTION_SEED_BOUNDS_RESULT_20261012.json) | A13: 5.902/8.385 = 70,39 % de obligaciones, no cobertura de líneas |
 | Madurez | [M01–M16 tras M10](MATURITY_RESOURCE_RESULT_20261011.json) | 5/16 = 31,25 % de cierre estricto del alcance original |
 | Cumplimiento de requisitos de tesis | [T01–T22 actuales](THESIS_CURRENT_RESULT_20261011.json) | 9/22 = 40,91 %; no calidad editorial ni aprobación científica |
-| Preparación técnica en seguridad | [SEC-PREP-20-v1 aplicada](SECURITY_READINESS_RESULT_20261011.json) | 7/20 = 35 %; auditoría parcial y hallazgo bajo abierto |
 | Usabilidad técnica | [A12, U01–U12](USABILITY_CURRENT_RESULT_20261010.md) | 11/12 = 91,67 %; observación humana pendiente |
 | Universalidad técnica | [A11, UV-TECH-A11-60-v1](UNIVERSALITY_80_RESULT_20261010.md) | 48/60 = 80 %; no se traslada automáticamente a otro wheel |
 

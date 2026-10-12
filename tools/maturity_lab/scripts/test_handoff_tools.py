@@ -12,8 +12,15 @@ import zipfile
 from pathlib import Path, PurePosixPath
 from unittest.mock import patch
 
+from assemble_kit import candidate_scope
 from check_benchmark_profile import requirements, resolution_command
 from check_upgrade_rollback import DOCUMENTARY_A7_CORE_HASH, OLD_HASHES
+from manifest_scope import (
+    receipt_schema,
+    required_pythons,
+    requires_runtime_identity,
+    validate_cell_scope,
+)
 from measure_maturity import observed_filesystem
 from run_vm_lab import Recorder, python_at, sha, verify_kit, write_runtime_constraints
 from validate_vm_receipts import Review, member
@@ -47,6 +54,47 @@ class HandoffToolsTests(unittest.TestCase):
         }
         return review
 
+    def test_separate_original_m13_expedition_preserves_all_receipt_cells(self):
+        candidate = candidate_scope("original-m13-arm")
+        self.assertEqual(required_pythons(candidate), ("3.10", "3.12"))
+        self.assertFalse(candidate["universality_matrix_reduced"])
+        self.assertFalse(candidate["other_platforms_and_python_minors_closed"])
+        self.assertEqual(candidate["criteria_automatically_closed"], [])
+        self.assertTrue(requires_runtime_identity(candidate))
+        for wrong in (None, False):
+            with self.subTest(marker=wrong), self.assertRaises(ValueError):
+                required_pythons({**candidate, "required_runtime_identity": wrong})
+        with self.assertRaises(ValueError):
+            validate_cell_scope(
+                candidate,
+                {
+                    "schema": "equiframe-maturity-vm-execution-1",
+                    "python_cells": [{"minor": "3.12"}],
+                },
+            )
+
+    def test_universality_scope_still_rejects_a_two_minor_receipt(self):
+        candidate = candidate_scope("universality")
+        self.assertEqual(required_pythons(candidate), ("3.10", "3.11", "3.12", "3.13"))
+        with self.assertRaises(ValueError):
+            validate_cell_scope(
+                candidate,
+                {
+                    "schema": "equiframe-maturity-vm-execution-2",
+                    "required_python_versions": ["3.10", "3.11", "3.12", "3.13"],
+                    "python_cells": [{"minor": "3.10"}, {"minor": "3.12"}],
+                },
+            )
+
+    def test_scope_is_explicit_and_returns_independent_manifests(self):
+        with self.assertRaises(ValueError):
+            candidate_scope("infer-from-installed-python")
+        mutated = candidate_scope("universality")
+        mutated["required_python_versions"].pop()
+        self.assertEqual(
+            len(candidate_scope("universality")["required_python_versions"]), 4
+        )
+
     def test_upgrade_uses_reviewed_executable_a7_identity(self):
         self.assertEqual(
             OLD_HASHES["core"],
@@ -66,7 +114,9 @@ class HandoffToolsTests(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             python_at(self.root / "missing")
 
-    @unittest.skipUnless(os.name == "posix", "POSIX virtual environments use interpreter links")
+    @unittest.skipUnless(
+        os.name == "posix", "POSIX virtual environments use interpreter links"
+    )
     def test_python_at_preserves_a_valid_posix_interpreter_link(self):
         entry = self.root / "linked/bin/python"
         entry.parent.mkdir(parents=True)
@@ -94,11 +144,16 @@ class HandoffToolsTests(unittest.TestCase):
             review.relative("/home/hernan/owned-lab/py3.10-all/receipt.json"),
             "py3.10-all/receipt.json",
         )
-        self.assertEqual(review.relative("py3.10-all/receipt.json"), "py3.10-all/receipt.json")
+        self.assertEqual(
+            review.relative("py3.10-all/receipt.json"), "py3.10-all/receipt.json"
+        )
         with self.assertRaises(ValueError):
             review.relative("/home/hernan/other-lab/receipt.json")
         for invalid in ("../outside", "nested/../receipt.json", "nested\\receipt.json"):
-            with self.subTest(invalid=invalid), self.assertRaisesRegex(ValueError, "canonical"):
+            with (
+                self.subTest(invalid=invalid),
+                self.assertRaisesRegex(ValueError, "canonical"),
+            ):
                 review.relative(invalid)
 
     def test_member_accepts_inventory_file(self):
@@ -130,7 +185,9 @@ class HandoffToolsTests(unittest.TestCase):
 
     def test_duplicate_command_labels_do_not_establish_a_pass(self):
         with self.assertRaisesRegex(ValueError, "repeated"):
-            self.review().commands([{"label": "install"}, {"label": "install"}], {"install"})
+            self.review().commands(
+                [{"label": "install"}, {"label": "install"}], {"install"}
+            )
 
     def test_timeout_cannot_pass_even_with_null_expected_exit(self):
         with self.assertRaisesRegex(ValueError, "timed-out"):
@@ -155,24 +212,32 @@ class HandoffToolsTests(unittest.TestCase):
             self.review().junit("suite.xml", 1)
 
     def test_junit_cannot_hide_missing_cases(self):
-        self.file("suite.xml", '<testsuite tests="1"><testcase name="synthetic"/></testsuite>')
+        self.file(
+            "suite.xml", '<testsuite tests="1"><testcase name="synthetic"/></testsuite>'
+        )
         with self.assertRaisesRegex(ValueError, "incomplete"):
             self.review().junit("suite.xml", 2)
 
     def test_junit_rejects_declared_count_drift(self):
-        self.file("suite.xml", '<testsuite tests="2"><testcase name="synthetic"/></testsuite>')
+        self.file(
+            "suite.xml", '<testsuite tests="2"><testcase name="synthetic"/></testsuite>'
+        )
         with self.assertRaisesRegex(ValueError, "count"):
             self.review().junit("suite.xml", 1)
 
     def test_junit_accepts_complete_synthetic_fixture_without_claiming_vm(self):
-        self.file("suite.xml", '<testsuite tests="1"><testcase name="synthetic"/></testsuite>')
+        self.file(
+            "suite.xml", '<testsuite tests="1"><testcase name="synthetic"/></testsuite>'
+        )
         self.review().junit("suite.xml", 1)
 
     def test_candidate_changed_member_is_rejected(self):
         path = self.file("payload", "initial")
         manifest = {
             "schema": "equiframe-maturity-candidate-1",
-            "files": {"payload": {"sha256": sha(path), "size_bytes": path.stat().st_size}},
+            "files": {
+                "payload": {"sha256": sha(path), "size_bytes": path.stat().st_size}
+            },
         }
         self.file("candidate.json", json.dumps(manifest))
         path.write_text("changed")
@@ -228,7 +293,9 @@ class HandoffToolsTests(unittest.TestCase):
             "frozen_data_unchanged": True,
             "native_execution_count_complete": True,
             "dataset_manifest_sha256": dataset_hash,
-            "native_result": {"executions": [{"engine": "pandas"}, {"engine": "duckdb"}]},
+            "native_result": {
+                "executions": [{"engine": "pandas"}, {"engine": "duckdb"}]
+            },
             "environment": {
                 "python": "3.12.1",
                 "machine": "aarch64",
@@ -238,7 +305,9 @@ class HandoffToolsTests(unittest.TestCase):
         }
         self.file("case.json", json.dumps(case))
         review = self.review()
-        review.candidate = {"files": {"consumer-data/manifest.json": {"sha256": dataset_hash}}}
+        review.candidate = {
+            "files": {"consumer-data/manifest.json": {"sha256": dataset_hash}}
+        }
         review.consumer_case(
             "case.json",
             "3.12",
@@ -262,7 +331,9 @@ class HandoffToolsTests(unittest.TestCase):
         receipt = {"commands": []}
         record = Recorder(self.root, receipt)
         with self.assertRaises(RuntimeError):
-            record.run("synthetic-failure", [sys.executable, "-I", "-c", "raise SystemExit(2)"])
+            record.run(
+                "synthetic-failure", [sys.executable, "-I", "-c", "raise SystemExit(2)"]
+            )
         self.assertEqual(receipt["commands"][0]["status"], "failed")
         self.assertEqual(receipt["commands"][0]["exit_code"], 2)
 
@@ -325,7 +396,11 @@ class HandoffToolsTests(unittest.TestCase):
     def test_benchmark_resolution_rejects_unknown_endpoint(self):
         with self.assertRaisesRegex(ValueError, "unknown benchmark profile endpoint"):
             resolution_command(
-                ["uv"], self.root / "runtime.in", sys.executable, "oldest", self.root / "lock"
+                ["uv"],
+                self.root / "runtime.in",
+                sys.executable,
+                "oldest",
+                self.root / "lock",
             )
 
     def test_cloud_validation_receipt_is_never_vm_evidence(self):
@@ -353,13 +428,17 @@ class HandoffToolsTests(unittest.TestCase):
 
     def test_runtime_constraints_keep_pins_without_implicit_hash_mode(self):
         path = self.root / "constraints.txt"
-        write_runtime_constraints(path, {"typing-extensions": "4.15.0", "numpy": "2.2.6"})
+        write_runtime_constraints(
+            path, {"typing-extensions": "4.15.0", "numpy": "2.2.6"}
+        )
         self.assertEqual(path.read_text(), "numpy==2.2.6\ntyping-extensions==4.15.0\n")
         self.assertNotIn("--hash", path.read_text())
 
     def test_runtime_constraints_reject_non_version_input(self):
         with self.assertRaises(ValueError):
-            write_runtime_constraints(self.root / "constraints", {"numpy": "2.2.6\nother==1"})
+            write_runtime_constraints(
+                self.root / "constraints", {"numpy": "2.2.6\nother==1"}
+            )
 
     def test_runtime_constraints_reject_empty_resolution(self):
         with self.assertRaises(ValueError):
@@ -370,15 +449,21 @@ class HandoffToolsTests(unittest.TestCase):
         ram = str(self.root / "ram").replace("\\", r"\134").replace(" ", r"\040")
         mounts = f"1 0 0:1 / {disk} rw - overlay overlay rw\n2 1 0:2 / {ram} rw - tmpfs tmpfs rw\n"
         with patch.object(Path, "read_text", return_value=mounts):
-            self.assertEqual(observed_filesystem(self.root / "ram/measurement"), "tmpfs")
-            self.assertEqual(observed_filesystem(self.root / "disk/measurement"), "overlay")
+            self.assertEqual(
+                observed_filesystem(self.root / "ram/measurement"), "tmpfs"
+            )
+            self.assertEqual(
+                observed_filesystem(self.root / "disk/measurement"), "overlay"
+            )
 
     def test_measurement_decodes_mount_path_escapes(self):
         disk = str(self.root).replace("\\", r"\134").replace(" ", r"\040")
         ram = str(self.root / "test path").replace("\\", r"\134").replace(" ", r"\040")
         mounts = f"1 0 0:1 / {disk} rw - overlay overlay rw\n2 1 0:2 / {ram} rw - tmpfs tmpfs rw\n"
         with patch.object(Path, "read_text", return_value=mounts):
-            self.assertEqual(observed_filesystem(self.root / "test path/measurement"), "tmpfs")
+            self.assertEqual(
+                observed_filesystem(self.root / "test path/measurement"), "tmpfs"
+            )
 
     def test_unknown_measurement_mount_fails_closed(self):
         with (
@@ -389,7 +474,9 @@ class HandoffToolsTests(unittest.TestCase):
 
     def test_unreadable_measurement_mount_fails_closed(self):
         with (
-            patch.object(Path, "read_text", side_effect=PermissionError("synthetic denial")),
+            patch.object(
+                Path, "read_text", side_effect=PermissionError("synthetic denial")
+            ),
             self.assertRaisesRegex(RuntimeError, "Cannot observe"),
         ):
             observed_filesystem(self.root)
@@ -411,7 +498,9 @@ class HandoffToolsTests(unittest.TestCase):
             "frozen_data_unchanged": True,
             "native_execution_count_complete": True,
             "dataset_manifest_sha256": "a" * 64,
-            "native_result": {"executions": [{"engine": "pandas"}, {"engine": "duckdb"}]},
+            "native_result": {
+                "executions": [{"engine": "pandas"}, {"engine": "duckdb"}]
+            },
             "environment": {
                 "python": "3.10.0 synthetic fixture",
                 "machine": "aarch64",
@@ -423,7 +512,9 @@ class HandoffToolsTests(unittest.TestCase):
     def case_review(self, case):
         self.file("case.json", json.dumps(case))
         review = self.review()
-        review.candidate = {"files": {"consumer-data/manifest.json": {"sha256": "a" * 64}}}
+        review.candidate = {
+            "files": {"consumer-data/manifest.json": {"sha256": "a" * 64}}
+        }
         return review
 
     def test_synthetic_case_validator_checks_positive_structure_only(self):
@@ -569,7 +660,9 @@ class VersionedScopeTests(unittest.TestCase):
 
         for minor in ("3.11", "3.13"):
             receipt = self.receipt()
-            receipt["python_cells"] = [c for c in receipt["python_cells"] if c["minor"] != minor]
+            receipt["python_cells"] = [
+                c for c in receipt["python_cells"] if c["minor"] != minor
+            ]
             with self.subTest(minor=minor), self.assertRaises(ValueError):
                 validate_cell_scope(self.candidate(), receipt)
 
@@ -607,7 +700,7 @@ class FinalIdentityTests(unittest.TestCase):
     synthetic_consumer_case = HandoffToolsTests.synthetic_consumer_case
     case_review = HandoffToolsTests.case_review
 
-    def test_new_receipt_rejects_changed_tooling_controller_input_or_unfinished_integrity(self):
+    def assert_runtime_identity_checks(self, scope):
         candidate = {
             "schema": "equiframe-maturity-candidate-2",
             "required_python_versions": ["3.10", "3.11", "3.12", "3.13"],
@@ -619,10 +712,11 @@ class FinalIdentityTests(unittest.TestCase):
                 "locks/controller.lock": {"sha256": "b" * 64},
                 "consumer-data/manifest.json": {"sha256": "c" * 64},
             },
+            **candidate_scope(scope),
         }
         self.file("candidate.json", json.dumps(candidate))
         receipt = {
-            "schema": "equiframe-maturity-vm-execution-2",
+            "schema": receipt_schema(candidate),
             "cloud_validation_only": False,
             "candidate_manifest_sha256": sha(self.root / "candidate.json"),
             "source": {},
@@ -644,8 +738,19 @@ class FinalIdentityTests(unittest.TestCase):
             review.kit = self.root
             review.candidate = candidate
             review.receipt = {**receipt, key: wrong}
-            with self.subTest(key=key), self.assertRaisesRegex(ValueError, "identity differs"):
+            with (
+                self.subTest(key=key),
+                self.assertRaisesRegex(ValueError, "identity differs"),
+            ):
                 review.validate()
+
+    def test_new_receipt_rejects_changed_tooling_controller_input_or_unfinished_integrity(
+        self,
+    ):
+        self.assert_runtime_identity_checks("universality")
+
+    def test_original_m13_receipt_enforces_all_runtime_identity_guards(self):
+        self.assert_runtime_identity_checks("original-m13-arm")
 
     def test_new_minor_claims_require_matching_observed_interpreter(self):
         for minor in ("3.11", "3.13"):

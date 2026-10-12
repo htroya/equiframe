@@ -13,7 +13,13 @@ import zipfile
 from pathlib import Path, PurePosixPath
 
 from frozen_tests import candidate_manifests, identity_sha256, verify_linux_junit
-from manifest_scope import RECEIPT_V1, RECEIPT_V2, required_pythons, validate_cell_scope
+from manifest_scope import (
+    RECEIPT_V1,
+    RECEIPT_V2,
+    required_pythons,
+    requires_runtime_identity,
+    validate_cell_scope,
+)
 
 
 def sha(path: Path) -> str:
@@ -30,7 +36,8 @@ def member(root: Path, name: str) -> Path:
         raise ValueError("expected a relative evidence member")
     path = root / relative
     if any(
-        (root / Path(*relative.parts[:n])).is_symlink() for n in range(1, len(relative.parts) + 1)
+        (root / Path(*relative.parts[:n])).is_symlink()
+        for n in range(1, len(relative.parts) + 1)
     ):
         raise ValueError("linked evidence member")
     if not path.resolve().is_relative_to(root.resolve()) or not path.is_file():
@@ -72,14 +79,18 @@ def require_command_contract(
         if command.count(flag) != 1:
             raise ValueError("recorded command lacks one unambiguous " + flag)
     for flag, value in pairs:
-        positions = [index for index, argument in enumerate(command) if argument == flag]
+        positions = [
+            index for index, argument in enumerate(command) if argument == flag
+        ]
         if len(positions) != 1 or positions[0] + 1 >= len(command):
             raise ValueError("recorded command lacks one unambiguous " + flag)
         if command[positions[0] + 1] != value:
             raise ValueError(f"recorded command requires {flag} {value}")
     unexpected = sorted(set(command).intersection(forbidden))
     if unexpected:
-        raise ValueError("recorded command contains forbidden option: " + ", ".join(unexpected))
+        raise ValueError(
+            "recorded command contains forbidden option: " + ", ".join(unexpected)
+        )
 
 
 def validate_core_command_contract(commands: list[dict]) -> None:
@@ -120,13 +131,16 @@ class Review:
         required_pythons(self.candidate)
         for name, record in self.candidate["files"].items():
             path = member(kit, name)
-            if sha(path) != record["sha256"] or path.stat().st_size != record["size_bytes"]:
+            if (
+                sha(path) != record["sha256"]
+                or path.stat().st_size != record["size_bytes"]
+            ):
                 raise ValueError("candidate kit changed: " + name)
         self.test_manifests = candidate_manifests(kit, self.candidate)
         self.receipt = json.loads(member(evidence, "receipt.json").read_text("utf-8"))
-        self.inventory = json.loads(member(evidence, "evidence-inventory.json").read_text("utf-8"))[
-            "files"
-        ]
+        self.inventory = json.loads(
+            member(evidence, "evidence-inventory.json").read_text("utf-8")
+        )["files"]
         if "receipt.json" not in self.inventory:
             raise ValueError("the top receipt is absent from its inventory")
         for name in self.inventory:
@@ -156,7 +170,11 @@ class Review:
         path = PurePosixPath(original)
         if ".." in path.parts or "\\" in original:
             raise ValueError("VM evidence path is not canonical POSIX")
-        return path.relative_to(self.lab).as_posix() if path.is_absolute() else path.as_posix()
+        return (
+            path.relative_to(self.lab).as_posix()
+            if path.is_absolute()
+            else path.as_posix()
+        )
 
     def file(self, name: str, digest: str | None = None) -> Path:
         if name not in self.inventory:
@@ -164,7 +182,10 @@ class Review:
         path = member(self.evidence, name)
         expected = self.inventory[name]
         actual = sha(path)
-        if actual != expected["sha256"] or path.stat().st_size != expected["size_bytes"]:
+        if (
+            actual != expected["sha256"]
+            or path.stat().st_size != expected["size_bytes"]
+        ):
             raise ValueError("evidence differs from its inventory: " + name)
         if digest is not None and actual != digest:
             raise ValueError("receipt digest differs from actual evidence: " + name)
@@ -173,7 +194,9 @@ class Review:
     def json(self, name: str, digest: str | None = None) -> dict:
         return json.loads(self.file(name, digest).read_text("utf-8"))
 
-    def commands(self, commands: list[dict], required: set[str], base: str = "") -> None:
+    def commands(
+        self, commands: list[dict], required: set[str], base: str = ""
+    ) -> None:
         labels = [entry["label"] for entry in commands]
         if len(labels) != len(set(labels)) or not required <= set(labels):
             raise ValueError("required command stages are missing or repeated")
@@ -181,8 +204,12 @@ class Review:
             if entry.get("status") != "passed" or entry.get("exit_code") != entry.get(
                 "expected_exit"
             ):
-                raise ValueError("failed/timed-out command cannot be counted as passing")
-            self.file((PurePosixPath(base) / entry["log"]).as_posix(), entry["log_sha256"])
+                raise ValueError(
+                    "failed/timed-out command cannot be counted as passing"
+                )
+            self.file(
+                (PurePosixPath(base) / entry["log"]).as_posix(), entry["log_sha256"]
+            )
 
     def junit(self, path: str, minimum: int, label: str | None = None) -> None:
         root = ET.parse(self.file(path)).getroot()
@@ -194,11 +221,15 @@ class Review:
             return
         cases = list(root.iter("testcase"))
         if len(cases) < minimum or any(
-            case.find(tag) is not None for case in cases for tag in ("failure", "error", "skipped")
+            case.find(tag) is not None
+            for case in cases
+            for tag in ("failure", "error", "skipped")
         ):
             raise ValueError("required suite is incomplete, failed, skipped or xfailed")
         for suite in root.iter("testsuite"):
-            if int(suite.attrib.get("tests", "-1")) != len(list(suite.iter("testcase"))):
+            if int(suite.attrib.get("tests", "-1")) != len(
+                list(suite.iter("testcase"))
+            ):
                 raise ValueError("JUnit testcase count does not match its declaration")
 
     def pair_binding(self, path: str, minor: str) -> None:
@@ -208,7 +239,9 @@ class Review:
             or binding["machine"] != "aarch64"
             or binding["isolated"] is not True
         ):
-            raise ValueError("paired runtime is not the required actual isolated ARM64 Python")
+            raise ValueError(
+                "paired runtime is not the required actual isolated ARM64 Python"
+            )
         if set(binding["packages"]) != set(self.wheel_payloads):
             raise ValueError("paired runtime is missing a package binding")
         for module, item in binding["packages"].items():
@@ -223,9 +256,12 @@ class Review:
             ):
                 raise ValueError("paired runtime wheel differs")
             if item["payload"] != {
-                name: record["sha256"] for name, record in self.wheel_payloads[module].items()
+                name: record["sha256"]
+                for name, record in self.wheel_payloads[module].items()
             }:
-                raise ValueError("paired runtime payload differs from the delivered wheel")
+                raise ValueError(
+                    "paired runtime payload differs from the delivered wheel"
+                )
 
     def core_profile(self, profile: dict, minor: str) -> None:
         matrix = self.json(profile["matrix"], profile["matrix_sha256"])
@@ -236,7 +272,10 @@ class Review:
         ):
             raise ValueError("core matrix cell did not pass")
         for item, key in [("wheel", "core_wheel"), ("sdist", "core_sdist")]:
-            if matrix["artifacts"][item]["sha256"] != self.candidate["artifact_hashes"][key]:
+            if (
+                matrix["artifacts"][item]["sha256"]
+                != self.candidate["artifact_hashes"][key]
+            ):
                 raise ValueError("core matrix used different artifact bytes")
         outer = matrix["cells"][0]
         if outer["status"] != "passed" or (outer["profile"], outer["endpoint"]) != (
@@ -308,7 +347,8 @@ class Review:
         selected = profile["profile"]
         if selected not in ("base", "ml"):
             needed.update(
-                "cli-compare-" + state for state in ("equivalent", "different", "not_evaluable")
+                "cli-compare-" + state
+                for state in ("equivalent", "different", "not_evaluable")
             )
             engines = (
                 ("pandas", "polars", "duckdb")
@@ -331,10 +371,17 @@ class Review:
             raise ValueError("core profile omitted a required stage")
         validate_core_command_contract(inner["commands"])
         lock = self.file(
-            str(PurePosixPath(name).parent / "runtime.lock"), inner["runtime_lock"]["sha256"]
+            str(PurePosixPath(name).parent / "runtime.lock"),
+            inner["runtime_lock"]["sha256"],
         )
-        pins = dict(re.findall(r"^([A-Za-z0-9_.-]+)==([^\s;]+)", lock.read_text("utf-8"), re.M))
-        normalized = {key.lower().replace("_", "-"): value for key, value in pins.items()}
+        pins = dict(
+            re.findall(
+                r"^([A-Za-z0-9_.-]+)==([^\s;]+)", lock.read_text("utf-8"), re.MULTILINE
+            )
+        )
+        normalized = {
+            key.lower().replace("_", "-"): value for key, value in pins.items()
+        }
         if not normalized or normalized != inner["runtime_versions"]:
             raise ValueError("core dependency inventory differs from actual lock")
         if any(
@@ -367,7 +414,10 @@ class Review:
                     command[stream + "_artifact"]["sha256"],
                 )
         if profile["profile"] == "all":
-            if "full-installed-suite" not in stages or inner["suite"].get("accepted") is not True:
+            if (
+                "full-installed-suite" not in stages
+                or inner["suite"].get("accepted") is not True
+            ):
                 raise ValueError("all-profile suite not fully accepted")
             self.junit(
                 str(PurePosixPath(name).parent / "pytest.xml"),
@@ -413,20 +463,27 @@ class Review:
             inner["runtime_binding_sha256"],
         )
         lock = self.file(
-            str(PurePosixPath(path).parent / "runtime.lock"), inner["runtime_lock_sha256"]
+            str(PurePosixPath(path).parent / "runtime.lock"),
+            inner["runtime_lock_sha256"],
         )
-        pins = dict(re.findall(r"^([A-Za-z0-9_.-]+)==([^\s;]+)", lock.read_text("utf-8"), re.M))
+        pins = dict(
+            re.findall(
+                r"^([A-Za-z0-9_.-]+)==([^\s;]+)", lock.read_text("utf-8"), re.MULTILINE
+            )
+        )
         installed = {
             key.lower().replace("_", "-"): version
             for key, version in binding["installed_distributions"].items()
         }
         if not pins or any(
-            installed.get(key.lower().replace("_", "-")) != version for key, version in pins.items()
+            installed.get(key.lower().replace("_", "-")) != version
+            for key, version in pins.items()
         ):
             raise ValueError("benchmark installed dependencies differ from lock")
         for module in ("equiframe", "equiframe_benchmark"):
             if binding["packages"][module]["payload"] != {
-                name: item["sha256"] for name, item in self.wheel_payloads[module].items()
+                name: item["sha256"]
+                for name, item in self.wheel_payloads[module].items()
             }:
                 raise ValueError("benchmark profile payload differs")
 
@@ -450,20 +507,28 @@ class Review:
             case.get("observed_exit_code"),
             case.get("expected_exit_code"),
         ) != (program, variant, source + "->" + target, expected, expected):
-            raise ValueError("consumer case identity or independent expected exit differs")
-        if case.get("status") != ("PASS" if variant == "good" else "EXPECTED_REJECTION"):
-            raise ValueError("consumer case did not observe the required verdict")
-        if case.get("accepted") is not (variant == "good") or case.get("published") is not (
-            variant == "good"
+            raise ValueError(
+                "consumer case identity or independent expected exit differs"
+            )
+        if case.get("status") != (
+            "PASS" if variant == "good" else "EXPECTED_REJECTION"
         ):
-            raise ValueError("consumer acceptance/publication differs from independent expectation")
+            raise ValueError("consumer case did not observe the required verdict")
+        if case.get("accepted") is not (variant == "good") or case.get(
+            "published"
+        ) is not (variant == "good"):
+            raise ValueError(
+                "consumer acceptance/publication differs from independent expectation"
+            )
         if (
             case.get("evidence_integrity_verified") is not True
             or case.get("portable_verified_without_native_origin") is not True
             or case.get("frozen_data_unchanged") is not True
             or case.get("native_execution_count_complete") is not True
         ):
-            raise ValueError("consumer integrity, portability or native coverage missing")
+            raise ValueError(
+                "consumer integrity, portability or native coverage missing"
+            )
         expected_data = self.candidate["files"]["consumer-data/manifest.json"]["sha256"]
         if case.get("dataset_manifest_sha256") != expected_data:
             raise ValueError("consumer used a different frozen dataset")
@@ -479,9 +544,13 @@ class Review:
             or env["machine"] != "aarch64"
             or env["isolated"] != 1
         ):
-            raise ValueError("consumer execution has the wrong Python/platform/isolation")
+            raise ValueError(
+                "consumer execution has the wrong Python/platform/isolation"
+            )
         if env.get("optimized") != int(optimized):
-            raise ValueError("consumer optimized execution differs from the required mode")
+            raise ValueError(
+                "consumer optimized execution differs from the required mode"
+            )
         return case
 
     def validate(self) -> dict:
@@ -489,7 +558,9 @@ class Review:
         if receipt.get("schema") not in (RECEIPT_V1, RECEIPT_V2):
             raise ValueError("unknown VM receipt format")
         if receipt.get("cloud_validation_only") is not False:
-            raise ValueError("cloud validation is not evidence of the required ARM64 VM")
+            raise ValueError(
+                "cloud validation is not evidence of the required ARM64 VM"
+            )
         if receipt.get("candidate_manifest_sha256") != sha(self.kit / "candidate.json"):
             raise ValueError("VM receipt belongs to another candidate manifest")
         if (
@@ -497,9 +568,12 @@ class Review:
             or receipt.get("artifact_hashes") != candidate["artifact_hashes"]
         ):
             raise ValueError("VM source/artifact identity differs")
-        if self.test_manifests and receipt.get("test_manifests") != candidate["test_manifests"]:
+        if (
+            self.test_manifests
+            and receipt.get("test_manifests") != candidate["test_manifests"]
+        ):
             raise ValueError("VM frozen test-manifest identity differs")
-        if candidate["schema"] == "equiframe-maturity-candidate-2":
+        if requires_runtime_identity(candidate):
             expected_scripts = {
                 name: item["sha256"]
                 for name, item in candidate["files"].items()
@@ -514,7 +588,9 @@ class Review:
                 != candidate["files"]["consumer-data/manifest.json"]["sha256"]
                 or receipt.get("kit_unchanged_after_run") is not True
             ):
-                raise ValueError("runtime tooling/lock/input identity differs or is unverified")
+                raise ValueError(
+                    "runtime tooling/lock/input identity differs or is unverified"
+                )
         host = receipt["actual_host"]
         if (
             host["hostname"],
@@ -572,7 +648,8 @@ class Review:
                 for variant in ("good", "defect", "not_evaluable")
             )
             required.update(
-                "sdist-build-" + name + "-" + minor for name in ("core", "benchmark", "consumer")
+                "sdist-build-" + name + "-" + minor
+                for name in ("core", "benchmark", "consumer")
             )
         self.commands(receipt["commands"], required)
         outcomes = {"good": 0, "different": 1, "not_evaluable": 3, "error": 2}
@@ -622,7 +699,11 @@ class Review:
                     self.benchmark_profile,
                 ),
             ]:
-                wanted = {(name, endpoint) for name in names for endpoint in ("minimum", "latest")}
+                wanted = {
+                    (name, endpoint)
+                    for name in names
+                    for endpoint in ("minimum", "latest")
+                }
                 actual = [(item["profile"], item["endpoint"]) for item in cell[key]]
                 if len(actual) != len(wanted) or set(actual) != wanted:
                     raise ValueError("required profile cells are missing/repeated")
@@ -652,18 +733,23 @@ class Review:
                 + "\n"
             )
             if constraints.read_text("utf-8") != expected_pins:
-                raise ValueError("paired install constraints differ from the solved core runtime")
+                raise ValueError(
+                    "paired install constraints differ from the solved core runtime"
+                )
             for name in ("pair-binding.json", "sdist-binding.json"):
                 self.pair_binding(root + "/" + name, minor)
                 installed = self.json(root + "/" + name)["installed_distributions"]
                 normalized = {
-                    key.lower().replace("_", "-"): value for key, value in installed.items()
+                    key.lower().replace("_", "-"): value
+                    for key, value in installed.items()
                 }
                 if any(
                     normalized.get(key) != value
                     for key, value in core_cell["runtime_versions"].items()
                 ):
-                    raise ValueError("paired wheel/sdist runtime changed a locked core dependency")
+                    raise ValueError(
+                        "paired wheel/sdist runtime changed a locked core dependency"
+                    )
             sdist_cases = cell["sdist_consumer_cases"]
             if len(sdist_cases) != 3 or {case["variant"] for case in sdist_cases} != {
                 "good",
@@ -685,8 +771,10 @@ class Review:
             for name in ("core", "benchmark", "consumer"):
                 rebuild = cell["sdist_rebuilds"][name]
                 if (
-                    rebuild["wheel_sha256"] != candidate["artifact_hashes"][name + "_wheel"]
-                    or rebuild["sdist_sha256"] != candidate["artifact_hashes"][name + "_sdist"]
+                    rebuild["wheel_sha256"]
+                    != candidate["artifact_hashes"][name + "_wheel"]
+                    or rebuild["sdist_sha256"]
+                    != candidate["artifact_hashes"][name + "_sdist"]
                 ):
                     raise ValueError("sdist rebuild byte identity differs")
             consumer = cell["consumer"]
@@ -711,7 +799,9 @@ class Review:
                     "migration",
                     "preparation",
                 )
-                for source, target in itertools.permutations(("pandas", "polars", "duckdb"), 2)
+                for source, target in itertools.permutations(
+                    ("pandas", "polars", "duckdb"), 2
+                )
                 for variant in ("good", "defect", "not_evaluable")
             }
             records = summary["records"]
@@ -736,9 +826,13 @@ class Review:
                         for key in ("process_error", "receipt_error", "logs_error")
                     )
                 ):
-                    raise ValueError("consumer child process failed or changed its expected exit")
+                    raise ValueError(
+                        "consumer child process failed or changed its expected exit"
+                    )
                 for stream in ("stdout", "stderr"):
-                    self.file(str(base / "logs" / (item["case_id"] + "." + stream + ".txt")))
+                    self.file(
+                        str(base / "logs" / (item["case_id"] + "." + stream + ".txt"))
+                    )
                 self.consumer_case(
                     str(base / item["case_receipt"]),
                     minor,
@@ -762,7 +856,9 @@ class Review:
                 optimized_summary.get("optimization_required"),
                 optimized_summary.get("optimized"),
             ) != ("PASS", 72, 24, 48, True, 144, 0, True, True):
-                raise ValueError("optimized consumer actual/expected native outcomes incomplete")
+                raise ValueError(
+                    "optimized consumer actual/expected native outcomes incomplete"
+                )
             optimized_records = optimized_summary["records"]
             optimized_observed = [
                 (item["program"], item["variant"], item["source"], item["target"])
@@ -791,7 +887,11 @@ class Review:
                     )
                 for stream in ("stdout", "stderr"):
                     self.file(
-                        str(optimized_base / "logs" / (item["case_id"] + "." + stream + ".txt"))
+                        str(
+                            optimized_base
+                            / "logs"
+                            / (item["case_id"] + "." + stream + ".txt")
+                        )
                     )
                 self.consumer_case(
                     str(optimized_base / item["case_receipt"]),
@@ -830,7 +930,7 @@ def main() -> int:
         raise ValueError("choose a new review output; preserve earlier results")
     try:
         result, code = validate(args.kit.resolve(), args.evidence.resolve()), 0
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001 - every unexpected review error rejects the receipt
         result = {
             "technical_receipts_consistent": False,
             "error": type(error).__name__,

@@ -57,6 +57,46 @@ def test_exact_unrounded_nine_area_average_and_historical_scopes():
     assert result["historical_candidate_areas"] == ["usability", "universality"]
 
 
+def test_explicit_eight_area_scope_preserves_exact_original_area_fractions():
+    rows = [row for row in metrics() if row["key"] != "security"]
+    result = tool.calculate(rows, exclude_security=True)
+    expected = (
+        sum(Fraction(100 * row["numerator"], row["denominator"]) for row in rows) / 8
+    )
+    assert result["exact_fraction"] == {
+        "numerator": expected.numerator,
+        "denominator": expected.denominator,
+    }
+    assert result["area_count"] == 8
+    assert result["excluded_areas"] == ["security"]
+    assert result["scope_change_is_technical_progress"] is False
+    assert all(
+        row["weight"] == {"numerator": 1, "denominator": 8} for row in result["areas"]
+    )
+    assert result["historical_candidate_areas"] == ["usability", "universality"]
+    with pytest.raises(ValueError):
+        tool.calculate(rows)
+
+
+@pytest.mark.parametrize(
+    "mutation", ["nine_areas", "drop_thesis", "replace_maturity", "denominator"]
+)
+def test_new_scope_cannot_silently_omit_other_weak_areas_or_change_denominators(
+    mutation,
+):
+    rows = [row for row in metrics() if row["key"] != "security"]
+    if mutation == "nine_areas":
+        rows = metrics()
+    elif mutation == "drop_thesis":
+        rows = [row for row in rows if row["key"] != "thesis"]
+    elif mutation == "replace_maturity":
+        rows = [row if row["key"] != "maturity" else metrics()[-1] for row in rows]
+    else:
+        rows[0]["denominator"] = 11
+    with pytest.raises(ValueError):
+        tool.calculate(rows, exclude_security=True)
+
+
 @pytest.mark.parametrize(
     "mutation", ["drop", "duplicate", "denominator", "boolean", "negative", "excess"]
 )

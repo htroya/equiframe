@@ -19,9 +19,28 @@ def required_pythons(candidate: dict) -> tuple[str, ...]:
     else:
         raise ValueError("unsupported candidate schema")
     actual = candidate.get("required_python_versions")
+    if candidate.get("scope_id") is not None and (
+        schema != CANDIDATE_V1
+        or candidate["scope_id"] != "M13-ARM-ORIGINAL-v1"
+        or candidate.get("required_runtime_identity") is not True
+        or actual != list(LEGACY_PYTHONS)
+    ):
+        raise ValueError(
+            "new original M13 scope requires complete explicit runtime identity"
+        )
     if (schema == CANDIDATE_V2 or actual is not None) and actual != list(expected):
-        raise ValueError("required Python scope cannot be omitted, reordered or reduced")
+        raise ValueError(
+            "required Python scope cannot be omitted, reordered or reduced"
+        )
     return expected
+
+
+def requires_runtime_identity(candidate: dict) -> bool:
+    required_pythons(candidate)
+    return (
+        candidate["schema"] == CANDIDATE_V2
+        or candidate.get("scope_id") == "M13-ARM-ORIGINAL-v1"
+    )
 
 
 def receipt_schema(candidate: dict) -> str:
@@ -33,9 +52,9 @@ def validate_cell_scope(candidate: dict, receipt: dict) -> tuple[str, ...]:
     expected = required_pythons(candidate)
     if receipt.get("schema") != receipt_schema(candidate):
         raise ValueError("receipt schema differs from candidate scope")
-    if candidate["schema"] == CANDIDATE_V2 and receipt.get("required_python_versions") != list(
-        expected
-    ):
+    if candidate["schema"] == CANDIDATE_V2 and receipt.get(
+        "required_python_versions"
+    ) != list(expected):
         raise ValueError("receipt required Python scope differs")
     cells = receipt.get("python_cells", [])
     actual = [cell.get("minor") for cell in cells]

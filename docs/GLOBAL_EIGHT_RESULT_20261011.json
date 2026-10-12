@@ -1,0 +1,160 @@
+{
+  "all_area_measurements_are_current_a13": false,
+  "area_count": 8,
+  "areas": [
+    {
+      "assessed_candidate": "0.12.0a12",
+      "denominator": 12,
+      "key": "usability",
+      "numerator": 11,
+      "percent": 91.66666666666667,
+      "record_targets_current_a13": false,
+      "rounded_percent": 91.67,
+      "source": "docs/USABILITY_CURRENT_RESULT_20261010.json",
+      "source_sha256": "d8b51775c2746ce2f05b7e7cd43df036363c2954e2de47fd45df2ef6aeaa04a9",
+      "weight": {
+        "denominator": 8,
+        "numerator": 1
+      }
+    },
+    {
+      "assessed_candidate": "0.12.0a13",
+      "denominator": 16,
+      "key": "maturity",
+      "numerator": 5,
+      "percent": 31.25,
+      "record_targets_current_a13": true,
+      "rounded_percent": 31.25,
+      "source": "docs/MATURITY_RESOURCE_RESULT_20261011.json",
+      "source_sha256": "add2072d1e9d78d671910830d1d2681529830337b8be80fed597b2ed83c665ef",
+      "weight": {
+        "denominator": 8,
+        "numerator": 1
+      }
+    },
+    {
+      "assessed_candidate": "0.12.0a11",
+      "denominator": 60,
+      "key": "universality",
+      "numerator": 48,
+      "percent": 80.0,
+      "record_targets_current_a13": false,
+      "rounded_percent": 80.0,
+      "source": "docs/UNIVERSALITY_80_RESULT_20261010.json",
+      "source_sha256": "c8456a492b8832ba350d81d01fffbeeb06bc1ad99cdababfe63d5f16485b0fad",
+      "weight": {
+        "denominator": 8,
+        "numerator": 1
+      }
+    },
+    {
+      "assessed_candidate": "0.12.0a13",
+      "denominator": 20,
+      "key": "pypi_preparation",
+      "numerator": 16,
+      "percent": 80.0,
+      "record_targets_current_a13": true,
+      "rounded_percent": 80.0,
+      "source": "docs/PYPI_PREPARATION_RESULT_20261010.json",
+      "source_sha256": "7da65e6f90904c42ff7a3ed4f6b078838cac566353a11a43c3423e6f0bc46159",
+      "weight": {
+        "denominator": 8,
+        "numerator": 1
+      }
+    },
+    {
+      "assessed_candidate": "0.12.0a13",
+      "denominator": 22,
+      "key": "thesis",
+      "numerator": 9,
+      "percent": 40.90909090909091,
+      "record_targets_current_a13": true,
+      "rounded_percent": 40.91,
+      "source": "docs/THESIS_CURRENT_RESULT_20261011.json",
+      "source_sha256": "37f695ac042057e0ade9ac2c4e002dd8d662d82892c40c419faafe9bd6d11be7",
+      "weight": {
+        "denominator": 8,
+        "numerator": 1
+      }
+    },
+    {
+      "assessed_candidate": "0.12.0a13",
+      "denominator": 20,
+      "key": "documentation",
+      "numerator": 18,
+      "percent": 90.0,
+      "record_targets_current_a13": true,
+      "rounded_percent": 90.0,
+      "source": "docs/DOCUMENTATION_RECHECK_20261010.json",
+      "source_sha256": "24e6c43c5b6f3af78a29113f6d21a8ef9f432cf43aa4477d308ff1ff7a7f09e8",
+      "weight": {
+        "denominator": 8,
+        "numerator": 1
+      }
+    },
+    {
+      "assessed_candidate": "0.12.0a13",
+      "denominator": 8385,
+      "key": "option_traceability",
+      "numerator": 5902,
+      "percent": 70.3875968992248,
+      "record_targets_current_a13": true,
+      "rounded_percent": 70.39,
+      "source": "docs/OPTION_SEED_BOUNDS_RESULT_20261012.json",
+      "source_sha256": "50651b738ecdd754d39a8642e85ff6d155bb7aefe83e3f257376d2fe2704b50d",
+      "weight": {
+        "denominator": 8,
+        "numerator": 1
+      }
+    },
+    {
+      "assessed_candidate": "0.12.0a13",
+      "denominator": 20,
+      "key": "package_quality",
+      "numerator": 16,
+      "percent": 80.0,
+      "record_targets_current_a13": true,
+      "rounded_percent": 80.0,
+      "source": "docs/PACKAGE_QUALITY_RESULT_20261010.json",
+      "source_sha256": "a4a69cb8ea6956df9972b297f601529528079aeaff66e66b2646c02529737044",
+      "weight": {
+        "denominator": 8,
+        "numerator": 1
+      }
+    }
+  ],
+  "exact_fraction": {
+    "denominator": 45408,
+    "numerator": 3202475
+  },
+  "excluded_areas": [
+    "security"
+  ],
+  "formula": "sum(100 * verified_i / original_denominator_i) / 8",
+  "historical_candidate_areas": [
+    "usability",
+    "universality"
+  ],
+  "input_matrix": "PROJECT_STATUS_MATRIX_20261011_EIGHT.json",
+  "input_matrix_sha256": "1ec8ed0114e0997ee82c4f0d6eac831f1dba58916a1c0143d6ae9a473d2cacb5",
+  "input_selection_rule": "Explicit reviewed consolidated matrix; no automatic chronological retrieval",
+  "limitations": [
+    "Equal weighting was explicitly selected; it is not an external or standardized quality assessment.",
+    "A global average does not mean every area reached75%, nor that thesis hypotheses, safety or publication were approved.",
+    "Historical A11/A12 measurements remain historical until their complete rubrics are reevaluated on A13.",
+    "Repeated tests, proposed scenarios, unknown inputs and partial criteria earn no additional area points."
+  ],
+  "owner_selected_method": "Mean of eight areas with equal weights; security explicitly excluded by owner2026-10-11",
+  "percent": 70.52666930937279,
+  "percentage_points_remaining": 4.473330690627202,
+  "recorded_at_utc": "2026-10-12T05:06:46.275305+00:00",
+  "rounded_percent": 70.53,
+  "rubric": "GLOBAL-EIGHT-EQUAL-v1",
+  "schema": "equiframe.global-progress.v1",
+  "scope": "Tracking average of latest recorded area measurements; candidate-specific area scores and external requirements remain unchanged",
+  "scope_change_is_technical_progress": false,
+  "sum_of_area_percentage_point_gains_required": 35.78664552501762,
+  "target_met": false,
+  "target_percent": 75,
+  "tool_sha256": "2793d68af12eb3044c6f836ef30e6c15a873a32d25e139053e76e06effdd65e3"
+}

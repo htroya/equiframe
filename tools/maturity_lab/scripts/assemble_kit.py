@@ -16,12 +16,19 @@ from frozen_tests import (
     read_manifest,
     verify_sdist_tests,
 )
-from manifest_scope import CANDIDATE_V2, UNIVERSALITY_PYTHONS
+from manifest_scope import (
+    CANDIDATE_V1,
+    CANDIDATE_V2,
+    LEGACY_PYTHONS,
+    UNIVERSALITY_PYTHONS,
+)
 from run_vm_lab import sha, verify_kit, write
 
 
 def git(repository: Path, *arguments: str) -> str:
-    return subprocess.check_output(["git", "-C", str(repository), *arguments], text=True).strip()
+    return subprocess.check_output(
+        ["git", "-C", str(repository), *arguments], text=True
+    ).strip()
 
 
 def copy(source: Path, target: Path) -> None:
@@ -31,12 +38,41 @@ def copy(source: Path, target: Path) -> None:
     shutil.copyfile(source, target)
 
 
+def candidate_scope(scope: str) -> dict:
+    """Keep the full matrix as default; name the original M13-only expedition."""
+    if scope == "universality":
+        return {
+            "schema": CANDIDATE_V2,
+            "required_python_versions": list(UNIVERSALITY_PYTHONS),
+            "scope_basis": "Universality handoff: all four Python minors remain required",
+            "criteria_automatically_closed": [],
+        }
+    if scope == "original-m13-arm":
+        return {
+            "schema": CANDIDATE_V1,
+            "required_python_versions": list(LEGACY_PYTHONS),
+            "scope_basis": "Original MATURITY_MATRIX M13: standalone ARM64 CPython3.10/3.12 laboratory",
+            "scope_id": "M13-ARM-ORIGINAL-v1",
+            "required_runtime_identity": True,
+            "universality_matrix_reduced": False,
+            "other_platforms_and_python_minors_closed": False,
+            "criteria_automatically_closed": [],
+        }
+    raise ValueError("unsupported candidate scope")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repository", type=Path, required=True)
     parser.add_argument("--consumer", type=Path, required=True)
     parser.add_argument("--consumer-data", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--scope",
+        choices=("universality", "original-m13-arm"),
+        default="universality",
+        help="Default preserves four minors. Original M13 is a separate two-minor ARM expedition, not universality closure.",
+    )
     parser.add_argument("--core-tests", type=int, required=True)
     parser.add_argument("--benchmark-tests", type=int, required=True)
     parser.add_argument("--consumer-tests", type=int, required=True)
@@ -54,11 +90,15 @@ def main() -> int:
     )
     args = parser.parse_args()
     repository, consumer, data, output = (
-        path.resolve() for path in (args.repository, args.consumer, args.consumer_data, args.output)
+        path.resolve()
+        for path in (args.repository, args.consumer, args.consumer_data, args.output)
     )
     if output.exists():
         raise ValueError("choose a new output; retain previous candidate identity")
-    if any(count <= 0 for count in (args.core_tests, args.benchmark_tests, args.consumer_tests)):
+    if any(
+        count <= 0
+        for count in (args.core_tests, args.benchmark_tests, args.consumer_tests)
+    ):
         raise ValueError("freeze actual required suite counts, never zero")
     for project in (repository, consumer, data):
         if git(project, "status", "--porcelain"):
@@ -87,7 +127,9 @@ def main() -> int:
             ["git", "-C", str(project), "bundle", "create", str(bundle), "HEAD"],
             check=True,
         )
-        subprocess.run(["git", "-C", str(project), "bundle", "verify", str(bundle)], check=True)
+        subprocess.run(
+            ["git", "-C", str(project), "bundle", "verify", str(bundle)], check=True
+        )
     source["consumer_data"] = {
         "commit": git(data, "rev-parse", "HEAD"),
         "tree": git(data, "rev-parse", "HEAD^{tree}"),
@@ -118,7 +160,9 @@ def main() -> int:
         for suffix, pattern in (("_wheel", "*.whl"), ("_sdist", "*.tar.gz")):
             found = list((package / "dist").glob(pattern))
             if len(found) != 1:
-                raise ValueError("exactly one current artifact of each kind is required")
+                raise ValueError(
+                    "exactly one current artifact of each kind is required"
+                )
             path = found[0]
             relative = "artifacts/" + path.name
             copy(path, output / relative)
@@ -171,8 +215,7 @@ def main() -> int:
         if path.is_file()
     }
     manifest = {
-        "schema": CANDIDATE_V2,
-        "required_python_versions": list(UNIVERSALITY_PYTHONS),
+        **candidate_scope(args.scope),
         "tooling_source": tooling_source,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "source": source,
