@@ -4,8 +4,13 @@
 tarea, glosario, integración y controles manuales. Las guías empaquetadas y los
 informes históricos tienen alcances separados.
 
-[Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261011_RECALCULATED.md): las
+[Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261011_GLOBAL75.md): las
 nueve áreas, su última medición identificada y las evaluaciones aún pendientes.
+
+[Meta global del 75 %](docs/GLOBAL_75_PLAN_20261011.md): promedio de nueve áreas
+con pesos iguales, elegido por el usuario. **66,43 % actual**, con madurez
+**5/16 = 31,25 %** tras cerrar M10. El escenario de 75,01 % es condicionado;
+los candidatos históricos y las puertas externas conservan su alcance.
 
 [Ampliación declarativa comprobada](docs/OPTION_DECLARATIVE_FOLLOWUP_20261011.md):
 270 obligaciones adicionales; trazabilidad **5.786/8.385 = 69,00 %**,

@@ -45,9 +45,13 @@ en VM no equivale a su despliegue o aceptación.
 
 ## Informes y alcance de los porcentajes
 
-La [matriz de las nueve áreas](PROJECT_STATUS_MATRIX_20261011_RECALCULATED.md) reúne los
+La [matriz de las nueve áreas](PROJECT_STATUS_MATRIX_20261011_GLOBAL75.md) reúne los
 resultados medidos e incorpora las nuevas evaluaciones de madurez, tesis y seguridad.
-Identifica el candidato de cada porcentaje; no calcula un promedio global.
+Identifica el candidato de cada porcentaje. El usuario eligió ahora un promedio
+de las nueve áreas con pesos iguales: [método](GLOBAL_75_METHOD_20261011.md) y
+[ruta al 75 %](GLOBAL_75_PLAN_20261011.md). El promedio vigente es **66,43 %**;
+M10 comprobado lleva madurez a **31,25 %**. El agregado no sustituye los criterios
+individuales, certificación, evidencia científica ni sus candidatos históricos.
 
 La [ampliación declarativa](OPTION_DECLARATIVE_FOLLOWUP_20261011.md) añade 270
 obligaciones con esperados completos y ejecución normal/optimizada: trazabilidad
