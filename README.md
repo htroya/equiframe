@@ -33,7 +33,11 @@ comprueba únicamente la configuración. No se ha ejecutado ni publica paquetes.
 [Trazabilidad revalidada A14, 13/10/2026](docs/A14_REVALIDATION_CHECKPOINT_20261013.md):
 **6.201/8.438 obligaciones**, con **2.237 pendientes** en el inventario indicado.
 La revisión independiente del corte `44aa0bd` reprodujo esos conteos. Este
-inventario aún no incluye toda la API EDA ni todo el monorepo. Las repeticiones
+inventario se amplió explícitamente con EDA en la
+[revalidación de artefactos corregidos](docs/A14_REVIEW_ARTIFACT_VALIDATION_20261013.md):
+**6.905/9.142**, con las mismas **2.237 obligaciones raíz pendientes**. El
+inventario ampliado incluye el namespace EDA declarado; otros componentes del
+monorepo conservan sus pruebas e inventarios propios. Las repeticiones
 y plataformas no crean nuevos IDs. El
 [corte histórico A13](docs/OPTION_EXCEPTIONS_RESULT_20261012.md) conserva
 **6.309/8.385 = 75,24 %**; su cifra no se transfiere a A14.

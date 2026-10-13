@@ -81,3 +81,9 @@ de los siete rubros y los 14,18 de los ocho son distancias históricas, no una
 estimación de horas ni una puntuación nueva. Ya se [preparó y verificó el piloto
 SERCOP](A14_SERCOP_EXPERIMENT_PREPARATION_20261013.md); las etiquetas, soporte
 normal, particiones finales y resultados científicos continúan pendientes.
+
+La [revalidación posterior de los artefactos corregidos](A14_REVIEW_ARTIFACT_VALIDATION_20261013.md)
+añade y ejecuta las 704 obligaciones EDA: el inventario SDK ampliado queda en
+6.905/9.142, 75,530518 % técnico, con 2.237 pendientes. Su contribución ponderada
+sin crédito manual es 67,977467 puntos; faltan 22,022533 para el 90 % de ese
+inventario ampliado. Las cifras anteriores se conservan con su alcance original.
