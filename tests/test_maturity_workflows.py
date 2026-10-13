@@ -37,7 +37,7 @@ class MaturityWorkflowTests(unittest.TestCase):
         text = (ROOT / '.github/workflows/release-candidate.yml').read_text()
         for package in ('equiframe','equiframe-benchmark'):
             project = (ROOT / 'packages' / package / 'pyproject.toml').read_text()
-            version = re.search(r'^version = "([^"]+)"', project, re.M).group(1)
+            version = re.search(r'^version = "([^"]+)"', project, re.MULTILINE).group(1)
             stem = package.replace('-', '_') + '-' + version
             self.assertIn(stem + '-py3-none-any.whl', text)
             self.assertIn(stem + '.tar.gz', text)

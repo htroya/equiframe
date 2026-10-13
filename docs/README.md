@@ -47,14 +47,19 @@ en VM no equivale a su despliegue o aceptación.
 
 La [matriz vigente de ocho áreas](PROJECT_STATUS_MATRIX_20261011_EIGHT.md) reúne
 las mediciones y el candidato de cada porcentaje. El propietario retiró un área
-del tablero; el promedio actual es **70,74 %**, sin reescribir el
+del tablero; el promedio actual es **75,82 %**, sin reescribir el
 [resultado histórico de nueve áreas](GLOBAL_75_RESULT_20261011.json).
 El cambio de alcance no constituye un incremento técnico. El agregado conserva
 los criterios individuales y los candidatos históricos.
 
-El [plan vigente](TARGET_80_85_PLAN_20261011.md) fija madurez y requisitos de
-tesis al menos al 80 %, y trazabilidad al menos al 85 %. Conserva las evidencias
-externas requeridas y el Word intacto. El
+El [plan vigente de Alpha](ALPHA_MAXIMIZATION_PLAN_20261012.md) prioriza agotar
+el trabajo comprobable hacia 100 % antes de que exista una Beta. Las últimas
+metas mínimas son 90 % en madurez, requisitos de tesis y trazabilidad; conserva
+los criterios, pendientes externos y Word intacto. El
+[plan Beta pendiente](PRIVATE_BETA_PLAN_20261012.md) no activa otra versión.
+Las [entregas humanas y de PyPI](HUMAN_REQUIREMENTS_20261012.md) y las
+[tareas pendientes de la VM](VM_PENDING_WORK_20261012.md) permiten revisar
+responsables, evidencia y orden. El
 [plan del 60 %](RUBRIC_FLOOR60_PLAN_20261011.md) queda como historia.
 
 Las [llamadas con oráculos originales](OPTION_TEST_CALLS_RESULT_20261012.md)
@@ -64,16 +69,27 @@ acreditó 32, además de las
 [40 de configuración opcional](OPTION_CONFIGURATION_RESULT_20261012.md), las
 [42 fronteras sobre fixtures originales](OPTION_SEED_BOUNDS_RESULT_20261012.md) y las
 [74 obligaciones de tipos públicos](OPTION_PUBLIC_TYPES_RESULT_20261011.md).
-La medición actual es **6.045/8.385 = 72,09 %**; faltan 1.083 IDs para el 85 %.
+El [parser CLI](OPTION_CLI_PARSER_RESULT_20261012.md) suma 92 IDs y los
+[constructores públicos](OPTION_CONSTRUCTORS_RESULT_20261012.md) suman 51,
+los [contextos](OPTION_CONTEXT_CONSTRUCTORS_RESULT_20261012.md) suman 66 y
+los [defaults de campos](OPTION_MODEL_DEFAULTS_RESULT_20261012.md) suman doce,
+y las [excepciones locales](OPTION_EXCEPTIONS_RESULT_20261012.md) suman 43.
+La medición actual es **6.309/8.385 = 75,24 %**; faltan 1.238 IDs para el 90 %.
 Las repeticiones y las guardias sin ID no incrementan la cobertura.
 
-La [preparación original de M13](M13_PREPARATION_20261012.md) conserva su corte
-histórico. Después se recibió autorización, se verificó la transferencia y
-comenzó el ensayo ARM64. El fallo de reconstrucción del wheel consumidor se
-conserva. El [candidato nuevo local](M13_LOCAL_CORRECTION_RESULT_20261012.json)
-usa una [regla de reconstrucción explícita](M13_REBUILD_POLICY_20261012.md);
-aún no está transferido ni ejecutado. La VM está dando timeouts SSH y M13
-continúa pendiente de evidencias finales completas y revisadas.
+El [laboratorio M13 concluido](M13_VM_COMPLETED_20261012.md) terminó
+115 comandos y 52 perfiles y devolvió íntegramente su expediente. La
+[evaluación nueva de madurez](MATURITY_SCOPE_REASSESSMENT_20261012.md)
+conserva su alcance original y usa además [sdists/suites nuevos](ALPHA_SDIST_AND_SUITES_20261012.md).
+La [usabilidad reevaluada A13](USABILITY_A13_REASSESSMENT_20261012.md)
+conserva 11/12 y distingue el pendiente humano.
+
+El [depósito SERCOP local](SERCOP_LOCAL_REPOSITORY_20261012.md) permanece fuera
+de Git. La [captura actual entregada](SERCOP_PUBLIC_DELIVERY_20261012.md)
+ya está en la VM en una carpeta pública de lectura y tiene HTTPS temporal.
+No contiene EDA/reflexión. El [diagnóstico del DW](JHAIR_DW_DIAGNOSTIC_20261012.md)
+distingue el prototipo de una carga anual aceptada. El [EDA autorizado después](EDA_NEXT_TASK_20261012.md)
+se ejecuta en salidas separadas tras esta entrega.
 
 La [comparación anual completa en la VM](SERCOP_ANNUAL_VM_20261011.md) aprueba
 81 comprobaciones SDK, incluidas 27 del corpus completo, y conserva ambas
@@ -113,10 +129,10 @@ casos específicos de Windows y los primeros recorridos como evidencia separada.
 | Documentación de este repositorio | [Plan DOC-PRO-20-v1](DOCUMENTATION_PLAN_20261010.md), [resultado inicial](DOCUMENTATION_RESULT_20261010.md), [verificación vigente](DOCUMENTATION_RECHECK_20261010.md) | 18/20 = 90 %; lectura humana independiente y documentación pública pendientes |
 | Preparación de PyPI | [Plan PYPI-PREP-20-v1](PYPI_PREPARATION_PLAN_20261010.md), [resultado](PYPI_PREPARATION_RESULT_20261010.md) | 16/20 = 80 %; preparación manual, cuatro requisitos externos pendientes |
 | Calidad de paquete | [A13, PACKAGE-QUALITY-RP-20-v1](PACKAGE_QUALITY_RESULT_20261010.md) | 16/20 = 80 %; inspiración cualitativa de Real Python |
-| Pruebas por opción | [Llamadas con oráculos originales A13](OPTION_TEST_CALLS_RESULT_20261012.md), [recibo vigente](OPTION_TEST_CALLS_RESULT_20261012.json) | A13: 6.045/8.385 = 72,09 % de obligaciones, no cobertura de líneas |
-| Madurez | [M01–M16 tras M10](MATURITY_RESOURCE_RESULT_20261011.json) | 5/16 = 31,25 % de cierre estricto del alcance original |
+| Pruebas por opción | [Recibo actual A13](OPTION_EXCEPTIONS_RESULT_20261012.json) | 6.309/8.385 = 75,24 % de obligaciones únicas |
+| Madurez | [Evaluación nueva](MATURITY_SCOPE_REASSESSMENT_RESULT_20261012.json) | 11/16 = 68.75 % de cierre original |
 | Cumplimiento de requisitos de tesis | [T01–T22 actuales](THESIS_CURRENT_RESULT_20261011.json) | 9/22 = 40,91 %; no calidad editorial ni aprobación científica |
-| Usabilidad técnica | [A12, U01–U12](USABILITY_CURRENT_RESULT_20261010.md) | 11/12 = 91,67 %; observación humana pendiente |
+| Usabilidad técnica | [Reevaluación A13](USABILITY_A13_REASSESSMENT_RESULT_20261012.json) | 11/12 = 91,67 %; observación humana pendiente |
 | Universalidad técnica | [A11, UV-TECH-A11-60-v1](UNIVERSALITY_80_RESULT_20261010.md) | 48/60 = 80 %; no se traslada automáticamente a otro wheel |
 
 Los informes con fecha/versión son registros históricos: sus hashes, matrices,

@@ -1,0 +1,147 @@
+{
+  "acquisitions": {
+    "annual_and_monthly": true,
+    "compressed_bytes": 486265328,
+    "formats": [
+      "json",
+      "csv",
+      "xlsx"
+    ],
+    "member_bytes": 4773507107,
+    "responses": 39,
+    "selector_method": "all",
+    "zip_crc_verified": true
+  },
+  "automatic_rubric_points": 0,
+  "award_example": {
+    "all_expected": true,
+    "annual_rows": 183891,
+    "currency_groups": 2,
+    "receipt_sha256": "b3662a445d13cbae14e93f9b713774724b70dd88a9d4ab12508d05d08bf18cb9",
+    "sdk_comparisons": 7
+  },
+  "candidate": "0.12.0a13",
+  "complete_snapshot_comparison": {
+    "comparison_alignment": "source array/package positions; not OCID-keyed semantic change attribution",
+    "counts": {
+      "different_release_arrays": 190614,
+      "equal_release_arrays": 5,
+      "new_release_occurrences": 190619,
+      "old_release_occurrences": 190619,
+      "package_positions": 190619
+    },
+    "receipt_sha256": "78be5072f7f0bad0cd44e762a5fa9e972a5178830133c61e6f37e610cb05c527"
+  },
+  "created_at_utc": "2026-10-12T22:01:01.583273+00:00",
+  "csv_projections": {
+    "all_columns_utf8": true,
+    "annual_rows_by_export": {
+      "awards": 183891,
+      "contracts": 180465,
+      "extensions": 7,
+      "metadata": 1,
+      "planning": 37821,
+      "releases": 190619,
+      "suppliers": 183888,
+      "tender": 185536
+    },
+    "full_source_readback_verified": true,
+    "rows_including_annual_monthly_overlap": 1924544,
+    "tables": 104
+  },
+  "custody": {
+    "bytes_checked": 9506267980,
+    "file_inventory": "03_metadatos/local-index-v1.json",
+    "file_inventory_sha256": "ad768c638037b1d69a0dd746ac8d6696980702ff9c3c0c80492999423b149882",
+    "files_checked": 531,
+    "recorded_source_table_reference_hashes_checked": 350
+  },
+  "data_rows_published_to_git": 0,
+  "git_tracked": false,
+  "json_snapshots": [
+    {
+      "award_occurrences": 183891,
+      "catalog": "02_tablas/9ee4e5f94f44e42c/catalog.json",
+      "catalog_sha256": "4e3cea623e1d1d36afed534c03d1ad7e61270d52a796a995b49e013a766fa971",
+      "collection_count": 28,
+      "occurrence_rows": 6081374,
+      "packages": 190619,
+      "releases": 190619,
+      "scalar_occurrences": 35369712,
+      "source_sha256": "9ee4e5f94f44e42c89ade804d00ed69cd24604d246ad6450a4a43b2bd42e3632"
+    },
+    {
+      "award_occurrences": 183891,
+      "catalog": "02_tablas/80201404465d6c21/catalog.json",
+      "catalog_sha256": "734e519e92a194d11f9698a57f239ca6cbe1a731494e036bb0cc8f9f716ec454",
+      "collection_count": 28,
+      "occurrence_rows": 6081376,
+      "packages": 190619,
+      "releases": 190619,
+      "scalar_occurrences": 35369723,
+      "source_sha256": "80201404465d6c212e4ad53c60e6a928ceebf0eadfb57a0e200805b49a1894a3"
+    }
+  ],
+  "limits": [
+    "Annual/monthly and collection occurrence totals contain overlaps; no deduplication or unique-process claim.",
+    "All original formats preserved; XLSX cell-by-cell semantic readback is not claimed.",
+    "Native full CSV table checks differ from SDK comparisons of summary rows and currency aggregates.",
+    "Positional snapshot inequality is not proof that that many unique procurements changed.",
+    "OCDS schemas captured, not complete extension/domain or approved cohort validation.",
+    "No real DW, normal training cohort, human labels or thesis hypothesis approval inferred."
+  ],
+  "local_directory": "local-data/sercop/2025",
+  "local_index": {
+    "file": "local-data/sercop/2025/03_metadatos/local-index-v1.json",
+    "sha256": "ad768c638037b1d69a0dd746ac8d6696980702ff9c3c0c80492999423b149882"
+  },
+  "local_readme": {
+    "file": "local-data/sercop/2025/README.md",
+    "sha256": "4c0ddfb5d816cb78f6e7ef88c1a8da5b10a864866985ba14e9142c1caffe61b8"
+  },
+  "local_result": {
+    "file": "local-data/sercop/2025/03_metadatos/local-result-v1.json",
+    "sha256": "ca581a474fd6f5d8aef7b1e4f5b09c079437b4ff2d19b27cd149e96c6ad4be5b"
+  },
+  "native_consumer": {
+    "all_expected": true,
+    "complete_table_readbacks": 312,
+    "receipt_sha256": "c33a82c3dffa748c85b41d9c89f5f3c9a658d99877811b072838712bd9f0d1c8",
+    "rows_by_engine": {
+      "duckdb": 1924544,
+      "pandas": 1924544,
+      "polars": 1924544
+    },
+    "scope": "312 complete native table readbacks against source-constructed CSV hashes;9 SDK comparisons of104-row receipt summaries only;not SDK comparisons of all raw rows or scientific evaluation",
+    "sdk_summary_comparisons": 9,
+    "sdk_summary_rows": 104,
+    "tables_by_engine": {
+      "duckdb": 104,
+      "pandas": 104,
+      "polars": 104
+    }
+  },
+  "new_data_transferred_to_vm": false,
+  "organized_originals": {
+    "csv": 104,
+    "json": 13,
+    "total": 130,
+    "xlsx": 13
+  },
+  "recorded_at_utc": "2026-10-12T22:04:22.747305+00:00",
+  "references": 21,
+  "references_declared_license": "CC BY 3.0 Ecuador; not a license decision for EquiFrame",
+  "schema": "equiframe.sercop-local-assessment.v1",
+  "scientific_approval": false,
+  "source_number_binary_float_conversion": false,
+  "tools": {
+    "sercop_awards_example.py": "3b158f04da02327aa63bdf0cb760e0fa6b92d5560dd822ff8a8def565e851b19",
+    "sercop_local_consumer.py": "a8e153ef200f94097e0cf1aace1bb104ad593c1db6b29c2511d6ba34af4c0765",
+    "sercop_local_exports.py": "840cbab2f2c1e0f9ddcd00dfa7813c3289e910bdb7c1e5453200e50151f0b9d7",
+    "sercop_local_index.py": "a5c8dc747e4236173dea11805ad6432632d2f45849e8924be02cbcc31a3c8473",
+    "sercop_local_repository.py": "2647cb06302d84b0dbd033ab4d752e82cb021e6fd7c7b31d1236b0e77d6e6c78",
+    "sercop_snapshot_comparison.py": "786451b6a0bca5f544218f232090f65118098a26b0fdd4ec576876f9e483858c",
+    "sercop_validation_workload.py": "50964fe8360ea4eaff4bdcd9618f629e9c15ea433a050d2fe792c97ec481d246"
+  },
+  "word_modified": false
+}
