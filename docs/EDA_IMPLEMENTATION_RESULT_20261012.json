@@ -606,9 +606,11 @@
   "documentation": {
     "status": "PASS",
     "documents": 83,
-    "local_destinations": 736,
+    "local_destinations": 738,
     "anchors": 19,
-    "live_and_historical_candidates_checked_separately": true
+    "live_and_historical_candidates_checked_separately": true,
+    "checker_source_sha256": "e1e8799a6c8502be6fc82c58118dcc303875365fba47f957a1d2b0a13c34e733",
+    "scope_source_sha256": "0e9bfefe9c18dfe7c389d6f108639f6e1fe36856605e54e05b6622430031b19a"
   },
   "root_final_delta": {
     "passed": 28,
