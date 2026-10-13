@@ -4,7 +4,7 @@ Ejemplo de uso de SnapshotClient — leer awards_2025.parquet del DW.
 Uso:
     python ejemplo_awards.py [base_dir]
 
-    base_dir: carpeta raíz de snapshots publicados por Jhair.
+    base_dir: carpeta raíz de snapshots publicados por Hernan.
               Por defecto apunta a la VM: /home/ubuntu/datos/snapshots
               En Windows local para pruebas: pasa la ruta como argumento.
 """
@@ -20,7 +20,7 @@ from snapshot_client import SnapshotClient
 
 # ── Configuración ──────────────────────────────────────────────────────────────
 
-# Ruta donde Jhair publica los snapshots del DW
+# Ruta donde Hernan publica los snapshots del DW
 BASE_DIR_VM = Path("/home/ubuntu/datos/snapshots")
 
 # Ruta del artefacto dentro del snapshot (confirmada con Jhair)
@@ -64,7 +64,7 @@ def main() -> None:
             print(f"  {a.file_path}")
         sys.exit(1)
 
-    # 4. Descargar y verificar integridad (SHA-256 + tamaño)
+    # 4. Descargar y verificar integridad (SHA-256 + tamaño del manifiesto de Hernan)
     print(f"\nDescargando {ARTIFACT_PATH} ...")
     ruta_local = client.download_artifact(ref, DESCARGA_LOCAL)
     print(f"Archivo local         : {ruta_local}")
