@@ -10,6 +10,7 @@ import argparse
 import importlib.util
 import json
 import re
+import stat
 import sys
 from datetime import date, datetime
 from datetime import timezone as _timezone
@@ -33,6 +34,23 @@ DIMENSIONS = {
         "item_id",
         "item_surrogate_key",
         ("item_descripcion", "item_unidad_medida"),
+    ),
+}
+DIMENSION_SQL = {
+    "dim_entidad": (
+        'SELECT entidad_surrogate_key, entidad_nombre, entidad_tipo, "entidad_ubicación" FROM dim_entidad WHERE entidad_id = ?',
+        "SELECT COALESCE(MAX(entidad_surrogate_key), 0) + 1 FROM dim_entidad",
+        'INSERT INTO dim_entidad (entidad_surrogate_key, entidad_id, entidad_nombre, entidad_tipo, "entidad_ubicación") VALUES (?, ?, ?, ?, ?)',
+    ),
+    "dim_proveedor": (
+        'SELECT proveedor_surrogate_key, proveedor_nombre, proveedor_tipo, "proveedor_país" FROM dim_proveedor WHERE proveedor_id = ?',
+        "SELECT COALESCE(MAX(proveedor_surrogate_key), 0) + 1 FROM dim_proveedor",
+        'INSERT INTO dim_proveedor (proveedor_surrogate_key, proveedor_id, proveedor_nombre, proveedor_tipo, "proveedor_país") VALUES (?, ?, ?, ?, ?)',
+    ),
+    "dim_item": (
+        "SELECT item_surrogate_key, item_descripcion, item_unidad_medida FROM dim_item WHERE item_id = ?",
+        "SELECT COALESCE(MAX(item_surrogate_key), 0) + 1 FROM dim_item",
+        "INSERT INTO dim_item (item_surrogate_key, item_id, item_descripcion, item_unidad_medida) VALUES (?, ?, ?, ?)",
     ),
 }
 MAX_INPUT_BYTES = 64 * 1024**2
@@ -124,6 +142,10 @@ def country_name(address):
 
 def normalize_award(award):
     require(isinstance(award, dict), "Invalid award")
+    require(
+        not {"awards", "releases", "records"}.intersection(award),
+        "Ambiguous OCDS grain; normalize releases into awards explicitly",
+    )
     identity = (
         text(award.get("ocid"), required=True, maximum=512),
         text(award.get("id"), required=True, maximum=512),
@@ -187,10 +209,6 @@ def normalize_award(award):
     }
 
 
-def quoted(identifier):
-    return '"' + identifier.replace('"', '""') + '"'
-
-
 def get_or_create_dimension(
     con,
     table_name,
@@ -212,31 +230,16 @@ def get_or_create_dimension(
     text(natural_key_value, required=True, maximum=512)
     for value in attribute_values:
         text(value)
-    table, natural, surrogate = map(
-        quoted, (table_name, natural_key_col, surrogate_key_col)
-    )
-    stored_columns = ", ".join(map(quoted, attribute_cols))
-    existing = con.execute(
-        f"SELECT {surrogate}, {stored_columns} FROM {table} WHERE {natural} = ?",
-        [natural_key_value],
-    ).fetchone()
+    select_sql, next_sql, insert_sql = DIMENSION_SQL[table_name]
+    existing = con.execute(select_sql, [natural_key_value]).fetchone()
     if existing is not None:
         require(
             tuple(existing[1:]) == tuple(attribute_values),
             "DW v1 cannot overwrite historical dimension attributes",
         )
         return existing[0]
-    key = con.execute(
-        f"SELECT COALESCE(MAX({surrogate}), 0) + 1 FROM {table}"
-    ).fetchone()[0]
-    columns = ", ".join(
-        map(quoted, (surrogate_key_col, natural_key_col, *attribute_cols))
-    )
-    placeholders = ", ".join("?" for _ in range(2 + len(attribute_cols)))
-    con.execute(
-        f"INSERT INTO {table} ({columns}) VALUES ({placeholders})",
-        [key, natural_key_value, *attribute_values],
-    )
+    key = con.execute(next_sql).fetchone()[0]
+    con.execute(insert_sql, [key, natural_key_value, *attribute_values])
     return key
 
 
@@ -379,7 +382,31 @@ def load_batch(
     return len(prepared)
 
 
+def ordinary_file(path, *, allow_missing=False):
+    path = path.absolute()
+    for parent in path.parents:
+        info = parent.lstat()
+        require(
+            stat.S_ISDIR(info.st_mode)
+            and not stat.S_ISLNK(info.st_mode)
+            and not getattr(info, "st_file_attributes", 0) & 0x400,
+            "Linked or invalid file ancestors are not supported",
+        )
+    try:
+        info = path.lstat()
+    except FileNotFoundError:
+        require(allow_missing, "Required file does not exist")
+    else:
+        require(
+            stat.S_ISREG(info.st_mode)
+            and not getattr(info, "st_file_attributes", 0) & 0x400,
+            "A regular file without links is required",
+        )
+    return path
+
+
 def read_input(path):
+    path = ordinary_file(path)
     helper_path = Path(__file__).resolve().parents[1] / "equiframe-data/safe_io.py"
     spec = importlib.util.spec_from_file_location("_dw_input_validation", helper_path)
     require(
@@ -400,7 +427,14 @@ def read_input(path):
     except (ValueError, UnicodeError, RecursionError):
         raise ValueError("Invalid input JSON") from None
     if isinstance(data, dict):
-        data = data.get("awards", [data])
+        if "awards" in data:
+            require(
+                set(data) == {"awards"},
+                "Award batches require an explicit awards-only envelope",
+            )
+            data = data["awards"]
+        else:
+            data = [data]
     require(isinstance(data, list), "Invalid award batch")
     return data
 
@@ -419,10 +453,8 @@ def main():
         awards = read_input(args.input_file)
         for award in awards:
             normalize_award(award)
-        require(
-            not args.db_path.is_symlink(), "Linked database paths are not supported"
-        )
-        con = duckdb.connect(str(args.db_path))
+        database_path = ordinary_file(args.db_path, allow_missing=True)
+        con = duckdb.connect(str(database_path))
         con.execute(
             Path(__file__).with_name("dw_schema.sql").read_text(encoding="utf-8")
         )

@@ -87,3 +87,11 @@ añade y ejecuta las 704 obligaciones EDA: el inventario SDK ampliado queda en
 6.905/9.142, 75,530518 % técnico, con 2.237 pendientes. Su contribución ponderada
 sin crédito manual es 67,977467 puntos; faltan 22,022533 para el 90 % de ese
 inventario ampliado. Las cifras anteriores se conservan con su alcance original.
+
+El [cierre posterior de 222 contextos raíz](A14_ROOT_CONTEXT_REVALIDATION_20261013.md)
+lleva el inventario SDK a **7.127/9.142 = 77,958871 % técnico**. Son
+**70,162984 puntos ponderados**, sin crédito manual. Para su meta del 90 %
+faltan **19,837016 puntos**, equivalentes a **2.015 obligaciones** aún sin
+acreditar; el [resumen](A14_ROOT_CONTEXT_RESULT_20261013.json) enumera las
+adiciones y las categorías pendientes. Este avance no calcula automáticamente
+el promedio de los siete rubros.

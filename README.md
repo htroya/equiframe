@@ -35,7 +35,9 @@ comprueba únicamente la configuración. No se ha ejecutado ni publica paquetes.
 La revisión independiente del corte `44aa0bd` reprodujo esos conteos. Este
 inventario se amplió explícitamente con EDA en la
 [revalidación de artefactos corregidos](docs/A14_REVIEW_ARTIFACT_VALIDATION_20261013.md):
-**6.905/9.142**, con las mismas **2.237 obligaciones raíz pendientes**. El
+**6.905/9.142**, con las mismas **2.237 obligaciones raíz pendientes** en ese
+corte. La [revalidación posterior de contextos](docs/A14_ROOT_CONTEXT_REVALIDATION_20261013.md)
+acredita 222 obligaciones raíz más: **7.127/9.142**, con **2.015 pendientes**. El
 inventario ampliado incluye el namespace EDA declarado; otros componentes del
 monorepo conservan sus pruebas e inventarios propios. Las repeticiones
 y plataformas no crean nuevos IDs. El

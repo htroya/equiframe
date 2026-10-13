@@ -14,6 +14,12 @@ También se rechazan cambios de atributos de una dimensión existente: el DDL v1
 no puede conservar versiones y sobrescribirlos alteraría snapshots anteriores.
 
 El JSON se abre como archivo local regular con un límite de 64 MiB. No se admiten
+enlaces en el archivo ni en sus directorios, tampoco en la ruta de la base.
+La entrada debe ser una adjudicación normalizada, una lista de ellas o un objeto
+con sólo `awards` que contenga esa lista. Un `release`/record OCDS debe normalizarse
+explícitamente antes: su `id` no puede convertirse en `award_id` ni perderse sus
+adjudicaciones internas. Un envoltorio con `awards` y otros campos se rechaza.
+No se admiten
 claves repetidas, NaN/Infinity, dinero float, booleano o textual. El dinero debe
 caber exactamente en `DECIMAL(18,2)`; se rechaza en lugar de redondearlo. Monto,
 moneda, fecha y asociaciones ausentes permanecen NULL. La fecha del procedimiento

@@ -1,6 +1,7 @@
 """Reject repairs, discarded associations and partial publications in DW v1."""
 
 import importlib.util
+import json
 import subprocess
 import sys
 from datetime import date
@@ -235,6 +236,76 @@ def test_json_duplicate_keys_and_nonfinite_tokens_are_rejected(tmp_path):
         path.write_text(data)
         with pytest.raises(ValueError):
             etl.read_input(path)
+
+
+@pytest.mark.parametrize("nested", ["awards", "releases", "records"])
+def test_release_identifiers_cannot_replace_award_grain(database, nested):
+    etl.load_batch(database, [{"id": "old", "ocid": "original"}], "original")
+    before = database.execute("SELECT * FROM fact_adjudicacion").fetchall()
+    release = {
+        "id": "release-1",
+        "ocid": "ocds-synthetic-1",
+        nested: [{"id": "award-1", "value": {"amount": 123, "currency": "USD"}}],
+    }
+    with pytest.raises(ValueError, match="Ambiguous OCDS grain"):
+        etl.load_batch(database, [release], "new")
+    assert database.execute("SELECT * FROM fact_adjudicacion").fetchall() == before
+    assert database.execute("SELECT snapshot_id FROM snapshot").fetchall() == [
+        ("original",)
+    ]
+
+
+def test_release_envelope_is_refused_without_discarding_parent_fields(tmp_path):
+    path = tmp_path / "source.json"
+    path.write_text(
+        json.dumps({"ocid": "parent", "id": "release", "awards": [{"id": "award"}]})
+    )
+    with pytest.raises(ValueError, match="awards-only envelope"):
+        etl.read_input(path)
+    path.write_text('{"awards":[{"ocid":"o1","id":"a1"}]}')
+    assert etl.read_input(path) == [{"ocid": "o1", "id": "a1"}]
+
+
+@pytest.mark.parametrize("missing", [False, True])
+def test_linked_file_ancestors_are_refused_for_input_and_database(tmp_path, missing):
+    actual = tmp_path / "actual"
+    actual.mkdir()
+    (actual / "source.json").write_text("[]")
+    link = tmp_path / "linked"
+    try:
+        link.symlink_to(actual, target_is_directory=True)
+    except OSError:
+        pytest.skip("platform lacks symlink permission")
+    target = link / ("new.duckdb" if missing else "source.json")
+    with pytest.raises(ValueError, match="ancestors"):
+        etl.ordinary_file(target, allow_missing=missing)
+
+
+def test_sql_syntax_in_values_is_preserved_as_data(database):
+    payload = "supplier'; DROP TABLE snapshot; --"
+    etl.load_batch(
+        database,
+        [{"ocid": "o1", "id": "a1", "suppliers": [{"id": payload, "name": payload}]}],
+        "s1",
+    )
+    assert database.execute(
+        "SELECT proveedor_id,proveedor_nombre FROM dim_proveedor"
+    ).fetchall() == [(payload, payload)]
+    assert database.execute("SELECT snapshot_id FROM snapshot").fetchall() == [("s1",)]
+
+
+def test_unapproved_sql_identifiers_are_refused_before_execution(database):
+    with pytest.raises(ValueError, match="Unsupported dimension identifiers"):
+        etl.get_or_create_dimension(
+            database,
+            "dim_item; DROP TABLE snapshot; --",
+            "item_id",
+            "x",
+            "item_surrogate_key",
+            ["item_descripcion", "item_unidad_medida"],
+            ["x", "x"],
+        )
+    assert database.execute("SELECT COUNT(*) FROM snapshot").fetchone() == (0,)
 
 
 def test_json_fraction_is_exact_and_cli_does_not_create_demo_data(tmp_path):

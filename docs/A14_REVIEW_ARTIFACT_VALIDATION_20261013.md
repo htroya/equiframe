@@ -46,6 +46,11 @@ crédito manual nuevo, esta trazabilidad aporta **67,977467/100**. Faltan
 **22,022533 puntos técnicos** para su 90 %. La raíz conserva su medición
 6.201/8.438: no se reescribe como si siempre hubiese incluido EDA.
 
+El [recibo posterior de contextos](A14_ROOT_CONTEXT_REVALIDATION_20261013.md)
+acredita 222 obligaciones raíz adicionales en ambos modos con estos mismos
+bytes. Su inventario ampliado queda en 7.127/9.142, con 2.015 pendientes;
+los conteos anteriores identifican el corte previo y se conservan.
+
 El promedio general A14 de los siete rubros requiere evaluar todos sus criterios.
 La distancia histórica es 16,44 puntos desde 73,56 %; para los ocho indicadores,
 14,18 desde 75,82 %. Ninguno se renombra como promedio A14.

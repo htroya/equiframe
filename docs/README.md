@@ -26,6 +26,7 @@ documentación](DOCUMENTATION_MAINTENANCE.md).
 
 - [Correcciones de la revisión independiente A14](A14_INDEPENDENT_REVIEW_FIXES_20261013.md)
   con [artefactos nuevos revalidados](A14_REVIEW_ARTIFACT_VALIDATION_20261013.md)
+  y [222 contextos raíz adicionales verificados](A14_ROOT_CONTEXT_REVALIDATION_20261013.md)
   y [expediente técnico SERCOP](A14_SERCOP_EXPERIMENT_PREPARATION_20261013.md):
   resultados nuevos y límites de su acreditación.
 - [Contribuir](../CONTRIBUTING.md): entornos, controles manuales y revisión.
