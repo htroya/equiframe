@@ -30,10 +30,13 @@ La [identidad de TestPyPI](docs/TESTPYPI_PUBLISHER_PREPARATION_20261013.md)
 está preparada con `publish-testpypi.yml` y entorno `testpypi`; su workflow
 comprueba únicamente la configuración. No se ha ejecutado ni publica paquetes.
 
-[Trazabilidad actual](docs/OPTION_EXCEPTIONS_RESULT_20261012.md):
-**6.309/8.385 = 75,24 %**, con 264 obligaciones adicionales en esta entrega.
-Restan 2.076 para 100 %, 1.238 para al menos 90 % y 819 para al menos 85 %.
-Las repeticiones y plataformas no crean nuevos IDs.
+[Trazabilidad revalidada A14, 13/10/2026](docs/A14_REVALIDATION_CHECKPOINT_20261013.md):
+**6.201/8.438 obligaciones**, con **2.237 pendientes** en el inventario indicado.
+La revisión independiente del corte `44aa0bd` reprodujo esos conteos. Este
+inventario aún no incluye toda la API EDA ni todo el monorepo. Las repeticiones
+y plataformas no crean nuevos IDs. El
+[corte histórico A13](docs/OPTION_EXCEPTIONS_RESULT_20261012.md) conserva
+**6.309/8.385 = 75,24 %**; su cifra no se transfiere a A14.
 
 [Madurez reevaluada A13](docs/MATURITY_SCOPE_REASSESSMENT_20261012.md):
 **11/16 = 68,75 %** con las definiciones originales y recibos actuales.

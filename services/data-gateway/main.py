@@ -1,5 +1,6 @@
 """Authenticated private gateway. Importing this module creates no data or credentials."""
 
+import asyncio
 import hashlib
 import json
 import logging
@@ -26,11 +27,13 @@ from equiframe_data.safe_io import (
 )
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, ConfigDict, Field
 
 logger = logging.getLogger("equiframe.gateway")
 MAX_BODY = 64 * 1024
+MAX_BODY_SECONDS = 5.0
+MAX_BODY_IDLE_SECONDS = 1.0
 
 
 class SubmitRequest(BaseModel):
@@ -50,9 +53,41 @@ class RunRequest(BaseModel):
 class SecureBoundary:
     def __init__(self, app):
         self.app = app
-        self._requests = deque()
+        self._requests = {role: deque() for role in ("operator", "reader", "anonymous")}
+        self._anonymous_origins = {}
         self._rate_lock = threading.Lock()
         self._slots = threading.BoundedSemaphore(4)
+
+    def _admit(self, role, scope):
+        now = time.monotonic()
+        with self._rate_lock:
+            requests = self._requests[role]
+            while requests and requests[0] <= now - 60:
+                requests.popleft()
+            if len(requests) >= 120:
+                return False
+            if role == "anonymous":
+                for key in tuple(self._anonymous_origins):
+                    records = self._anonymous_origins[key]
+                    while records and records[0] <= now - 60:
+                        records.popleft()
+                    if not records:
+                        del self._anonymous_origins[key]
+                peer = scope.get("client")
+                origin = (
+                    peer[0]
+                    if isinstance(peer, (tuple, list))
+                    and peer
+                    and isinstance(peer[0], str)
+                    and len(peer[0]) <= 256
+                    else "unknown"
+                )
+                records = self._anonymous_origins.setdefault(origin, deque())
+                if len(records) >= 30:
+                    return False
+                records.append(now)
+            requests.append(now)
+            return True
 
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
@@ -65,26 +100,51 @@ class SecureBoundary:
                     *message.get("headers", []),
                     (b"x-content-type-options", b"nosniff"),
                     (b"cache-control", b"no-store"),
-                    (b"content-security-policy", b"default-src 'none'; frame-ancestors 'none'"),
+                    (
+                        b"content-security-policy",
+                        b"default-src 'none'; frame-ancestors 'none'",
+                    ),
                     (b"referrer-policy", b"no-referrer"),
                 ]
                 if scope.get("scheme") == "https":
-                    message["headers"].append((b"strict-transport-security", b"max-age=31536000"))
+                    message["headers"].append(
+                        (b"strict-transport-security", b"max-age=31536000")
+                    )
             await send(message)
 
         async def reject(status, message):
-            await JSONResponse({"detail": message}, status_code=status)(scope, receive, secure_send)
+            await JSONResponse({"detail": message}, status_code=status)(
+                scope, receive, secure_send
+            )
 
-        now = time.monotonic()
-        with self._rate_lock:
-            while self._requests and self._requests[0] < now - 60:
-                self._requests.popleft()
-            limited = len(self._requests) >= 120
-            if not limited:
-                self._requests.append(now)
-        if limited:
-            await reject(429, "Límite de solicitudes alcanzado.")
+        if scope.get("path") == "/health":
+            if scope["method"] not in ("GET", "HEAD"):
+                await reject(405, "Método no permitido.")
+                return
+            headers = dict(scope.get("headers", []))
+            length = headers.get(b"content-length", b"0")
+            if (
+                not length.isdigit()
+                or len(length) > 6
+                or int(length) != 0
+                or b"transfer-encoding" in headers
+            ):
+                await reject(400, "La consulta de salud no admite cuerpo.")
+                return
+            response = (
+                JSONResponse({"status": "ok"})
+                if scope["method"] == "GET"
+                else Response(status_code=200)
+            )
+            await response(scope, receive, secure_send)
             return
+
+        async def unauthorized(message):
+            if self._admit("anonymous", scope):
+                await reject(401, message)
+            else:
+                await reject(429, "Límite de solicitudes alcanzado.")
+
         if scope.get("path") != "/health":
             if scope.get("scheme") != "https":
                 await reject(400, "Se requiere HTTPS.")
@@ -92,21 +152,24 @@ class SecureBoundary:
             headers = scope.get("headers", [])
             authorization = [v for k, v in headers if k.lower() == b"authorization"]
             if len(authorization) != 1 or len(authorization[0]) > 512:
-                await reject(401, "Autenticación requerida.")
+                await unauthorized("Autenticación requerida.")
                 return
             header = authorization[0]
             if not header.startswith(b"Bearer ") or not 32 <= len(header[7:]) <= 256:
-                await reject(401, "Credencial inválida.")
+                await unauthorized("Credencial inválida.")
                 return
             candidate = hashlib.sha256(header[7:]).hexdigest()
             settings = scope["app"].state.settings
             operator = secrets.compare_digest(candidate, settings["operator_digest"])
             reader = secrets.compare_digest(candidate, settings["reader_digest"])
             if not (operator or reader):
-                await reject(401, "Credencial inválida.")
+                await unauthorized("Credencial inválida.")
                 return
             if scope["method"] not in ("GET", "HEAD") and not operator:
                 await reject(403, "Permiso insuficiente.")
+                return
+            if not self._admit("operator" if operator else "reader", scope):
+                await reject(429, "Límite de solicitudes alcanzado.")
                 return
         if not self._slots.acquire(blocking=False):
             await reject(503, "Servicio ocupado.")
@@ -114,12 +177,28 @@ class SecureBoundary:
         try:
             headers = dict(scope.get("headers", []))
             length = headers.get(b"content-length", b"0")
-            if not length.isdigit() or int(length) > MAX_BODY:
+            if not length.isdigit() or len(length) > 6 or int(length) > MAX_BODY:
                 await reject(413, "Solicitud demasiado grande.")
                 return
+            if scope["method"] in ("GET", "HEAD") and (
+                int(length) != 0 or b"transfer-encoding" in headers
+            ):
+                await reject(400, "La consulta no admite cuerpo.")
+                return
             payload = bytearray()
-            while True:
-                message = await receive()
+            deadline = time.monotonic() + MAX_BODY_SECONDS
+            while scope["method"] not in ("GET", "HEAD"):
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    await reject(408, "Tiempo de recepción agotado.")
+                    return
+                try:
+                    message = await asyncio.wait_for(
+                        receive(), timeout=min(MAX_BODY_IDLE_SECONDS, remaining)
+                    )
+                except asyncio.TimeoutError:  # noqa: UP041 -- distinct from TimeoutError on Python 3.10
+                    await reject(408, "Tiempo de recepción agotado.")
+                    return
                 if message["type"] == "http.disconnect":
                     return
                 block = message.get("body", b"")
@@ -151,7 +230,11 @@ class SecureBoundary:
                 nonlocal consumed
                 if not consumed:
                     consumed = True
-                    return {"type": "http.request", "body": bytes(payload), "more_body": False}
+                    return {
+                        "type": "http.request",
+                        "body": bytes(payload),
+                        "more_body": False,
+                    }
                 return await receive()
 
             await self.app(scope, bounded_receive, secure_send)
@@ -176,30 +259,47 @@ def _perform(call):
         raise HTTPException(400, "Entrada o estado inválido.") from None
     except Exception as exc:  # noqa: BLE001 -- HTTP boundary must redact unexpected failures.
         logger.error(
-            "operation_failed kind=%s frames=%s", type(exc).__name__, safe_error_frames(exc)
+            "operation_failed kind=%s frames=%s",
+            type(exc).__name__,
+            safe_error_frames(exc),
         )
         raise HTTPException(503, "Ocurrió un error; intente más tarde.") from None
 
 
-def create_app(*, base_dir=None, input_dir=None, token_sha256=None, read_token_sha256=None):
+def create_app(
+    *, base_dir=None, input_dir=None, token_sha256=None, read_token_sha256=None
+):
     @asynccontextmanager
     async def lifespan(application):
         configured_base = base_dir or os.environ.get("EQUIFRAME_GATEWAY_DATA_DIR")
         configured_input = input_dir or os.environ.get("EQUIFRAME_GATEWAY_INPUT_DIR")
         operator = token_sha256 or os.environ.get("EQUIFRAME_GATEWAY_TOKEN_SHA256")
-        reader = read_token_sha256 or os.environ.get("EQUIFRAME_GATEWAY_READ_TOKEN_SHA256")
+        reader = read_token_sha256 or os.environ.get(
+            "EQUIFRAME_GATEWAY_READ_TOKEN_SHA256"
+        )
         if not configured_base or not configured_input or not operator:
-            raise RuntimeError("Configure las carpetas y el resumen de credencial del gateway.")
+            raise RuntimeError(
+                "Configure las carpetas y el resumen de credencial del gateway."
+            )
         operator = digest(operator)
         reader = digest(reader) if reader else "0" * 64
         if reader == operator:
-            raise RuntimeError("Las credenciales de lectura y operación deben ser distintas.")
+            raise RuntimeError(
+                "Las credenciales de lectura y operación deben ser distintas."
+            )
         state_root = Path(configured_base).resolve()
         input_root = Path(configured_input).resolve()
-        if state_root.is_relative_to(input_root) or input_root.is_relative_to(state_root):
+        if state_root.is_relative_to(input_root) or input_root.is_relative_to(
+            state_root
+        ):
             raise RuntimeError("Las carpetas de entrada y estado no deben solaparse.")
-        application.state.settings = {"operator_digest": operator, "reader_digest": reader}
-        application.state.manager = JobManager(configured_base, input_dir=configured_input)
+        application.state.settings = {
+            "operator_digest": operator,
+            "reader_digest": reader,
+        }
+        application.state.manager = JobManager(
+            configured_base, input_dir=configured_input
+        )
         yield
 
     application = FastAPI(
@@ -226,7 +326,9 @@ def create_app(*, base_dir=None, input_dir=None, token_sha256=None, read_token_s
     @application.post("/jobs", status_code=201)
     def submit(req: SubmitRequest, mgr: Annotated[JobManager, Depends(manager)]):
         return _perform(
-            lambda: _public(mgr.submit_job(req.operation, req.snapshot_id, req.idempotency_key))
+            lambda: _public(
+                mgr.submit_job(req.operation, req.snapshot_id, req.idempotency_key)
+            )
         )
 
     @application.get("/jobs")
@@ -238,7 +340,9 @@ def create_app(*, base_dir=None, input_dir=None, token_sha256=None, read_token_s
         return _perform(lambda: _public(mgr.get_job(identifier(job_id))))
 
     @application.post("/jobs/{job_id}/run")
-    def run_job(job_id: str, req: RunRequest, mgr: Annotated[JobManager, Depends(manager)]):
+    def run_job(
+        job_id: str, req: RunRequest, mgr: Annotated[JobManager, Depends(manager)]
+    ):
         # Strings remain relative until confined by JobManager; no arbitrary server paths.
         return _perform(lambda: _public(mgr.run_job(identifier(job_id), req.archivos)))
 

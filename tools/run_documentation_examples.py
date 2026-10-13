@@ -56,7 +56,8 @@ with zipfile.ZipFile(sys.argv[1]) as archive:
             if hashlib.sha256(installed.read_bytes()).digest() != hashlib.sha256(archive.read(name)).digest():
                 raise RuntimeError('Installed SDK payload differs: ' + name)
             checked += 1
-print(json.dumps({'python': sys.version, 'utf8_mode': sys.flags.utf8_mode, 'sdk': equiframe.__version__,
+print(json.dumps({'python': sys.version, 'executable': sys.executable, 'prefix': sys.prefix,
+                 'base_prefix': sys.base_prefix, 'utf8_mode': sys.flags.utf8_mode, 'sdk': equiframe.__version__,
                  'arrow': pyarrow.__version__, 'sdk_path': str(package), 'payload_members': checked}))
 """
 
@@ -135,7 +136,7 @@ def main() -> int:
         work.mkdir(parents=True, exist_ok=False)
         probe = subprocess.run(
             [
-                str(args.python.resolve()),
+                str(args.python.absolute()),
                 "-I",
                 "-X",
                 "utf8",
@@ -166,7 +167,7 @@ def main() -> int:
                 folder.mkdir()
                 script = folder / "example.py"
                 script.write_text(code, encoding="utf-8", newline="\n")
-                command = [str(args.python.resolve()), "-I", "-X", "utf8"]
+                command = [str(args.python.absolute()), "-I", "-X", "utf8"]
                 if optimized:
                     command.append("-O")
                 command.append(str(script))

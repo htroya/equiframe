@@ -206,10 +206,15 @@ def _analyze(
                 "threads": limits.threads,
                 "max_temp_directory_size": f"{limits.temp_disk_mb}MB",
                 "temp_directory": str(temporary),
-                "TimeZone": "UTC",
+                "autoinstall_known_extensions": False,
                 "preserve_insertion_order": True,
             },
         )
+        # ICU bundled with the wheel is initialized during connect on some hosts.
+        # Set UTC afterwards, while implicit extension downloads remain disabled.
+        connection.execute("SET TimeZone='UTC'")
+        if connection.execute("SELECT current_setting('TimeZone')").fetchone() != ("UTC",):
+            raise ValueError("EDA requires an available UTC timezone setting")
 
         def interrupt() -> None:
             # Timer race with close is not a diagnostic success.

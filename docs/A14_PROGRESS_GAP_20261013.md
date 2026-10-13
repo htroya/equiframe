@@ -60,3 +60,24 @@ Fuentes de partida: [matriz de ocho indicadores](PROJECT_STATUS_MATRIX_20261011_
 [trazabilidad más reciente](OPTION_EXCEPTIONS_RESULT_20261012.md),
 [madurez](MATURITY_SCOPE_REASSESSMENT_20261012.md) y
 [requisitos de tesis](THESIS_CURRENT_RESULT_20261011.json).
+
+## Revalidación A14 posterior e independiente
+
+El [corte A14 revalidado](A14_REVALIDATION_CHECKPOINT_20261013.md) y la revisión
+independiente acreditan **6.201 / 8.438** obligaciones, **73,488978 %** del
+inventario técnico delimitado. Reservando diez puntos humanos sin acreditar,
+su contribución es **66,140081 / 100**. Completar las **2.237 obligaciones**
+restantes llevaría ese bloque al 90 %: faltan **23,859919 puntos** en este
+rubricado específico, no 1.238 obligaciones del umbral histórico.
+
+El namespace EDA añade un inventario que debe registrarse y verificarse por
+separado; la revisión señala 704 obligaciones adicionales. No se presume su
+cumplimiento por las pruebas generales ni se cambia en silencio el denominador
+8.438. Los nuevos artefactos de las [correcciones](A14_INDEPENDENT_REVIEW_FIXES_20261013.md)
+también requieren recibos vinculados a sus propios bytes.
+
+**El promedio general A14 sigue sin una medición completa**. Los 16,44 puntos
+de los siete rubros y los 14,18 de los ocho son distancias históricas, no una
+estimación de horas ni una puntuación nueva. Ya se [preparó y verificó el piloto
+SERCOP](A14_SERCOP_EXPERIMENT_PREPARATION_20261013.md); las etiquetas, soporte
+normal, particiones finales y resultados científicos continúan pendientes.

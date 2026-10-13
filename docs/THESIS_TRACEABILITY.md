@@ -527,3 +527,13 @@ puntos a la intervención humana por área y conserva estas dependencias
 explícitas. Ningún recibo histórico A11/A13 se renombra como validación A14.
 La huella de reglas cambia por el código de comprobación interno; los
 catálogos experimentales congelados conservan su identidad y sus resultados.
+
+## Preparación de expediente real — 2026-10-13
+
+Se prepararon 216 ejecuciones nativas sobre 12 unidades OCID y tres familias,
+con esperados independientes, controles/mutaciones y dos hojas ciegas sin
+etiquetas. El [recibo técnico](A14_SERCOP_EXPERIMENT_PREPARATION_20261013.md)
+acredita la preparación y su recomputación; no aprueba una cohorte o normalidad.
+La agrupación conservadora deja un solo grupo y no soporta calibración/test.
+No se declara N_fit, entrenamiento final, congelación científica ni nueve
+estratos aprobados. Los requisitos que necesitan esos insumos siguen pendientes.

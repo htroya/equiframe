@@ -16,7 +16,7 @@ from datetime import datetime
 from datetime import timezone as _timezone
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Protocol, cast
 from uuid import uuid4
 
 import equiframe as ef
@@ -36,6 +36,11 @@ from equiframe_benchmark.scale_types import (
 )
 
 UTC = _timezone.utc
+
+
+class _SysconfOS(Protocol):
+    def sysconf(self, name: str, /) -> int: ...
+
 
 _WINDOWS_UNAME_ENV = (
     "EQUIFRAME_SUPERVISED_SYSTEM",
@@ -194,8 +199,8 @@ def _environment() -> dict[str, str]:
             result[package] = "not_installed"
     try:
         result["physical_memory_bytes"] = str(
-            os.sysconf("SC_PAGE_SIZE")  # type: ignore[attr-defined]
-            * os.sysconf("SC_PHYS_PAGES")  # type: ignore[attr-defined]
+            cast(_SysconfOS, os).sysconf("SC_PAGE_SIZE")
+            * cast(_SysconfOS, os).sysconf("SC_PHYS_PAGES")
         )
     except (ValueError, OSError, AttributeError):
         result["physical_memory_bytes"] = "not_available"

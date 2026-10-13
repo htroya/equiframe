@@ -42,10 +42,18 @@ de idempotencia acotada. `run` acepta `{ "archivos": { "items": "items.parquet" 
 las rutas se resuelven exclusivamente dentro de la entrada autorizada. No acepta
 SQL, comandos ni rutas absolutas del servidor.
 
-JSON estricto sin campos adicionales; máximo 64 KiB, 256 archivos, cuatro
-solicitudes activas y 120 solicitudes/minuto por proceso. El servicio controla
-un escritor de filesystem entre procesos; las cuotas HTTP son por proceso y el
-proxy debe fijar el límite agregado si se amplían workers. Los errores HTTP son
+JSON estricto sin campos adicionales; máximo 64 KiB, 256 archivos y cuatro
+solicitudes de negocio activas. La recepción del cuerpo vence tras un segundo
+sin datos o cinco segundos totales, aunque lleguen bloques intermedios. Hay
+cuotas separadas de 120 solicitudes/minuto para operación, lectura y peticiones
+sin autenticación; estas últimas tienen además 30/minuto por origen ASGI. No se
+acepta `X-Forwarded-For` arbitrario para determinar ese origen.
+`GET /health` y `HEAD /health` no reciben cuerpos ni ocupan cupos de negocio;
+otros métodos y cuerpos declarados se rechazan. Las peticiones sin credenciales
+no consumen la cuota de los operadores ni la consulta de salud.
+El servicio controla un escritor de filesystem entre procesos; las cuotas HTTP
+son por proceso y el proxy debe fijar el límite agregado si se amplían workers.
+Los errores HTTP son
 genéricos y los logs internos sólo registran IDs, clases de error y estado de
 commit, sin tokens, claves de idempotencia, rutas de entrada ni valores.
 

@@ -1,354 +1,451 @@
-#!/usr/bin/env python3
+"""Bounded DW v1 prototype: exact money, NULL absences and transactional batches.
+
+Temporal projection and bridge schemas remain domain decisions. Unsupported
+timestamp precision or multiple suppliers/items are rejected without publication.
 """
-ETL para cargar datos OCDS en el DW de Jhair (equiframe-sercop).
-Lee archivos JSON OCDS y los carga en el Data Warehouse DuckDB.
-"""
+
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import json
+import re
+import sys
+from datetime import date, datetime
+from datetime import timezone as _timezone
+from decimal import Context, Decimal, InvalidOperation, localcontext
+from pathlib import Path
 
 import duckdb
-import pathlib
-import sys
-import json
-from datetime import datetime
-import argparse
 
-def get_or_create_dimension(con, table_name, natural_key_col, natural_key_value, 
-                           surrogate_key_col, attribute_cols, attribute_values):
-    """
-    Generic function to get or create a dimension row.
-    Returns the surrogate key.
-    If the row exists, updates the attributes and returns the existing surrogate key.
-    If not, inserts a new row with a new surrogate key (max+1) and returns it.
-    
-    Parameters:
-    - table_name: name of the dimension table
-    - natural_key_col: column name of the natural key
-    - natural_key_value: value of the natural key
-    - surrogate_key_col: column name of the surrogate key
-    - attribute_cols: list of attribute column names (to update if exists)
-    - attribute_values: list of attribute values corresponding to attribute_cols
-    """
-    # First, try to get the surrogate key by the natural key
-    result = con.execute(f"""
-        SELECT {surrogate_key_col} FROM {table_name} 
-        WHERE {natural_key_col} = ?
-    """, (natural_key_value,)).fetchone()
-    
-    if result is not None:
-        sk = result[0]
-        # Update the attributes if they changed
-        set_clause = ", ".join([f"{col} = ?" for col in attribute_cols])
-        con.execute(f"""
-            UPDATE {table_name} 
-            SET {set_clause}
-            WHERE {natural_key_col} = ?
-        """, attribute_values + [natural_key_value])
-        return sk
-    else:
-        # Insert a new row with a new surrogate key
-        new_sk = con.execute(f"""
-            SELECT COALESCE(MAX({surrogate_key_col}), 0) + 1 FROM {table_name}
-        """).fetchone()[0]
-        cols = [surrogate_key_col, natural_key_col] + attribute_cols
-        columns_sql = ", ".join(cols)
-        placeholders = ", ".join(["?"] * len(cols))
-        con.execute(f"""
-            INSERT INTO {table_name} ({columns_sql})
-            VALUES ({placeholders})
-        """, [new_sk, natural_key_value] + attribute_values)
-        return new_sk
+DIMENSIONS = {
+    "dim_entidad": (
+        "entidad_id",
+        "entidad_surrogate_key",
+        ("entidad_nombre", "entidad_tipo", "entidad_ubicación"),
+    ),
+    "dim_proveedor": (
+        "proveedor_id",
+        "proveedor_surrogate_key",
+        ("proveedor_nombre", "proveedor_tipo", "proveedor_país"),
+    ),
+    "dim_item": (
+        "item_id",
+        "item_surrogate_key",
+        ("item_descripcion", "item_unidad_medida"),
+    ),
+}
+MAX_INPUT_BYTES = 64 * 1024**2
+MAX_AWARDS = 100000
+UTC = _timezone.utc  # noqa: UP017 -- preserve Python 3.10 compatibility
 
-def load_ocds_award(con, award_data, snapshot_id):
-    """
-    Carga un award OCDS en las tablas del DW.
-    Retorna los IDs de las dimensiones creadas/usadas.
-    """
-    
-    # Extract key fields from award
-    award_id = award_data.get('id', 'UNKNOWN')
-    ocid = award_data.get('ocid', 'UNKNOWN')
-    
-    # Extract value information
-    value_info = award_data.get('value', {})
-    monto = value_info.get('amount', 0.0)
-    moneda = value_info.get('currency', 'USD')
-    
-    # Extract status
-    estado = award_data.get('status', 'UNKNOWN')
-    
-    # Procesar entidad contratante (procuringEntity)
-    entity = award_data.get('procuringEntity', {})
-    entidad_id = entity.get('id', 'UNKNOWN')
-    entidad_nombre = entity.get('name', '')
-    entidad_tipo = entity.get('entityType', '')
-    entidad_ubicación = ''
-    if 'address' in entity and entity['address']:
-        addr = entity['address']
-        localidad = addr.get('locality', '')
-        region = addr.get('region', '')
-        pais = addr.get('country_name', '')
-        parts = [localidad, region, pais]
-        entidad_ubicación = ', '.join([p for p in parts if p])
-    
-    # Get or create entidad
-    entidad_sk = get_or_create_dimension(
-        con, 'dim_entidad', 'entidad_id', entidad_id,
-        'entidad_surrogate_key',
-        ['entidad_nombre', 'entidad_tipo', 'entidad_ubicación'],
-        [entidad_nombre, entidad_tipo, entidad_ubicación]
+
+def require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def text(value, *, required=False, maximum=65536):
+    if value is None and not required:
+        return None
+    require(
+        isinstance(value, str)
+        and (not required or bool(value))
+        and len(value) <= maximum,
+        "Invalid text field",
     )
-    
-    # Procesar proveedores (suppliers)
-    proveedor_sk = None
-    suppliers = award_data.get('suppliers', [])
-    if suppliers:
-        # Tomar el primer proveedor (en OCDS puede haber múltiples)
-        supplier = suppliers[0]
-        proveedor_id = supplier.get('id', 'UNKNOWN')
-        proveedor_nombre = supplier.get('name', '')
-        proveedor_tipo = 'Privado'  # Default, podría mejorarse
-        proveedor_país = ''
-        if 'address' in supplier and supplier['address']:
-            addr = supplier['address']
-            proveedor_país = addr.get('country_name', '')
-        
-        # Get or create proveedor
-        proveedor_sk = get_or_create_dimension(
-            con, 'dim_proveedor', 'proveedor_id', proveedor_id,
-            'proveedor_surrogate_key',
-            ['proveedor_nombre', 'proveedor_tipo', 'proveedor_país'],
-            [proveedor_nombre, proveedor_tipo, proveedor_país]
-        )
-    
-    # Procesar items
-    item_sk = None
-    items = award_data.get('items', [])
-    if items:
-        # Tomar el primer item (simplificación)
-        item = items[0]
-        item_id = item.get('id', 'UNKNOWN')
-        item_descripcion = item.get('description', '')
-        item_unidad_medida = ''
-        if 'unit' in item and item['unit']:
-            item_unidad_medida = item['unit'].get('name', '')
-        
-        # Get or create item
-        item_sk = get_or_create_dimension(
-            con, 'dim_item', 'item_id', item_id,
-            'item_surrogate_key',
-            ['item_descripcion', 'item_unidad_medida'],
-            [item_descripcion, item_unidad_medida]
-        )
-    
-    # Procesar fecha
-    fecha_str = award_data.get('date', '')
-    fecha_sk = None
-    fecha_date = None
-    if fecha_str:
-        try:
-            # Parsear fecha ISO
-            if 'T' in fecha_str:
-                fecha_dt = datetime.fromisoformat(fecha_str.replace('Z', '+00:00'))
-            else:
-                fecha_dt = datetime.fromisoformat(fecha_str)
-            fecha_date = fecha_dt.date()
-            
-            # Generar surrogate key como YYYYMMDD
-            fecha_sk = int(fecha_date.strftime('%Y%m%d'))
-            
-            # Insert or ignore (since attributes are deterministic from date)
-            con.execute("""
-                INSERT OR IGNORE INTO dim_fecha 
-                (fecha_surrogate_key, fecha, año, mes, día, trimestre)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (
-                fecha_sk,
-                fecha_date,
-                fecha_date.year,
-                fecha_date.month,
-                fecha_date.day,
-                (fecha_date.month - 1) // 3 + 1  # Trimestre
-            ))
-        except Exception as e:
-            print(f"Advertencia: No se pudo parsear fecha '{fecha_str}': {e}")
-            # Usar fecha actual como fallback
-            fecha_date = datetime.now().date()
-            fecha_sk = int(fecha_date.strftime('%Y%m%d'))
-            
-            con.execute("""
-                INSERT OR IGNORE INTO dim_fecha 
-                (fecha_surrogate_key, fecha, año, mes, día, trimestre)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (
-                fecha_sk,
-                fecha_date,
-                fecha_date.year,
-                fecha_date.month,
-                fecha_date.day,
-                (fecha_date.month - 1) // 3 + 1
-            ))
-    else:
-        # If no date, use today
-        fecha_date = datetime.now().date()
-        fecha_sk = int(fecha_date.strftime('%Y%m%d'))
-        
-        con.execute("""
-            INSERT OR IGNORE INTO dim_fecha 
-            (fecha_surrogate_key, fecha, año, mes, día, trimestre)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (
-            fecha_sk,
-            fecha_date,
-            fecha_date.year,
-            fecha_date.month,
-            fecha_date.day,
-            (fecha_date.month - 1) // 3 + 1
-        ))
-    
-    # Use the parsed date (or fallback) for both procedure and adjudication dates
-    fecha_procedimiento = fecha_date
-    fecha_adjudicacion = fecha_date
-    
-    # Insertar hecho (fact_adjudicacion)
-    # We use INSERT OR IGNORE then UPDATE to handle idempotency
-    con.execute("""
-        INSERT OR IGNORE INTO fact_adjudicacion (
-            fact_id, snapshot_id, ocid, award_id, monto, moneda, estado,
-            fecha_procedimiento, fecha_adjudicacion,
-            entidad_surrogate_key, proveedor_surrogate_key,
-            item_surrogate_key, fecha_surrogate_key
-        ) VALUES (
-            (SELECT COALESCE(MAX(fact_id), 0) + 1 FROM fact_adjudicacion),
-            ?, ?, ?, ?, ?, ?,
-            ?, ?,
-            ?, ?, ?, ?
-        )
-    """, (
-        snapshot_id, ocid, award_id, monto, moneda, estado,
-        fecha_procedimiento, fecha_adjudicacion,
-        entidad_sk, proveedor_sk, item_sk, fecha_sk
-    ))
-    
-    # Actualizar si ya existía (por la restricción UNIQUE)
-    con.execute("""
-        UPDATE fact_adjudicacion 
-        SET monto = ?, moneda = ?, estado = ?,
-            fecha_procedimiento = ?, fecha_adjudicacion = ?,
-            entidad_surrogate_key = ?, proveedor_surrogate_key = ?,
-            item_surrogate_key = ?, fecha_surrogate_key = ?
-        WHERE snapshot_id = ? AND ocid = ? AND award_id = ?
-    """, (
-        monto, moneda, estado,
-        fecha_procedimiento, fecha_adjudicacion,
-        entidad_sk, proveedor_sk, item_sk, fecha_sk,
-        snapshot_id, ocid, award_id
-    ))
-    
+    return value
+
+
+def mapping(value):
+    require(value is None or isinstance(value, dict), "Invalid nested record")
+    return value or {}
+
+
+def calendar_date(value):
+    if value is None:
+        return None
+    require(
+        isinstance(value, str)
+        and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value) is not None,
+        "DW v1 requires explicit calendar dates; timestamp projection is not approved",
+    )
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        raise ValueError("Invalid calendar date") from None
+
+
+def money(value):
+    if value is None:
+        return None
+    require(
+        type(value) in (int, Decimal), "Money requires exact decimal or integer input"
+    )
+    value = Decimal(value)
+    require(
+        value.is_finite() and not (value.is_zero() and value.is_signed()),
+        "Unsupported monetary value",
+    )
+    try:
+        with localcontext(Context(prec=64)):
+            stored = value.quantize(Decimal("0.01"))
+    except InvalidOperation:
+        raise ValueError("Money does not fit DW v1") from None
+    require(
+        value == stored and stored.copy_abs() <= Decimal("9999999999999999.99"),
+        "Money does not fit DECIMAL(18,2) exactly",
+    )
+    return stored
+
+
+def single_collection(value):
+    require(value is None or isinstance(value, list), "Invalid association collection")
+    values = value or []
+    require(
+        len(values) <= 1,
+        "DW v1 does not support multiple associations; nothing may be discarded",
+    )
+    require(
+        all(isinstance(item, dict) for item in values), "Invalid association record"
+    )
+    return values[0] if values else None
+
+
+def country_name(address):
+    current = text(address.get("countryName"))
+    legacy = text(address.get("country_name"))
+    require(
+        current is None or legacy is None or current == legacy,
+        "Conflicting country names",
+    )
+    return current if current is not None else legacy
+
+
+def normalize_award(award):
+    require(isinstance(award, dict), "Invalid award")
+    identity = (
+        text(award.get("ocid"), required=True, maximum=512),
+        text(award.get("id"), required=True, maximum=512),
+    )
+    value = mapping(award.get("value"))
+    amount = money(value.get("amount"))
+    currency = value.get("currency")
+    require(
+        currency is None
+        or isinstance(currency, str)
+        and re.fullmatch(r"[A-Z]{3}", currency) is not None,
+        "Invalid currency",
+    )
+    entity = mapping(award.get("procuringEntity"))
+    supplier = single_collection(award.get("suppliers"))
+    item = single_collection(award.get("items"))
+    dimensions = {}
+    for name, record in (
+        ("dim_entidad", entity or None),
+        ("dim_proveedor", supplier),
+        ("dim_item", item),
+    ):
+        if record is None:
+            dimensions[name] = None
+            continue
+        natural = text(record.get("id"), required=True, maximum=512)
+        if name == "dim_entidad":
+            address = mapping(record.get("address"))
+            parts = [text(address.get(key)) for key in ("locality", "region")]
+            parts.append(country_name(address))
+            location = (
+                ", ".join(part for part in parts if part is not None)
+                if any(part is not None for part in parts)
+                else None
+            )
+            attributes = [
+                text(record.get("name")),
+                text(record.get("entityType")),
+                location,
+            ]
+        elif name == "dim_proveedor":
+            address = mapping(record.get("address"))
+            attributes = [
+                text(record.get("name")),
+                text(record.get("entityType")),
+                country_name(address),
+            ]
+        else:
+            unit = mapping(record.get("unit"))
+            attributes = [text(record.get("description")), text(unit.get("name"))]
+        dimensions[name] = (natural, attributes)
     return {
-        'entidad_id': entidad_id,
-        'proveedor_id': proveedor_id if suppliers else None,
-        'item_id': item_id if items else None,
-        'fecha': fecha_str
+        "ocid": identity[0],
+        "award_id": identity[1],
+        "amount": amount,
+        "currency": currency,
+        "status": text(award.get("status"), maximum=50),
+        "award_date": calendar_date(award.get("date")),
+        "procedure_date": calendar_date(award.get("procedure_date")),
+        "dimensions": dimensions,
     }
 
-def main():
-    parser = argparse.ArgumentParser(description='Cargar datos OCDS en el DW')
-    parser.add_argument('input_file', help='Archivo JSON OCDS de entrada')
-    parser.add_argument('--snapshot-id', required=True, help='ID del snapshot (ej: 20231001)')
-    parser.add_argument('--snapshot-timestamp', default=None, help='Timestamp del snapshot (ISO format)')
-    parser.add_argument('--source', default='SERCOP-OCDS', help='Fuente de los datos')
-    parser.add_argument('--version', default='1.0', help='Versión del snapshot')
-    parser.add_argument('--db-path', default='dw_sercop.duckdb', help='Ruta a la base DuckDB')
-    
-    args = parser.parse_args()
-    
-    # Ruta a la base DuckDB
-    db_path = pathlib.Path(args.db_path)
-    print(f"Conectando a DuckDB en {db_path}")
-    
-    # Verificar que exista la base, si no crearla
-    if not db_path.exists():
-        print(f"Base de datos no encontrada. Creando nueva base en {db_path}")
-        # Ejecutar etl_init.py para crear esquema y datos básicos
-        import subprocess
-        import sys
-        result = subprocess.run([sys.executable, 'etl_init.py'], 
-                              capture_output=True, text=True, cwd=pathlib.Path(__file__).parent)
-        if result.returncode != 0:
-            print(f"ERROR: Falló la creación de la base: {result.stderr}")
-            sys.exit(1)
-        print("Base de datos creada exitosamente.")
-    
-    con = duckdb.connect(database=str(db_path))
-    
-    # Leer archivo OCDS
-    print(f"Leyendo archivo OCDS: {args.input_file}")
+
+def quoted(identifier):
+    return '"' + identifier.replace('"', '""') + '"'
+
+
+def get_or_create_dimension(
+    con,
+    table_name,
+    natural_key_col,
+    natural_key_value,
+    surrogate_key_col,
+    attribute_cols,
+    attribute_values,
+):
+    require(
+        table_name in DIMENSIONS
+        and (natural_key_col, surrogate_key_col, tuple(attribute_cols))
+        == DIMENSIONS[table_name],
+        "Unsupported dimension identifiers",
+    )
+    require(
+        len(attribute_cols) == len(attribute_values), "Invalid dimension attributes"
+    )
+    text(natural_key_value, required=True, maximum=512)
+    for value in attribute_values:
+        text(value)
+    table, natural, surrogate = map(
+        quoted, (table_name, natural_key_col, surrogate_key_col)
+    )
+    stored_columns = ", ".join(map(quoted, attribute_cols))
+    existing = con.execute(
+        f"SELECT {surrogate}, {stored_columns} FROM {table} WHERE {natural} = ?",
+        [natural_key_value],
+    ).fetchone()
+    if existing is not None:
+        require(
+            tuple(existing[1:]) == tuple(attribute_values),
+            "DW v1 cannot overwrite historical dimension attributes",
+        )
+        return existing[0]
+    key = con.execute(
+        f"SELECT COALESCE(MAX({surrogate}), 0) + 1 FROM {table}"
+    ).fetchone()[0]
+    columns = ", ".join(
+        map(quoted, (surrogate_key_col, natural_key_col, *attribute_cols))
+    )
+    placeholders = ", ".join("?" for _ in range(2 + len(attribute_cols)))
+    con.execute(
+        f"INSERT INTO {table} ({columns}) VALUES ({placeholders})",
+        [key, natural_key_value, *attribute_values],
+    )
+    return key
+
+
+def _insert_award(con, award, snapshot_id):
+    keys = {}
+    for table, value in award["dimensions"].items():
+        if value is None:
+            keys[table] = None
+        else:
+            natural, surrogate, columns = DIMENSIONS[table]
+            keys[table] = get_or_create_dimension(
+                con, table, natural, value[0], surrogate, list(columns), value[1]
+            )
+    observed_date = award["award_date"]
+    date_key = None
+    if observed_date is not None:
+        date_key = (
+            observed_date.year * 10000 + observed_date.month * 100 + observed_date.day
+        )
+        con.execute(
+            'INSERT OR IGNORE INTO dim_fecha (fecha_surrogate_key, fecha, "año", mes, "día", trimestre) VALUES (?, ?, ?, ?, ?, ?)',
+            [
+                date_key,
+                observed_date,
+                observed_date.year,
+                observed_date.month,
+                observed_date.day,
+                (observed_date.month - 1) // 3 + 1,
+            ],
+        )
+    con.execute(
+        """INSERT INTO fact_adjudicacion (fact_id, snapshot_id, ocid, award_id, monto, moneda, estado,
+        fecha_procedimiento, fecha_adjudicacion, entidad_surrogate_key, proveedor_surrogate_key,
+        item_surrogate_key, fecha_surrogate_key) VALUES
+        ((SELECT COALESCE(MAX(fact_id),0)+1 FROM fact_adjudicacion), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        [
+            snapshot_id,
+            award["ocid"],
+            award["award_id"],
+            award["amount"],
+            award["currency"],
+            award["status"],
+            award["procedure_date"],
+            observed_date,
+            keys["dim_entidad"],
+            keys["dim_proveedor"],
+            keys["dim_item"],
+            date_key,
+        ],
+    )
+    return {
+        "entidad_id": award["dimensions"]["dim_entidad"][0]
+        if award["dimensions"]["dim_entidad"]
+        else None,
+        "proveedor_id": award["dimensions"]["dim_proveedor"][0]
+        if award["dimensions"]["dim_proveedor"]
+        else None,
+        "item_id": award["dimensions"]["dim_item"][0]
+        if award["dimensions"]["dim_item"]
+        else None,
+        "fecha": observed_date.isoformat() if observed_date else None,
+    }
+
+
+def load_ocds_award(con, award_data, snapshot_id):
+    award = normalize_award(award_data)
+    text(snapshot_id, required=True, maximum=128)
+    con.execute("BEGIN TRANSACTION")
     try:
-        with open(args.input_file, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-    except Exception as e:
-        print(f"ERROR: No se pudo leer el archivo {args.input_file}: {e}")
-        sys.exit(1)
-    
-    # Manejar tanto un solo award como un paquete de awards
-    awards = []
-    if isinstance(data, dict) and 'awards' in data:
-        # Formato paquete con lista de awards
-        awards = data['awards']
-    elif isinstance(data, dict) and 'ocid' in data:
-        # Single award
-        awards = [data]
-    elif isinstance(data, list):
-        # Lista directa de awards
-        awards = data
-    else:
-        print(f"ERROR: Formato OCDS no reconocido en {args.input_file}")
-        sys.exit(1)
-    
-    print(f"Procesando {len(awards)} award(s)...")
-    
-    # Insertar metadata del snapshot
-    snapshot_timestamp = args.snapshot_timestamp
-    if not snapshot_timestamp:
-        snapshot_timestamp = datetime.now().isoformat()
-    
-    con.execute("""
-        INSERT OR REPLACE INTO snapshot 
-        (snapshot_id, snapshot_timestamp, source, version)
-        VALUES (?, ?, ?, ?)
-    """, (args.snapshot_id, snapshot_timestamp, args.source, args.version))
-    
-    # Procesar cada award
-    procesados = 0
-    errores = 0
-    
-    for i, award in enumerate(awards):
-        try:
-            result = load_ocds_award(con, award, args.snapshot_id)
-            procesados += 1
-            if (i + 1) % 10 == 0 or i == len(awards) - 1:
-                print(f"  Procesados {i + 1}/{len(awards)} awards...")
-        except Exception as e:
-            errores += 1
-            print(f"ERROR procesando award {i}: {e}")
-            # Continuar con los otros awards
-    
-    # Verificaciones simples
-    print("\nVerificación de conteos:")
-    for table in ["snapshot", "dim_entidad", "dim_proveedor", "dim_item", "dim_fecha", "fact_adjudicacion"]:
-        cnt = con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
-        print(f"  {table}: {cnt}")
-    
-    print(f"\nResumen:")
-    print(f"  Awards procesados exitosamente: {procesados}")
-    print(f"  Awards con errores: {errores}")
-    print(f"  Total awards: {len(awards)}")
-    
-    con.close()
-    if errores:
-        print(f"\nETL incompleto: {errores} award(s) con errores. Revise la carga parcial.")
+        result = _insert_award(con, award, snapshot_id)
+        con.execute("COMMIT")
+        return result
+    except Exception:
+        con.execute("ROLLBACK")
+        raise
+
+
+def load_batch(
+    con,
+    awards,
+    snapshot_id,
+    *,
+    snapshot_timestamp=None,
+    source="SERCOP-OCDS",
+    version="1.0",
+):
+    text(snapshot_id, required=True, maximum=128)
+    text(source, required=True, maximum=256)
+    text(version, required=True, maximum=128)
+    require(
+        isinstance(awards, list) and 0 < len(awards) <= MAX_AWARDS,
+        "Invalid bounded award batch",
+    )
+    prepared = [normalize_award(award) for award in awards]
+    require(
+        len({(award["ocid"], award["award_id"]) for award in prepared})
+        == len(prepared),
+        "Duplicate award grain",
+    )
+    stamp = (
+        datetime.now(UTC)
+        if snapshot_timestamp is None
+        else datetime.fromisoformat(
+            text(snapshot_timestamp, required=True, maximum=64).replace("Z", "+00:00")  # noqa: FURB162 -- ISO Z needs translation on Python 3.10
+        )
+    )
+    require(stamp.tzinfo is not None, "Snapshot timestamp requires timezone")
+    con.execute("BEGIN TRANSACTION")
+    try:
+        require(
+            con.execute(
+                "SELECT 1 FROM snapshot WHERE snapshot_id = ?", [snapshot_id]
+            ).fetchone()
+            is None,
+            "Published snapshot ID cannot be replaced; use a new ID",
+        )
+        con.execute(
+            "INSERT INTO snapshot (snapshot_id, snapshot_timestamp, source, version) VALUES (?, ?, ?, ?)",
+            [
+                snapshot_id,
+                stamp.astimezone(UTC).replace(tzinfo=None),
+                source,
+                version,
+            ],
+        )
+        for award in prepared:
+            _insert_award(con, award, snapshot_id)
+        require(
+            con.execute(
+                "SELECT COUNT(*) FROM fact_adjudicacion WHERE snapshot_id = ?",
+                [snapshot_id],
+            ).fetchone()[0]
+            == len(prepared),
+            "Award count reconciliation failed",
+        )
+        con.execute("COMMIT")
+    except Exception:
+        con.execute("ROLLBACK")
+        raise
+    return len(prepared)
+
+
+def read_input(path):
+    helper_path = Path(__file__).resolve().parents[1] / "equiframe-data/safe_io.py"
+    spec = importlib.util.spec_from_file_location("_dw_input_validation", helper_path)
+    require(
+        spec is not None and spec.loader is not None, "Input validation unavailable"
+    )
+    helper = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(helper)
+    with helper.open_regular(path) as stream:
+        raw = stream.read(MAX_INPUT_BYTES + 1)
+    require(len(raw) <= MAX_INPUT_BYTES, "Input budget exhausted")
+    try:
+        data = json.loads(
+            raw.decode("utf-8"),
+            parse_float=Decimal,
+            object_pairs_hook=helper._members,
+            parse_constant=helper._constant,
+        )
+    except (ValueError, UnicodeError, RecursionError):
+        raise ValueError("Invalid input JSON") from None
+    if isinstance(data, dict):
+        data = data.get("awards", [data])
+    require(isinstance(data, list), "Invalid award batch")
+    return data
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("input_file", type=Path)
+    parser.add_argument("--snapshot-id", required=True)
+    parser.add_argument("--snapshot-timestamp")
+    parser.add_argument("--source", default="SERCOP-OCDS")
+    parser.add_argument("--version", default="1.0")
+    parser.add_argument("--db-path", type=Path, default=Path("dw_sercop.duckdb"))
+    args = parser.parse_args()
+    con = None
+    try:
+        awards = read_input(args.input_file)
+        for award in awards:
+            normalize_award(award)
+        require(
+            not args.db_path.is_symlink(), "Linked database paths are not supported"
+        )
+        con = duckdb.connect(str(args.db_path))
+        con.execute(
+            Path(__file__).with_name("dw_schema.sql").read_text(encoding="utf-8")
+        )
+        count = load_batch(
+            con,
+            awards,
+            args.snapshot_id,
+            snapshot_timestamp=args.snapshot_timestamp,
+            source=args.source,
+            version=args.version,
+        )
+    except (ValueError, OSError, duckdb.Error, InvalidOperation):
+        print(
+            "ETL rechazado; el lote no se publicó. Revise contrato y evidencia privada.",
+            file=sys.stderr,
+        )
         return 1
-    print(f"\nETL completado. Base DuckDB disponible en: {db_path.resolve()}")
+    finally:
+        if con is not None:
+            con.close()
+    print(f"ETL completado: {count} adjudicaciones publicadas atómicamente.")
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

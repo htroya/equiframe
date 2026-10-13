@@ -53,9 +53,15 @@ los formatos admitidos; no se infiere una aprobación de dominio ni se convierte
 CSV silenciosamente. El núcleo no importa este componente.
 
 El extra `etl` conserva un extractor OCDS **prototipo**. Valida estructura y
-presupuestos, conserva Decimal, proveedores y descripciones, y no inventa USD
+presupuestos, conserva Decimal, asociaciones de proveedores y descripciones, y no inventa USD
 cuando falta moneda. Los nombres históricos `monto_usd` no significan conversión
 a USD: consulte siempre la moneda. No sustituye el DW ni una cohorte aprobada.
+La precisión y escala monetarias se comprueban sobre todos los valores del
+lote, con representación decimal de hasta 38 dígitos y verificación reversible.
+Valores no representables se rechazan. `df_awards.proveedores` conserva todas
+las asociaciones sin repetir el monto; `proveedor_id`, `proveedor_nombre` y
+`proveedor_ruc` son campos históricos del primer proveedor. El estado de
+presencia de la colección y sus IDs/nombres se conserva explícitamente.
 El presupuesto por defecto es 64 MiB / 250.000 releases / 2.000.000 filas
 aplanadas; cambiarlo es explícito dentro de los límites admitidos. Valores y
 colecciones malformados se rechazan sin repetir su contenido en el error.

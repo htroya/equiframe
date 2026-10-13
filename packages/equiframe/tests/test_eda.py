@@ -49,6 +49,44 @@ def run(tmp_path, table, config=None, name="run", suffix="parquet", **kwargs):
     return result
 
 
+def test_timezone_is_initialized_after_connect_without_extension_downloads(tmp_path, monkeypatch):
+    import duckdb
+
+    connect = duckdb.connect
+    configurations = []
+
+    def observe(*args, **kwargs):
+        configurations.append(kwargs["config"])
+        assert "TimeZone" not in kwargs["config"]
+        assert kwargs["config"]["autoinstall_known_extensions"] is False
+        return connect(*args, **kwargs)
+
+    monkeypatch.setattr(duckdb, "connect", observe)
+    result = run(tmp_path, pa.table({"id": [1], "date": ["2025-01-01"]}))
+    assert result.state == "completed"
+    assert len(configurations) == 1
+
+
+def test_unavailable_timezone_fails_and_closes_connection(tmp_path, monkeypatch):
+    import duckdb
+
+    class FailedConnection:
+        closed = False
+
+        def execute(self, statement):
+            assert statement == "SET TimeZone='UTC'"
+            raise RuntimeError("timezone initialization unavailable")
+
+        def close(self):
+            self.closed = True
+
+    connection = FailedConnection()
+    monkeypatch.setattr(duckdb, "connect", lambda *args, **kwargs: connection)
+    result = run(tmp_path, pa.table({"id": [1]}))
+    assert result.state == "failed"
+    assert connection.closed
+
+
 def test_raw_distinctions_and_identifiers(tmp_path):
     table = pa.table(
         {"id": ["", "0", None, "NaN", "001"], "n": [None, float("nan"), 0.0, float("inf"), 1.0]}

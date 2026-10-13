@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+import subprocess
 from pathlib import Path
 from urllib.parse import urlsplit
 from urllib.request import url2pathname
@@ -332,6 +333,33 @@ def test_symlinks_rejected_in_root_ancestors_and_files(tmp_path, location):
         except OSError:
             pytest.skip("symlinks unavailable")
     with pytest.raises(ArtifactIntegrityError, match=r"symlink|link"):
+        inspect(result, root)
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows directory junctions only")
+@pytest.mark.parametrize("location", ["root", "ancestor"])
+def test_windows_junctions_are_rejected_before_evidence_reads(tmp_path, location):
+    actual = tmp_path / "actual"
+    result = keyed(actual)
+    link = tmp_path / "junction"
+    quoted_link = str(link).replace("'", "''")
+    quoted_target = str(actual).replace("'", "''")
+    subprocess.run(
+        [
+            "powershell",
+            "-NoProfile",
+            "-NonInteractive",
+            "-Command",
+            f"New-Item -ItemType Junction -Path '{quoted_link}' "
+            f"-Target '{quoted_target}' | Out-Null",
+        ],
+        check=True,
+        capture_output=True,
+        timeout=30,
+    )
+    assert link.lstat().st_file_attributes & 0x400
+    root = link if location == "root" else link / result.comparison_id
+    with pytest.raises(io.EvidencePathError, match="reparse"):
         inspect(result, root)
 
 

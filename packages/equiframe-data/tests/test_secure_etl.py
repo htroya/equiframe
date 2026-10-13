@@ -132,6 +132,42 @@ def test_tender_preserves_zero_and_its_source_currency(tmp_path):
     assert row["moneda"] == "EUR"
 
 
+@pytest.mark.parametrize("position", [0, 99, 100, 101])
+def test_money_precision_is_independent_of_inference_window_and_order(tmp_path, position):
+    awards = [
+        {"id": str(index), "value": {"amount": 1.0, "currency": "USD"}} for index in range(102)
+    ]
+    awards[position]["value"]["amount"] = 1.123456
+    path = tmp_path / "source.json"
+    path.write_text(json.dumps([{"releases": [{"ocid": "o1", "awards": awards}]}]))
+    _, _, result, _ = etl.cargar(path)
+    assert result["monto_usd"].to_list() == [
+        Decimal("1.123456") if index == position else Decimal("1.0") for index in range(102)
+    ]
+    assert result.schema["monto_usd"] == etl.pl.Decimal(38, 6)
+
+
+def test_all_supplier_associations_preserved_without_repeating_money(tmp_path):
+    path = tmp_path / "source.json"
+    path.write_text(
+        '[{"releases":[{"ocid":"o1","awards":[{"id":"a1","value":{"amount":10.25},"suppliers":[{"id":"s1","name":"First"},{"id":"s2","name":"Second"}]}]}]}]'
+    )
+    _, _, result, _ = etl.cargar(path)
+    assert result.height == 1
+    row = result.to_dicts()[0]
+    assert row["monto_usd"] == Decimal("10.25")
+    assert row["proveedor_id"] == "s1"
+    assert [supplier["id"] for supplier in row["proveedores"]] == ["s1", "s2"]
+
+
+@pytest.mark.parametrize("amount", ["1e-39", "123456789012345678901234567890123456789", "-0.0"])
+def test_unrepresentable_money_is_rejected_explicitly(tmp_path, amount):
+    path = tmp_path / "source.json"
+    path.write_text('[{"releases":[{"ocid":"o1","awards":[{"value":{"amount":' + amount + "}}]}]}]")
+    with pytest.raises(ValueError):
+        etl.cargar(path)
+
+
 @pytest.mark.parametrize(
     "award",
     [

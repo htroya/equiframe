@@ -643,3 +643,17 @@ con controles fallidos/ausentes pendientes. Se conserva el promedio histórico
 solicitados. El reparto no acredita ciencia ni convierte obligaciones técnicas
 sin ejecutar en tareas humanas. Véase
 [el método A14](A14_TECHNICAL_90_METHOD_20261013.md).
+
+## Revisión independiente y preparación experimental — 2026-10-13
+
+Por instrucción del propietario se corrigen los hallazgos del corte 44aa0bd
+en todo el monorepo, manteniendo evidencia original y [regresiones separadas](A14_INDEPENDENT_REVIEW_FIXES_20261013.md).
+El DDL SERCOP v1 no se amplía sin acuerdo de dominio: las cargas incompatibles
+se rechazan y se revierte el lote, preservando ausencias y datos históricos.
+No constituye aceptación de las entregas de Jhair/José ni despliegue del DW.
+
+El [piloto real](A14_SERCOP_EXPERIMENT_PREPARATION_20261013.md) propone selección,
+comparación explícita y grupos conservadores antes de ver resultados. Sus fichas
+ciegas permanecen sin etiquetas. Las propuestas no aprueban normalidad, protocolo,
+independencia estadística, N_fit, resultados ni publicación. La construcción y
+prueba privada de Alpha están autorizadas; TestPyPI permanece sólo en configuración.

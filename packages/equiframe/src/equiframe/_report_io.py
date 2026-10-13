@@ -105,8 +105,11 @@ def _directory(path: Path) -> Path:
     path = _absolute(path)
     try:
         for item in (*reversed(path.parents), path):
+            inspected = item.lstat()
             _path_require(
-                stat.S_ISDIR(item.lstat().st_mode), "evidence directories must not be symlinks"
+                stat.S_ISDIR(inspected.st_mode)
+                and not getattr(inspected, "st_file_attributes", 0) & 0x400,
+                "evidence directories must not be symlinks or reparse points",
             )
     except OSError as error:
         raise ArtifactIOError("cannot inspect evidence directory") from error
@@ -149,7 +152,11 @@ def _open_regular(path: Path) -> Iterator[BinaryIO]:
     directory_descriptors: list[int] = []
     try:
         before = path.lstat()
-        _path_require(stat.S_ISREG(before.st_mode), "evidence must be a regular file, not a link")
+        _path_require(
+            stat.S_ISREG(before.st_mode)
+            and not getattr(before, "st_file_attributes", 0) & 0x400,
+            "evidence must be a regular file, not a link or reparse point",
+        )
         flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NONBLOCK", 0)
         if os.open in os.supports_dir_fd and hasattr(os, "O_NOFOLLOW"):
             directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
@@ -163,7 +170,11 @@ def _open_regular(path: Path) -> Iterator[BinaryIO]:
             descriptor = os.open(path, flags)
             _directory(parent)
         after = os.fstat(descriptor)
-        _path_require(stat.S_ISREG(after.st_mode), "evidence must remain a regular file")
+        _path_require(
+            stat.S_ISREG(after.st_mode)
+            and not getattr(after, "st_file_attributes", 0) & 0x400,
+            "evidence must remain a regular file without reparse points",
+        )
         _require(
             (before.st_dev, before.st_ino) == (after.st_dev, after.st_ino),
             "evidence file changed while opening",

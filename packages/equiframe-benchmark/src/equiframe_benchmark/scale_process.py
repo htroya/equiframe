@@ -32,6 +32,22 @@ from typing_extensions import Self
 
 from equiframe_benchmark.models import Document, Text
 
+
+class _PosixOS(Protocol):
+    P_PID: int
+    WEXITED: int
+    WNOHANG: int
+    WNOWAIT: int
+
+    def waitid(self, idtype: int, pid: int, options: int, /) -> object | None: ...
+
+    def killpg(self, process_group: int, signal_number: int, /) -> None: ...
+
+
+class _PosixSignals(Protocol):
+    SIGKILL: int
+
+
 NonnegativeInt = Annotated[int, Field(ge=0)]
 NonnegativeFloat = Annotated[float, Field(ge=0)]
 MEASUREMENT_CONTRACT_ID: Literal["equiframe_process_resources_v1"] = (
@@ -638,10 +654,12 @@ def _child_exited(process: subprocess.Popen[bytes]) -> bool:
     if _nonreaping_wait_available():
         try:
             return (
-                os.waitid(  # type: ignore[attr-defined]
-                    os.P_PID,  # type: ignore[attr-defined]
+                cast(_PosixOS, os).waitid(
+                    cast(_PosixOS, os).P_PID,
                     process.pid,
-                    os.WEXITED | os.WNOHANG | os.WNOWAIT,  # type: ignore[attr-defined]
+                    cast(_PosixOS, os).WEXITED
+                    | cast(_PosixOS, os).WNOHANG
+                    | cast(_PosixOS, os).WNOWAIT,
                 )
                 is not None
             )
@@ -786,7 +804,7 @@ def _kill_and_wait(process: subprocess.Popen[bytes], measurements: _Measurements
                     try:
                         # waitid(WNOWAIT) preserves this leader, including a zombie,
                         # so this session/group ID cannot have been reused.
-                        os.killpg(process.pid, signal.SIGKILL)  # type: ignore[attr-defined]
+                        cast(_PosixOS, os).killpg(process.pid, cast(_PosixSignals, signal).SIGKILL)
                     except ProcessLookupError:
                         pass
                     except OSError as error:

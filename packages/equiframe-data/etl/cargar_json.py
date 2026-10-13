@@ -51,6 +51,8 @@ def _validate_section(section: dict) -> None:
         type(amount) not in (int, Decimal) or isinstance(amount, Decimal) and not amount.is_finite()
     ):
         raise ValueError("Invalid monetary amount")
+    if isinstance(amount, Decimal) and amount.is_zero() and amount.is_signed():
+        raise ValueError("Signed monetary zero is not representable by this extractor")
     currency = _val(section, "value", "currency")
     if currency is not None and (
         not isinstance(currency, str)
@@ -73,6 +75,51 @@ def _validate_section(section: dict) -> None:
     suppliers = section.get("suppliers") or []
     if any(item.get("id") is not None and not isinstance(item["id"], str) for item in suppliers):
         raise ValueError("Invalid supplier identity")
+    if any(
+        item.get("name") is not None and not isinstance(item["name"], str) for item in suppliers
+    ):
+        raise ValueError("Invalid supplier name")
+
+
+def _state(record, field):
+    return "missing" if field not in record else "null" if record[field] is None else "present"
+
+
+def _frame(rows, *, monetary=False, suppliers=False):
+    """Infer across all bounded rows, with explicit reversible monetary storage."""
+    overrides = {}
+    expected = []
+    if monetary and rows:
+        expected = [None if row["monto_usd"] is None else Decimal(row["monto_usd"]) for row in rows]
+        scale = max(
+            (max(0, -value.as_tuple().exponent) for value in expected if value is not None),
+            default=0,
+        )
+        if scale > 38:
+            raise ValueError("Monetary scale exceeds supported decimal storage")
+        for value in expected:
+            if (
+                value is not None
+                and not value.is_zero()
+                and len(value.as_tuple().digits) + value.as_tuple().exponent + scale > 38
+            ):
+                raise ValueError("Monetary precision exceeds supported decimal storage")
+        overrides["monto_usd"] = pl.Decimal(precision=38, scale=scale)
+    if suppliers and rows:
+        overrides["proveedores"] = pl.List(
+            pl.Struct(
+                {
+                    "id": pl.String,
+                    "nombre": pl.String,
+                    "id_estado": pl.String,
+                    "nombre_estado": pl.String,
+                }
+            )
+        )
+    result = pl.DataFrame(rows, schema_overrides=overrides, infer_schema_length=None, strict=True)
+    if monetary and rows and result["monto_usd"].to_list() != expected:
+        raise ValueError("Monetary conversion is not reversible")
+    return result
 
 
 # ── extractores por sección ───────────────────────────────────────────────────
@@ -129,6 +176,16 @@ def _filas_awards(ocid: str, awards: list) -> list[dict]:
                 "proveedor_id": proveedor_id,
                 "proveedor_ruc": _extraer_ruc(proveedor_id),
                 "proveedor_nombre": proveedor_nombre,
+                "proveedores_estado": _state(a, "suppliers"),
+                "proveedores": [
+                    {
+                        "id": supplier.get("id"),
+                        "nombre": supplier.get("name"),
+                        "id_estado": _state(supplier, "id"),
+                        "nombre_estado": _state(supplier, "name"),
+                    }
+                    for supplier in a.get("suppliers") or []
+                ],
                 "descripcion": a.get("description") or "",
             }
         )
@@ -225,6 +282,11 @@ def cargar(
             awards = r.get("awards") or []
             parties = r.get("parties") or []
             flat_rows += 1 + int(bool(r.get("tender"))) + len(awards) + len(parties)
+            flat_rows += sum(
+                len(award.get("suppliers") or [])
+                for award in awards
+                if isinstance(award.get("suppliers"), list)
+            )
             if flat_rows > max_flat_rows:
                 raise ValueError("Output row budget exhausted")
             _validate_section(r)
@@ -250,10 +312,10 @@ def cargar(
 
     print(f"Releases procesados : {total:,}")
 
-    df_releases = pl.DataFrame(rows_rel)
-    df_tender = pl.DataFrame(rows_ten)
-    df_awards = pl.DataFrame(rows_awa)
-    df_parties = pl.DataFrame(rows_par)
+    df_releases = _frame(rows_rel)
+    df_tender = _frame(rows_ten, monetary=True)
+    df_awards = _frame(rows_awa, monetary=True, suppliers=True)
+    df_parties = _frame(rows_par)
 
     print(f"df_releases : {df_releases.shape}")
     print(f"df_tender   : {df_tender.shape}")
