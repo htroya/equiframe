@@ -2,6 +2,8 @@
 
 import importlib.util
 import json
+import subprocess
+import sys
 from decimal import Decimal
 from pathlib import Path
 
@@ -12,6 +14,44 @@ spec = importlib.util.spec_from_file_location(
 )
 etl = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(etl)
+
+
+def test_direct_source_execution_uses_its_own_validation_helper(tmp_path):
+    """A hostile same-named module must neither run nor disable input limits."""
+    poison = tmp_path / "poison"
+    poison.mkdir()
+    marker = tmp_path / "unexpected-import"
+    (poison / "safe_io.py").write_text(
+        f"from pathlib import Path\nPath({str(marker)!r}).write_text('unsafe')\n"
+        "raise RuntimeError('hostile helper was imported')\n"
+    )
+    valid = tmp_path / "input.json"
+    valid.write_text('[{"releases":[{"ocid":"o1"}]}]')
+    source = Path(etl.__file__)
+    script = tmp_path / "source_consumer.py"
+    script.write_text(
+        "import importlib.util, sys\n"
+        f"sys.path.insert(0, {str(poison)!r})\n"
+        f"spec = importlib.util.spec_from_file_location('source_etl', {str(source)!r})\n"
+        "module = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\n"
+        f"frames = module.cargar({str(valid)!r})\n"
+        "if frames[0].height != 1: raise RuntimeError('Incomplete extraction')\n"
+        "try:\n"
+        f"    module.cargar({str(valid)!r}, max_input_bytes=1)\n"
+        "except ValueError:\n    print('EXPECTED_REJECTION')\n"
+        "else:\n    raise RuntimeError('Input budget bypassed')\n"
+    )
+    result = subprocess.run(
+        [sys.executable, "-I", str(script)],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "EXPECTED_REJECTION" in result.stdout
+    assert not marker.exists()
 
 
 def test_list_navigation_preserves_supplier_and_zero():

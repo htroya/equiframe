@@ -174,7 +174,17 @@ def cargar(
     if __package__:
         from ..safe_io import _constant, _members, open_regular
     else:
-        from safe_io import _constant, _members, open_regular
+        # Direct script execution must use this checkout's helper, without
+        # importing a same-named module from the working directory or PYTHONPATH.
+        import importlib.util
+
+        helper_path = Path(__file__).resolve().parents[1] / "safe_io.py"
+        spec = importlib.util.spec_from_file_location("_equiframe_data_etl_safe_io", helper_path)
+        if spec is None or spec.loader is None:
+            raise RuntimeError("Input validation helper unavailable")
+        helper = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(helper)
+        _constant, _members, open_regular = helper._constant, helper._members, helper.open_regular
     with open_regular(Path(ruta)) as stream:
         payload = stream.read(max_input_bytes + 1)
     if len(payload) > max_input_bytes:
