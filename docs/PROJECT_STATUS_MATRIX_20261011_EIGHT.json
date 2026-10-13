@@ -1,12 +1,13 @@
 {
-  "active_plan": "docs/TARGET_80_85_PLAN_20261011.md",
+  "active_plan": "docs/ALPHA_MAXIMIZATION_PLAN_20261012.md",
   "additional_engineering_evidence": {
     "automatic_rubric_points": 0,
     "sha256": "31aa05d69753df435948f971c742cde89dc627d430e15ff8a0ca19654fdd8bba",
     "source": "docs/SERCOP_ANNUAL_VM_RESULT_20261011.json"
   },
-  "assessed_checkout_base_commit": "ab508e443eeb5576348fa62c5cbf9efab9de2a19",
+  "assessed_checkout_base_commit": "ac2434841d562599f4bcdd8e30d15ff3000ee7d4",
   "assessment_date_local": "2026-10-12",
+  "beta_activated": false,
   "current_package_versions": {
     "equiframe": "0.12.0a13",
     "equiframe-benchmark": "0.12.0a13"
@@ -20,65 +21,35 @@
   "measured_areas": 8,
   "metrics": [
     {
-      "artifact_inventory": [
-        {
-          "bytes": 461339,
-          "file": "equiframe-0.12.0a12-py3-none-any.whl",
-          "sha256": "1d769926f3003686a0b728cebc6163c939e5b33f7278b86182877b816b8a3c88"
-        },
-        {
-          "bytes": 1180795,
-          "file": "equiframe-0.12.0a12.tar.gz",
-          "sha256": "225e83f8c0ce2dd90cd615c2b38c0f4e206d519eae570abfa578478235be5c2a"
-        },
-        {
-          "bytes": 127143,
-          "file": "equiframe_benchmark-0.12.0a12-py3-none-any.whl",
-          "sha256": "735a18025177d839a7097eb34a4f9665e7fe8dd26ac97310f134d1a9ea526503"
-        },
-        {
-          "bytes": 437098,
-          "file": "equiframe_benchmark-0.12.0a12.tar.gz",
-          "sha256": "971a182214738cb5a1de4954ba484e89b0de1712678e2edaa6626f450dfddfff"
-        },
-        {
-          "bytes": 28254,
-          "file": "equiframe_consumer_lab-0.1.14-py3-none-any.whl",
-          "sha256": "b996f64dce8ec80d7aaa21f3ef8e633cb6313a6ff4e67a12711b731cfcf52b58"
-        },
-        {
-          "bytes": 28229,
-          "file": "equiframe_consumer_lab-0.1.14.tar.gz",
-          "sha256": "01c52d6619f55b0b52ad77c1defc6ddbaec9a434931f537cefefc5bb13a99b5f"
-        }
-      ],
       "aspect": "Usabilidad para arquitecto/científico de datos",
-      "assessed_candidate": "0.12.0a12",
+      "assessed_candidate": "0.12.0a13",
       "comparable_gain_from_screenshot": null,
       "denominator": 12,
       "key": "usability",
-      "new_area_assessment_executed": false,
+      "new_area_assessment_executed": true,
       "numerator": 11,
       "percent": 91.66666666666667,
       "recalculated_now": true,
       "recalculation_scope": "Arithmetic and source/hash binding; existing area evaluation retains its candidate and scope.",
-      "record_targets_current_a13": false,
+      "record_targets_current_a13": true,
       "remaining": [
         "U12"
       ],
       "rounded_percent": 91.67,
       "rubric": "USABILITY-U01-U12-20261007-preserved",
-      "scope": "Technical criteria, not human satisfaction or adoption; A12 record is not transferred to A13",
+      "scope": "Technical preserved U01-U12 criterion closure on A13; U12 human adoption remains pending",
       "screenshot_percent_unverified": 80,
-      "source": "docs/USABILITY_CURRENT_RESULT_20261010.json",
-      "source_sha256": "d8b51775c2746ce2f05b7e7cd43df036363c2954e2de47fd45df2ef6aeaa04a9",
-      "status": "LATEST_RECORDED_MEASUREMENT"
+      "source": "docs/USABILITY_A13_REASSESSMENT_RESULT_20261012.json",
+      "source_sha256": "6adad17fc7b39caeb250d86c63d9786af82733e581861e61b0a0ca359db127b0",
+      "status": "CURRENT_INTERNAL_MEASUREMENT",
+      "human_review": false
     },
     {
-      "additional_required": 8,
+      "additional_required": 4,
       "aspect": "Madurez",
       "assessed_candidate": "0.12.0a13",
       "denominator": 16,
+      "desired_maximum_percent": 100,
       "historical_strict_plan_closure": {
         "assessment_date": "2026-10-08",
         "candidate": "0.12.0a8",
@@ -95,23 +66,23 @@
       },
       "human_review": false,
       "key": "maturity",
-      "new_area_assessment_executed": false,
-      "new_current_evidence": "M10 original local100/1000x3 resource protocol verified in Windows A13; original platform exceptions preserved.",
-      "numerator": 5,
-      "percent": 31.25,
-      "previous_record_source": "docs/MATURITY_VM_RESULT_20261011.json",
+      "new_area_assessment_executed": true,
+      "new_current_evidence": "Original scope reread and actual new PEP517 sdists, full3.11/3.13 suites, producer regression; closes M05/M07/M11/M12/M14 and substantiates M06; historical assessments preserved",
+      "numerator": 11,
+      "percent": 68.75,
+      "previous_record_source": "docs/MATURITY_HANDOFF_RESULT_20261012.json",
       "recalculated_now": true,
       "recalculation_scope": "Arithmetic and source/hash binding; existing area evaluation retains its candidate and scope.",
       "record_targets_current_a13": true,
-      "rounded_percent": 31.25,
+      "rounded_percent": 68.75,
       "rubric": "M01-M16-original-scope-preserved",
-      "scope": "Strict complete-criterion closure of M01-M16 with the original package/platform/profile/version-band scope; not a standardized library maturity score.",
-      "source": "docs/MATURITY_RESOURCE_RESULT_20261011.json",
-      "source_sha256": "add2072d1e9d78d671910830d1d2681529830337b8be80fed597b2ed83c665ef",
+      "scope": "Strict original sixteen-definition closure on A13; M04 cells not silently extended to unrelated evidence/consumer/recovery criteria; human/canceled gates remain open",
+      "source": "docs/MATURITY_SCOPE_REASSESSMENT_RESULT_20261012.json",
+      "source_sha256": "fedec2fff2f4f74a3575c85a2e81fa7b8b25794177e1a8fbc9c27e5865a66356",
       "status": "CURRENT_INTERNAL_MEASUREMENT_TARGET_NOT_MET",
       "target_met": false,
-      "target_percent": 80,
-      "target_verified": 13
+      "target_percent": 90,
+      "target_verified": 15
     },
     {
       "artifact_sha256": {
@@ -217,10 +188,11 @@
       "target_percent": 90
     },
     {
-      "additional_required": 9,
+      "additional_required": 11,
       "aspect": "Cumplimiento de la tesis",
       "assessed_candidate": "0.12.0a13",
       "denominator": 22,
+      "desired_maximum_percent": 100,
       "human_review": false,
       "key": "thesis",
       "new_area_assessment_executed": false,
@@ -237,8 +209,8 @@
       "source_sha256": "37f695ac042057e0ade9ac2c4e002dd8d662d82892c40c419faafe9bd6d11be7",
       "status": "CURRENT_INTERNAL_MEASUREMENT_TARGET_NOT_MET",
       "target_met": false,
-      "target_percent": 80,
-      "target_verified": 18
+      "target_percent": 90,
+      "target_verified": 20
     },
     {
       "aspect": "Documentación profesional",
@@ -305,35 +277,36 @@
       "status": "LATEST_RECORDED_MEASUREMENT"
     },
     {
-      "additional_required": 1083,
+      "additional_required": 1238,
       "aspect": "Pruebas con trazabilidad por opción",
       "assessed_candidate": "0.12.0a13",
       "denominator": 8385,
+      "desired_maximum_percent": 100,
       "human_review": false,
       "key": "option_traceability",
       "native_followup": "docs/VM_TARGET_FOLLOWUP_20261011.json",
       "native_followup_scope": "Four ARM64 repeats in3.10/3.12 normal/-O;1054 identical cases per run; no coverage added.",
       "new_area_assessment_executed": true,
-      "new_current_evidence": "71 unique IDs bound to actual complete public calls and frozen original literal oracles;375 selected tests PASS normal and optimized;10 harness guards PASS in each mode.",
-      "numerator": 6045,
-      "percent": 72.09302325581395,
+      "new_current_evidence": "43 unique local exception contract IDs;30 cases each mode with full literal state/messages,MRO,binding and same-object catch;C initializer body unobservable;no actual IO/engine failure inference.",
+      "numerator": 6309,
+      "percent": 75.24150268336315,
       "previous_record_source": "docs/OPTION_BOUNDARY_RESULT_20261011.json",
       "recalculated_now": true,
       "recalculation_scope": "Arithmetic and source/hash binding; existing area evaluation retains its candidate and scope.",
       "record_targets_current_a13": true,
       "remaining": [
-        "2340 NOT_RUN",
-        "1083 additional verified IDs required for >=85%"
+        "2076 NOT_RUN",
+        "1238 additional unique verified IDs required for >=90%"
       ],
-      "rounded_percent": 72.09,
+      "rounded_percent": 75.24,
       "rubric": "Frozen A13 core option obligation inventory",
-      "scope": "Original literal semantic tests, actual public arguments and Python binding; not exhaustive API semantics or scientific acceptance",
-      "source": "docs/OPTION_TEST_CALLS_RESULT_20261012.json",
-      "source_sha256": "b2b8dcf0f7d5d2db53c9c1a4d378bd4fc14a0accf4704858bc1fdba26807344b",
+      "scope": "Complete local exception instance, literal message/args/code/MRO, actual Python initializer binding or controlled C invocation, same-object raise/catch; synthetic decision fixtures, not real IO/engine/comparison failures",
+      "source": "docs/OPTION_EXCEPTIONS_RESULT_20261012.json",
+      "source_sha256": "36421d54f37de4ee9116af2c729092bb6a3f3906494f14113311387533698569",
       "status": "CURRENT_INTERNAL_MEASUREMENT_TARGET_NOT_MET",
       "target_met": false,
-      "target_percent": 85,
-      "target_verified": 7128
+      "target_percent": 90,
+      "target_verified": 7547
     },
     {
       "artifact_inventory": [
@@ -407,7 +380,7 @@
     "source": "docs/PROJECT_STATUS_MATRIX_20261011_GLOBAL75.json"
   },
   "public_publication_performed": false,
-  "recorded_at_utc": "2026-10-12T16:41:43.174447+00:00",
+  "recorded_at_utc": "2026-10-13T01:59:22.423042+00:00",
   "schema": "equiframe.project-status.v1",
   "scope": "Owner-selected eight-area board; original per-area denominators and candidate identities retained.",
   "scope_change_is_technical_progress": false,

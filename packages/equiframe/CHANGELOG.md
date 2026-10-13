@@ -1,5 +1,19 @@
 ## 0.12.0a13 — package quality and producer identity (2026-10-10)
 
+## 0.12.0a14 — private Alpha, optional standalone EDA
+
+- Add optional `equiframe.eda` and `equiframe eda`/`equiframe-eda`: fixed local
+  snapshots, raw quality/repetitions, explicit text conversions, grouped exact
+  Decimal/discrete quantiles, IQR/unscaled MAD and separate JSON/portable HTML.
+- New experimental version 1.0 EDA contracts; no existing migration/Verify
+  signatures, defaults, comparisons, outcomes or R/M/B/H/O algorithms change.
+- DuckDB/Plotly stay optional and lazy. Historical fixtures and original A13
+  distributions remain immutable. A13 measurements are not automatically A14.
+- New detector metadata defaults to actual A14 producer, with older producers
+  retained as admitted history. This changes the experimental producer schema,
+  not trained features or algorithms. No Beta or public distribution claim.
+
+
 - Align the current experimental detector-schema inventory with the reviewed
   A13 producer identity. Asset preflight now rejects stale inventory hashes
   without rewriting them; add a corruption regression before full test runs.

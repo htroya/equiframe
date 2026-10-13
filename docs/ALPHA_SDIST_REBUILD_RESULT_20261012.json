@@ -1,0 +1,299 @@
+{
+  "schema": "equiframe.alpha-sdist-public-assessment.v1",
+  "candidate": "0.12.0a13",
+  "consumer_candidate": "0.1.15",
+  "status": "PASS",
+  "private_result_sha256": "051a62bbf7977ae6464b07ca652402c89ce7c205d9929266f6e4692796e7af0b",
+  "source_sha256": "7d68e020ba21c6a687da1c472efa7e57137a29e41d1cec96a7e7e3b9b7c2dc66",
+  "helper_sha256": {
+    "alpha_platforms_20261012\\run_windows_cells_v2.py": "52971bc0780110553f7d4d9a0308aefcb6f3cf18cd58201f0e736c5e0cf43a3c",
+    "alpha_platforms_20261012\\probe_identity_isolated_v3.py": "6bb2b8b108e610c2659c80c904793a2aef91fa7f837d3566198f7b91a2a6a2bc",
+    "equiframe\\tools\\maturity_lab\\scripts\\normalize_consumer_wheel.py": "318aaaac0d99e51ced7d9513b51ed05a5cacb855bdce0304a48179ea764a6633"
+  },
+  "pep517_backend_isolation": true,
+  "cells": [
+    {
+      "minor": "3.11",
+      "status": "PASS",
+      "rebuilt": {
+        "core": {
+          "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+          "sdist_sha256": "164b70270344343094dc0a688bf8dbfe20a27112f7227e2f7fe318f085b71935"
+        },
+        "benchmark": {
+          "wheel_sha256": "fb843318d044a36a7ba4efab7d7d997d45798e12d16df7a9aa1b472b2c6359d8",
+          "sdist_sha256": "4f8c47a00a8724b234e87c0a7147e193092122c77772e9169bd954744dd6e9c7"
+        },
+        "consumer": {
+          "wheel_sha256": "be82d4f7422dc98bbfbd978746eca5051280b1935b1191cb6fb566c61337838e",
+          "sdist_sha256": "ebecd34b85d9922bc015421842f64ff980329660f33b41af1a93e7408f087393"
+        }
+      },
+      "identity": {
+        "status": "PASS",
+        "python": "3.11.16 (main, Sep 29 2026, 14:58:48) [MSC v.1944 64 bit (AMD64)]",
+        "executable": "C:\\HT\\maestria datos\\tesis\\alpha_platforms_20261012\\sdist-pep517-311-313-v3\\3.11\\runtime\\Scripts\\python.exe",
+        "prefix": "C:\\HT\\maestria datos\\tesis\\alpha_platforms_20261012\\sdist-pep517-311-313-v3\\3.11\\runtime",
+        "system": "Windows",
+        "machine": "AMD64",
+        "packages": {
+          "equiframe": {
+            "version": "0.12.0a13",
+            "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+            "payload_files_verified": 130
+          },
+          "equiframe-benchmark": {
+            "version": "0.12.0a13",
+            "wheel_sha256": "fb843318d044a36a7ba4efab7d7d997d45798e12d16df7a9aa1b472b2c6359d8",
+            "payload_files_verified": 38
+          }
+        },
+        "imported_origins": {
+          "equiframe": "C:\\HT\\maestria datos\\tesis\\alpha_platforms_20261012\\sdist-pep517-311-313-v3\\3.11\\runtime\\Lib\\site-packages\\equiframe\\__init__.py",
+          "equiframe_benchmark": "C:\\HT\\maestria datos\\tesis\\alpha_platforms_20261012\\sdist-pep517-311-313-v3\\3.11\\runtime\\Lib\\site-packages\\equiframe_benchmark\\__init__.py",
+          "equiframe.examples.integrations.universal_first_use": "C:\\HT\\maestria datos\\tesis\\alpha_platforms_20261012\\sdist-pep517-311-313-v3\\3.11\\runtime\\Lib\\site-packages\\equiframe\\examples\\integrations\\universal_first_use.py"
+        },
+        "isolated": true,
+        "python_environment_redirection_absent": true,
+        "dependencies": {
+          "pydantic": "2.14.1",
+          "typer": "0.27.3",
+          "pyarrow": "25.0.1",
+          "pandas": "3.0.6",
+          "polars": "1.44.2",
+          "duckdb": "1.5.6",
+          "numpy": "2.4.6",
+          "scikit-learn": "1.9.1",
+          "packaging": "26.3"
+        },
+        "human_independent_review": false
+      },
+      "build_lock_sha256": "c687f8627f48161c64d9093e18714dca8702720dda39337239ba01fc63ca3955",
+      "runtime_lock_sha256": "d9e3608a2657e7da91354924eabad6ccdff860c0235906cefb7ac51e0d314b5c",
+      "examples": [
+        {
+          "case": "good",
+          "optimized": false,
+          "status": "PASS",
+          "receipt_sha256": "0b97561b6ea52a6174d9b06f89443329a73263e4dbf0efa76792ebf3436cade2",
+          "attempted_executions": 18,
+          "completed_executions": 18,
+          "complete_comparisons": 18,
+          "deliberate_differences": 0,
+          "expected_failed_executions": 0,
+          "expected_exit": 0
+        },
+        {
+          "case": "different",
+          "optimized": false,
+          "status": "PASS",
+          "receipt_sha256": "afd02df1bf77e20f133bada6c141f6ab00e7b71306a986427ce85e92a01fcf30",
+          "attempted_executions": 18,
+          "completed_executions": 18,
+          "complete_comparisons": 18,
+          "deliberate_differences": 3,
+          "expected_failed_executions": 0,
+          "expected_exit": 1
+        },
+        {
+          "case": "corrupt",
+          "optimized": false,
+          "status": "PASS",
+          "receipt_sha256": "c9ecbf06320a2dec09c3d0eeafc704539b025100bd21b673ef11780374a6d020",
+          "attempted_executions": 18,
+          "completed_executions": 15,
+          "complete_comparisons": 15,
+          "deliberate_differences": 0,
+          "expected_failed_executions": 3,
+          "expected_exit": 3
+        },
+        {
+          "case": "good",
+          "optimized": true,
+          "status": "PASS",
+          "receipt_sha256": "0b97561b6ea52a6174d9b06f89443329a73263e4dbf0efa76792ebf3436cade2",
+          "attempted_executions": 18,
+          "completed_executions": 18,
+          "complete_comparisons": 18,
+          "deliberate_differences": 0,
+          "expected_failed_executions": 0,
+          "expected_exit": 0
+        },
+        {
+          "case": "different",
+          "optimized": true,
+          "status": "PASS",
+          "receipt_sha256": "afd02df1bf77e20f133bada6c141f6ab00e7b71306a986427ce85e92a01fcf30",
+          "attempted_executions": 18,
+          "completed_executions": 18,
+          "complete_comparisons": 18,
+          "deliberate_differences": 3,
+          "expected_failed_executions": 0,
+          "expected_exit": 1
+        },
+        {
+          "case": "corrupt",
+          "optimized": true,
+          "status": "PASS",
+          "receipt_sha256": "c9ecbf06320a2dec09c3d0eeafc704539b025100bd21b673ef11780374a6d020",
+          "attempted_executions": 18,
+          "completed_executions": 15,
+          "complete_comparisons": 15,
+          "deliberate_differences": 0,
+          "expected_failed_executions": 3,
+          "expected_exit": 3
+        }
+      ]
+    },
+    {
+      "minor": "3.13",
+      "status": "PASS",
+      "rebuilt": {
+        "core": {
+          "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+          "sdist_sha256": "164b70270344343094dc0a688bf8dbfe20a27112f7227e2f7fe318f085b71935"
+        },
+        "benchmark": {
+          "wheel_sha256": "fb843318d044a36a7ba4efab7d7d997d45798e12d16df7a9aa1b472b2c6359d8",
+          "sdist_sha256": "4f8c47a00a8724b234e87c0a7147e193092122c77772e9169bd954744dd6e9c7"
+        },
+        "consumer": {
+          "wheel_sha256": "be82d4f7422dc98bbfbd978746eca5051280b1935b1191cb6fb566c61337838e",
+          "sdist_sha256": "ebecd34b85d9922bc015421842f64ff980329660f33b41af1a93e7408f087393"
+        }
+      },
+      "identity": {
+        "status": "PASS",
+        "python": "3.13.15 (main, Sep 24 2026, 17:56:47) [MSC v.1944 64 bit (AMD64)]",
+        "executable": "C:\\HT\\maestria datos\\tesis\\alpha_platforms_20261012\\sdist-pep517-311-313-v3\\3.13\\runtime\\Scripts\\python.exe",
+        "prefix": "C:\\HT\\maestria datos\\tesis\\alpha_platforms_20261012\\sdist-pep517-311-313-v3\\3.13\\runtime",
+        "system": "Windows",
+        "machine": "AMD64",
+        "packages": {
+          "equiframe": {
+            "version": "0.12.0a13",
+            "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+            "payload_files_verified": 130
+          },
+          "equiframe-benchmark": {
+            "version": "0.12.0a13",
+            "wheel_sha256": "fb843318d044a36a7ba4efab7d7d997d45798e12d16df7a9aa1b472b2c6359d8",
+            "payload_files_verified": 38
+          }
+        },
+        "imported_origins": {
+          "equiframe": "C:\\HT\\maestria datos\\tesis\\alpha_platforms_20261012\\sdist-pep517-311-313-v3\\3.13\\runtime\\Lib\\site-packages\\equiframe\\__init__.py",
+          "equiframe_benchmark": "C:\\HT\\maestria datos\\tesis\\alpha_platforms_20261012\\sdist-pep517-311-313-v3\\3.13\\runtime\\Lib\\site-packages\\equiframe_benchmark\\__init__.py",
+          "equiframe.examples.integrations.universal_first_use": "C:\\HT\\maestria datos\\tesis\\alpha_platforms_20261012\\sdist-pep517-311-313-v3\\3.13\\runtime\\Lib\\site-packages\\equiframe\\examples\\integrations\\universal_first_use.py"
+        },
+        "isolated": true,
+        "python_environment_redirection_absent": true,
+        "dependencies": {
+          "pydantic": "2.14.1",
+          "typer": "0.27.3",
+          "pyarrow": "25.0.1",
+          "pandas": "3.0.6",
+          "polars": "1.44.2",
+          "duckdb": "1.5.6",
+          "numpy": "2.5.4",
+          "scikit-learn": "1.9.1",
+          "packaging": "26.3"
+        },
+        "human_independent_review": false
+      },
+      "build_lock_sha256": "2d83d1fdb3166e6e85d8258d8abb745cbdf0166018510d86947d3d6b24f00adb",
+      "runtime_lock_sha256": "66521bcd419979c40b5971e35a94c5072d94b3c7250300041ab09c84620fc5fb",
+      "examples": [
+        {
+          "case": "good",
+          "optimized": false,
+          "status": "PASS",
+          "receipt_sha256": "0b97561b6ea52a6174d9b06f89443329a73263e4dbf0efa76792ebf3436cade2",
+          "attempted_executions": 18,
+          "completed_executions": 18,
+          "complete_comparisons": 18,
+          "deliberate_differences": 0,
+          "expected_failed_executions": 0,
+          "expected_exit": 0
+        },
+        {
+          "case": "different",
+          "optimized": false,
+          "status": "PASS",
+          "receipt_sha256": "afd02df1bf77e20f133bada6c141f6ab00e7b71306a986427ce85e92a01fcf30",
+          "attempted_executions": 18,
+          "completed_executions": 18,
+          "complete_comparisons": 18,
+          "deliberate_differences": 3,
+          "expected_failed_executions": 0,
+          "expected_exit": 1
+        },
+        {
+          "case": "corrupt",
+          "optimized": false,
+          "status": "PASS",
+          "receipt_sha256": "c9ecbf06320a2dec09c3d0eeafc704539b025100bd21b673ef11780374a6d020",
+          "attempted_executions": 18,
+          "completed_executions": 15,
+          "complete_comparisons": 15,
+          "deliberate_differences": 0,
+          "expected_failed_executions": 3,
+          "expected_exit": 3
+        },
+        {
+          "case": "good",
+          "optimized": true,
+          "status": "PASS",
+          "receipt_sha256": "0b97561b6ea52a6174d9b06f89443329a73263e4dbf0efa76792ebf3436cade2",
+          "attempted_executions": 18,
+          "completed_executions": 18,
+          "complete_comparisons": 18,
+          "deliberate_differences": 0,
+          "expected_failed_executions": 0,
+          "expected_exit": 0
+        },
+        {
+          "case": "different",
+          "optimized": true,
+          "status": "PASS",
+          "receipt_sha256": "afd02df1bf77e20f133bada6c141f6ab00e7b71306a986427ce85e92a01fcf30",
+          "attempted_executions": 18,
+          "completed_executions": 18,
+          "complete_comparisons": 18,
+          "deliberate_differences": 3,
+          "expected_failed_executions": 0,
+          "expected_exit": 1
+        },
+        {
+          "case": "corrupt",
+          "optimized": true,
+          "status": "PASS",
+          "receipt_sha256": "c9ecbf06320a2dec09c3d0eeafc704539b025100bd21b673ef11780374a6d020",
+          "attempted_executions": 18,
+          "completed_executions": 15,
+          "complete_comparisons": 15,
+          "deliberate_differences": 0,
+          "expected_failed_executions": 3,
+          "expected_exit": 3
+        }
+      ]
+    }
+  ],
+  "command_count": 40,
+  "original_artifact_hashes": {
+    "equiframe-0.12.0a13-py3-none-any.whl": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+    "equiframe-0.12.0a13.tar.gz": "164b70270344343094dc0a688bf8dbfe20a27112f7227e2f7fe318f085b71935",
+    "equiframe_benchmark-0.12.0a13-py3-none-any.whl": "fb843318d044a36a7ba4efab7d7d997d45798e12d16df7a9aa1b472b2c6359d8",
+    "equiframe_benchmark-0.12.0a13.tar.gz": "4f8c47a00a8724b234e87c0a7147e193092122c77772e9169bd954744dd6e9c7",
+    "equiframe_consumer_lab-0.1.15-py3-none-any.whl": "be82d4f7422dc98bbfbd978746eca5051280b1935b1191cb6fb566c61337838e",
+    "equiframe_consumer_lab-0.1.15.tar.gz": "ebecd34b85d9922bc015421842f64ff980329660f33b41af1a93e7408f087393"
+  },
+  "new_traceability_ids": 0,
+  "human_review": false,
+  "scope": "Windows AMD64 CPython3.11/3.13; frozen original sdists, byte-identical wheel/sdist rebuild, direct sdist install, payload/origin and native example smoke normal/-O; not all M04 cells",
+  "earlier_attempts_preserved": [
+    "sdist-311-313-v1",
+    "sdist-pep517-311-313-v2"
+  ],
+  "private_install_no_deps_reason": "Public dependencies resolved normally and installed from complete hash locks first, then private original local sdists with backend build isolation and pip check. No private name resolved from a public index."
+}

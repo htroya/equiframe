@@ -75,6 +75,23 @@ class DocumentationToolTests(unittest.TestCase):
         self.assertEqual(len(receipt["remote_targets_not_fetched"]), 1)
         self.assertEqual(receipt["local_destinations_checked"], 0)
 
+    def test_historical_candidate_is_checked_without_reassigning_live_version(self):
+        self.write("index.md", "# Historical candidate 0.12.0a13\n")
+        self.write("package.toml", 'version = "0.12.0a14"\n')
+        self.manifest["historical_version_checks"] = [
+            {
+                "document": "index.md",
+                "metadata": "package.toml",
+                "pattern": r"Historical candidate ([0-9.a-z]+)",
+                "assessed_candidate": "0.12.0a13",
+            }
+        ]
+        receipt = audit(self.root, self.manifest)
+        self.assertEqual(receipt["status"], "PASS")
+        self.assertEqual(receipt["historical_version_checks"][0]["observed"], "0.12.0a13")
+        self.write("index.md", "# Historical candidate 0.12.0a14\n")
+        self.assertEqual(audit(self.root, self.manifest)["status"], "FAIL")
+
     def test_reference_links_and_undefined_reference(self):
         self.assertIn((1, "target.md"), links("[Read][target]\n[target]: target.md\n"))
         with self.assertRaisesRegex(ValueError, "Undefined reference"):

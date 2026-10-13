@@ -224,6 +224,24 @@ def audit(root: Path, manifest: dict) -> dict:
                     "observed": value,
                 }
             )
+    historical_versions = []
+    for check in manifest.get("historical_version_checks", []):
+        body = local_path(root, check["document"]).read_text(encoding="utf-8")
+        expected = check["assessed_candidate"]
+        observed = re.search(check["pattern"], body, re.MULTILINE)
+        value = observed.group(1) if observed else None
+        historical_versions.append(
+            {"document": check["document"], "expected": expected, "observed": value}
+        )
+        if value != expected:
+            failures.append(
+                {
+                    "document": check["document"],
+                    "reason": "historical assessed version mismatch",
+                    "expected": expected,
+                    "observed": value,
+                }
+            )
     return {
         "status": "FAIL" if failures else "PASS",
         "scope": manifest["scope"],
@@ -233,6 +251,7 @@ def audit(root: Path, manifest: dict) -> dict:
         "local_anchors_checked": checked_anchors,
         "remote_targets_not_fetched": remote,
         "version_checks": versions,
+        "historical_version_checks": historical_versions,
         "failures": failures,
         "limits": "Offline explicit scope; inline/reference Markdown links and ATX/setext heading IDs. "
         "No general renderer equivalence, HTML href audit, remote availability or human review.",

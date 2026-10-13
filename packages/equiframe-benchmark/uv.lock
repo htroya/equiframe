@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.10, <3.14"
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
@@ -299,7 +299,7 @@ wheels = [
 
 [[package]]
 name = "equiframe"
-version = "0.12.0a13"
+version = "0.12.0a14"
 source = { directory = "../equiframe" }
 dependencies = [
     { name = "pydantic" },
@@ -330,14 +330,19 @@ ml = [
 [package.metadata]
 requires-dist = [
     { name = "duckdb", marker = "extra == 'duckdb'", specifier = ">=1.5.6,<2" },
+    { name = "duckdb", marker = "extra == 'eda'", specifier = ">=1.5.6,<2" },
+    { name = "duckdb", marker = "extra == 'eda-charts'", specifier = ">=1.5.6,<2" },
     { name = "duckdb", marker = "extra == 'engines'", specifier = ">=1.5.6,<2" },
     { name = "numpy", marker = "extra == 'ml'", specifier = ">=2,<3" },
     { name = "pandas", marker = "extra == 'engines'", specifier = ">=2.2,<4" },
     { name = "pandas", marker = "extra == 'pandas'", specifier = ">=2.2,<4" },
+    { name = "plotly", marker = "extra == 'eda-charts'", specifier = ">=6.3,<8" },
     { name = "polars", marker = "extra == 'engines'", specifier = ">=1.30,<2" },
     { name = "polars", marker = "extra == 'polars'", specifier = ">=1.30,<2" },
     { name = "pyarrow", marker = "extra == 'arrow'", specifier = ">=20,<26" },
     { name = "pyarrow", marker = "extra == 'duckdb'", specifier = ">=20,<26" },
+    { name = "pyarrow", marker = "extra == 'eda'", specifier = ">=20,<26" },
+    { name = "pyarrow", marker = "extra == 'eda-charts'", specifier = ">=20,<26" },
     { name = "pyarrow", marker = "extra == 'engines'", specifier = ">=20,<26" },
     { name = "pyarrow", marker = "extra == 'pandas'", specifier = ">=20,<26" },
     { name = "pyarrow", marker = "extra == 'polars'", specifier = ">=20,<26" },
@@ -347,7 +352,7 @@ requires-dist = [
     { name = "typing-extensions", specifier = ">=4.14,<5" },
     { name = "tzdata", specifier = ">=2025.2" },
 ]
-provides-extras = ["ml", "arrow", "pandas", "polars", "duckdb", "engines"]
+provides-extras = ["ml", "arrow", "pandas", "polars", "duckdb", "engines", "eda", "eda-charts"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -365,7 +370,7 @@ dev = [
 
 [[package]]
 name = "equiframe-benchmark"
-version = "0.12.0a13"
+version = "0.12.0a14"
 source = { editable = "." }
 dependencies = [
     { name = "equiframe", extra = ["arrow"] },

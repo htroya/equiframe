@@ -369,11 +369,6 @@ EXPERIMENTAL_API = (
 # Tuple: file name, classification, canonical schema SHA-256.
 SCHEMA_INVENTORY = (
     (
-        "snapshot-manifest-1.0.schema.json",
-        "experimental",
-        "ed83a8b275f5357b75731da1f34a30f98a61fa3342adcfcdc72adaf8f740778c",
-    ),
-    (
         "artifact-ref-1.0.schema.json",
         "stable",
         "a07bfab18772f05d5eb78a9a2ea5967808320d306b162553a7ea93c96e6a7b70",
@@ -421,12 +416,12 @@ SCHEMA_INVENTORY = (
     (
         "detector-bundle-1.0.schema.json",
         "experimental",
-        "2cb9ddbc2206be4407cfaf088d4f083277afb043854de15b371af91d45b391ea",
+        "9a4ba0e9dc229c283183c40dc9679dea102d511afb628c95d50f38391b1c98b1",
     ),
     (
         "detector-fit-1.0.schema.json",
         "experimental",
-        "f461f8caa361537676fe065a3c1948480d3924429c19c0bb78622f250a8f9cb1",
+        "494a6c432d2307c7e2fe2b5af1259a32e1d71325b098a7389e7b1656990b1a51",
     ),
     (
         "detector-score-result-1.0.schema.json",
@@ -442,6 +437,26 @@ SCHEMA_INVENTORY = (
         "diff-contract-1.0.schema.json",
         "stable",
         "1607b342fe4c928632d31526290275451ad4d97d9a992060ff3b39c9542f84b3",
+    ),
+    (
+        "eda-config-1.0.schema.json",
+        "experimental",
+        "65ea2de1dd1d43bd0f1bb8942dd5b28ff7a95f346c24edc01418ec5a04083fe1",
+    ),
+    (
+        "eda-manifest-1.0.schema.json",
+        "experimental",
+        "f9d3b6ccb63249f7bd796f8154135a04c844578231666a988e400c857d0b3e2d",
+    ),
+    (
+        "eda-result-1.0.schema.json",
+        "experimental",
+        "5bce9ab1457ab99b5ed818ecaac7695caef205c12eff29dd0fe6507e8c8a0cad",
+    ),
+    (
+        "eda-source-1.0.schema.json",
+        "experimental",
+        "182d1cc45e149e0251acdae721dd78b4f73721d69cd52f630140c805b96265fb",
     ),
     (
         "equivalence-decision-1.0.schema.json",
@@ -622,6 +637,11 @@ SCHEMA_INVENTORY = (
         "rule-options-1.0.schema.json",
         "stable",
         "e6546b88c0848b160407eec63aaf8e6b6122ff8edc38b40fb4c98ae4cb049c7a",
+    ),
+    (
+        "snapshot-manifest-1.0.schema.json",
+        "experimental",
+        "ed83a8b275f5357b75731da1f34a30f98a61fa3342adcfcdc72adaf8f740778c",
     ),
     (
         "verification-request-1.0.schema.json",
@@ -835,6 +855,33 @@ CLI_INVENTORY = (
         ("argument|request|request|required=True|default=None",),
         (0, 2, 3),
     ),
+    (
+        "eda run",
+        "experimental",
+        (
+            "argument|source|source|required=True|default=None",
+            "option|output|--output|required=True|default=None",
+            "option|config|--config|required=False|default=None",
+            "option|format|--format|required=False|default=parquet",
+            "option|snapshot_id|--snapshot-id|required=False|default=local",
+            "option|expected_sha256|--expected-sha256|required=False|default=None",
+            "option|manifest|--manifest|required=False|default=None",
+            "option|manifest_sha256|--manifest-sha256|required=False|default=None",
+        ),
+        (0, 2, 3),
+    ),
+    (
+        "eda migration",
+        "experimental",
+        (
+            "argument|path|path|required=True|default=None",
+            "option|output|--output|required=True|default=None",
+            "option|side|--side|required=False|default=source",
+            "option|config|--config|required=False|default=None",
+        ),
+        (0, 2, 3),
+    ),
+    ("eda inspect", "experimental", ("argument|path|path|required=True|default=None",), (0, 3)),
 )
 
 # Exact stable function signatures and stable model shapes; review changes explicitly.

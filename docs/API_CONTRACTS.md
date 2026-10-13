@@ -1,6 +1,6 @@
 # API Python y contratos de intercambio
 
-Versiones candidatas actuales: `equiframe 0.12.0a13` y `equiframe-benchmark 0.12.0a13`, formatos independientes `1.0`, Verify operacional, migrador y ETL local. El [README del
+Versiones candidatas actuales: `equiframe 0.12.0a14` y `equiframe-benchmark 0.12.0a14`, formatos independientes `1.0`, Verify operacional, migrador y ETL local. El [README del
 paquete](../packages/equiframe/README.md) contiene instalación, comandos y un
 ejemplo Python ejecutable. Las secciones por versión conservan la evolución de la API. La aceptación del servicio real, la evaluación científica y la comprobación final de las distribuciones actuales conservan sus controles propios.
 
@@ -22,7 +22,7 @@ equivalencia; la notación O y los nombres existentes `oracle`, `OracleResult`,
 | `contract_fingerprint(contract) -> str` | SHA-256 hexadecimal de esos bytes; no equivalencia tabular |
 | `contract_json_schema() -> dict[str, object]` | JSON Schema generado desde `Contract` |
 
-La API explícita está en `equiframe.__all__`; `__version__` es `0.12.0a13`.
+La API explícita está en `equiframe.__all__`; `__version__` es `0.12.0a14`.
 Desde STEP6 cada export, comando y esquema tiene clasificación explícita en
 [compatibilidad](COMPATIBILITY.md), consultable con `get_stability_register()`.
 `get_compatibility_policy()` publica los avisos/plazos; `get_adapter_capabilities()`
@@ -701,3 +701,15 @@ y la restricción de sufijos Sort para controles DuckDB permanecen explícitos.
 Los defaults nuevos se omiten en nodos con forma histórica, conservando los
 fingerprints IR/spec 1.0. No se reescriben expedientes anteriores ni se cambia
 el alcance metodológico o la independencia R/M/B/H/O.
+
+## EDA opcional A14 — formatos experimentales 1.0
+
+Namespace `equiframe.eda`: Source, EdaConfig, Resources, Conversion, KeyRule,
+NumericRule, ColumnProfile, DuplicateProfile, Finding, EdaResult, ResultFile y
+EdaManifest; analyze/analyze_artifact/analyze_migration/read_result.
+La [referencia](../packages/equiframe/docs/eda.md) fija entradas, estados,
+conversiones, denominadores, cuantiles y CLI. Inventario explícito del namespace
+y cuatro JSON schemas registrados; importaciones opcionales diferidas.
+Las firmas/defaults/significados existentes de migrate/check_migration/verify/
+verify_migration no cambian. EDA `completed` no establece equivalencia,
+corrección independiente, alerta científica ni autorización de publicación.

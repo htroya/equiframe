@@ -1,0 +1,128 @@
+{
+  "addendum_tool_sha256": "f25e76272c0911276f398b9ed4163ff5f7002f05899661fc454357f7d003329f",
+  "ai_review": {
+    "blocking_discrepancy": false,
+    "human_review": false,
+    "reviewer": "mi_dot",
+    "role": "AI_READ_ONLY"
+  },
+  "artifact_hashes": {
+    "benchmark_sdist": "4f8c47a00a8724b234e87c0a7147e193092122c77772e9169bd954744dd6e9c7",
+    "benchmark_wheel": "fb843318d044a36a7ba4efab7d7d997d45798e12d16df7a9aa1b472b2c6359d8",
+    "consumer_sdist": "ebecd34b85d9922bc015421842f64ff980329660f33b41af1a93e7408f087393",
+    "consumer_wheel": "be82d4f7422dc98bbfbd978746eca5051280b1935b1191cb6fb566c61337838e",
+    "core_sdist": "164b70270344343094dc0a688bf8dbfe20a27112f7227e2f7fe318f085b71935",
+    "core_wheel": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23"
+  },
+  "candidate": "0.12.0a13",
+  "candidate_manifest_sha256": "55eb4ce44c5453a884e3424c8d490c645338696cc0e9ca5c235f94366612f9fa",
+  "commands": 115,
+  "completion_envelopes": {
+    "all_hashes_match": true,
+    "custody_sha256": "c4e70c6a96c277eeb02ede3e1736a6c976b8b30003d914c278b76b9927cb5c54",
+    "files": 17
+  },
+  "consumer": "0.1.15",
+  "criterion_closed": "M13",
+  "elapsed_seconds": 5266.097705137916,
+  "executor": "Codex /root through expressly authorized owner-local SSH; AI technical executor",
+  "finished_at_utc": "2026-10-12T22:46:47.052430+00:00",
+  "full_return": {
+    "archive_bytes": 486344558,
+    "archive_sha256": "1027b8166416d831ac07bdb8e3b390dd2448734a68cc9863ed830b94739b8802",
+    "criteria_automatically_closed": [],
+    "files": 234999,
+    "full_archive_readback_verified": true,
+    "human_independent_review": false,
+    "original_lab_status": "passed",
+    "payload_bytes": 1765263585,
+    "recorded_at_utc": "2026-10-12T23:33:15.178035+00:00",
+    "schema": "equiframe.r2-raw-custody.v1",
+    "status": "PASS"
+  },
+  "host": {
+    "hostname": "maestria-vnic",
+    "kernel": "6.8.0-1060-oracle",
+    "machine": "aarch64",
+    "resources": {
+      "budget_is_system_quota": false,
+      "cgroup_observed": {
+        "cpu.max": {
+          "unavailable": "FileNotFoundError"
+        },
+        "memory.current": {
+          "unavailable": "FileNotFoundError"
+        },
+        "memory.high": {
+          "unavailable": "FileNotFoundError"
+        },
+        "memory.max": {
+          "unavailable": "FileNotFoundError"
+        }
+      },
+      "cpu_count": 2,
+      "memory_bytes": {
+        "MemAvailable": 11836456960,
+        "MemTotal": 12512505856
+      },
+      "rlimit_as": [
+        -1,
+        -1
+      ],
+      "rlimit_cpu": [
+        -1,
+        -1
+      ],
+      "rlimit_nofile": [
+        1024,
+        1048576
+      ]
+    },
+    "system": "Linux",
+    "uid": 1003,
+    "user": "hernan"
+  },
+  "kit_sha256": "354c704a5d760b8295031a1a966c135c3e41d111327cce97ad10180799d87e63",
+  "kit_unchanged_after_run": true,
+  "limits": [
+    "M13 only: other full platform/profile scopes stay open.",
+    "AI execution and review do not grant human or scientific acceptance.",
+    "No SDK Beta built or activated; original Alpha artifact payloads preserved.",
+    "Consumer suite JUnit was normal Python; optimized consumer programs do not substitute for optimized unit tests.",
+    "Original failed run and the failed validator/first addendum launch are retained separately."
+  ],
+  "minimum_free_disk_bytes": 24709763072,
+  "normal_consumer_cases_per_python": 72,
+  "observed_rss_peak_bytes": 786178048,
+  "optimized_consumer_cases_per_python": 72,
+  "other_criteria_closed": [],
+  "passed_profiles": 52,
+  "previous_original_run": {
+    "archive_bytes": 484261330,
+    "archive_sha256": "56fc4f44a89240f4282a4652240ff98ba2144ecd845e43dce2de50b3cd036ef4",
+    "files": 234133,
+    "preserved_and_returned": true,
+    "status": "failed"
+  },
+  "receipt_review_sha256": "341169da69029f34f2e3de599434bbb828fed92f6825bbeeb93b1b117d68ba97",
+  "recorded_at_utc": "2026-10-12T23:56:22.402205+00:00",
+  "required_python_versions": [
+    "3.10.12",
+    "3.12.15"
+  ],
+  "resource_monitor_errors": [],
+  "resource_scope": "100/1000 rows x3 trials each Python; nine Linux counters; separate max_rows1 not_evaluable control",
+  "schema": "equiframe.m13-native-completed-assessment.v1",
+  "ssh_transport": "User-authorized owner-local pinned host and hernan_nueva.key; observed actual owner UID1003 and ARM64. Hashes alone do not authenticate a human.",
+  "started_at_utc": "2026-10-12T21:19:00.954460+00:00",
+  "status": "PASS",
+  "subtest_summary": {
+    "each_python": {
+      "passed_subtest_events": 15,
+      "raw_junit_counter": 34,
+      "unique_main_tests": 19
+    },
+    "raw_files_unchanged": true,
+    "source_manifest_sha256": "5e6846208e489598424825228276233fcefcb2af2e6246d1691e6b0ebed0e081"
+  }
+}

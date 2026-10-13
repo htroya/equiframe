@@ -211,6 +211,16 @@ def get_stability_register() -> tuple[StabilityRecord, ...]:
             ),
             StabilityRecord(
                 surface="namespace",
+                name="equiframe.eda",
+                status="experimental",
+                commitment=(
+                    "Optional standalone diagnostics; exact nested API names/signatures/shapes "
+                    "are explicitly inventoried in equiframe.eda._inventory. No change to "
+                    "migration/Verify or detectors; unavailable metrics are not zero alerts."
+                ),
+            ),
+            StabilityRecord(
+                surface="namespace",
                 name="equiframe.benchmark",
                 status="unsupported",
                 commitment=(

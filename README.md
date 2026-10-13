@@ -1,36 +1,45 @@
 # EquiFrame
 
+**Código actual: pareja 0.12.0a14, Alpha privada.** La extensión opcional
+[EDA](packages/equiframe/docs/eda.md) usa salidas privadas separadas. Los
+porcentajes enlazados abajo conservan sus candidatos evaluados (A13/A11);
+no se transfieren automáticamente al nuevo candidato ni activan Beta.
+
+
 [Portal de documentación / Documentation portal](docs/README.md): rutas por
 tarea, glosario, integración y controles manuales. Las guías empaquetadas y los
 informes históricos tienen alcances separados.
 
 [Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261011_EIGHT.md):
-ocho áreas vigentes, fuentes, candidatos y **70,74 % de promedio**. El cambio de
-alcance solicitado y el avance técnico se identifican por separado.
+ocho áreas vigentes y **75,82 % de promedio** con fracciones originales.
+Usabilidad se reevaluó sobre A13; Universalidad conserva su medición A11.
+La meta vigente es maximizar Alpha hacia 100 % conservando pendientes reales.
+El [plan Alpha](docs/ALPHA_MAXIMIZATION_PLAN_20261012.md) distingue trabajo
+técnico y [entregas humanas/PyPI](docs/HUMAN_REQUIREMENTS_20261012.md).
+Beta sigue aplazada: alcanzar el promedio no cierra cada área.
 
-[Metas vigentes](docs/TARGET_80_85_PLAN_20261011.md): madurez y requisitos de
-tesis **≥80 %**, trazabilidad **≥85 %**, con criterios originales y pendientes
-externos explícitos. El [promedio anterior de nueve áreas](docs/GLOBAL_75_RESULT_20261011.json)
-y el [plan anterior del 60 %](docs/RUBRIC_FLOOR60_PLAN_20261011.md) son históricos.
+[Trazabilidad actual](docs/OPTION_EXCEPTIONS_RESULT_20261012.md):
+**6.309/8.385 = 75,24 %**, con 264 obligaciones adicionales en esta entrega.
+Restan 2.076 para 100 %, 1.238 para al menos 90 % y 819 para al menos 85 %.
+Las repeticiones y plataformas no crean nuevos IDs.
 
-[Trazabilidad actual](docs/OPTION_TEST_CALLS_RESULT_20261012.md):
-71 obligaciones vinculadas a llamadas públicas y oráculos originales, además
-de las [32 de propiedades](docs/OPTION_PROPERTIES_RESULT_20261012.md), las
-[40 de configuración](docs/OPTION_CONFIGURATION_RESULT_20261012.md), las
-[42 fronteras/miembros](docs/OPTION_SEED_BOUNDS_RESULT_20261012.md) y las
-[74 obligaciones de tipos públicos](docs/OPTION_PUBLIC_TYPES_RESULT_20261011.md);
-**6.045/8.385 = 72,09 %**. Faltan **1.083 IDs verificados** para al menos 85 %.
-El [recibo de custodia actual](docs/TRACE_SEMANTIC_CALLS_CUSTODY_20261012.json)
-identifica el respaldo privado de este lote y sus intentos no acreditados.
-El [respaldo anterior](docs/TRACE_INCREMENT_CUSTODY_20261012.json) se conserva.
+[Madurez reevaluada A13](docs/MATURITY_SCOPE_REASSESSMENT_20261012.md):
+**11/16 = 68,75 %** con las definiciones originales y recibos actuales.
+[M13 ARM64](docs/M13_VM_COMPLETED_20261012.md) concluyó 115 comandos y 52
+perfiles; su expediente completo fue devuelto y verificado. Los intentos
+anteriores y sus fallos permanecen separados. Las [sdists y suites adicionales](docs/ALPHA_SDIST_AND_SUITES_20261012.md)
+complementan la evidencia sin atribuir aceptación humana ni todos los sistemas.
 
-[Kit de madurez M13 original](docs/M13_PREPARATION_20261012.md): su transferencia
-recibió autorización, se verificó y el ensayo ARM64 comenzó. La reconstrucción
-del wheel consumidor conservó un fallo por formato ZIP. El
-[candidato corregido local](docs/M13_LOCAL_CORRECTION_RESULT_20261012.json)
-declara la [regla de reconstrucción](docs/M13_REBUILD_POLICY_20261012.md);
-aún no se ha transferido ni ejecutado. La VM está dando timeouts SSH y M13
-permanece pendiente de un ensayo completo revisado.
+[Dataset entregado a la tutora](docs/SERCOP_PUBLIC_DELIVERY_20261012.md):
+captura SERCOP organizada, hashes verificados, carpeta VM de lectura y HTTPS
+temporal. [Copia local](docs/SERCOP_LOCAL_REPOSITORY_20261012.md) fuera de Git.
+La entrega pública contiene datos y procedencia, sin EDA ni reflexión.
+El [diagnóstico DW](docs/JHAIR_DW_DIAGNOSTIC_20261012.md) delimita el prototipo,
+sus fallos reproducidos y los pendientes de Jhair/José.
+
+El [encargo EDA posterior](docs/EDA_NEXT_TASK_20261012.md) se ejecutó después
+de esa entrega. Su [implementación A14 y pruebas Windows/ARM64](docs/EDA_IMPLEMENTATION_20261012.md)
+conservan salidas privadas, candidatos históricos y la entrega de la tutora.
 
 [SERCOP anual completo en la VM](docs/SERCOP_ANNUAL_VM_20261011.md):
 81 comprobaciones SDK completas aprobadas, incluidas 27 sobre las 183.891
@@ -99,8 +108,8 @@ Este porcentaje identifica el wheel A12; no se atribuye automáticamente a A13.
 El recibo distingue validación de metadatos, rechazos esperados y opciones
 pendientes; no acredita por sí solo sus efectos en motores nativos.
 
-[Usabilidad técnica evaluada](docs/USABILITY_CURRENT_RESULT_20261010.md):
-11/12 criterios completos (91,67 %) para A12, con la misma rúbrica U01–U12.
+[Usabilidad técnica actual](docs/USABILITY_A13_REASSESSMENT_20261012.md):
+11/12 criterios completos (91,67 %) reevaluados para A13 con la misma rúbrica U01–U12.
 La evaluación con personas reales sigue pendiente; no es un porcentaje de
 satisfacción ni modifica el índice separado de Universalidad A11.
 Las evaluaciones A11/A12 permanecen ligadas a sus artefactos históricos.
@@ -114,7 +123,7 @@ locate differences in values, types, keys, multiplicity and order. Use EquiFrame
 inside an existing pandas, Polars, Arrow or CI workflow, or use its separate
 native execution, verification and bounded migration APIs.
 
-**Status: private Alpha pair: core 0.12.0a13 / benchmark 0.12.0a13.** Identify artifacts by commit and
+**Status: private Alpha pair: core 0.12.0a14 / benchmark 0.12.0a14.** Identify artifacts by commit and
 wheel/sdist SHA-256, not the version string alone. The team's package is **not
 publicly released on PyPI**. License and name/ownership decisions remain pending.
 Public release requires STEP10, the global review and specific owner approval.
@@ -141,7 +150,7 @@ compara directamente ese resultado con el 25 % de cierre del corte histórico A9
 ## Install the private candidate
 
 Use the [private wheelhouse installation guide](packages/equiframe/docs/installed-private.md) with
-`equiframe[arrow]==0.12.0a13`, a fresh environment outside the checkout,
+`equiframe[arrow]==0.12.0a14`, a fresh environment outside the checkout,
 normal pip dependency resolution and the separately supplied artifact hashes.
 It includes Linux and PowerShell commands and a separate hash-locked trial.
 This is private installation by name, not publication in PyPI or TestPyPI.
@@ -149,8 +158,9 @@ Choose `[duckdb]` for the architect's SQL exercise, `[arrow]` for the scientist'
 preparation, or `[engines]` for native migration across all three engines. Add
 `ml` only when using the optional detector fitting APIs. The
 [role first-use guide](packages/equiframe/docs/first-use.md) needs no ML package.
-The separate benchmark is `equiframe-benchmark[engines,ml,resources]==0.12.0a13`
-and requires exactly core `0.12.0a13`. The prior a6 package artifacts and
+The separate benchmark is `equiframe-benchmark[engines,ml,resources]==0.12.0a14`
+and requires exactly core `0.12.0a14`. Add `[eda]` or `[eda-charts]` for the
+[optional diagnostics](packages/equiframe/docs/eda.md). The prior a6 package artifacts and
 observations remain historical; current receipts identify corrected minimum-Polars
 expression composition.
 Python metadata targets 3.10/3.11/3.12/3.13; the maturity matrix remains open until every required cell is reviewed; only actual artifact-specific receipts establish

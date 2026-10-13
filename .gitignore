@@ -40,6 +40,8 @@ credentials*.json
 /runs/
 /models/
 /tmp/
+/local-data/sercop/
+/.private-beta/
 *.duckdb
 *.duckdb.*
 *.db

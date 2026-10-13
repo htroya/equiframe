@@ -2,7 +2,7 @@
 
 Este documento define entregas técnicas propuestas. Las tareas ya asignadas por el equipo son: José crea la VM y el acceso Python compartido; Jhair construye el DW; Hernán desarrolla y evalúa EquiFrame. Los detalles de sus componentes se acuerdan con sus responsables.
 
-Estado actual (2026-10-10): candidatos `equiframe 0.12.0a13` y `equiframe-benchmark 0.12.0a13`,
+Estado actual (2026-10-12): candidatos `equiframe 0.12.0a14` y `equiframe-benchmark 0.12.0a14`,
 con Verify, ETL, migración y destino local. Las herramientas locales y las interfaces consumidoras están
 implementadas; el servicio/DW real, las etiquetas/revisión del corpus y la aceptación científica siguen
 pendientes. Las propuestas de despliegue de este documento no acreditan entregas
@@ -242,3 +242,16 @@ fijado fuera de Git. Su carga Parquet local y reconciliación manual de dos awar
 prueban el consumidor de Hernán; no acreditan conexión al servicio de José,
 esquema DW de Jhair, escritores compartidos ni aceptación en OCI. El contrato de
 entrega de esos responsables continúa vigente, sin modificar sus carpetas.
+
+## EDA A14 y fronteras del equipo
+
+Hernán/Sol entrega `equiframe.eda` genérico, conversiones declaradas, diagnósticos,
+reportes y pruebas. Configuraciones SERCOP viven en herramientas consumidoras;
+no se redefine DW ni gateway. Jhair debe aprobar grano/compilación/clave/cohorte,
+monedas, reglas de calidad y carga/reconciliación. José debe mantener proveedores
+inmutables y ejecutar límites agregados, coordinación y continuidad del servicio.
+El EDA lee archivos publicados; no abre la DuckDB mutable compartida. Los
+reportes se guardan fuera de la entrega de lectura de la tutora y no se publican
+ni reinician sus servicios. Ambos motores del ETL conservan su propia lectura/
+transformación del mismo snapshot según la frontera declarada; un EDA no
+modifica esa frontera ni concede aceptación.

@@ -1,5 +1,11 @@
 ## 0.12.0a13 — package quality and producer identity (2026-10-10)
 
+## 0.12.0a14 — private Alpha pairing
+
+Pair with core A14's optional EDA. No detector training, thesis metrics or
+historic evidence rewritten. Existing benchmark protocol and APIs unchanged.
+
+
 - Remove a process-test race by capturing OS descendant identities before real
   cleanup instead of requiring the terminated worker to finish writing a file.
   Check every captured descendant stops; supervisor behavior remains unchanged.

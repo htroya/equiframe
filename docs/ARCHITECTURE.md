@@ -8,7 +8,7 @@ artefactos identifican qué combinaciones se ejecutaron realmente.
 
 Nota de candidato de madurez 2026-10-08: a8 amplía la admisión objetivo a Python 3.10-3.13; consulte [el plan M01-M16](MATURITY_PLAN.md). Las secciones y recibos históricos siguientes conservan su candidato y no acreditan pruebas nuevas.
 
-Estado actual: candidatos núcleo `0.12.0a13` y benchmark `0.12.0a13`, sobre pasos 1–10 técnicos y migrador, con Verify operacional y ETL local. Las revisiones contribuyen a 11–13 y la preparación de distribución sin cerrar sus criterios externos. La aceptación del servicio/DW real, las etiquetas/revisión del corpus y la evaluación científica siguen pendientes. El corpus técnico externo congelado no acredita esos resultados científicos. Fuente histórica del diseño: borrador identificado en [trazabilidad](THESIS_TRACEABILITY.md). La [arquitectura del paso 8](STEP_08_DESIGN.md), el [paso 9](STEP_09_DESIGN.md), la [evaluación del paso 10](STEP_10_EVALUATION.md) y el [diseño del migrador](MIGRATION_DESIGN.md) conservan sus decisiones y evidencias. Las secciones fechadas por versiones anteriores describen esa evolución; no sustituyen este estado actual. El [portal](README.md) distingue documentación de uso e informes por artefacto.
+Estado actual: candidatos núcleo `0.12.0a14` y benchmark `0.12.0a14`, sobre pasos 1–10 técnicos y migrador, con Verify operacional y ETL local. Las revisiones contribuyen a 11–13 y la preparación de distribución sin cerrar sus criterios externos. La aceptación del servicio/DW real, las etiquetas/revisión del corpus y la evaluación científica siguen pendientes. El corpus técnico externo congelado no acredita esos resultados científicos. Fuente histórica del diseño: borrador identificado en [trazabilidad](THESIS_TRACEABILITY.md). La [arquitectura del paso 8](STEP_08_DESIGN.md), el [paso 9](STEP_09_DESIGN.md), la [evaluación del paso 10](STEP_10_EVALUATION.md) y el [diseño del migrador](MIGRATION_DESIGN.md) conservan sus decisiones y evidencias. Las secciones fechadas por versiones anteriores describen esa evolución; no sustituyen este estado actual. El [portal](README.md) distingue documentación de uso e informes por artefacto.
 
 ## 1. Propósito y alcance
 
@@ -375,3 +375,14 @@ sintácticamente directos antes y no se introducen. Persisten seis componentes
 cíclicos al incluir imports locales/de tipos; se muestran en el informe en vez
 de afirmar que el grafo completo es acíclico. Análisis estático no demuestra
 todo comportamiento dinámico. No se dividieron archivos solo por tamaño.
+
+## Extensión opcional EDA — A14
+
+`equiframe.eda` perfila un snapshot de archivo propio mediante DuckDB y devuelve
+contratos 1.0 separados. Arrow lee metadatos/capturas; Plotly opcional genera
+HTML portable. No fabrica ejecuciones para usar profiles ni importa el dominio.
+Los recibos de migración/bundle pasan por sus lectores verificados; sus estados
+y bytes se conservan y sus perfiles no sustituyen comparación completa.
+Conversiones explícitas conservan originales, Decimal/monedas y errores;
+IQR/MAD de valores del dataset no son B/M de ejecuciones ni entrenan modelos.
+[API, recursos y límites](../packages/equiframe/docs/eda.md).

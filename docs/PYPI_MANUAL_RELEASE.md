@@ -3,7 +3,13 @@
 [Portal](README.md) · [Plan PYPI-PREP-20-v1](PYPI_PREPARATION_PLAN_20261010.md) ·
 [Política vigente del paquete](../packages/equiframe/docs/releasing.md)
 
-Estado: pareja privada **0.12.0a13**, sin licencia de distribución aprobada.
+Corte auditado de este runbook: pareja privada **0.12.0a13**, sin licencia de distribución aprobada.
+El código actual es [A14](EDA_IMPLEMENTATION_20261012.md); sus artefactos y
+comprobaciones propios no sustituyen los hashes del manifiesto A13 siguiente.
+El [manifiesto separado A14](../tools/pypi_candidate_a14.json), SHA-256
+`31ba467c50e5bf7cbc428aa4720d725a825bd723d073e9e81ab0e4ed457e5ba3`,
+también pasó la auditoría offline contra sus cuatro archivos exactos.
+Los pasos de derechos, cuentas y publicación permanecen pendientes.
 Este runbook prepara controles y la entrega futura. Las herramientas no suben
 archivos, buscan tokens, firman aprobaciones ni habilitan publicación. El modo
 de trabajo acordado es manual, sin Actions y sin nuevos recursos de pago.
