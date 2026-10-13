@@ -1,6 +1,6 @@
 # Portal de documentación / Documentation portal
 
-Pareja actual **EquiFrame / benchmark 0.12.0a13**, Alpha privada. Este portal
+Pareja actual **EquiFrame / benchmark 0.12.0a14**, Alpha privada. Este portal
 pertenece al repositorio. El [manual del núcleo](../packages/equiframe/docs/index.md)
 también viene dentro de su wheel identificado; las páginas raíz nuevas no se
 añaden retroactivamente a un wheel entregado. [Cómo mantener y comprobar la
@@ -15,6 +15,7 @@ documentación](DOCUMENTATION_MAINTENANCE.md).
 | Integrarlo en un pipeline | [Recorrido de tres estados](DOCUMENTATION_WORKFLOW.md) | Código completo para aceptar, rechazar diferencias y rechazar lo no evaluable |
 | Diseñar una integración | [Arquitecto](../packages/equiframe/docs/arquitecto.md), [arquitectura](ARCHITECTURE.md), [propiedad de componentes](TEAM_INTEGRATION.md) | Fronteras, snapshots y contratos; responsabilidades pendientes identificadas |
 | Preparar datos de análisis | [Científico](../packages/equiframe/docs/cientifico.md), [ingestión](../packages/equiframe/docs/ingestion.md) | Tipos, ausencias y precisión conservados |
+| Explorar calidad y distribuciones | [EDA opcional](../packages/equiframe/docs/eda.md), [implementación y validación A14](EDA_IMPLEMENTATION_20261012.md) | Diagnóstico privado con datos originales y métricas no evaluables explícitas |
 | Elegir o consultar una API | [Elegir API](../packages/equiframe/docs/choosing-api.md), [referencia](../packages/equiframe/docs/api.md), [CLI y gates](../packages/equiframe/docs/outcome-gates.md) | Operaciones existentes y estados correctos |
 | Entender un resultado | [Semántica](../packages/equiframe/docs/semantics.md), [glosario](DOCUMENTATION_GLOSSARY.md) | Alcance de equivalencia, finalización y revisión |
 | Añadir una fuente u operación | [Extensiones](../packages/equiframe/docs/extending.md), [fuentes](../packages/equiframe/docs/universal-sources.md), [IR](../packages/equiframe/docs/migration-ir.md) | Interfaces y subconjuntos nativos; sin ejecutar plugins desde JSON |

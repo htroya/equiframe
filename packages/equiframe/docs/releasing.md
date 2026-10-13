@@ -3,7 +3,7 @@
 ## Current state
 
 `equiframe` and `equiframe-benchmark` are private Alpha candidates, currently
-numbered `0.12.0a13` and distinguished by commit plus SHA-256. They are **not** a
+numbered `0.12.0a14` and distinguished by commit plus SHA-256. They are **not** a
 public PyPI release. No project distribution license has been selected or
 authorized. Technical installation tests do not grant redistribution permission.
 Do not run an unqualified `pip install equiframe` to obtain this candidate: a

@@ -39,7 +39,7 @@ a failure. Escalate the smallest reproducible semantic difference instead.
 ### A13 corrects new detector producer identity
 
 A12 incorrectly inherited the A11 default when fitting a new detector. A13
-records `0.12.0a13` for newly fitted detector evidence and admits explicit A12
+records `0.12.0a14` for newly fitted detector evidence and admits explicit A12
 and A13 producer records. This changes provenance metadata, not fitting,
 thresholds, labels or the `equiframe-if-mad-1.0` algorithm identity. Existing
 bundles retain their recorded producer; readers never relabel old evidence.
@@ -319,7 +319,7 @@ A5 artifacts and receipts, and use the exact A6 package hashes for new validatio
 No output-model contract or scientific methodology changed.
 
 
-## 0.12.0a13 first use and environment diagnosis
+## 0.12.0a14 first use and environment diagnosis
 
 Two new experimental commands use existing public comparison/report APIs:
 `python -I -m equiframe doctor --extra arrow` checks local metadata;

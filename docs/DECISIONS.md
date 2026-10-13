@@ -584,3 +584,26 @@ manual de release: se actualizan a A13 conservando los gates optativos, permisos
 de lectura y ausencia de publicación. No se ejecuta Actions. Los wheels/sdist
 originales A13 conservan sus bytes y versiones; los cambios de repositorio no
 se presentan como un paquete nuevo ni como documentación instalada nueva.
+
+## Extensión EDA autorizada tras entrega Alpha — 2026-10-12
+
+Después de main `cfd65b9`, el propietario autorizó el encargo adjunto: EDA
+genérico opcional en la distribución existente, caso real SERCOP ya entregado.
+El código nuevo usa candidato privado A14 y conserva A13/fixtures históricos.
+
+- Dataset independiente o capturas verificadas; no ejecución ficticia, segundo
+  verificador ni cambio de planes/tolerancias/R/M/B/H/O.
+- Perfiles crudos antes de conversiones; tipos/errores/originales y monedas
+  explícitos. Cuantiles discretos exactos y media racional distinguidos de
+  aproximaciones de stddev/histogramas/visualización. IQR/MAD son observaciones
+  de dataset, no entrenamiento ni nueva función del B experimental.
+- Captura anual retrospectiva fijada por manifestSHA `712022f8470428f25fa12b307e301ad6ef6fb0f9c59634ab8b90569380ac279c`;
+  sin concatenar anual y meses ni asumir cohorte por selector2025.
+- Salidas privadas exclusivas fuera de entrega pública y Git; Word, HTTP/túnel,
+  permisos y documentación de la tutora intactos. José/Jhair conservan dominio,
+  snapshots/servicio, limpieza/carga/reconciliación y aceptación del DW.
+- Presupuestos cooperativos/interruptquery explícitos; capacidades no fieles
+  rechazan, métricas no evaluables nunca reciben cero alertas.
+
+Es una decisión de ingeniería y diagnóstico exploratorio; no cambia hipótesis,
+splits, etiquetas, soportes ni resultados científicos. Beta sigue aplazada.

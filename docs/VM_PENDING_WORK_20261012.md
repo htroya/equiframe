@@ -19,6 +19,13 @@ ssh -i "C:\HT\maestria datos\tesis\VM\hernan_nueva.key" hernan@157.137.227.1
 - [Dataset público](SERCOP_PUBLIC_DELIVERY_20261012.md): entrega autorizada,
   287 archivos, hashes verificados, sólo lectura y HTTPS por túnel saliente.
   No hay EDA/reflexión ni DW aceptado en esa carpeta.
+- [Alpha A14 y EDA](EDA_IMPLEMENTATION_20261012.md): misma pareja de wheels
+  y dependencias comunes que Windows, instalación y payloads cotejados,
+  suite ARM completa anterior más delta final, benchmark con `resources`,
+  modo optimizado y ocho tablas anuales. Los runs quedan privados fuera
+  de la carpeta pública. El expediente devuelto de 343 miembros pasó SHA/CRC.
+- Limpieza: 9.421.471.744 bytes de laboratorios M13 respaldados y
+  683.454.464 bytes de temporales A14; se conserva el runtime vigente.
 
 ## Pendiente real
 
@@ -34,9 +41,10 @@ ssh -i "C:\HT\maestria datos\tesis\VM\hernan_nueva.key" hernan@157.137.227.1
 4. Continuidad pública: confirmar hosting estable si se necesita enlace fijo.
    Los servicios de usuario están habilitados; un reinicio del Quick Tunnel
    cambia el hostname y requiere comunicar el enlace nuevo.
-5. Nueva extensión EDA: el propietario la autorizó **después** de terminar esta
-   entrega Alpha, controles y subida a `main`. Usará salidas exclusivas fuera
-   de la carpeta pública; no modifica ni reinicia el dataset ni sus servicios.
+5. Celdas A14: esta nueva evidencia corresponde a Windows y ARM64 Python 3.12;
+   no convierte los ensayos A13 de otros Python/plataformas en pruebas A14.
+   La extensión EDA ya está instalada en ambos hosts. Falta reevaluar las
+   rúbricas completas y restantes celdas comprometidas con el nuevo candidato.
 
 No hace falta repetir los expedientes completos devueltos sin motivo nuevo.
 Las pruebas restantes deben tener alcance y resultado propios. Para retirar

@@ -2,7 +2,7 @@
 
 [Inicio](inicio.md) · [Fuentes](universal-sources.md) · [Extensiones](extending.md)
 
-Este candidato privado 0.12.0a13 permite cambiar la entrada conservando un
+Este candidato privado 0.12.0a14 permite cambiar la entrada conservando un
 contrato y un plan nativo común. El siguiente recorrido utiliza datos sintéticos
 y un esperado literal independiente. No necesita benchmark, servicios remotos,
 credenciales, GitHub Actions ni recursos de pago.
@@ -38,7 +38,7 @@ y la licencia siguen pendientes. Desde una carpeta nueva fuera del checkout:
 
 ```powershell
 py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install 'C:\ruta\equiframe-0.12.0a13-py3-none-any.whl[engines]'
+.\.venv\Scripts\python.exe -m pip install 'C:\ruta\equiframe-0.12.0a14-py3-none-any.whl[engines]'
 .\.venv\Scripts\python.exe -m pip check
 .\.venv\Scripts\python.exe -m equiframe.examples.integrations.universal_first_use --output caso-correcto
 .\.venv\Scripts\python.exe -m equiframe.examples.integrations.universal_first_use --case different --output caso-distinto

@@ -111,8 +111,11 @@ from equiframe import (
     default_rule_registry,
     rule_set_fingerprint,
 )
+from equiframe.eda import EdaConfig, EdaManifest, EdaResult
+from equiframe.eda import Source as EdaSource
 
 ROOT = Path(__file__).resolve().parents[1]
+
 NULLS = NullPolicy(representations=("null",))
 
 
@@ -568,6 +571,10 @@ def main() -> None:
         ("workflow-request", WorkflowRequest),
         ("workflow-result", WorkflowResult),
         ("load-receipt", LoadReceipt),
+        ("eda-config", EdaConfig),
+        ("eda-manifest", EdaManifest),
+        ("eda-result", EdaResult),
+        ("eda-source", EdaSource),
     ):
         assets[ROOT / "schemas" / (name + "-1.0.schema.json")] = render_schema(
             model.model_json_schema()

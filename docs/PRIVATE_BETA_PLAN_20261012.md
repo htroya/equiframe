@@ -2,7 +2,8 @@
 
 Encargo del propietario: maximizar el avance comprobable, preparar e implementar
 una Beta privada, organizar SERCOP 2025 localmente y entregar a `main`.
-La versión activa sigue siendo **núcleo y benchmark 0.12.0a13 (Alpha privada)**.
+La versión activa es **núcleo y benchmark 0.12.0a14 (Alpha privada)**, tras
+la [extensión opcional EDA](EDA_IMPLEMENTATION_20261012.md).
 Por instrucción del propietario, primero se debe agotar el trabajo comprobable
 para llevar Alpha al 100 %. La Beta está aplazada. El identificador `0.12.0b1`
 es una propuesta futura: no hay artefactos Beta construidos, instalados ni

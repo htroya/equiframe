@@ -17,6 +17,7 @@ from equiframe.bundle import export_bundle, import_bundle, inspect_bundle
 from equiframe.comparison import compare
 from equiframe.comparison_types import ComparisonSpec
 from equiframe.detectors import read_detector_bundle
+from equiframe.eda.cli import app as eda_app
 from equiframe.errors import CapabilityError, ContractIOError, ContractValidationError
 from equiframe.evidence import inspect_evidence, load_json, read_pipeline
 from equiframe.ingestion import IngestionSpec, ingest_file
@@ -55,6 +56,9 @@ ingestion_app = typer.Typer(no_args_is_help=True)
 app.add_typer(ingestion_app, name="ingestion", help="Parse explicit CSV/JSON/JSONL contracts.")
 workflow_app = typer.Typer(no_args_is_help=True)
 app.add_typer(workflow_app, name="workflow", help="Run dependent native ETL checkpoints.")
+app.add_typer(
+    eda_app, name="eda", help="Optional independent dataset diagnostics; no approval gate."
+)
 
 
 @app.command("doctor")

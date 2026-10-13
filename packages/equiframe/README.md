@@ -1,4 +1,9 @@
-# EquiFrame 0.12.0a13
+# EquiFrame 0.12.0a14
+
+Optional [dataset EDA](docs/eda.md) in this private Alpha candidate profiles
+fixed snapshots through DuckDB with Plotly optional. It preserves original
+values and separates diagnostics from migration/Verify and R/M/B/H/O.
+
 
 [Primer uso por perfil / First use](docs/first-use.md)
 
@@ -18,7 +23,7 @@ APIs with explicit capabilities and failure states.
 
 ## Private Alpha status
 
-This is the **private Alpha candidate 0.12.0a13**, identified by its commit and
+This is the **private Alpha candidate 0.12.0a14**, identified by its commit and
 artifact hashes. The team's package is **not publicly released on PyPI**.
 Do not install an unrelated package with this name from an arbitrary index.
 License and name/ownership remain owner decisions; access is not permission to
@@ -36,7 +41,7 @@ pending ownership decisions.
 ## Install the private candidate
 
 Use the [private wheelhouse installation guide](docs/installed-private.md) with
-`equiframe[engines,ml]==0.12.0a13`, a fresh environment outside the checkout,
+`equiframe[engines,ml]==0.12.0a14`, a fresh environment outside the checkout,
 normal pip dependency resolution and the separately supplied artifact hashes.
 It includes Linux and PowerShell commands and a separate hash-locked trial.
 This is private installation by name, not publication in PyPI or TestPyPI.

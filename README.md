@@ -1,5 +1,11 @@
 # EquiFrame
 
+**Código actual: pareja 0.12.0a14, Alpha privada.** La extensión opcional
+[EDA](packages/equiframe/docs/eda.md) usa salidas privadas separadas. Los
+porcentajes enlazados abajo conservan sus candidatos evaluados (A13/A11);
+no se transfieren automáticamente al nuevo candidato ni activan Beta.
+
+
 [Portal de documentación / Documentation portal](docs/README.md): rutas por
 tarea, glosario, integración y controles manuales. Las guías empaquetadas y los
 informes históricos tienen alcances separados.
@@ -31,9 +37,9 @@ La entrega pública contiene datos y procedencia, sin EDA ni reflexión.
 El [diagnóstico DW](docs/JHAIR_DW_DIAGNOSTIC_20261012.md) delimita el prototipo,
 sus fallos reproducidos y los pendientes de Jhair/José.
 
-El [encargo EDA posterior](docs/EDA_NEXT_TASK_20261012.md) empieza tras esta
-entrega y sus controles/subida a main. Usará artefactos separados y candidato
-Alpha propio; no hereda porcentajes A13 ni modifica la entrega de la tutora.
+El [encargo EDA posterior](docs/EDA_NEXT_TASK_20261012.md) se ejecutó después
+de esa entrega. Su [implementación A14 y pruebas Windows/ARM64](docs/EDA_IMPLEMENTATION_20261012.md)
+conservan salidas privadas, candidatos históricos y la entrega de la tutora.
 
 [SERCOP anual completo en la VM](docs/SERCOP_ANNUAL_VM_20261011.md):
 81 comprobaciones SDK completas aprobadas, incluidas 27 sobre las 183.891
@@ -117,7 +123,7 @@ locate differences in values, types, keys, multiplicity and order. Use EquiFrame
 inside an existing pandas, Polars, Arrow or CI workflow, or use its separate
 native execution, verification and bounded migration APIs.
 
-**Status: private Alpha pair: core 0.12.0a13 / benchmark 0.12.0a13.** Identify artifacts by commit and
+**Status: private Alpha pair: core 0.12.0a14 / benchmark 0.12.0a14.** Identify artifacts by commit and
 wheel/sdist SHA-256, not the version string alone. The team's package is **not
 publicly released on PyPI**. License and name/ownership decisions remain pending.
 Public release requires STEP10, the global review and specific owner approval.
@@ -144,7 +150,7 @@ compara directamente ese resultado con el 25 % de cierre del corte histórico A9
 ## Install the private candidate
 
 Use the [private wheelhouse installation guide](packages/equiframe/docs/installed-private.md) with
-`equiframe[arrow]==0.12.0a13`, a fresh environment outside the checkout,
+`equiframe[arrow]==0.12.0a14`, a fresh environment outside the checkout,
 normal pip dependency resolution and the separately supplied artifact hashes.
 It includes Linux and PowerShell commands and a separate hash-locked trial.
 This is private installation by name, not publication in PyPI or TestPyPI.
@@ -152,8 +158,9 @@ Choose `[duckdb]` for the architect's SQL exercise, `[arrow]` for the scientist'
 preparation, or `[engines]` for native migration across all three engines. Add
 `ml` only when using the optional detector fitting APIs. The
 [role first-use guide](packages/equiframe/docs/first-use.md) needs no ML package.
-The separate benchmark is `equiframe-benchmark[engines,ml,resources]==0.12.0a13`
-and requires exactly core `0.12.0a13`. The prior a6 package artifacts and
+The separate benchmark is `equiframe-benchmark[engines,ml,resources]==0.12.0a14`
+and requires exactly core `0.12.0a14`. Add `[eda]` or `[eda-charts]` for the
+[optional diagnostics](packages/equiframe/docs/eda.md). The prior a6 package artifacts and
 observations remain historical; current receipts identify corrected minimum-Polars
 expression composition.
 Python metadata targets 3.10/3.11/3.12/3.13; the maturity matrix remains open until every required cell is reviewed; only actual artifact-specific receipts establish

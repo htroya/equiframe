@@ -1,6 +1,7 @@
 # Maximizar Alpha antes de una Beta privada
 
-La versión activa es **0.12.0a13**. El propietario pidió ejecutar todo lo
+La versión activa es **0.12.0a14**, tras la [extensión EDA validada](EDA_IMPLEMENTATION_20261012.md).
+El corte evaluado de este plan conserva **A13** y sus recibos. El propietario pidió ejecutar todo lo
 posible para alcanzar 100 % en Alpha antes de que exista una Beta. La entrega
 conserva los artefactos originales A13 y sus seis identidades; no cambia su
 versión, sus contratos ni los resultados históricos A11/A12.
@@ -53,7 +54,7 @@ Las decisiones humanas, entregables y roles de PyPI están en
 [HUMAN_REQUIREMENTS_20261012.md](HUMAN_REQUIREMENTS_20261012.md).
 La VM concluyó M13 y devolvió su evidencia completa. Posteriormente, el
 propietario autorizó y se comprobó la entrega pública SERCOP de lectura. El
-[EDA posterior](EDA_NEXT_TASK_20261012.md) empieza tras esta entrega y sus
+[EDA posterior](EDA_NEXT_TASK_20261012.md) se ejecutó tras esta entrega y sus
 controles/subida a main, en salidas independientes sin alterar la fuente.
 
 ## Paso posterior a Beta
@@ -62,5 +63,5 @@ La fase Alpha debe quedar agotada de forma comprobable antes de retomar el
 [plan Beta](PRIVATE_BETA_PLAN_20261012.md). Cada pendiente debe identificar su
 causa, evidencia faltante y responsable; una dificultad o una prueba preparada
 no constituye agotamiento. Los cambios de identidad Beta están apartados y
-la fuente activa permanece A13. Una futura Beta necesitará sus propios
+la fuente activa es ahora A14, también Alpha. Una futura Beta necesitará sus propios
 artefactos, instalación, consumidor compatible, inventario y mediciones.

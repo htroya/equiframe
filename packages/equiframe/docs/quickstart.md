@@ -2,7 +2,7 @@
 
 [Handbook](index.md) · [Recipes](recipes.md) · [Semantics](semantics.md)
 
-This guide uses synthetic local data and the private Alpha candidate **0.12.0a13**.
+This guide uses synthetic local data and the private Alpha candidate **0.12.0a14**.
 It works outside a source checkout. The current candidate targets Python 3.10–3.13;
 use the exact interpreter/platform receipt delivered with your candidate.
 The first-use builder produces a separate hash lock for the selected minor.
@@ -15,7 +15,7 @@ The current route is the [private wheelhouse](installed-private.md), with normal
 pip resolution and a separate hash-locked trial. The earlier first-use kit is
 historical. Obtain these items through the authorized private channel:
 
-- `equiframe-0.12.0a13-py3-none-any.whl`
+- `equiframe-0.12.0a14-py3-none-any.whl`
 - A receipt identifying its commit and expected SHA-256, received through a
   channel you trust independently of the artifact
 - A wheelhouse containing the reviewed runtime dependency wheels for your
@@ -26,7 +26,7 @@ same untrusted archive cannot authenticate its sender. Check the supplied wheel
 against the separate receipt before installing. For example, from its directory:
 
 ```bash
-python3.12 -c "from pathlib import Path; import hashlib; p=Path('equiframe-0.12.0a13-py3-none-any.whl'); print(hashlib.sha256(p.read_bytes()).hexdigest())"
+python3.12 -c "from pathlib import Path; import hashlib; p=Path('equiframe-0.12.0a14-py3-none-any.whl'); print(hashlib.sha256(p.read_bytes()).hexdigest())"
 ```
 
 Compare the printed value with the receipt. Stop on a mismatch. Do not copy the
@@ -41,7 +41,7 @@ mkdir equiframe-consumer
 cd equiframe-consumer
 python3.12 -m venv .venv
 . .venv/bin/activate
-WHEEL=/absolute/path/equiframe-0.12.0a13-py3-none-any.whl
+WHEEL=/absolute/path/equiframe-0.12.0a14-py3-none-any.whl
 WHEELHOUSE=/absolute/path/reviewed-wheelhouse
 python -m pip install --no-index --find-links "$WHEELHOUSE" "${WHEEL}[arrow]"
 python -m pip check

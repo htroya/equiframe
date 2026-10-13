@@ -1,6 +1,8 @@
 # Estado consolidado de las ocho áreas vigentes
 
-Núcleo y benchmark **0.12.0a13, Alpha privada**. Los ocho denominadores
+Último corte de rúbricas: núcleo y benchmark **0.12.0a13, Alpha privada**.
+El código actual es [A14, también Alpha](EDA_IMPLEMENTATION_20261012.md), aún
+sin reevaluación completa de estas ocho rúbricas. Los ocho denominadores
 originales y cada candidato evaluado se conservan. El área retirada por el
 propietario conserva sus registros históricos; el cambio de tablero no suma
 avance técnico. La última meta es maximizar cada área hacia 100 % salvo cierres
@@ -38,7 +40,7 @@ Repeticiones, suites y plataformas no crean nuevos IDs.
 [estado VM](VM_PENDING_WORK_20261012.md), [dataset público](SERCOP_PUBLIC_DELIVERY_20261012.md)
 y [diagnóstico DW](JHAIR_DW_DIAGNOSTIC_20261012.md) detallan alcances y causas.
 Alpha sigue abierta; Beta está aplazada. El [encargo EDA posterior](EDA_NEXT_TASK_20261012.md)
-se ejecuta después de los controles y subida de esta fase a main.
+se ejecutó después de los controles y subida de esta fase a main.
 
 El Word conserva SHA-256 `883b187f08221b9b4abab775430d9a2c87b6d92f503494317f3e1fec214d0f3c`.
 No se publica en PyPI/TestPyPI, no se ejecutan Actions ni se crean recursos pagos.

@@ -1,4 +1,10 @@
-# Encargo posterior: extensión opcional equiframe.eda
+# Orden del encargo EDA y ejecución posterior
+
+**Actualización:** la fase previa fue publicada y comprobada en `main`, commit
+`cfd65b90e749053f68aaf7d1c2b1d1f508e2db8e`. Después se implementó la
+[extensión A14 y se validó en Windows/ARM64](EDA_IMPLEMENTATION_20261012.md).
+El texto siguiente conserva el orden original; sus expresiones de futuro
+describen ese encargo anterior, no una tarea técnica todavía sin implementar.
 
 El propietario indicó implementar el prompt adjunto **después de concluir el
 trabajo actual, sus verificaciones/pruebas Alpha y subirlo a `main`**. Esta página

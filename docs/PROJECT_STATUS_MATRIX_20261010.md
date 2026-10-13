@@ -1,5 +1,10 @@
 # EquiFrame: matriz de porcentajes y alcance
 
+Este documento conserva el corte histórico del 10 de octubre. El
+[último tablero evaluado A13/A11](PROJECT_STATUS_MATRIX_20261011_EIGHT.md) y
+la [implementación actual A14](EDA_IMPLEMENTATION_20261012.md) tienen
+recibos separados; las versiones indicadas abajo pertenecen a aquel corte.
+
 Fecha local: 2026-10-10, America/Guayaquil. Base de esta consolidación:
 `3cc7c72fc7c0f76e810289f0e09514b1b0aad6ab`, verificada también en GitHub.
 Versión actual: `equiframe 0.12.0a13` y `equiframe-benchmark 0.12.0a13`.

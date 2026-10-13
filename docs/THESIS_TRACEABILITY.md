@@ -504,3 +504,14 @@ Los controles de estilo, artefactos, suites técnicas y metadatos no sustituyen
 corpus, perfiles reales, etiquetas, congelación, experimentos pareados,
 reproducción independiente ni aprobación académica. El
 [plan técnico](IMPLEMENTATION_95_PLAN_20261011.md) no altera hipótesis ni soportes.
+
+## EDA genérico opcional — A14, alcance técnico separado
+
+La nueva extensión contribuye a inspección/procedencia, contratos explícitos,
+recursos y evidencia reproducible del producto. El ejemplo anual usa la captura
+entregada a la tutora, sin escribir dentro de ella ni cambiar el Word.
+No cierra por sí solo T03/T04/T06/T07/T13/T14/T15/T16/T18/T19/T20/T21: siguen
+pendientes dominio/cohorte/normalidad/oráculo humano/DW/servicio/freeze/ciencia
+y reproducción independiente. Frecuencias o outliers de adjudicaciones no son
+perfiles de ejecuciones ni N_fit >10.000, etiquetas O o utilidad de Isolation
+Forest. [Referencia técnica](../packages/equiframe/docs/eda.md).
