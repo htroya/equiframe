@@ -67,6 +67,9 @@ example-runs/
 equiframe-comparisons/
 comparison-runs/
 equiframe-benchmark-runs/
-"packages/equiframe-data/descargados/"  
-"packages/equiframe-data/jobs_prueba/"  
-"practica-equiframe/"  
+packages/equiframe-data/descargados/
+packages/equiframe-data/jobs_prueba/
+practica-equiframe/
+
+# Resultados locales de EDA — nunca se publican en el repositorio
+eda-resultados/
