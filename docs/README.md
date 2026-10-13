@@ -43,6 +43,8 @@ documentación](DOCUMENTATION_MAINTENANCE.md).
   [acceso compartido SERCOP](SERCOP_SHARED_ACCESS_20261013.md).
 - [Desarrollo seguro A14](A14_SECURE_DEVELOPMENT_20261013.md): código corregido,
   pruebas, análisis automatizados y limitaciones identificadas.
+- [Revalidación actual A14](A14_REVALIDATION_CHECKPOINT_20261013.md): suites
+  completas, identidad de los candidatos privados y obligaciones pendientes.
 
 ## Investigar e integrar con el equipo
 
@@ -65,7 +67,7 @@ los criterios individuales y los candidatos históricos.
 
 El [plan vigente de Alpha](ALPHA_MAXIMIZATION_PLAN_20261012.md) prioriza agotar
 el trabajo comprobable hacia 100 % antes de que exista una Beta. Las últimas
-metas mínimas son 90 % en madurez, requisitos de tesis y trazabilidad; conserva
+metas mínimas son 90 % en los siete rubros solicitados; conserva
 los criterios, pendientes externos y Word intacto. El
 [plan Beta pendiente](PRIVATE_BETA_PLAN_20261012.md) no activa otra versión.
 Las [entregas humanas y de PyPI](HUMAN_REQUIREMENTS_20261012.md) y las

@@ -34,6 +34,8 @@ CATALOG_HASHES = {
     "trace85_20261011/context-constructor-catalog-v1.json": "56c4cb44a57e6d36cb01c28f4e1fc0b57032194ae8a3c70cea2e8211de8517fa",
     "trace85_20261011/exception-catalog-v1.json": "a708c50cd0750178b623c98d6871a31d5cb9d4574facb0b02d40113f0406ed7b",
     "trace85_20261011/cli-parser-catalog-v2.json": "847e207775d36e4bd6173e714120e2c4c7576183b6bf55620065846832dc223b",
+    "trace85_20261011/configuration-catalog-v2.json": "38e89bc9bdb9e712b32e69701c11854721be022f331a7bc99e8cc9ecb0893e2f",
+    "avance_95_20261011/operations-normal/result.json": "4c7702cd398d4c0196ec163820b51a115734f59f3c73e21bb140de793bae1b0c",
 }
 
 
@@ -104,6 +106,10 @@ contexts = module("contexts", REPO / "tools/option_context_constructor_followup.
 exceptions = module("exceptions", REPO / "tools/option_exception_followup.py")
 parser_cases = module("parser_cases", REPO / "tools/option_cli_parser_followup.py")
 discovery = module("discovery", REPO / "packages/equiframe/tools/option_inventory.py")
+configurations = module(
+    "configurations", REPO / "tools/option_configuration_followup.py"
+)
+operations = module("operations", REPO / "tools/option_operations.py")
 original = ROOT / "revision_95_20261011/trace_inputs/catalog-a13.json"
 catalog = read(original)
 if sha(original) != "9eaa56aa71b803d901b07b56da0a89eb3cb610a44dc67a78513b553288ab59e1":
@@ -231,6 +237,37 @@ exception_catalog = read(path)
 refs = exceptions.fixtures(exception_catalog)
 for case in exception_catalog["cases"]:
     receipts.append(exceptions.execute(case, refs))
+path = ROOT / "avance_95_20261011/operations-normal/result.json"
+catalogs[str(path.relative_to(ROOT))] = sha(path)
+for index, original_case in enumerate(read(path)["receipts"]):
+    # Expected inputs are retained; historical observations/statuses are ignored.
+    case = {
+        key: value
+        for key, value in original_case.items()
+        if key not in ("observed", "status")
+    }
+    directory = run_root / "native" / str(index)
+    directory.mkdir(parents=True)
+    try:
+        record = operations.execute(case, directory)
+    except Exception as error:  # noqa: BLE001 - record unexpected failures, never credit them
+        record = {
+            **case,
+            "status": "FAIL",
+            "observed": {"unexpected_exception": type(error).__name__},
+        }
+    receipts.append(record)
+path = ROOT / "trace85_20261011/configuration-catalog-v2.json"
+catalogs[str(path.relative_to(ROOT))] = sha(path)
+fixture_module = module(
+    "captured_fixture", REPO / "packages/equiframe/tests/rule_helpers.py"
+)
+for index, case in enumerate(read(path)["cases"]):
+    receipts.append(
+        configurations.execute(
+            case, run_root / "configuration" / str(index), ef, fixture_module.captured
+        )
+    )
 path = ROOT / "trace85_20261011/cli-parser-catalog-v2.json"
 catalogs[str(path.relative_to(ROOT))] = sha(path)
 from equiframe.cli import app
