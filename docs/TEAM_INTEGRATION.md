@@ -16,6 +16,14 @@ demuestra el gateway de José o el DW de Jhair. El corpus técnico congelado no
 es una evaluación científica aceptada. Las responsabilidades de la tabla siguen
 vigentes. Consulta el [portal](README.md) para separar guías y evidencias fechadas.
 
+Actualización del 13 de octubre de 2026: el propietario autorizó corregir
+directamente el cliente de datos y el gateway. Su [implementación y pruebas
+A14](A14_SECURE_DEVELOPMENT_20261013.md) incluyen validación, confinamiento,
+integridad, bloqueo/recuperación y autenticación por roles. El puente opcional
+consume un manifiesto de esquema independiente del núcleo. La propiedad de
+carpetas de la tabla se conserva; el gateway autenticado no está desplegado
+y el DW/servicio real todavía requiere entrega y aceptación de sus responsables.
+
 ## 1. Propiedad y dependencias
 
 | Responsable | Carpetas | Entrega que consumen los demás |

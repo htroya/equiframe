@@ -250,7 +250,8 @@ class _Work:
             ) -> tuple[PhysicalColumn, ...]:
                 import pyarrow as pa
 
-                assert isinstance(loaded, pa.Table)
+                if not (isinstance(loaded, pa.Table)):
+                    raise AssertionError("Internal invariant check failed.")
                 types = dict(native)
                 return tuple(
                     PhysicalColumn(
@@ -296,7 +297,8 @@ class _Work:
 
     def verify_table(self, table: TableArtifact, *, index: bool = False) -> None:
         ref = table.index if index else table.data
-        assert ref is not None
+        if not (ref is not None):
+            raise AssertionError("Internal invariant check failed.")
         copied = snapshot(ref, self.directory, self.options, self.check)
         try:
             with batches(copied, self.options, self.check) as (schema, reader):
@@ -459,7 +461,8 @@ class _Work:
         pos: int,
     ) -> None:
         order = self.schema.order
-        assert isinstance(order, SignificantOrder)
+        if not (isinstance(order, SignificantOrder)):
+            raise AssertionError("Internal invariant check failed.")
         result = 0
         for sort in order.by:
             index = self.names.index(sort.column)
@@ -484,7 +487,8 @@ class _Work:
             self.strategy = "sequence"
         elif self.key_valid:
             self.strategy = "key"
-            assert self.key is not None
+            if not (self.key is not None):
+                raise AssertionError("Internal invariant check failed.")
             self.selected_key = self.key.name
         else:
             self.strategy = "matching" if approximate else "multiset"
@@ -727,7 +731,8 @@ def _compare(
                     for tolerance_value in (tolerance.absolute, tolerance.relative):
                         if tolerance_value is not None:
                             parts = tolerance_value.as_tuple()
-                            assert isinstance(parts.exponent, int)
+                            if not (isinstance(parts.exponent, int)):
+                                raise AssertionError("Internal invariant check failed.")
                             if (
                                 max(abs(parts.exponent), len(parts.digits))
                                 > options.max_numeric_digits

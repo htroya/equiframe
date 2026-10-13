@@ -391,13 +391,15 @@ def run_workflow(
                     inputs[binding.name] = captured[binding.source]
                 else:
                     parent = prior[binding.stage].migration
-                    assert parent is not None
+                    if not (parent is not None):
+                        raise AssertionError("Internal invariant check failed.")
                     pipeline = parent.source if binding.output == "source" else parent.target
-                    assert (
+                    if not (
                         pipeline is not None
                         and pipeline.execution is not None
                         and pipeline.execution.output is not None
-                    )
+                    ):
+                        raise AssertionError("Internal invariant check failed.")
                     # Native migration checkpoints retain separate generated
                     # indexes. The next migration still enforces its own index
                     # policy rather than silently receiving only data bytes.

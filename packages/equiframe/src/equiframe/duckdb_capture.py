@@ -198,7 +198,8 @@ def capture_duckdb(
         check()
 
         def watch() -> None:
-            assert session is not None
+            if not (session is not None):
+                raise AssertionError("Internal invariant check failed.")
             while not stopped.wait(0.01):
                 if signal.cancelled or (
                     checked.timeout_seconds is not None

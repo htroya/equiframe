@@ -15,10 +15,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from snapshot_client import SnapshotClient, ArtifactRef
-
+from snapshot_client import ArtifactRef, SnapshotClient
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
 
 def _sha256(path: Path) -> str:
     h = hashlib.sha256()
@@ -40,21 +40,23 @@ def _crear_snapshot(base: Path, snap_id: str, tablas: dict[str, str]) -> None:
     for tabla, contenido in tablas.items():
         archivo = snap_dir / f"{tabla}.csv"
         archivo.write_text(contenido, encoding="utf-8")
-        artifacts.append({
-            "table_name": tabla,
-            "file_path":  f"{tabla}.csv",
-            "size_bytes": archivo.stat().st_size,
-            "sha256":     _sha256(archivo),
-            "version":    snap_id,
-            "row_count":  contenido.count("\n"),
-        })
+        artifacts.append(
+            {
+                "table_name": tabla,
+                "file_path": f"{tabla}.csv",
+                "size_bytes": archivo.stat().st_size,
+                "sha256": _sha256(archivo),
+                "version": snap_id,
+                "row_count": contenido.count("\n"),
+            }
+        )
 
     manifiesto = {
         "snapshot_id": snap_id,
-        "version":     snap_id,
-        "source":      "prueba",
-        "timestamp":   "2026-10-13T00:00:00+00:00",
-        "artifacts":   artifacts,
+        "version": snap_id,
+        "source": "prueba",
+        "timestamp": "2026-10-13T00:00:00+00:00",
+        "artifacts": artifacts,
     }
     (snap_dir / "manifest.json").write_text(
         json.dumps(manifiesto, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -71,6 +73,7 @@ def fail(msg: str) -> None:
 
 
 # ── A. Seleccionar versión ────────────────────────────────────────────────────
+
 
 def test_listar_snapshots_vacio():
     """list_snapshots devuelve lista vacía si no hay snapshots publicados."""
@@ -98,8 +101,8 @@ def test_listar_ignora_directorios_sin_manifiesto():
     with tempfile.TemporaryDirectory() as tmp:
         base = Path(tmp)
         _crear_snapshot(base, "20261001", {"fact_adjudicacion": "id,monto\n1,100"})
-        (base / "carpeta_sin_manifiesto").mkdir()          # no debe aparecer
-        (base / "20261001.tmp").mkdir()                    # carga en progreso, no aparece
+        (base / "carpeta_sin_manifiesto").mkdir()  # no debe aparecer
+        (base / "20261001.tmp").mkdir()  # carga en progreso, no aparece
 
         client = SnapshotClient(base_dir=base)
         versiones = client.list_snapshots()
@@ -109,15 +112,20 @@ def test_listar_ignora_directorios_sin_manifiesto():
 
 # ── B. Consultar tablas ───────────────────────────────────────────────────────
 
+
 def test_consultar_tablas_de_snapshot():
     """get_snapshot devuelve el manifiesto con todas las tablas del snapshot."""
     with tempfile.TemporaryDirectory() as tmp:
         base = Path(tmp)
-        _crear_snapshot(base, "20261001", {
-            "fact_adjudicacion":     "id,monto\n1,100\n2,200",
-            "dim_entidad":           "id,nombre\nE1,MinSalud",
-            "adjudicacion_proveedor":"award_id,proveedor_id\n1,P1",
-        })
+        _crear_snapshot(
+            base,
+            "20261001",
+            {
+                "fact_adjudicacion": "id,monto\n1,100\n2,200",
+                "dim_entidad": "id,nombre\nE1,MinSalud",
+                "adjudicacion_proveedor": "award_id,proveedor_id\n1,P1",
+            },
+        )
 
         client = SnapshotClient(base_dir=base)
         manifiesto = client.get_snapshot("20261001")
@@ -134,10 +142,14 @@ def test_get_artifact_por_nombre():
     """SnapshotManifest.get_artifact devuelve la referencia correcta por nombre."""
     with tempfile.TemporaryDirectory() as tmp:
         base = Path(tmp)
-        _crear_snapshot(base, "20261001", {
-            "fact_adjudicacion": "id,monto\n1,500",
-            "dim_fecha":         "fecha\n2026-01-01",
-        })
+        _crear_snapshot(
+            base,
+            "20261001",
+            {
+                "fact_adjudicacion": "id,monto\n1,500",
+                "dim_fecha": "fecha\n2026-01-01",
+            },
+        )
 
         client = SnapshotClient(base_dir=base)
         manifiesto = client.get_snapshot("20261001")
@@ -167,13 +179,18 @@ def test_version_inexistente_lanza_error():
 
 # ── C. Descargar y verificar hashes ──────────────────────────────────────────
 
+
 def test_descargar_y_verificar_hash_correcto():
     """download_artifact descarga el archivo y verifica tamaño + SHA-256."""
     with tempfile.TemporaryDirectory() as tmp:
         base = Path(tmp)
-        _crear_snapshot(base, "20261001", {
-            "fact_adjudicacion": "id,monto\n1,100\n2,200\n3,300",
-        })
+        _crear_snapshot(
+            base,
+            "20261001",
+            {
+                "fact_adjudicacion": "id,monto\n1,100\n2,200\n3,300",
+            },
+        )
 
         client = SnapshotClient(base_dir=base)
         manifiesto = client.get_snapshot("20261001")
@@ -227,10 +244,14 @@ def test_flujo_completo_seleccionar_consultar_descargar():
     with tempfile.TemporaryDirectory() as tmp:
         base = Path(tmp)
         _crear_snapshot(base, "20260601", {"fact_adjudicacion": "id,monto\n1,100"})
-        _crear_snapshot(base, "20261001", {
-            "fact_adjudicacion":     "id,monto\n1,100\n2,200",
-            "dim_entidad":           "id,nombre\nE1,MinSalud",
-        })
+        _crear_snapshot(
+            base,
+            "20261001",
+            {
+                "fact_adjudicacion": "id,monto\n1,100\n2,200",
+                "dim_entidad": "id,nombre\nE1,MinSalud",
+            },
+        )
 
         client = SnapshotClient(base_dir=base)
 
@@ -266,15 +287,18 @@ if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
 
     pruebas = [
-        ("A1. Listar snapshots — vacío",                  test_listar_snapshots_vacio),
-        ("A2. Listar snapshots — orden descendente",      test_listar_snapshots_orden_descendente),
-        ("A3. Ignorar dirs sin manifiesto",               test_listar_ignora_directorios_sin_manifiesto),
-        ("B1. Consultar tablas del snapshot",             test_consultar_tablas_de_snapshot),
-        ("B2. get_artifact por nombre",                   test_get_artifact_por_nombre),
-        ("B3. Versión inexistente lanza error",           test_version_inexistente_lanza_error),
-        ("C1. Descargar y verificar hash correcto",       test_descargar_y_verificar_hash_correcto),
-        ("C2. Archivo corrupto rechazado y eliminado",    test_archivo_corrupto_rechazado_y_eliminado),
-        ("C3. Flujo completo seleccionar-consultar-desc", test_flujo_completo_seleccionar_consultar_descargar),
+        ("A1. Listar snapshots — vacío", test_listar_snapshots_vacio),
+        ("A2. Listar snapshots — orden descendente", test_listar_snapshots_orden_descendente),
+        ("A3. Ignorar dirs sin manifiesto", test_listar_ignora_directorios_sin_manifiesto),
+        ("B1. Consultar tablas del snapshot", test_consultar_tablas_de_snapshot),
+        ("B2. get_artifact por nombre", test_get_artifact_por_nombre),
+        ("B3. Versión inexistente lanza error", test_version_inexistente_lanza_error),
+        ("C1. Descargar y verificar hash correcto", test_descargar_y_verificar_hash_correcto),
+        ("C2. Archivo corrupto rechazado y eliminado", test_archivo_corrupto_rechazado_y_eliminado),
+        (
+            "C3. Flujo completo seleccionar-consultar-desc",
+            test_flujo_completo_seleccionar_consultar_descargar,
+        ),
     ]
 
     errores = 0
@@ -289,7 +313,7 @@ if __name__ == "__main__":
             print(f"  ERROR inesperado: {type(e).__name__}: {e}")
             errores += 1
 
-    print(f"\n{'='*55}")
+    print(f"\n{'=' * 55}")
     total = len(pruebas)
     print(f"Resultado: {total - errores}/{total} pruebas pasaron")
     if errores:

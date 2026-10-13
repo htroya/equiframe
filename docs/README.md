@@ -33,11 +33,21 @@ documentación](DOCUMENTATION_MAINTENANCE.md).
   controles repetibles y ejemplos seleccionados. No se ejecutan Actions.
 - [Preparación manual de PyPI](PYPI_MANUAL_RELEASE.md): auditoría del par,
   entrega propuesta y pendientes reales de licencia, cuentas y publicación.
+- [Preparación de TestPyPI](TESTPYPI_PUBLISHER_PREPARATION_20261013.md): valores
+  exactos del publicador y workflow de configuración, sin ejecutar publicación.
+- [Brecha hasta 90 %](A14_PROGRESS_GAP_20261013.md) y
+  [reparto técnico/humano](A14_TECHNICAL_90_METHOD_20261013.md): cortes históricos
+  separados de la evaluación pendiente de A14.
+- [Cliente de datos](../packages/equiframe-data/README.md),
+  [gateway privado](../services/data-gateway/README.md) y
+  [acceso compartido SERCOP](SERCOP_SHARED_ACCESS_20261013.md).
+- [Desarrollo seguro A14](A14_SECURE_DEVELOPMENT_20261013.md): código corregido,
+  pruebas, análisis automatizados y limitaciones identificadas.
 
 ## Investigar e integrar con el equipo
 
 El [benchmark](../packages/equiframe-benchmark/README.md) es otra distribución;
-requiere exactamente el núcleo A13. Sus APIs no convierten una comparación
+requiere exactamente el núcleo A14. Sus APIs no convierten una comparación
 técnica en un resultado científico. [Diseño experimental](EXPERIMENT_DESIGN.md),
 [trazabilidad de tesis](THESIS_TRACEABILITY.md) y [hoja de ruta](HERNAN_ROADMAP.md#paso-13-profesionalismo-de-api-cli-y-documentación)
 identifican las decisiones y revisiones pendientes. R, M, B, H y O conservan

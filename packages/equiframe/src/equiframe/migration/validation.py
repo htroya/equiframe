@@ -122,7 +122,8 @@ def _literal(expression: LiteralExpression) -> IRColumn:
     elif isinstance(dtype, DecimalType) and isinstance(value, DecimalValue):
         with localcontext(exact_decimal_context()):
             exponent = value.value.as_tuple().exponent
-            assert isinstance(exponent, int)
+            if not (isinstance(exponent, int)):
+                raise AssertionError("Internal invariant check failed.")
             valid = (
                 exponent >= -dtype.scale
                 and not (value.value.is_zero() and value.value.is_signed())

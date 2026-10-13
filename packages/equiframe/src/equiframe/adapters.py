@@ -255,7 +255,8 @@ class DuckDBAdapter:
         connection: duckdb.DuckDBPyConnection | None = None
 
         def watch() -> None:
-            assert connection is not None
+            if not (connection is not None):
+                raise AssertionError("Internal invariant check failed.")
             while not stopped.wait(0.01):
                 if context.cancellation.cancelled or (
                     context.deadline is not None and time.perf_counter() >= context.deadline
@@ -283,7 +284,8 @@ class DuckDBAdapter:
                     "SELECT current_setting('memory_limit'), current_setting('threads'), "
                     "current_setting('TimeZone'), current_setting('max_temp_directory_size')"
                 ).fetchone()
-                assert settings is not None
+                if not (settings is not None):
+                    raise AssertionError("Internal invariant check failed.")
                 for name, value in zip(
                     ("memory_limit", "threads", "timezone", "max_spill"), settings, strict=True
                 ):

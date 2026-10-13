@@ -303,7 +303,8 @@ def read_pipeline(path: Path, *, verify: bool = True) -> PipelineResult:
                 if result.detection.scores.fit_sha256 != detector_fingerprint(bundle.fit):
                     raise ArtifactIntegrityError("scored fit fingerprint mismatch")
                 if result.detection.scores.matrix_sha256 is not None:
-                    assert result.profile is not None
+                    if not (result.profile is not None):
+                        raise AssertionError("Internal invariant check failed.")
                     matrix = transform_profiles(bundle.fit.preprocessor, (result.profile.vector,))
                     if result.detection.scores.matrix_sha256 != profile_digest(
                         matrix.model_dump(mode="json")

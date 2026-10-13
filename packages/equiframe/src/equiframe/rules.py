@@ -247,7 +247,8 @@ class RuleContext:
             expected=expected,
             message=message or code.replace("_", " "),
         )
-        assert self.sink is not None
+        if not (self.sink is not None):
+            raise AssertionError("Internal invariant check failed.")
         block = _json(finding.model_dump(mode="json")) + b"\n"
         if self.evidence_bytes + len(block) > self.options.max_evidence_bytes:
             raise ResourceLimitError("rule max_evidence_bytes exhausted")
@@ -260,7 +261,8 @@ class RuleContext:
 
 
 def _schema(definition: RuleDefinition, context: RuleContext) -> None:
-    assert isinstance(definition, SchemaCheck)
+    if not (isinstance(definition, SchemaCheck)):
+        raise AssertionError("Internal invariant check failed.")
     table = context.table(definition.table)
     columns = context.spec(definition.table).schema_spec.columns
     expected_names = tuple(column.name for column in columns)
@@ -299,7 +301,8 @@ def _schema(definition: RuleDefinition, context: RuleContext) -> None:
 
 
 def _key(definition: RuleDefinition, context: RuleContext) -> None:
-    assert isinstance(definition, KeyCheck)
+    if not (isinstance(definition, KeyCheck)):
+        raise AssertionError("Internal invariant check failed.")
     key = next(
         k for k in context.spec(definition.table).schema_spec.keys if k.name == definition.key
     )
@@ -325,7 +328,8 @@ def _key(definition: RuleDefinition, context: RuleContext) -> None:
 
 
 def _cardinality(definition: RuleDefinition, context: RuleContext) -> None:
-    assert isinstance(definition, CardinalityCheck)
+    if not (isinstance(definition, CardinalityCheck)):
+        raise AssertionError("Internal invariant check failed.")
     count = context.table(definition.table).num_rows
     if count < definition.minimum or (
         definition.maximum is not None and count > definition.maximum
@@ -339,7 +343,8 @@ def _cardinality(definition: RuleDefinition, context: RuleContext) -> None:
 
 
 def _join(definition: RuleDefinition, context: RuleContext) -> None:
-    assert isinstance(definition, JoinCheck)
+    if not (isinstance(definition, JoinCheck)):
+        raise AssertionError("Internal invariant check failed.")
     sides: list[dict[tuple[object, ...], list[int]]] = []
     for name, columns in (
         (definition.left_table, definition.left_columns),
@@ -379,9 +384,11 @@ def _join(definition: RuleDefinition, context: RuleContext) -> None:
 
 
 def _order(definition: RuleDefinition, context: RuleContext) -> None:
-    assert isinstance(definition, OrderCheck)
+    if not (isinstance(definition, OrderCheck)):
+        raise AssertionError("Internal invariant check failed.")
     policy = context.spec(definition.table).schema_spec.order
-    assert isinstance(policy, SignificantOrder)
+    if not (isinstance(policy, SignificantOrder)):
+        raise AssertionError("Internal invariant check failed.")
     previous: tuple[ComparisonValue, ...] | None = None
     for position, values in context.rows(definition.table, definition.columns):
         if previous is not None:
@@ -412,7 +419,8 @@ def _order(definition: RuleDefinition, context: RuleContext) -> None:
 
 
 def _aggregate(definition: RuleDefinition, context: RuleContext) -> None:
-    assert isinstance(definition, AggregateCheck)
+    if not (isinstance(definition, AggregateCheck)):
+        raise AssertionError("Internal invariant check failed.")
     source_columns = (*definition.group_by, *((definition.measure,) if definition.measure else ()))
     groups: dict[tuple[object, ...], tuple[tuple[ComparisonValue, ...], list[ComparisonValue]]] = {}
     source_rows = 0

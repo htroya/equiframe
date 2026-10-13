@@ -68,7 +68,8 @@ def schema_compatible(dtype: pa.DataType, column: ColumnSpec, policy: Comparison
         return False
     if observed[0] == "timestamp":
         temporal = column.temporal_policy
-        assert isinstance(temporal, TimestampPolicy)
+        if not (isinstance(temporal, TimestampPolicy)):
+            raise AssertionError("Internal invariant check failed.")
         # Zone changes only preserve meaning for instant comparison. A naive
         # observation needs the separately authorized assume_zone policy.
         if observed[2] is None:
@@ -111,7 +112,8 @@ def physical_value(scalar: pa.Scalar) -> ComparisonValue:
 
 
 def number(value: ComparisonValue) -> Fraction:
-    assert value.value is not None
+    if not (value.value is not None):
+        raise AssertionError("Internal invariant check failed.")
     if value.kind == "float":
         return Fraction.from_float(float(value.value))
     return Fraction(Decimal(value.value))
@@ -131,14 +133,16 @@ def row_identity(row: tuple[ComparisonValue, ...]) -> bytes:
 
 
 def temporal_point(value: ComparisonValue, policy: TimestampPolicy) -> int:
-    assert value.value is not None and value.unit in NS
+    if not (value.value is not None and value.unit in NS):
+        raise AssertionError("Internal invariant check failed.")
     ns = int(value.value) * NS[value.unit]
     if value.timezone is None:
         if policy.naive == "reject":
             raise ValueError("naive_timestamp")
         if policy.naive == "preserve":
             return ns
-        assert policy.timezone is not None
+        if not (policy.timezone is not None):
+            raise AssertionError("Internal invariant check failed.")
         wall = _datetime(ns)
         choices = [wall.replace(tzinfo=timezone(policy.timezone), fold=fold) for fold in (0, 1)]
         valid = [
@@ -220,7 +224,8 @@ def normalize(
             if scaled.denominator != 1 or abs(scaled) >= 10**dtype.precision:
                 issues.append("decimal_precision")
         elif dtype.kind == "date":
-            assert value.value is not None
+            if not (value.value is not None):
+                raise AssertionError("Internal invariant check failed.")
             days = int(value.value)
             if value.unit == "ms":
                 if days % 86400000:
@@ -228,7 +233,8 @@ def normalize(
                 days //= 86400000
             out = ComparisonValue(kind="date", value=str(days), unit="day")
             policy = column.temporal_policy
-            assert isinstance(policy, DatePolicy)
+            if not (isinstance(policy, DatePolicy)):
+                raise AssertionError("Internal invariant check failed.")
             lower = (
                 date.fromisoformat(policy.lower.value).toordinal() - EPOCH if policy.lower else None
             )
@@ -239,7 +245,8 @@ def normalize(
                 issues.append("temporal_interval")
         elif dtype.kind == "timestamp":
             stamp = column.temporal_policy
-            assert isinstance(stamp, TimestampPolicy)
+            if not (isinstance(stamp, TimestampPolicy)):
+                raise AssertionError("Internal invariant check failed.")
             try:
                 point = temporal_point(value, stamp)
             except ValueError as error:

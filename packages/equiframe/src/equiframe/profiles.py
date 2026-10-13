@@ -213,7 +213,8 @@ def _converted(value: ComparisonValue, target: ColumnSpec) -> ComparisonValue:
         )
     if kind == "timestamp" and value.kind == "string":
         policy = target.temporal_policy
-        assert isinstance(policy, TimestampPolicy)
+        if not (isinstance(policy, TimestampPolicy)):
+            raise AssertionError("Internal invariant check failed.")
         parsed_stamp = TimestampValue(value=text)
         point = parsed_stamp.nanoseconds(instant=parsed_stamp.has_offset) - (
             date(1970, 1, 1).toordinal() * 86400 * 10**9
@@ -269,7 +270,8 @@ def _measure(feature: ProfileFeature, context: _ProfileContext) -> FeatureObserv
             support=FeatureSupport(rows=count),
         )
     if metric in ("razon_salida_entrada", "expansion_union"):
-        assert feature.denominator_table is not None
+        if not (feature.denominator_table is not None):
+            raise AssertionError("Internal invariant check failed.")
         return _ratio(
             feature,
             count,
@@ -277,7 +279,8 @@ def _measure(feature: ProfileFeature, context: _ProfileContext) -> FeatureObserv
             FeatureSupport(rows=count),
         )
     if metric == "claves_sin_pareja":
-        assert feature.right_table is not None
+        if not (feature.right_table is not None):
+            raise AssertionError("Internal invariant check failed.")
         left_types = tuple(table.schema.field(c).type for c in feature.columns)
         right_types = tuple(
             context.tables[feature.right_table].schema.field(c).type for c in feature.right_columns
@@ -341,7 +344,8 @@ def _measure(feature: ProfileFeature, context: _ProfileContext) -> FeatureObserv
             context.insert(distinct, identity(value))
         if metric == "fechas_invalidas" and value.kind != "null":
             present += 1
-            assert feature.target is not None
+            if not (feature.target is not None):
+                raise AssertionError("Internal invariant check failed.")
             try:
                 converted = _converted(value, feature.target)
                 _, issues = normalize(converted, feature.target)

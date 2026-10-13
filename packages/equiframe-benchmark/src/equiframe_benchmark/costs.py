@@ -369,7 +369,8 @@ def _reference_data(
     reference: ef.ArtifactRef | ef.TableArtifact | ef.ExecutionResult,
 ) -> ef.ArtifactRef:
     if isinstance(reference, ef.ExecutionResult):
-        assert reference.output is not None
+        if not (reference.output is not None):
+            raise AssertionError("Internal invariant check failed.")
         return reference.output.data
     return reference.data if isinstance(reference, ef.TableArtifact) else reference
 

@@ -206,13 +206,15 @@ class TimestampValue(FrozenModel):
     @property
     def fractional_digits(self) -> int:
         match = _TIMESTAMP.fullmatch(self.value)
-        assert match is not None
+        if not (match is not None):
+            raise AssertionError("Internal invariant check failed.")
         return len((match["fraction"] or "")[1:])
 
     def nanoseconds(self, *, instant: bool) -> int:
         """Exact ordering key; no float timestamp or sub-microsecond truncation."""
         match = _TIMESTAMP.fullmatch(self.value)
-        assert match is not None
+        if not (match is not None):
+            raise AssertionError("Internal invariant check failed.")
         day = date.fromisoformat(match["date"]).toordinal()
         seconds = day * 86400 + int(match["hour"]) * 3600
         seconds += int(match["minute"]) * 60 + int(match["second"])

@@ -116,7 +116,8 @@ def _expression(expression: Expression, frame: pd.DataFrame, columns: Any) -> pd
                 decimal_context.traps[Inexact] = True
             result = cast("pd.Series[Any]", getattr(left, operation)(right))
             if expression.operation == "divide":
-                assert isinstance(expression.logical_type, DecimalType)
+                if not (isinstance(expression.logical_type, DecimalType)):
+                    raise AssertionError("Internal invariant check failed.")
                 quantum = Decimal(1).scaleb(-expression.logical_type.scale)
                 rounding = (
                     ROUND_HALF_UP
@@ -148,7 +149,8 @@ def _expression(expression: Expression, frame: pd.DataFrame, columns: Any) -> pd
         from equiframe._timezones import timezone
 
         dtype = expression_type(expression.argument, columns).logical_type
-        assert isinstance(dtype, TimestampType)
+        if not (isinstance(dtype, TimestampType)):
+            raise AssertionError("Internal invariant check failed.")
         argument = _expression(expression.argument, frame, columns)
         before = argument.astype(_dtype(IntegerType(bits=64, signed=True)))
         if before.eq(-(2**63)).fillna(False).any():
@@ -270,7 +272,8 @@ def _aggregate(frame: pd.DataFrame, node: Aggregate, validated: ValidatedIR) -> 
         if measure.operation == "count_rows":
             value = group.size() if group is not None else pd.Series([len(frame)])
         else:
-            assert measure.column is not None
+            if not (measure.column is not None):
+                raise AssertionError("Internal invariant check failed.")
             series = frame[measure.column]
             if measure.operation == "count_valid":
                 value = (

@@ -1,13 +1,11 @@
-"""
-equiframe-data — componente de acceso a datos del DW (José).
+"""Public API for the private data integration component."""
 
-API pública:
-    SnapshotClient  → seleccionar versión, consultar tablas, descargar archivos
-    JobManager      → gestionar trabajos de carga con escritor único
-"""
-
-from .snapshot_client import SnapshotClient, SnapshotManifest, ArtifactRef
-from .job_manager import JobManager, Job
+if __package__:
+    from .job_manager import Job, JobManager
+    from .snapshot_client import ArtifactRef, SnapshotClient, SnapshotManifest
+else:
+    from job_manager import Job, JobManager
+    from snapshot_client import ArtifactRef, SnapshotClient, SnapshotManifest
 
 __all__ = [
     "SnapshotClient",

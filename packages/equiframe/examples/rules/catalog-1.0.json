@@ -1,7 +1,7 @@
 {
   "catalog_id": "equiframe.synthetic.rules",
   "catalog_revision": 1,
-  "catalog_sha256": "fedfaaeaaff87ac0f0403ec94e704e917a53e5f0851b2ae5827b3bbaf5aa0cbd",
+  "catalog_sha256": "7fdffdaba0b6fc14d37e46385b56f475d97fbf4cff8835d6330af6b635c3e1e2",
   "entries": [
     {
       "contract_file": "../nulls_types.json",
@@ -21,8 +21,8 @@
       },
       "family": "nulls_types",
       "implementations": {
-        "key": "equiframe.rules._key@1:ac295e8fec0458521473234c599768f8fdd6d957cbb79b67dc9dd089b91f321b",
-        "schema": "equiframe.rules._schema@1:ac295e8fec0458521473234c599768f8fdd6d957cbb79b67dc9dd089b91f321b"
+        "key": "equiframe.rules._key@1:578d4dab8607acbac24eb82b34a9604e8f028d1b7d949a872523d54a5ca4bfd4",
+        "schema": "equiframe.rules._schema@1:578d4dab8607acbac24eb82b34a9604e8f028d1b7d949a872523d54a5ca4bfd4"
       },
       "limitations": "Key and schema checks cannot reconstruct failed source-to-output conversions.",
       "preconditions": [
@@ -34,7 +34,7 @@
           }
         }
       ],
-      "rule_set_sha256": "9ab6d81b8a0453169bf6e4d86cc5865eedb6b3d2a86902c517af7fc04336fa88",
+      "rule_set_sha256": "8df7e8e25dc1628578af3f2b9456b59222360e8d7459fd36e1d2b840171d50a4",
       "rules": [
         {
           "applicability": [],
@@ -81,8 +81,8 @@
       },
       "family": "joins",
       "implementations": {
-        "join": "equiframe.rules._join@1:ac295e8fec0458521473234c599768f8fdd6d957cbb79b67dc9dd089b91f321b",
-        "schema": "equiframe.rules._schema@1:ac295e8fec0458521473234c599768f8fdd6d957cbb79b67dc9dd089b91f321b"
+        "join": "equiframe.rules._join@1:578d4dab8607acbac24eb82b34a9604e8f028d1b7d949a872523d54a5ca4bfd4",
+        "schema": "equiframe.rules._schema@1:578d4dab8607acbac24eb82b34a9604e8f028d1b7d949a872523d54a5ca4bfd4"
       },
       "limitations": "Join checks validate captured input relationships, not the full output projection.",
       "preconditions": [
@@ -94,7 +94,7 @@
           }
         }
       ],
-      "rule_set_sha256": "3ffbd4d56faa257819c6a1706ec7feca9d183dfaddc471c1d4941607ffcc0c41",
+      "rule_set_sha256": "7bc5d2446da6c2dc6bfcf8b8d4101a852342105d2f2b10c38fc79ace36789e01",
       "rules": [
         {
           "applicability": [],
@@ -149,8 +149,8 @@
       },
       "family": "duplicates_order",
       "implementations": {
-        "order": "equiframe.rules._order@1:ac295e8fec0458521473234c599768f8fdd6d957cbb79b67dc9dd089b91f321b",
-        "schema": "equiframe.rules._schema@1:ac295e8fec0458521473234c599768f8fdd6d957cbb79b67dc9dd089b91f321b"
+        "order": "equiframe.rules._order@1:578d4dab8607acbac24eb82b34a9604e8f028d1b7d949a872523d54a5ca4bfd4",
+        "schema": "equiframe.rules._schema@1:578d4dab8607acbac24eb82b34a9604e8f028d1b7d949a872523d54a5ca4bfd4"
       },
       "limitations": "Order check does not prove full multiplicity preservation.",
       "preconditions": [
@@ -162,7 +162,7 @@
           }
         }
       ],
-      "rule_set_sha256": "c9fd4b1a9077d91619762286a9aeedc3f5d4f7eb2fab98251a997862d51ed7cc",
+      "rule_set_sha256": "33be8923fc17b5c8e442a36456ade7ac9bb741c6c0ddec3872c9f12c2da2b96d",
       "rules": [
         {
           "applicability": [],
@@ -211,8 +211,8 @@
       },
       "family": "aggregations",
       "implementations": {
-        "aggregate": "equiframe.rules._aggregate@1:ac295e8fec0458521473234c599768f8fdd6d957cbb79b67dc9dd089b91f321b",
-        "schema": "equiframe.rules._schema@1:ac295e8fec0458521473234c599768f8fdd6d957cbb79b67dc9dd089b91f321b"
+        "aggregate": "equiframe.rules._aggregate@1:578d4dab8607acbac24eb82b34a9604e8f028d1b7d949a872523d54a5ca4bfd4",
+        "schema": "equiframe.rules._schema@1:578d4dab8607acbac24eb82b34a9604e8f028d1b7d949a872523d54a5ca4bfd4"
       },
       "limitations": "Only declared sum by currency is reconciled; entity allocation is not checked.",
       "preconditions": [
@@ -224,7 +224,7 @@
           }
         }
       ],
-      "rule_set_sha256": "50abdbcc766f1d711c1a97d3ff30affd2103c79ec8f5a72439d6ebc0db453ab3",
+      "rule_set_sha256": "312f216a6e26ceec87e4a59d1faa0466f3d6f8bc90c4510bea9450346b9655a4",
       "rules": [
         {
           "applicability": [],
@@ -277,8 +277,8 @@
       },
       "family": "dates",
       "implementations": {
-        "cardinality": "equiframe.rules._cardinality@1:ac295e8fec0458521473234c599768f8fdd6d957cbb79b67dc9dd089b91f321b",
-        "schema": "equiframe.rules._schema@1:ac295e8fec0458521473234c599768f8fdd6d957cbb79b67dc9dd089b91f321b"
+        "cardinality": "equiframe.rules._cardinality@1:578d4dab8607acbac24eb82b34a9604e8f028d1b7d949a872523d54a5ca4bfd4",
+        "schema": "equiframe.rules._schema@1:578d4dab8607acbac24eb82b34a9604e8f028d1b7d949a872523d54a5ca4bfd4"
       },
       "limitations": "Schema and row count do not prove every temporal value retains its entity.",
       "preconditions": [
@@ -290,7 +290,7 @@
           }
         }
       ],
-      "rule_set_sha256": "5e3c53d881abb553af9d74f594bd02be107955523d126b41b9201b57cb6c1694",
+      "rule_set_sha256": "7c0c423f3c9646c0a3a286af7902cc00686df49f0afc7c5d2d66292e2e520fc6",
       "rules": [
         {
           "applicability": [],

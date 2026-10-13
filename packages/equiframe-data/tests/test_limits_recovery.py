@@ -9,7 +9,6 @@ Cubre los puntos de Hernan:
 
 import hashlib
 import json
-import os
 import shutil
 import sys
 import tempfile
@@ -17,11 +16,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from job_manager import JobManager, COMPLETED, FAILED, CANCELLED
-from snapshot_client import SnapshotClient, ArtifactRef
-
+from job_manager import CANCELLED, FAILED, JobManager
+from snapshot_client import ArtifactRef, SnapshotClient
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
 
 def _sha256(path: Path) -> str:
     h = hashlib.sha256()
@@ -44,20 +43,22 @@ def _crear_snapshot_prueba(base: Path, snap_id: str, contenido: str) -> Path:
     csv = snap_dir / "fact_adjudicacion.csv"
     csv.write_text(contenido, encoding="utf-8")
     size = csv.stat().st_size
-    sha  = _sha256(csv)
+    sha = _sha256(csv)
     manifest = {
         "snapshot_id": snap_id,
-        "version":     snap_id,
-        "source":      "prueba",
-        "timestamp":   "2026-10-07T00:00:00",
-        "artifacts": [{
-            "table_name": "fact_adjudicacion",
-            "file_path":  "fact_adjudicacion.csv",
-            "size_bytes": size,
-            "sha256":     sha,
-            "version":    snap_id,
-            "row_count":  1,
-        }],
+        "version": snap_id,
+        "source": "prueba",
+        "timestamp": "2026-10-07T00:00:00+00:00",
+        "artifacts": [
+            {
+                "table_name": "fact_adjudicacion",
+                "file_path": "fact_adjudicacion.csv",
+                "size_bytes": size,
+                "sha256": sha,
+                "version": snap_id,
+                "row_count": 1,
+            }
+        ],
     }
     (snap_dir / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -75,6 +76,7 @@ def fail(msg: str) -> None:
 
 
 # ── 1. Pruebas de límites ─────────────────────────────────────────────────────
+
 
 def test_trabajo_duplicado_mismo_contenido():
     """Misma clave e igual contenido devuelve el mismo trabajo sin duplicar."""
@@ -112,9 +114,9 @@ def test_cancelar_trabajo_pendiente():
 def test_cancelar_trabajo_completado_falla():
     """No se puede cancelar un trabajo ya completado."""
     with tempfile.TemporaryDirectory() as tmp:
-        mgr  = JobManager(Path(tmp))
-        csv  = _crear_csv(Path(tmp) / "fact.csv", "id,monto\n1,100.00")
-        job  = mgr.submit_job("load", "snap-D", "clave-completado")
+        mgr = JobManager(Path(tmp))
+        csv = _crear_csv(Path(tmp) / "fact.csv", "id,monto\n1,100.00")
+        job = mgr.submit_job("load", "snap-D", "clave-completado")
         mgr.run_job(job.job_id, {"fact_adjudicacion": csv})
         try:
             mgr.cancel_job(job.job_id)
@@ -152,6 +154,7 @@ def test_archivo_corrupto_rechazado():
 
 # ── 2. Consultas mientras se carga ────────────────────────────────────────────
 
+
 def test_snapshot_anterior_disponible_durante_carga():
     """
     El snapshot anterior sigue disponible mientras se prepara uno nuevo.
@@ -160,7 +163,7 @@ def test_snapshot_anterior_disponible_durante_carga():
     """
     with tempfile.TemporaryDirectory() as tmp:
         base = Path(tmp)
-        mgr  = JobManager(base)
+        mgr = JobManager(base)
 
         # Publicar snapshot inicial (v1)
         csv_v1 = _crear_csv(base / "fact_v1.csv", "id,monto\n1,500.00")
@@ -194,13 +197,14 @@ def test_snapshot_anterior_disponible_durante_carga():
 
 # ── 3. Recuperación de respaldo ───────────────────────────────────────────────
 
+
 def test_recuperacion_respaldo():
     """
     Si el snapshot activo se corrompe o elimina,
     se puede restaurar desde un respaldo previo.
     """
     with tempfile.TemporaryDirectory() as tmp:
-        base      = Path(tmp)
+        base = Path(tmp)
         snaps_dir = base / "snapshots"
         backup_dir = base / "respaldos"
         backup_dir.mkdir(parents=True)
@@ -208,7 +212,7 @@ def test_recuperacion_respaldo():
         # Publicar snapshot v1 y hacer respaldo
         _crear_snapshot_prueba(base, "snap-bkp-v1", "id,monto\n1,100.00")
         snap_v1 = snaps_dir / "snap-bkp-v1"
-        bkp_v1  = backup_dir / "snap-bkp-v1"
+        bkp_v1 = backup_dir / "snap-bkp-v1"
         shutil.copytree(snap_v1, bkp_v1)
         ok("snapshot v1 respaldado en carpeta respaldos/")
 
@@ -235,7 +239,7 @@ def test_carga_fallida_no_toca_snapshot_anterior():
     """Si una carga falla a mitad, el snapshot anterior permanece intacto."""
     with tempfile.TemporaryDirectory() as tmp:
         base = Path(tmp)
-        mgr  = JobManager(base)
+        mgr = JobManager(base)
 
         # Publicar snapshot inicial
         csv_v1 = _crear_csv(base / "fact_v1.csv", "id,monto\n1,100.00")
@@ -266,14 +270,17 @@ if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
 
     pruebas = [
-        ("1a. Trabajo duplicado — misma clave",       test_trabajo_duplicado_mismo_contenido),
-        ("1b. Clave en conflicto",                    test_clave_en_conflicto),
-        ("1c. Cancelar trabajo pendiente",            test_cancelar_trabajo_pendiente),
-        ("1d. Cancelar trabajo completado falla",     test_cancelar_trabajo_completado_falla),
-        ("1e. Archivo corrupto rechazado",            test_archivo_corrupto_rechazado),
-        ("2a. Snapshot anterior disponible en carga", test_snapshot_anterior_disponible_durante_carga),
-        ("3a. Recuperacion desde respaldo",           test_recuperacion_respaldo),
-        ("3b. Carga fallida no toca snapshot prev",   test_carga_fallida_no_toca_snapshot_anterior),
+        ("1a. Trabajo duplicado — misma clave", test_trabajo_duplicado_mismo_contenido),
+        ("1b. Clave en conflicto", test_clave_en_conflicto),
+        ("1c. Cancelar trabajo pendiente", test_cancelar_trabajo_pendiente),
+        ("1d. Cancelar trabajo completado falla", test_cancelar_trabajo_completado_falla),
+        ("1e. Archivo corrupto rechazado", test_archivo_corrupto_rechazado),
+        (
+            "2a. Snapshot anterior disponible en carga",
+            test_snapshot_anterior_disponible_durante_carga,
+        ),
+        ("3a. Recuperacion desde respaldo", test_recuperacion_respaldo),
+        ("3b. Carga fallida no toca snapshot prev", test_carga_fallida_no_toca_snapshot_anterior),
     ]
 
     errores = 0
@@ -288,7 +295,7 @@ if __name__ == "__main__":
             print(f"  ERROR inesperado: {e}")
             errores += 1
 
-    print(f"\n{'='*50}")
+    print(f"\n{'=' * 50}")
     total = len(pruebas)
     print(f"Resultado: {total - errores}/{total} pruebas pasaron")
     if errores:

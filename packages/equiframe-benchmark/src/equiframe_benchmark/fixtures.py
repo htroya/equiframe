@@ -248,15 +248,19 @@ def registry() -> ef.TransformationRegistry:
 
 
 def assert_expected(actual: list[dict[str, object]], expected: list[dict[str, object]]) -> None:
-    assert len(actual) == len(expected), (actual, expected)
+    if not (len(actual) == len(expected)):
+        raise AssertionError("Internal invariant check failed.")
     for observed, wanted in zip(actual, expected, strict=True):
-        assert observed.keys() == wanted.keys()
+        if not (observed.keys() == wanted.keys()):
+            raise AssertionError("Internal invariant check failed.")
         for key, value in wanted.items():
             if isinstance(value, float) and math.isnan(value):
                 actual_value = observed[key]
-                assert isinstance(actual_value, float) and math.isnan(actual_value)
+                if not (isinstance(actual_value, float) and math.isnan(actual_value)):
+                    raise AssertionError("Internal invariant check failed.")
             else:
-                assert observed[key] == value, (observed, wanted)
+                if not (observed[key] == value):
+                    raise AssertionError("Internal invariant check failed.")
 
 
 def expected_table(case: Case) -> pa.Table:

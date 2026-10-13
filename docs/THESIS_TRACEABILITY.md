@@ -515,3 +515,15 @@ pendientes dominio/cohorte/normalidad/oráculo humano/DW/servicio/freeze/ciencia
 y reproducción independiente. Frecuencias o outliers de adjudicaciones no son
 perfiles de ejecuciones ni N_fit >10.000, etiquetas O o utilidad de Isolation
 Forest. [Referencia técnica](../packages/equiframe/docs/eda.md).
+
+## Desarrollo seguro y reparto 90/10 — 2026-10-13
+
+El endurecimiento del cliente/gateway, su puente genérico y los controles
+internos que sobreviven a `-O` generan evidencia de funcionamiento técnico.
+No aportan por sí solos cohortes, normalidad, N_fit, etiquetas O confirmadas,
+aceptación del DW, aprobación de protocolo ni resultados pareados sobre datos
+reales. El [nuevo reparto](A14_TECHNICAL_90_METHOD_20261013.md) reserva diez
+puntos a la intervención humana por área y conserva estas dependencias
+explícitas. Ningún recibo histórico A11/A13 se renombra como validación A14.
+La huella de reglas cambia por el código de comprobación interno; los
+catálogos experimentales congelados conservan su identidad y sus resultados.

@@ -155,7 +155,8 @@ def _witness(
     def key_columns(key: object) -> tuple[str, ...]:
         from equiframe.contracts import KeySpec
 
-        assert isinstance(key, KeySpec)
+        if not (isinstance(key, KeySpec)):
+            raise AssertionError("Internal invariant check failed.")
         return (
             (*key.scope.columns, *key.columns)
             if isinstance(key.scope, ColumnKeyScope)

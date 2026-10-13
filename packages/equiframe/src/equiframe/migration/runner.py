@@ -314,7 +314,8 @@ def migrate(
 
     def capture() -> bool:
         nonlocal expected_ref
-        assert compiled is not None
+        if not (compiled is not None):
+            raise AssertionError("Internal invariant check failed.")
         capture_dir = directory / "capture"
         capture_dir.mkdir(exist_ok=False)
         context = RunContext(
@@ -448,9 +449,11 @@ def migrate(
         right: PipelineResult | ArtifactRef | None,
         reference: Literal["peer", "expected"],
     ) -> ComparisonResult:
-        assert left is not None and left.execution is not None and right is not None
+        if not (left is not None and left.execution is not None and right is not None):
+            raise AssertionError("Internal invariant check failed.")
         target = right.execution if isinstance(right, PipelineResult) else right
-        assert target is not None
+        if not (target is not None):
+            raise AssertionError("Internal invariant check failed.")
         return compare(
             left.execution,
             target,

@@ -1,28 +1,40 @@
-"""
-Cliente de snapshots del DW de Jhair — equiframe-data (José).
-
-Operaciones principales:
-  get_snapshot(snapshot_id)        → manifiesto con tablas, tamaños y SHA-256
-  download_artifact(ref, destino)  → descarga y verifica integridad antes de usar
-
-Reglas:
-  - Todas las tablas deben pertenecer a la misma versión del snapshot.
-  - Si tamaño o SHA-256 no coinciden con el inventario, la copia se rechaza.
-  - Las llaves privadas y credenciales nunca se guardan en este archivo.
-"""
+"""Immutable local snapshots with bounded manifests and verified copies."""
 
 import hashlib
-import json
-import shutil
-from dataclasses import dataclass, field
+import os
+import tempfile
+from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 
+if __package__:
+    from .safe_io import (
+        MAX_ARTIFACT_BYTES,
+        MAX_ARTIFACTS,
+        confined,
+        digest,
+        identifier,
+        open_regular,
+        read_json,
+        relative_path,
+        unsigned_integer,
+    )
+else:
+    from safe_io import (
+        MAX_ARTIFACT_BYTES,
+        MAX_ARTIFACTS,
+        confined,
+        digest,
+        identifier,
+        open_regular,
+        read_json,
+        relative_path,
+        unsigned_integer,
+    )
 
-# ── Tipos de datos ────────────────────────────────────────────────────────────
 
-@dataclass
+@dataclass(frozen=True)
 class ArtifactRef:
-    """Referencia a un archivo dentro de un snapshot."""
     snapshot_id: str
     table_name: str
     file_path: str
@@ -31,178 +43,164 @@ class ArtifactRef:
     row_count: int | None = None
 
 
-@dataclass
+@dataclass(frozen=True)
 class SnapshotManifest:
-    """Manifiesto inmutable de un snapshot del DW."""
     snapshot_id: str
     version: str
     source: str
     timestamp: str
-    artifacts: list[ArtifactRef] = field(default_factory=list)
+    artifacts: tuple[ArtifactRef, ...] = ()
 
-    def get_artifact(self, table_name: str) -> ArtifactRef | None:
-        for a in self.artifacts:
-            if a.table_name == table_name:
-                return a
-        return None
+    def get_artifact(self, table_name):
+        return next((a for a in self.artifacts if a.table_name == table_name), None)
 
 
-# ── Verificación de integridad ────────────────────────────────────────────────
-
-def _sha256_file(path: Path) -> str:
+def _sha256_file(path):
     h = hashlib.sha256()
-    with open(path, "rb") as f:
-        for bloque in iter(lambda: f.read(1 << 20), b""):
-            h.update(bloque)
+    with open_regular(path) as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            h.update(block)
     return h.hexdigest()
 
 
-def _verificar_artifact(path: Path, ref: ArtifactRef) -> None:
-    """Verifica tamaño y SHA-256. Lanza ValueError si no coinciden."""
-    size_real = path.stat().st_size
-    if size_real != ref.size_bytes:
-        raise ValueError(
-            f"Tamaño incorrecto en '{path.name}': "
-            f"esperado {ref.size_bytes} bytes, obtenido {size_real} bytes. "
-            f"Copia rechazada."
-        )
-    sha_real = _sha256_file(path)
-    if sha_real != ref.sha256:
-        raise ValueError(
-            f"SHA-256 incorrecto en '{path.name}': "
-            f"esperado {ref.sha256}, obtenido {sha_real}. "
-            f"Copia rechazada — el archivo puede estar corrupto o modificado."
-        )
+def _verificar_artifact(path, ref):
+    if path.stat().st_size != ref.size_bytes:
+        raise ValueError("Tamaño incorrecto. Copia rechazada.")
+    if _sha256_file(path) != ref.sha256:
+        raise ValueError("SHA-256 incorrecto. Copia rechazada.")
 
 
-# ── Cliente principal ─────────────────────────────────────────────────────────
+def _validate_ref(ref, maximum):
+    if not isinstance(ref, ArtifactRef):
+        raise ValueError("Referencia de artefacto inválida.")
+    identifier(ref.snapshot_id)
+    identifier(ref.table_name)
+    relative_path(ref.file_path)
+    digest(ref.sha256)
+    unsigned_integer(ref.size_bytes, maximum=maximum)
+    if ref.row_count is not None:
+        unsigned_integer(ref.row_count, maximum=2**63 - 1)
+
 
 class SnapshotClient:
-    """
-    Cliente que accede a los snapshots del DW de Jhair.
+    def __init__(self, base_dir, *, max_artifact_bytes=MAX_ARTIFACT_BYTES):
+        self.base_dir = Path(base_dir).resolve()
+        self.max_artifact_bytes = unsigned_integer(max_artifact_bytes, maximum=MAX_ARTIFACT_BYTES)
+        self._pinned = {}
 
-    En producción, 'base_dir' apunta a la carpeta compartida en la VM
-    donde Jhair publica los snapshots exportados como Parquet + manifiesto JSON.
-    """
-
-    def __init__(self, base_dir: Path) -> None:
-        self.base_dir = Path(base_dir)
-
-    def get_snapshot(self, snapshot_id: str) -> SnapshotManifest:
-        """
-        Pide el manifiesto de un snapshot concreto.
-        Lanza FileNotFoundError si el snapshot no existe.
-        Lanza ValueError si el manifiesto está malformado o mezcla versiones.
-        """
-        manifiesto_path = self.base_dir / snapshot_id / "manifest.json"
-        if not manifiesto_path.exists():
-            raise FileNotFoundError(
-                f"Snapshot '{snapshot_id}' no encontrado en {self.base_dir}. "
-                f"Verifica con Jhair que el snapshot fue publicado."
+    def get_snapshot(self, snapshot_id):
+        identifier(snapshot_id)
+        if snapshot_id in self._pinned:
+            return self._pinned[snapshot_id]
+        if not self.base_dir.exists():
+            raise FileNotFoundError(f"Snapshot '{snapshot_id}' no encontrado.")
+        path = confined(self.base_dir, f"{snapshot_id}/manifest.json")
+        if not path.exists():
+            raise FileNotFoundError(f"Snapshot '{snapshot_id}' no encontrado.")
+        data = read_json(path)
+        required = {"snapshot_id", "version", "source", "timestamp", "artifacts"}
+        if (
+            not isinstance(data, dict)
+            or not required <= data.keys()
+            or (data.keys() - required - {"producer_job_id"})
+        ):
+            raise ValueError("Manifiesto inválido.")
+        if data["snapshot_id"] != snapshot_id:
+            raise ValueError("Identidad de snapshot incompatible.")
+        version = identifier(data["version"])
+        source, timestamp = data["source"], data["timestamp"]
+        if (
+            not isinstance(source, str)
+            or not 1 <= len(source) <= 256
+            or any(ord(c) < 32 for c in source)
+        ):
+            raise ValueError("Fuente inválida.")
+        if not isinstance(timestamp, str) or len(timestamp) > 64:
+            raise ValueError("Timestamp inválido.")
+        try:
+            parsed = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise ValueError("Timestamp inválido.") from exc
+        if parsed.tzinfo is None:
+            raise ValueError("Timestamp sin zona horaria.")
+        entries = data["artifacts"]
+        if not isinstance(entries, list) or not 1 <= len(entries) <= MAX_ARTIFACTS:
+            raise ValueError("Inventario vacío o demasiado grande.")
+        artifacts = []
+        names, paths = set(), set()
+        for entry in entries:
+            fields = {"table_name", "file_path", "size_bytes", "sha256"}
+            if (
+                not isinstance(entry, dict)
+                or not fields <= entry.keys()
+                or (entry.keys() - fields - {"row_count", "version"})
+            ):
+                raise ValueError("Entrada de inventario inválida.")
+            if entry.get("version", version) != version:
+                raise ValueError("El snapshot mezcla versiones.")
+            ref = ArtifactRef(
+                snapshot_id,
+                entry["table_name"],
+                entry["file_path"],
+                entry["size_bytes"],
+                entry["sha256"],
+                entry.get("row_count"),
             )
+            _validate_ref(ref, self.max_artifact_bytes)
+            if ref.table_name in names or ref.file_path.casefold() in paths:
+                raise ValueError("Tablas o archivos duplicados.")
+            names.add(ref.table_name)
+            paths.add(ref.file_path.casefold())
+            confined(self.base_dir, f"{snapshot_id}/{ref.file_path}")
+            artifacts.append(ref)
+        manifest = SnapshotManifest(snapshot_id, version, source, timestamp, tuple(artifacts))
+        self._pinned[snapshot_id] = manifest
+        return manifest
 
-        with open(manifiesto_path, encoding="utf-8-sig") as f:
-            data = json.load(f)
-
-        # Validar que todas las tablas son de la misma versión
-        versiones = {a.get("version", data.get("version")) for a in data.get("artifacts", [])}
-        versiones.discard(None)
-        if len(versiones) > 1:
-            raise ValueError(
-                f"El snapshot '{snapshot_id}' mezcla versiones: {versiones}. "
-                f"Todas las tablas deben ser de la misma versión."
-            )
-
-        artifacts = [
-            ArtifactRef(
-                snapshot_id=snapshot_id,
-                table_name=a["table_name"],
-                file_path=a["file_path"],
-                size_bytes=a["size_bytes"],
-                sha256=a["sha256"],
-                row_count=a.get("row_count"),
-            )
-            for a in data.get("artifacts", [])
-        ]
-
-        return SnapshotManifest(
-            snapshot_id=snapshot_id,
-            version=data.get("version", ""),
-            source=data.get("source", ""),
-            timestamp=data.get("timestamp", ""),
-            artifacts=artifacts,
-        )
-
-    def list_snapshots(self) -> list[str]:
-        """
-        Lista todas las versiones de snapshot disponibles, ordenadas de más
-        reciente a más antigua (orden lexicográfico descendente del snapshot_id).
-        Solo incluye directorios que tengan un manifest.json válido.
-        """
+    def list_snapshots(self):
         if not self.base_dir.exists():
             return []
-        return sorted(
-            [d.name for d in self.base_dir.iterdir()
-             if d.is_dir() and (d / "manifest.json").exists()],
-            reverse=True,
-        )
+        snapshots = []
+        for directory in self.base_dir.iterdir():
+            try:
+                self.get_snapshot(directory.name)
+            except (ValueError, FileNotFoundError, NotADirectoryError):
+                continue
+            snapshots.append(directory.name)
+        return sorted(snapshots, reverse=True)
 
-    def download_artifact(self, ref: ArtifactRef, destino: Path) -> Path:
-        """
-        Descarga un archivo del snapshot y verifica tamaño + SHA-256.
-        Rechaza la copia si no coinciden con el inventario de Jhair.
-        Devuelve la ruta local del archivo verificado.
-        """
-        origen = self.base_dir / ref.snapshot_id / ref.file_path
-        if not origen.exists():
-            raise FileNotFoundError(
-                f"Archivo '{ref.file_path}' no encontrado en el snapshot '{ref.snapshot_id}'."
-            )
-
-        destino = Path(destino)
-        destino.mkdir(parents=True, exist_ok=True)
-        archivo_local = destino / Path(ref.file_path).name
-
-        shutil.copy2(origen, archivo_local)
-
-        # Verificar integridad — rechaza si no coincide
+    def download_artifact(self, ref, destino):
+        _validate_ref(ref, self.max_artifact_bytes)
+        if ref not in self.get_snapshot(ref.snapshot_id).artifacts:
+            raise ValueError("Referencia ajena al inventario fijado.")
+        source = confined(self.base_dir, f"{ref.snapshot_id}/{ref.file_path}")
+        destination = Path(destino)
+        if destination.is_symlink():
+            raise ValueError("No se permiten enlaces en el destino.")
+        destination.mkdir(parents=True, exist_ok=True)
+        final = confined(destination, relative_path(ref.file_path).name)
+        if final.exists():
+            _verificar_artifact(final, ref)
+            return final
+        fd, temporary = tempfile.mkstemp(prefix=".download-", dir=destination)
         try:
-            _verificar_artifact(archivo_local, ref)
-        except ValueError:
-            archivo_local.unlink(missing_ok=True)
-            raise
-
-        print(f"OK  {ref.table_name}: {archivo_local.name} ({ref.size_bytes:,} bytes, SHA-256 verificado)")
-        return archivo_local
-
-
-# ── Uso de ejemplo ────────────────────────────────────────────────────────────
-
-if __name__ == "__main__":
-    import sys
-    sys.stdout.reconfigure(encoding="utf-8")
-
-    # Apunta a la carpeta de snapshots publicados por Jhair en la VM
-    # En produccion: base_dir = Path("/home/ubuntu/datos/snapshots")
-    base_dir = Path(__file__).parent / "snapshots_prueba"
-
-    client = SnapshotClient(base_dir=base_dir)
-
-    try:
-        manifiesto = client.get_snapshot("20231001")
-        print(f"Snapshot : {manifiesto.snapshot_id}")
-        print(f"Version  : {manifiesto.version}")
-        print(f"Fuente   : {manifiesto.source}")
-        print(f"Timestamp: {manifiesto.timestamp}")
-        print(f"Tablas   : {[a.table_name for a in manifiesto.artifacts]}")
-
-        destino = Path(__file__).parent / "descargados"
-        for artifact in manifiesto.artifacts:
-            client.download_artifact(artifact, destino)
-
-        print("\nTodas las tablas descargadas y verificadas correctamente.")
-
-    except FileNotFoundError as e:
-        print(f"ERROR: {e}")
-    except ValueError as e:
-        print(f"RECHAZO: {e}")
+            with os.fdopen(fd, "wb") as output, open_regular(source) as stream:
+                remaining = ref.size_bytes
+                h = hashlib.sha256()
+                while remaining:
+                    block = stream.read(min(1024 * 1024, remaining))
+                    if not block:
+                        raise ValueError("Tamaño incorrecto. Copia rechazada.")
+                    output.write(block)
+                    h.update(block)
+                    remaining -= len(block)
+                if stream.read(1):
+                    raise ValueError("Tamaño incorrecto. Copia rechazada.")
+                if h.hexdigest() != ref.sha256:
+                    raise ValueError("SHA-256 incorrecto. Copia rechazada.")
+                output.flush()
+                os.fsync(output.fileno())
+            os.link(temporary, final)
+            return final
+        finally:
+            Path(temporary).unlink(missing_ok=True)

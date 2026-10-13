@@ -221,7 +221,8 @@ class TimestampPolicy(FrozenModel):
             fail("naive_timestamp", "policy rejects timestamps without offset", field, "value")
         if self.naive == "preserve":
             return value.nanoseconds(instant=False)
-        assert self.timezone is not None
+        if not (self.timezone is not None):
+            raise AssertionError("Internal invariant check failed.")
         choices = [value.in_zone(self.timezone, fold=fold) for fold in (0, 1)]
         try:
             valid = [
@@ -339,7 +340,8 @@ class ColumnSpec(FrozenModel):
                     "temporal_policy",
                 )
             if isinstance(self.logical_type, TimestampType):
-                assert isinstance(self.temporal_policy, TimestampPolicy)
+                if not (isinstance(self.temporal_policy, TimestampPolicy)):
+                    raise AssertionError("Internal invariant check failed.")
                 if self.logical_type.timezone != self.temporal_policy.timezone:
                     fail(
                         "temporal_zone",
@@ -387,7 +389,8 @@ class ColumnSpec(FrozenModel):
                 fail("integer_range", "literal exceeds integer width/sign", *location, "value")
         if isinstance(self.logical_type, DecimalType) and value.kind == "decimal":
             parts = value.value.as_tuple()
-            assert isinstance(parts.exponent, int)
+            if not (isinstance(parts.exponent, int)):
+                raise AssertionError("Internal invariant check failed.")
             if parts.exponent < -self.logical_type.scale:
                 fail(
                     "decimal_literal_scale",

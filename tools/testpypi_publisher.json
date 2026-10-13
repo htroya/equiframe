@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "project_name": "equiframe",
+  "owner": "htroya",
+  "repository": "equiframe",
+  "workflow_filename": "publish-testpypi.yml",
+  "environment_name": "testpypi",
+  "mode": "configuration_only",
+  "publication_enabled": false
+}

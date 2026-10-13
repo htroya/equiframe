@@ -614,7 +614,8 @@ def _verify_model(model: FrozenFamilyModel, definition: FreezeDefinition) -> Non
     _selected(model, definition, calibration=False)
     _selected(model, definition, calibration=True)
     if model.audit is not None:
-        assert model.training is not None and model.calibration is not None
+        if not (model.training is not None and model.calibration is not None):
+            raise AssertionError("Internal invariant check failed.")
         actual_audit = audit_detector_selections(
             model.training,
             model.calibration,
@@ -626,7 +627,10 @@ def _verify_model(model: FrozenFamilyModel, definition: FreezeDefinition) -> Non
             raise ValueError("group support audit differs from actual selections")
     if model.bundle is None:
         return
-    assert model.training is not None and model.calibration is not None and model.audit is not None
+    if not (
+        model.training is not None and model.calibration is not None and model.audit is not None
+    ):
+        raise AssertionError("Internal invariant check failed.")
     if model.audit.state != "eligible":
         raise ValueError("a detector bundle cannot bypass insufficient group support")
     fit = model.bundle.fit

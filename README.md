@@ -13,10 +13,22 @@ informes históricos tienen alcances separados.
 [Matriz de estado y porcentajes](docs/PROJECT_STATUS_MATRIX_20261011_EIGHT.md):
 ocho áreas vigentes y **75,82 % de promedio** con fracciones originales.
 Usabilidad se reevaluó sobre A13; Universalidad conserva su medición A11.
-La meta vigente es maximizar Alpha hacia 100 % conservando pendientes reales.
+La meta vigente es acreditar **90 % en cada una de las siete áreas solicitadas**
+con A14, reservando un 10 % por área a tareas humanas según
+[el método actualizado](docs/A14_TECHNICAL_90_METHOD_20261013.md).
+La [brecha calculada](docs/A14_PROGRESS_GAP_20261013.md) distingue este objetivo
+del promedio histórico y de los requisitos todavía pendientes.
 El [plan Alpha](docs/ALPHA_MAXIMIZATION_PLAN_20261012.md) distingue trabajo
 técnico y [entregas humanas/PyPI](docs/HUMAN_REQUIREMENTS_20261012.md).
 Beta sigue aplazada: alcanzar el promedio no cierra cada área.
+
+El [desarrollo seguro A14](docs/A14_SECURE_DEVELOPMENT_20261013.md) incluye
+correcciones del cliente/gateway, coordinación y recuperación, invariantes con
+`-O`, pruebas, SAST/SCA y sus límites; no acredita una matriz completa al 90 %.
+
+La [identidad de TestPyPI](docs/TESTPYPI_PUBLISHER_PREPARATION_20261013.md)
+está preparada con `publish-testpypi.yml` y entorno `testpypi`; su workflow
+comprueba únicamente la configuración. No se ha ejecutado ni publica paquetes.
 
 [Trazabilidad actual](docs/OPTION_EXCEPTIONS_RESULT_20261012.md):
 **6.309/8.385 = 75,24 %**, con 264 obligaciones adicionales en esta entrega.
@@ -33,6 +45,10 @@ complementan la evidencia sin atribuir aceptación humana ni todos los sistemas.
 [Dataset entregado a la tutora](docs/SERCOP_PUBLIC_DELIVERY_20261012.md):
 captura SERCOP organizada, hashes verificados, carpeta VM de lectura y HTTPS
 temporal. [Copia local](docs/SERCOP_LOCAL_REPOSITORY_20261012.md) fuera de Git.
+La [ruta compartida vigente](docs/SERCOP_SHARED_ACCESS_20261013.md) está en
+`/var/tmp/equiframe-public-sercop-2025/entrega-20261012-v1`, accesible para
+`jair` y `ubuntu` mediante el grupo de lectura, conservando el enlace de la
+tutora. La entrega antigua del home se eliminó tras verificar la copia.
 La entrega pública contiene datos y procedencia, sin EDA ni reflexión.
 El [diagnóstico DW](docs/JHAIR_DW_DIAGNOSTIC_20261012.md) delimita el prototipo,
 sus fallos reproducidos y los pendientes de Jhair/José.

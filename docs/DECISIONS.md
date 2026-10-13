@@ -607,3 +607,39 @@ El código nuevo usa candidato privado A14 y conserva A13/fixtures históricos.
 
 Es una decisión de ingeniería y diagnóstico exploratorio; no cambia hipótesis,
 splits, etiquetas, soportes ni resultados científicos. Beta sigue aplazada.
+
+## Desarrollo seguro y objetivo técnico A14 — 2026-10-13
+
+El propietario autoriza corregir el cliente de datos, la coordinación y el
+gateway aportados por el equipo, conservar Alpha A14 y preparar la identidad
+de TestPyPI. Prohíbe usar Codex Security y abrir agentes sin consulta; el trabajo
+se realiza directamente con código, pruebas, Ruff/Bandit y pip-audit.
+
+Se fijan validación acotada de manifiestos/cargas, confinamiento de rutas,
+rechazo de enlaces, comprobación de hashes, publicación atómica y bloqueo de
+escritor con recuperación. El gateway exige tokens separados por rol,
+configuración externa, HTTPS y respuestas genéricas; no se despliega todavía
+esta nueva autenticación. El puente opcional al núcleo mantiene independiente
+el contrato genérico y no acredita aceptación del DW o del servicio real.
+
+Las comprobaciones internas antes escritas como `assert` pasan a controles
+explícitos para conservarse con Python `-O`. Esto cambia la huella del módulo
+de reglas; se regenera el catálogo técnico vigente con el generador existente.
+Los recibos, candidatos y experimentos históricos conservan sus huellas.
+No se cambian los esperados independientes ni los algoritmos R/M/B/H/O.
+Se sincronizan cuatro esquemas técnicos del benchmark cuyo valor por defecto
+y enumeración de productor aún omitían A14, aunque el código ya lo admitía.
+Se conserva la admisión de A13 y los activos experimentales congelados.
+
+El mínimo Arrow pasa a 23.0.1 conservando el techo 26 y la resolución 25.0.1
+existente. Responde a CVE-2026-25087 en la biblioteca C++; su API afectada no
+está expuesta por Python. Los artefactos construidos antes de este ajuste no
+se presentan como artefactos del nuevo metadato. No se reconstruye ni publica
+para TestPyPI mientras esa fase continúe excluida por el propietario.
+
+La regla prospectiva por área es `90 × fracción técnica + 10 × fracción humana`,
+con controles fallidos/ausentes pendientes. Se conserva el promedio histórico
+75,82 % de ocho indicadores y se distingue el promedio 73,56 % de los siete
+solicitados. El reparto no acredita ciencia ni convierte obligaciones técnicas
+sin ejecutar en tareas humanas. Véase
+[el método A14](A14_TECHNICAL_90_METHOD_20261013.md).

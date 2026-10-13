@@ -139,7 +139,8 @@ def _expression(expression: Expression, columns: tuple[IRColumn, ...]) -> str:
         operand = expression_type(expression.left, columns).logical_type
         if expression.operation == "multiply" and isinstance(operand, DecimalType):
             right_type = expression_type(expression.right, columns).logical_type
-            assert isinstance(right_type, DecimalType)
+            if not (isinstance(right_type, DecimalType)):
+                raise AssertionError("Internal invariant check failed.")
             # Widen before multiplication: DuckDB otherwise uses a DECIMAL(18)
             # intermediate for <=18-digit operands even when the outer cast is
             # DECIMAL(38). Preserve each original scale during promotion.

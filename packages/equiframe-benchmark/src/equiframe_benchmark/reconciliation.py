@@ -106,7 +106,8 @@ def _exact_sum(values: list[Decimal]) -> str:
     total = 0
     for value in values:
         sign, digits, exponent = value.as_tuple()
-        assert isinstance(exponent, int)
+        if not (isinstance(exponent, int)):
+            raise AssertionError("Internal invariant check failed.")
         coefficient = int("".join(map(str, digits)))
         total += (-coefficient if sign else coefficient) * 10 ** (exponent - scale)
     digits = tuple(map(int, str(abs(total))))

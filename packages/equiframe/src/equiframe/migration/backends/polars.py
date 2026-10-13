@@ -208,7 +208,8 @@ def _check_localizations(
         if not isinstance(item, LocalizeTimestamp):
             continue
         dtype = expression_type(item.argument, columns).logical_type
-        assert isinstance(dtype, TimestampType)
+        if not (isinstance(dtype, TimestampType)):
+            raise AssertionError("Internal invariant check failed.")
         before = _expression(item.argument, columns).cast(pl.Int64)
         after = _expression(item, columns).cast(pl.Int64)
         # Decimal(38,0) subtraction is native and wide enough for the full
@@ -268,7 +269,8 @@ def _aggregate(frame: pl.DataFrame, node: Aggregate, validated: ValidatedIR) -> 
         if measure.operation == "count_rows":
             result = pl.len()
         else:
-            assert measure.column is not None
+            if not (measure.column is not None):
+                raise AssertionError("Internal invariant check failed.")
             column = _column(measure.column, names)
             if measure.operation == "count_valid":
                 result = column.count()

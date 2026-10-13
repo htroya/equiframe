@@ -35,7 +35,8 @@ def test_frozen_catalog_has_exact_reviewable_identity():
 def test_frozen_metadata_case(case):
     receipt = trace.execute_case(case, CATALOG["seeds"], ef)
     if case["id"] == "DetectorVersions.equiframe.default" and ef.__version__ in (
-        "0.12.0a13", "0.12.0a14",
+        "0.12.0a13",
+        "0.12.0a14",
     ):
         # The immutable A12 catalog describes the A11 default in the old wheel.
         # A13 fixes producer identity; A14 emits its own current identity.

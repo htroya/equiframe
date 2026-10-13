@@ -18,13 +18,13 @@ Documentation = "https://github.com/htroya/equiframe/blob/main/packages/equifram
 
 [project.optional-dependencies]
 ml = ["scikit-learn>=1.7,<1.10", "numpy>=2,<3"]
-arrow = ["pyarrow>=20,<26"]
-pandas = ["pandas>=2.2,<4", "pyarrow>=20,<26"]
-polars = ["polars>=1.30,<2", "pyarrow>=20,<26"]
-duckdb = ["duckdb>=1.5.6,<2", "pyarrow>=20,<26"]
-engines = ["pandas>=2.2,<4", "polars>=1.30,<2", "duckdb>=1.5.6,<2", "pyarrow>=20,<26"]
-eda = ["duckdb>=1.5.6,<2", "pyarrow>=20,<26"]
-eda-charts = ["duckdb>=1.5.6,<2", "pyarrow>=20,<26", "plotly>=6.3,<8"]
+arrow = ["pyarrow>=23.0.1,<26"]
+pandas = ["pandas>=2.2,<4", "pyarrow>=23.0.1,<26"]
+polars = ["polars>=1.30,<2", "pyarrow>=23.0.1,<26"]
+duckdb = ["duckdb>=1.5.6,<2", "pyarrow>=23.0.1,<26"]
+engines = ["pandas>=2.2,<4", "polars>=1.30,<2", "duckdb>=1.5.6,<2", "pyarrow>=23.0.1,<26"]
+eda = ["duckdb>=1.5.6,<2", "pyarrow>=23.0.1,<26"]
+eda-charts = ["duckdb>=1.5.6,<2", "pyarrow>=23.0.1,<26", "plotly>=6.3,<8"]
 
 [project.scripts]
 equiframe = "equiframe.cli:main"

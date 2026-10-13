@@ -151,7 +151,8 @@ def fit_detectors(
         m = _unavailable("isolation_forest", reason)
         b = _unavailable("mad", reason)
     else:
-        assert matrix is not None
+        if not (matrix is not None):
+            raise AssertionError("Internal invariant check failed.")
         columns = tuple(zip(*matrix.values, strict=True))
         medians = tuple(_median(c) for c in columns)
         deviations = tuple(
@@ -189,14 +190,16 @@ def _forest_score(model: DetectorModel, row: tuple[float, ...]) -> float:
         index = depth = 0
         node = tree.nodes[index]
         while node.left is not None:
-            assert (
+            if not (
                 node.feature is not None and node.threshold is not None and node.right is not None
-            )
+            ):
+                raise AssertionError("Internal invariant check failed.")
             index = node.left if row[node.feature] <= node.threshold else node.right
             depth += 1
             node = tree.nodes[index]
         total += depth + _average_path(node.samples)
-    assert model.effective_samples is not None
+    if not (model.effective_samples is not None):
+        raise AssertionError("Internal invariant check failed.")
     return float(2 ** (-total / (len(model.trees) * _average_path(model.effective_samples))))
 
 
@@ -229,7 +232,8 @@ def _inference_matrix(
 def _score_model(model: DetectorModel, matrix: FeatureMatrix | None) -> DetectorScores:
     if model.state == "not_estimable":
         return DetectorScores(state="not_estimable", reason=model.reason)
-    assert matrix is not None
+    if not (matrix is not None):
+        raise AssertionError("Internal invariant check failed.")
     scorer = _forest_score if model.method == "isolation_forest" else _mad_score
     return DetectorScores(state="scored", values=tuple(scorer(model, row) for row in matrix.values))
 
@@ -305,7 +309,8 @@ def _decisions(
                 )
             )
             continue
-        assert isinstance(calibrated.threshold, float) and score is not None
+        if not (isinstance(calibrated.threshold, float) and score is not None):
+            raise AssertionError("Internal invariant check failed.")
         rows.append(
             DetectorDecision(
                 result=ComponentDecision(

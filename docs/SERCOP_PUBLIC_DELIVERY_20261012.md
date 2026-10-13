@@ -1,5 +1,11 @@
 # Dataset SERCOP 2025 entregado para consulta
 
+**Actualización 13 de octubre:** la [ruta compartida y el origen HTTPS](SERCOP_SHARED_ACCESS_20261013.md)
+ahora usan `/var/tmp/equiframe-public-sercop-2025/entrega-20261012-v1`.
+El enlace de la tutora se conservó y la entrega antigua del home se eliminó
+después de verificar la copia y los 286 enlaces. El recibo del 12 de octubre
+siguiente conserva su corte histórico.
+
 La [carpeta pública](https://garlic-comments-semiconductor-assume.trycloudflare.com/)
 permite leer/descargar los datos sin cuenta. La entrega permanece en
 `/home/hernan/public-sercop-2025/entrega-20261012-v1`, con archivos 0444 y

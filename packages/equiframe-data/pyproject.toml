@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling==1.28.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "equiframe-data"
+version = "0.1.0a14"
+description = "Private immutable snapshots and coordinated data jobs for EquiFrame"
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+classifiers = ["Development Status :: 3 - Alpha"]
+
+[project.optional-dependencies]
+core = ["equiframe[arrow]==0.12.0a14"]
+etl = ["polars>=1.30,<2"]
+
+[tool.hatch.build.targets.wheel]
+packages = []
+
+[tool.hatch.build.targets.wheel.force-include]
+"__init__.py" = "equiframe_data/__init__.py"
+"snapshot_client.py" = "equiframe_data/snapshot_client.py"
+"job_manager.py" = "equiframe_data/job_manager.py"
+"safe_io.py" = "equiframe_data/safe_io.py"
+"core_adapter.py" = "equiframe_data/core_adapter.py"
+"etl" = "equiframe_data/etl"
+
+[tool.hatch.build.targets.sdist]
+include = ["/*.py", "/etl", "/tests", "/pyproject.toml", "/README.md"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]

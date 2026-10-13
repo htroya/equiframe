@@ -4,6 +4,13 @@ Versiones candidatas actuales: `equiframe 0.12.0a14` y `equiframe-benchmark 0.12
 paquete](../packages/equiframe/README.md) contiene instalación, comandos y un
 ejemplo Python ejecutable. Las secciones por versión conservan la evolución de la API. La aceptación del servicio real, la evaluación científica y la comprobación final de las distribuciones actuales conservan sus controles propios.
 
+El [cliente opcional A14](../packages/equiframe-data/README.md) implementa un
+almacén local de snapshots verificados y un puente al `SnapshotClient` del
+núcleo mediante un manifiesto de esquema independiente. El
+[gateway privado](../services/data-gateway/README.md) añade autenticación y
+trabajos sobre ese componente; su implementación no acredita un despliegue,
+el DW ni toda la API de transporte propuesta para el equipo.
+
 El alcance científico principal comprende `nulls_types`, `joins` y `aggregations`
 en las parejas Pandas–Polars, Pandas–DuckDB y Polars–DuckDB: nueve estratos. El
 software conserva además `duplicates_order` y `dates` como capacidades genéricas.

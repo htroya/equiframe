@@ -294,9 +294,11 @@ def _validate_difference(difference: ComparisonDifference, result: ComparisonRes
         else:
             _require(d.column in names, "schema column is not declared")
         return
-    assert d.side is not None
+    if not (d.side is not None):
+        raise AssertionError("Internal invariant check failed.")
     _require(d.position is not None, "contract evidence requires a row position")
-    assert d.position is not None
+    if not (d.position is not None):
+        raise AssertionError("Internal invariant check failed.")
     # Ingest emits violations before incrementing its row count. Interruption
     # can retain a violation at exactly the next observed position.
     _require(
@@ -388,7 +390,8 @@ def inspect_evidence(
                 continue
             a, b = difference.position, difference.other_position
             if difference.code == "cell_value":
-                assert a is not None and b is not None and difference.column is not None
+                if not (a is not None and b is not None and difference.column is not None):
+                    raise AssertionError("Internal invariant check failed.")
                 cell = (a, b, difference.column)
                 _require(cell not in cells, "duplicate aligned cell evidence")
                 cells.add(cell)
@@ -510,7 +513,8 @@ def export_reproduction(
         result.left is not None and result.right is not None,
         "reproduction requires both captured outputs",
     )
-    assert result.left is not None and result.right is not None
+    if not (result.left is not None and result.right is not None):
+        raise AssertionError("Internal invariant check failed.")
     _require(
         result.left.execution is None and result.right.execution is None,
         "execution-backed sources require their independent execution context; export unsupported",
