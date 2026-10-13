@@ -133,6 +133,20 @@ class SnapshotClient:
             artifacts=artifacts,
         )
 
+    def list_snapshots(self) -> list[str]:
+        """
+        Lista todas las versiones de snapshot disponibles, ordenadas de más
+        reciente a más antigua (orden lexicográfico descendente del snapshot_id).
+        Solo incluye directorios que tengan un manifest.json válido.
+        """
+        if not self.base_dir.exists():
+            return []
+        return sorted(
+            [d.name for d in self.base_dir.iterdir()
+             if d.is_dir() and (d / "manifest.json").exists()],
+            reverse=True,
+        )
+
     def download_artifact(self, ref: ArtifactRef, destino: Path) -> Path:
         """
         Descarga un archivo del snapshot y verifica tamaño + SHA-256.
