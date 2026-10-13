@@ -12,8 +12,8 @@
     },
     {
       "file": "equiframe-0.12.0a14.tar.gz",
-      "bytes": 1558889,
-      "sha256": "db8703f2a4b56ef736845476e49c2b239f176606f3e1bc4d4716afd022fb2e52"
+      "bytes": 1558866,
+      "sha256": "a146f9790e8d29a39c0d6ca8c234b2c9e3fbff1ef4cef522ba26c29c61004722"
     },
     {
       "file": "equiframe_benchmark-0.12.0a14-py3-none-any.whl",
@@ -22,8 +22,8 @@
     },
     {
       "file": "equiframe_benchmark-0.12.0a14.tar.gz",
-      "bytes": 434326,
-      "sha256": "999a915fe3b1ef275c325a1d0b4228c532184fcd9016e4b5b1a2e8eb553d0051"
+      "bytes": 434310,
+      "sha256": "d21d59c2a495de2ef3d608f864d4af7d92a185a4ec3d978b7441d6b25528e82b"
     }
   ],
   "source_pins": [
@@ -538,5 +538,176 @@
     "Full aggregates are distinct from bounded examples/visual samples; exact money sums/discrete quantiles and approximate float charts are labelled",
     "EDA cannot establish equality/correctness/fraud or authorize DW publication; no detector fit, labels or source cleaning",
     "Year selector 2025 is retrospective source selection, not a scientifically accepted cohort"
-  ]
+  ],
+  "code_and_tests_commit": "57850aac819ab45a90ce69284f7e200ca0d9c332",
+  "implementation_started_date_local": "2026-10-12",
+  "delivery_checks_completed_date_local": "2026-10-13",
+  "prior_local_build_artifacts": [
+    {
+      "file": "equiframe-0.12.0a14-py3-none-any.whl",
+      "bytes": 490819,
+      "sha256": "211d09a429aaebadc51bb64f7d95931e6d08a9a5c502e14bb48c941c0eae7a93"
+    },
+    {
+      "file": "equiframe-0.12.0a14.tar.gz",
+      "bytes": 1558889,
+      "sha256": "db8703f2a4b56ef736845476e49c2b239f176606f3e1bc4d4716afd022fb2e52"
+    },
+    {
+      "file": "equiframe_benchmark-0.12.0a14-py3-none-any.whl",
+      "bytes": 127142,
+      "sha256": "06f6f3e98a497b7f625b40d808c468bfe9f080b826c937062e7230f4cb88c2ce"
+    },
+    {
+      "file": "equiframe_benchmark-0.12.0a14.tar.gz",
+      "bytes": 434326,
+      "sha256": "999a915fe3b1ef275c325a1d0b4228c532184fcd9016e4b5b1a2e8eb553d0051"
+    }
+  ],
+  "git_source_build": {
+    "status": "PASS",
+    "commands": [
+      {
+        "package": "equiframe",
+        "exit_code": 0
+      },
+      {
+        "package": "equiframe-benchmark",
+        "exit_code": 0
+      }
+    ],
+    "wheels": [
+      {
+        "file": "equiframe-0.12.0a14-py3-none-any.whl",
+        "sha256": "211d09a429aaebadc51bb64f7d95931e6d08a9a5c502e14bb48c941c0eae7a93",
+        "identical_to_installed_wheel": true
+      },
+      {
+        "file": "equiframe_benchmark-0.12.0a14-py3-none-any.whl",
+        "sha256": "06f6f3e98a497b7f625b40d808c468bfe9f080b826c937062e7230f4cb88c2ce",
+        "identical_to_installed_wheel": true
+      }
+    ],
+    "all_629_sdist_source_members_match_git": true,
+    "ancestor_gitignore_bound_to_repository_file": true,
+    "source_check_sha256": "6672de2a39e718f5a4dbe260eaa45529542aff074ad438688146139f3e628b9b",
+    "wheels_identical_to_all_installed_and_tested_artifacts": true,
+    "alignment_reason": "Original local source export differed from Git only by CRLF in the vendored upstream license and ancestor .gitignore metadata. New sdists use exact Git bytes; upstream license text and runtime wheels are unchanged. Earlier exports remain preserved."
+  },
+  "offline_distribution_audit": {
+    "source": "tools/pypi_candidate_a14.json",
+    "source_sha256": "31ba467c50e5bf7cbc428aa4720d725a825bd723d073e9e81ab0e4ed457e5ba3",
+    "artifacts_verified": true,
+    "publication_ready": false,
+    "published": false,
+    "upload_available": false,
+    "private_packet_sha256": "630ef8993294948dd24423706b8d4f0ed537e41666e1ca2a854ebb7e85e3f0e2"
+  },
+  "documentation": {
+    "status": "PASS",
+    "documents": 83,
+    "local_destinations": 736,
+    "anchors": 19,
+    "live_and_historical_candidates_checked_separately": true
+  },
+  "root_final_delta": {
+    "passed": 28,
+    "failed": 0,
+    "includes_seventeen_documentation_tool_cases": true
+  },
+  "vm_cleanup": {
+    "status": "PASS",
+    "remote_custody_sha256": "6c6bc079bd2599707b664aba149bff611f7a2118e8ce3d032abad8dbd65e4066",
+    "local_full_readback_already_confirmed": true,
+    "removed": [
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-v1/sources",
+        "allocated_bytes": 15904768
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-v1/core-temp",
+        "allocated_bytes": 385101824
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-v1/core-cache",
+        "allocated_bytes": 913408
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-v1/bench-temp",
+        "allocated_bytes": 94441472
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-v1/bench-cache",
+        "allocated_bytes": 90112
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-v1/optimized-temp",
+        "allocated_bytes": 25505792
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-v1/optimized-cache",
+        "allocated_bytes": 28672
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-final-v2/sources",
+        "allocated_bytes": 12931072
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-final-v2/test-temp",
+        "allocated_bytes": 28549120
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-final-v2/test-cache",
+        "allocated_bytes": 36864
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-final-v2/opt-temp",
+        "allocated_bytes": 25563136
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-final-v2/opt-cache",
+        "allocated_bytes": 28672
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-final-v3/sources",
+        "allocated_bytes": 12931072
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-final-v3/bench-temp",
+        "allocated_bytes": 26443776
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-final-v3/bench-cache",
+        "allocated_bytes": 36864
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-final-v3/test-temp",
+        "allocated_bytes": 28712960
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-final-v3/test-cache",
+        "allocated_bytes": 36864
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-final-v3/opt-temp",
+        "allocated_bytes": 25726976
+      },
+      {
+        "path": "/home/hernan/equiframe-alpha-a14-20261013-final-v3/opt-cache",
+        "allocated_bytes": 28672
+      }
+    ],
+    "free_before": 31721340928,
+    "free_after": 32404795392,
+    "freed_bytes": 683454464,
+    "preserved": [
+      "current A14 runtime",
+      "all artifact attempts",
+      "all raw logs and JUnit",
+      "custody archives",
+      "private real EDA runs",
+      "public teacher dataset and services",
+      "original A13 backups"
+    ]
+  }
 }

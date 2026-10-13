@@ -42,6 +42,18 @@ final actúa como marcador de finalización. El lector verifica inventario
 cerrado y vínculos. Una migración/captura verificada se revalida antes de
 finalizar EDA; el diagnóstico nunca sustituye comparación completa ni Verify.
 
+El código y las pruebas pertenecen al commit
+`57850aac819ab45a90ce69284f7e200ca0d9c332`. Las distribuciones definitivas se
+reconstruyeron con bytes Git exactos: 629 miembros fuente comprobados, incluida
+la procedencia del `.gitignore` ancestral. La alineación sólo cambió saltos
+de línea de la licencia vendorizada y metadatos de ignorados en las sdists;
+los textos de licencia y ambos wheels instalados permanecen idénticos.
+El [manifiesto A14](../tools/pypi_candidate_a14.json) es independiente del
+A13. La auditoría offline de sus cuatro artefactos pasó con publicación
+deshabilitada; no acredita derechos, cuentas, ensayo público ni una nueva
+puntuación completa de preparación PyPI. Los controles de entrega finalizaron
+el 13 de octubre de 2026, después del inicio de este trabajo el día 12.
+
 ## Validación comprobada
 
 | Alcance | Windows Python 3.12.4 | Linux ARM64 Python 3.12.15 |
