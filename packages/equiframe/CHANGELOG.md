@@ -1,5 +1,13 @@
 ## 0.12.0a14 — private Alpha, optional standalone EDA
 
+- Validate built-in native transformation metadata and callback/SQL types at
+  construction, without invoking code or importing engines. Fixed native
+  engines must match their class; SQL whitespace and text remain unchanged.
+  Metadata rejection retains Pydantic ValidationError with input values hidden.
+- Require explicit boolean output/row-enforcement flags in RunContext checks;
+  numeric and string truthiness cannot select or disable row budgets. Validate
+  measurement stages before entering a callback or changing timing state.
+
 - Add optional `equiframe.eda` and `equiframe eda`/`equiframe-eda`: fixed local
   snapshots, raw quality/repetitions, explicit text conversions, grouped exact
   Decimal/discrete quantiles, IQR/unscaled MAD and separate JSON/portable HTML.

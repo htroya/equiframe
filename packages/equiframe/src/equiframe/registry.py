@@ -6,6 +6,8 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal, Protocol
 
+from pydantic import ConfigDict, TypeAdapter
+
 from equiframe._base import Identifier, PositiveInt, Text
 from equiframe.errors import InvalidExecutionInput
 from equiframe.execution_types import ExecutionPlan
@@ -31,6 +33,18 @@ class Transformation(Protocol):
     def code_version(self) -> str: ...
 
 
+def _native_identity(
+    engine: str, expected: str, transformation_id: str, revision: int, code_version: str
+) -> None:
+    """Validate built-in metadata without importing or invoking native runtimes."""
+    safe_errors = ConfigDict(hide_input_in_errors=True)
+    TypeAdapter(Identifier, config=safe_errors).validate_python(transformation_id, strict=True)
+    TypeAdapter(PositiveInt, config=safe_errors).validate_python(revision, strict=True)
+    TypeAdapter(Text, config=safe_errors).validate_python(code_version, strict=True)
+    if type(engine) is not str or engine != expected:
+        raise InvalidExecutionInput("native transformation engine differs from its class")
+
+
 @dataclass(frozen=True)
 class PandasTransformation:
     transformation_id: str
@@ -38,6 +52,13 @@ class PandasTransformation:
     code_version: str
     revision: int = 1
     engine: Literal["pandas"] = "pandas"
+
+    def __post_init__(self) -> None:
+        _native_identity(
+            self.engine, "pandas", self.transformation_id, self.revision, self.code_version
+        )
+        if not callable(self.callback):
+            raise InvalidExecutionInput("native transformation requires a trusted callable")
 
 
 @dataclass(frozen=True)
@@ -48,6 +69,13 @@ class PolarsTransformation:
     revision: int = 1
     engine: Literal["polars"] = "polars"
 
+    def __post_init__(self) -> None:
+        _native_identity(
+            self.engine, "polars", self.transformation_id, self.revision, self.code_version
+        )
+        if not callable(self.callback):
+            raise InvalidExecutionInput("native transformation requires a trusted callable")
+
 
 @dataclass(frozen=True)
 class DuckDBTransformation:
@@ -56,6 +84,15 @@ class DuckDBTransformation:
     code_version: str
     revision: int = 1
     engine: Literal["duckdb"] = "duckdb"
+
+    def __post_init__(self) -> None:
+        _native_identity(
+            self.engine, "duckdb", self.transformation_id, self.revision, self.code_version
+        )
+        if not isinstance(self.sql, str) or not self.sql.strip() or "\x00" in self.sql:
+            raise InvalidExecutionInput("native transformation requires nonempty trusted SQL text")
+        if any(0xD800 <= ord(char) <= 0xDFFF for char in self.sql):
+            raise InvalidExecutionInput("native SQL requires valid Unicode scalar values")
 
 
 class TransformationRegistry:

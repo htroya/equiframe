@@ -10,6 +10,10 @@ registra suites completas del candidato identificado, 7.593/9.142 obligaciones
 acreditadas y controles nativos reales. Distingue cambios posteriores que
 necesitan artefacto propio y controles científicos pendientes.
 
+La [admisión estricta de transformaciones y presupuestos](docs/A14_TRANSFORMATION_ADMISSION_20261014.md)
+registra la corrección posterior de callbacks, motores y banderas de límites,
+con pruebas de fuente y validación del nuevo artefacto por separado.
+
 
 [Portal de documentación / Documentation portal](docs/README.md): rutas por
 tarea, glosario, integración y controles manuales. Las guías empaquetadas y los

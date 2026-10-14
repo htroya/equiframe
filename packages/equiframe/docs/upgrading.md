@@ -5,6 +5,20 @@
 
 ## Before changing a dependency or candidate
 
+The current private A14 source rejects invalid built-in transformation metadata
+at construction. `PandasTransformation` and `PolarsTransformation` require an
+explicit callable; `DuckDBTransformation` requires nonempty trusted Unicode SQL
+without NUL. No constructor runs that code or imports a native engine. Valid SQL
+is preserved verbatim, including surrounding whitespace. Revision/identity/version
+errors retain `ValidationError`; engine/callback/SQL admission errors use
+`InvalidExecutionInput`. Custom registered implementations remain explicit.
+
+`RunContext.check_table` requires actual boolean `output` and `enforce_rows`
+values. Pass `False` deliberately to skip its row checkpoint; this does not
+disable its Arrow buffer budget. `measure` rejects invalid stage text before
+entering the operation. Constructor validation and budget guards do not sandbox
+trusted callbacks or provide hard process-memory/preemption guarantees.
+
 A11 adds experimental source inputs and deterministic windows; see the
 [five-step guide](universalidad-cinco-pasos.md). Existing plans keep their node
 defaults. Consumers of the experimental IR/migration/workflow schemas should

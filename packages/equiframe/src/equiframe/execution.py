@@ -18,7 +18,7 @@ from uuid import uuid4
 
 from pydantic import TypeAdapter, ValidationError
 
-from equiframe._base import Identifier
+from equiframe._base import Identifier, Text
 from equiframe._error_reporting import report_failure
 from equiframe._regular_io import local_output_directory
 from equiframe.contracts import DecimalType, TimestampType
@@ -107,6 +107,8 @@ class RunContext:
             )
 
     def check_table(self, table: pa.Table, *, output: bool, enforce_rows: bool = True) -> None:
+        if type(output) is not bool or type(enforce_rows) is not bool:
+            raise InvalidExecutionInput("table budget flags require explicit booleans")
         self.check()
         import pyarrow as pa
 
@@ -124,6 +126,7 @@ class RunContext:
 
     @contextmanager
     def measure(self, stage: str) -> Iterator[None]:
+        TypeAdapter(Text).validate_python(stage, strict=True)
         previous = self.stage
         self.stage = stage
         self.check()
