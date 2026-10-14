@@ -99,3 +99,49 @@ utilizado. No infiere cobertura desde imports, retornos no estimables o fallos.
 Los expedientes privados se conservan en `a14_review_fixes_20261013` y en el
 directorio de validación de la VM. No se publicaron paquetes, no se ejecutó el
 workflow TestPyPI y la entrega de la tutora conserva su función de consulta.
+
+## Revalidación posterior del núcleo corregido
+
+El artefacto del corte `c611a93ea1dc80cb0ffce10ca23b6b38c3f6ef26` incorpora las
+correcciones de lectores y publicación descritas arriba. Su wheel tiene
+SHA-256 `308bbbe9f647b825ad66aa11d9e2cebeb7f0b045ca449af9dd658ee0ba5fc9a4`.
+Pasó 8.259 pruebas del núcleo en Windows (74 omitidas) y 8.298 en Linux ARM64
+(35 omitidas), sin fallos. Benchmark en Linux pasó 636, con tres omisiones;
+cliente y herramientas seleccionadas pasaron 209. Los ejemplos de documentación
+y `twine check --strict` pasaron sobre los artefactos privados identificados.
+
+Los 300 OCID del corpus anual que contienen múltiples adjudicaciones se
+ejecutaron en dos lotes acotados: **2.700 controles nativos**. La recomputación
+interna verificó 300 archivos ZIP, **64.800 miembros**, 1.914 importes y todos
+los outputs/perfiles frente a los objetos fuente, conservando precisión y escala.
+Observó 30 vectores numéricos distintos por familia. No es una revisión externa
+ni confirma normalidad, independencia estadística o `N_fit`; éste continúa cero.
+
+La reproducción de 395 pruebas originales, tanto normal como con `-O`, acreditó
+42 IDs nuevos sobre este wheel. Sus aserciones literales y auxiliares se
+conservaron, y los recibos semánticos concordaron entre modos.
+
+Otras **40 obligaciones** corresponden a presencias y ausencias reales de los
+once requisitos y nueve grupos de extras. En una copia privada se desinstaló
+un requisito por vez, se comprobó su fallo esperado en ambos modos, se restauró
+con resolución normal de dependencias y se ejecutó `pip check`. Las operaciones
+positivas verificaron filas nativas, ajuste técnico sintético/score MAD y EDA
+con/sin gráficos. Un grupo ausente significa que falta un miembro requerido y
+su operación no queda disponible; no se infiere que desaparecieron todos sus
+miembros. Los entornos previamente acreditados no se modificaron.
+
+El primer instrumento confundió restos de `__pycache__` con un paquete instalado;
+se corrigió la preparación de la ausencia retirando únicamente esos cachés
+verificados dentro de la copia privada. Otro instrumento esperaba `failed`,
+aunque `MissingDependencyError` pertenece a `InvalidExecutionInput`; se corrigió
+el esperado a `invalid_input` según el contrato, sin cambiar el SDK. Los intentos
+fallidos se conservaron y no se acreditaron.
+
+La unión disjunta del candidato corregido alcanza **7.593/9.142 obligaciones**,
+con **1.549 pendientes**. Con el bloque manual todavía sin acreditar son
+**74,7506 puntos** de trazabilidad y faltan **15,2494 puntos técnicos** para 90.
+No es una evaluación completa de los siete rubros. El expediente consolidado
+privado es `root-consolidated-c611a93-literal-dependencies-v1.json`; el recibo de
+dependencias y su instrumento están conservados en el ZIP privado
+`dependency-runtime-c611a93-receipts-v3.zip`, SHA-256
+`73705e6b95bb819462d101b227707edf94b23a167dedb47801138c1e3bcc6fa6`.

@@ -6,7 +6,7 @@ porcentajes enlazados abajo conservan sus candidatos evaluados (A13/A11);
 no se transfieren automáticamente al nuevo candidato ni activan Beta.
 
 El [avance de validación y corpus del 14/10](docs/A14_NATIVE_CORPUS_PROGRESS_20261014.md)
-registra suites completas del candidato identificado, 7.511/9.142 obligaciones
+registra suites completas del candidato identificado, 7.593/9.142 obligaciones
 acreditadas y controles nativos reales. Distingue cambios posteriores que
 necesitan artefacto propio y controles científicos pendientes.
 
