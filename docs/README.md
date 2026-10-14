@@ -30,6 +30,7 @@ documentación](DOCUMENTATION_MAINTENANCE.md).
   con [endurecimiento posterior de rutas EDA](A14_EDA_PATH_HARDENING_20261013.md)
   y [errores seguros y lectura de evidencias](A14_SAFE_ERRORS_EVIDENCE_20261013.md)
   con [recuperación de informes y supervisor Windows](A14_REPORT_RECOVERY_VENV_20261013.md)
+  y [copia segura de artefactos](A14_ARTIFACT_COPY_20261014.md)
   y [expediente técnico SERCOP](A14_SERCOP_EXPERIMENT_PREPARATION_20261013.md):
   resultados nuevos y límites de su acreditación.
 - [Contribuir](../CONTRIBUTING.md): entornos, controles manuales y revisión.

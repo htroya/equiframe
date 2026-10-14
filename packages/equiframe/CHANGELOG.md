@@ -28,6 +28,9 @@
 - Preserve relative report paths and safe recovery categories with the protected
   readers. Contract/profile/detector document reads reject special files and use
   a 64 MiB budget; generic document OS errors retain their type/errno without paths.
+- Protect local artifact copies against special files and linked directories;
+  bound verified copies by the declared byte size before publication, reject
+  wrong path types explicitly, and preserve exclusive publication and source bytes.
 
 ## 0.12.0a13 — package quality and producer identity (2026-10-10)
 

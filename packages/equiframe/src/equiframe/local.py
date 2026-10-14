@@ -11,6 +11,12 @@ from urllib.request import url2pathname
 from uuid import uuid4
 
 from equiframe._base import Text
+from equiframe._regular_io import (
+    local_input_path,
+    new_directory_path,
+    open_regular_file,
+    regular_directory,
+)
 from equiframe.errors import ArtifactIntegrityError, ArtifactIOError, CapabilityError
 from equiframe.types import ArtifactRef
 
@@ -44,19 +50,34 @@ def local_path(ref: ArtifactRef) -> Path:
 
 
 def _copy(source: Path, destination: Path, expected: ArtifactRef | None = None) -> tuple[str, int]:
+    source = local_input_path(source)
+    destination = local_input_path(destination)
+    new_directory_path(destination.parent)
     temporary = destination.with_name(destination.name + "." + uuid4().hex + ".part")
     digest = hashlib.sha256()
     size = 0
     try:
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        with source.open("rb") as reader, temporary.open("xb") as writer:
-            while block := reader.read(1024 * 1024):
-                writer.write(block)
-                digest.update(block)
-                size += len(block)
-            writer.flush()
-            os.fsync(writer.fileno())
-        if expected and (digest.hexdigest() != expected.sha256 or size != expected.size_bytes):
+        with open_regular_file(source) as reader:
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            regular_directory(destination.parent)
+            with temporary.open("xb") as writer:
+                while True:
+                    capacity = 1024 * 1024
+                    if expected is not None:
+                        capacity = min(capacity, expected.size_bytes - size + 1)
+                    block = reader.read(capacity)
+                    if not block:
+                        break
+                    if expected is not None and size + len(block) > expected.size_bytes:
+                        raise ArtifactIntegrityError("artifact exceeds its declared byte size")
+                    writer.write(block)
+                    digest.update(block)
+                    size += len(block)
+                writer.flush()
+                os.fsync(writer.fileno())
+        if expected is not None and (
+            digest.hexdigest() != expected.sha256 or size != expected.size_bytes
+        ):
             raise ArtifactIntegrityError("artifact bytes do not match declared SHA-256/size")
         # Atomic publication that fails if destination exists, including concurrent writers.
         os.link(temporary, destination)
@@ -71,11 +92,15 @@ def _copy(source: Path, destination: Path, expected: ArtifactRef | None = None) 
 
 class LocalArtifactStore:
     def __init__(self, root: Path) -> None:
-        self.root = root.resolve()
+        if not isinstance(root, Path):
+            raise TypeError("artifact store root must be a Path")
+        self.root = new_directory_path(local_input_path(root))
 
     def put(self, path: Path, *, media_type: str) -> ArtifactRef:
         from pydantic import TypeAdapter
 
+        if not isinstance(path, Path):
+            raise TypeError("artifact input must be a Path")
         media_type = TypeAdapter(Text).validate_python(media_type, strict=True)
         format_name = _FORMATS.get(path.suffix.lower())
         if format_name is None:
@@ -94,6 +119,8 @@ class LocalArtifactStore:
         )
 
     def get(self, ref: ArtifactRef, destination: Path) -> Path:
+        if not isinstance(destination, Path):
+            raise TypeError("artifact destination must be a Path")
         ref = ArtifactRef.model_validate(ref)
         _copy(local_path(ref), destination, ref)
         return destination
