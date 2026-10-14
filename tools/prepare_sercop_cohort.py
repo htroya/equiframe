@@ -14,7 +14,7 @@ import io
 import json
 import zipfile
 from collections import Counter
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
 
@@ -297,7 +297,7 @@ def prepare(archive_path, output, *, publication_year=None):
     result = {
         "schema": "equiframe.sercop-cohort-proposal.v1",
         "status": "PROPOSED",
-        "recorded_at_utc": datetime.now(UTC).isoformat(),
+        "recorded_at_utc": datetime.now(timezone.utc).isoformat(),  # noqa: UP017 - Python 3.10 compatibility
         "source_sha256": SOURCE_SHA256,
         "tool_sha256": tool_sha,
         "parser_sha256": parser_sha,

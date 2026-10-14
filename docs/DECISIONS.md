@@ -657,3 +657,18 @@ comparación explícita y grupos conservadores antes de ver resultados. Sus fich
 ciegas permanecen sin etiquetas. Las propuestas no aprueban normalidad, protocolo,
 independencia estadística, N_fit, resultados ni publicación. La construcción y
 prueba privada de Alpha están autorizadas; TestPyPI permanece sólo en configuración.
+
+## Preparación nativa por fragmentos — 2026-10-14
+
+Se conserva el protocolo propuesto de tres familias/motores, esperados de
+fuente/stdlib, reglas de esquema y perfiles del piloto. Un ejecutor por lotes
+consume los fragmentos anuales fijados antes de obtener resultados. No cambia
+features, R/M/B/H/O, etiquetas ni particiones; conserva OCID y plantillas comunes
+como dependencias. La compresión conserva y verifica toda la evidencia antes
+de retirar únicamente temporales generados dentro del lote privado.
+
+Motivo: preparar perfiles reales sin releer el ZIP anual por unidad y sin
+agotar disco/inodos. Versión: protocolo de controles `sercop-native-batch.v1`.
+Consecuencia: una unidad candidata ejecutada sigue sin aprobar normalidad,
+independencia o `N_fit`; no cierra evaluación científica. Alcance y recibos en
+[el avance fechado](A14_NATIVE_CORPUS_PROGRESS_20261014.md).

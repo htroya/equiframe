@@ -16,7 +16,7 @@ import math
 import shutil
 import zipfile
 from collections import Counter
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from decimal import Decimal, localcontext
 from pathlib import Path
 
@@ -633,7 +633,7 @@ def prepare(archive_path, directory, units_count):
     summary = {
         "schema": "equiframe.sercop-experiment-preparation.v1",
         "candidate": ef.__version__,
-        "recorded_at_utc": datetime.now(UTC).isoformat(),
+        "recorded_at_utc": datetime.now(timezone.utc).isoformat(),  # noqa: UP017 - Python 3.10 compatibility
         "source_sha256": SOURCE_SHA256,
         "catalog_sha256": digest(catalog),
         "splits_sha256": digest(splits),

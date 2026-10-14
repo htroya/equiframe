@@ -24,10 +24,20 @@ READERS = (
     "document",
     "comparison",
     "rules",
+    "detector",
+    "comparison_report",
 )
 
 
 def read(operation, root):
+    if operation == "detector":
+        from equiframe import read_detector_bundle
+
+        return read_detector_bundle(root / "bundle.json")
+    if operation == "comparison_report":
+        from equiframe import read_comparison_report
+
+        return read_comparison_report(root / "bundle.json")
     if operation == "comparison":
         from equiframe import read_comparison
 
@@ -127,6 +137,8 @@ try:
     elif operation == 'document': read_document(root / 'bundle.json')
     elif operation == 'comparison': equiframe.read_comparison(root / 'bundle.json')
     elif operation == 'rules': equiframe.read_rule_evaluation(root / 'bundle.json')
+    elif operation == 'detector': equiframe.read_detector_bundle(root / 'bundle.json')
+    elif operation == 'comparison_report': equiframe.read_comparison_report(root / 'bundle.json')
     elif operation == 'events': verify_events(root / 'bundle.json', operation_id='test')
     elif operation == 'describe': describe_file(root / 'bundle.json', root)
     elif operation == 'bundle': read_bundle(root)

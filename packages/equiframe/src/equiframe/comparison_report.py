@@ -8,10 +8,11 @@ from collections import Counter
 from pathlib import Path
 from typing import Literal, cast
 
+from equiframe._regular_io import local_input_path, local_output_directory, open_regular_file
 from equiframe.comparison_types import ComparisonDifference, ComparisonResult, ComparisonValue
 from equiframe.contracts import ColumnKeyScope
 from equiframe.diff_contracts import DiffContract
-from equiframe.errors import ArtifactIntegrityError, ResourceLimitError
+from equiframe.errors import ArtifactIntegrityError, ArtifactIOError, ResourceLimitError
 from equiframe.evidence import canonical_bytes
 from equiframe.report_types import (
     ComparisonReport,
@@ -551,8 +552,14 @@ def read_comparison_report(path: Path, *, max_bytes: int = 2 * 1024 * 1024) -> C
 
     if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes <= 0:
         raise ValueError("max_bytes must be a positive integer")
-    with path.open("rb") as source:
-        raw = source.read(max_bytes + 1)
+    try:
+        with open_regular_file(local_input_path(path)) as source:
+            raw = source.read(max_bytes + 1)
+    except ArtifactIOError as error:
+        cause = error.__cause__
+        if isinstance(cause, OSError):
+            raise type(cause)(cause.errno, "comparison report cannot be read") from None
+        raise
     if len(raw) > max_bytes:
         raise ResourceLimitError("comparison report exceeds reader budget")
     parse_json(raw)
@@ -584,6 +591,7 @@ def write_comparison_report(
     sensitive raw captures and require explicit values/metadata opt-ins.
     """
     options = ReportOptions.model_validate(ReportOptions() if options is None else options)
+    directory = local_output_directory(directory)
     report = comparison_report(
         result, options=options, evidence_root=evidence_root, declaration=declaration
     )
@@ -594,10 +602,6 @@ def write_comparison_report(
     }
     if any(len(content) > options.max_report_bytes for content in documents.values()):
         raise ResourceLimitError("comparison report output exceeds max_report_bytes")
-    # Reject symlinked ancestors rather than silently publishing in another place.
-    for ancestor in (directory, *directory.parents):
-        if ancestor.is_symlink():
-            raise ArtifactIntegrityError("report destination must not contain symlinks")
     directory.mkdir(mode=0o700, parents=True, exist_ok=False)
     if options.mode == "reproduction":
         if evidence_root is None:

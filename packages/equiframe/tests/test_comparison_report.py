@@ -70,6 +70,53 @@ def test_public_report_exports_are_available():
         assert name in ef.__all__
 
 
+@pytest.mark.parametrize("link_kind", ["symlink", "junction"])
+def test_report_publication_refuses_linked_roots_before_writing(tmp_path, link_kind):
+    real = tmp_path / "external"
+    real.mkdir()
+    marker = real / "unchanged.bin"
+    marker.write_bytes(b"external data")
+    link = tmp_path / "linked"
+    if link_kind == "junction":
+        if os.name != "nt":
+            pytest.skip("Windows directory junction")
+        made = subprocess.run(
+            ["cmd", "/c", "mklink", "/J", str(link), str(real)],
+            capture_output=True,
+            check=False,
+            timeout=10,
+        )
+        assert made.returncode == 0, made.stderr
+    else:
+        try:
+            link.symlink_to(real, target_is_directory=True)
+        except OSError:
+            pytest.skip("Host does not permit directory symlinks")
+    table = pa.table({"value": [1, 1, 2]})
+    result = ef.diff(table, table, work_dir=tmp_path / "comparison")
+    try:
+        with pytest.raises(ef.ArtifactIntegrityError):
+            write_comparison_report(result, link / "report")
+        assert list(real.iterdir()) == [marker]
+        assert marker.read_bytes() == b"external data"
+    finally:
+        if link_kind == "junction":
+            link.rmdir()
+        else:
+            link.unlink()
+
+
+def test_report_publication_accepts_ordinary_parent_navigation(tmp_path):
+    traversed = tmp_path / "traversed"
+    traversed.mkdir()
+    table = pa.table({"value": [1, 1, 2]})
+    result = ef.diff(table, table, work_dir=tmp_path / "comparison")
+    report = write_comparison_report(result, traversed / ".." / "report")
+    assert report.state == "equivalent" and report.complete
+    assert ef.read_comparison_report(tmp_path / "report/report.json") == report
+    assert not list(traversed.iterdir())
+
+
 @pytest.mark.parametrize("reference", ["peer", "expected"])
 def test_complete_equivalence_preserves_reference_and_exact_counts(tmp_path, reference):
     candidate = pa.table({"id": [2, 1], "value": [20, 10]})

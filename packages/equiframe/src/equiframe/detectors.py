@@ -1,6 +1,5 @@
 """Fit, score and calibrate family detectors independently from rules and the oracle."""
 
-import json
 import math
 import platform
 import struct
@@ -8,7 +7,9 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Literal
 
+from equiframe._document_io import read_document as _read_document
 from equiframe._document_io import write_document as _write_document
+from equiframe._regular_io import local_input_path
 from equiframe.detector_types import (
     ComponentDecision,
     ComponentDetectionResult,
@@ -31,7 +32,7 @@ from equiframe.detector_types import (
     numeric_score,
     quantile_rank,
 )
-from equiframe.errors import ArtifactIntegrityError, MissingDependencyError
+from equiframe.errors import ArtifactIntegrityError, MissingDependencyError, ResourceLimitError
 from equiframe.preprocessing import _compatible, fit_preprocessor, transform_profiles
 from equiframe.profile_types import (
     FeatureMatrix,
@@ -40,7 +41,6 @@ from equiframe.profile_types import (
     ProfileVector,
     profile_digest,
 )
-from equiframe.serialization import _constant, _JsonObject, _unique_objects
 
 
 def _unavailable(method: Literal["isolation_forest", "mad"], reason: str) -> DetectorModel:
@@ -379,11 +379,10 @@ def write_detector_bundle(bundle: DetectorBundle, path: Path) -> str:
 
 def read_detector_bundle(path: Path, *, expected_sha256: str | None = None) -> DetectorBundle:
     """Read bounded declarative data only; no pickle, estimator restoration or imports."""
-    with path.open("rb") as source:
-        raw = source.read(64 * 1024 * 1024 + 1)
-    if len(raw) > 64 * 1024 * 1024:
-        raise ValueError("detector bundle exceeds the 64 MiB document limit")
-    _unique_objects(json.loads(raw, object_pairs_hook=_JsonObject, parse_constant=_constant))
+    try:
+        raw = _read_document(local_input_path(path))
+    except ResourceLimitError:
+        raise ValueError("detector bundle exceeds the 64 MiB document limit") from None
     bundle = DetectorBundle.model_validate_json(raw)
     if expected_sha256 is not None and detector_fingerprint(bundle) != expected_sha256:
         raise ArtifactIntegrityError("detector bundle fingerprint mismatch")

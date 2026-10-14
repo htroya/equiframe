@@ -537,3 +537,13 @@ acredita la preparación y su recomputación; no aprueba una cohorte o normalida
 La agrupación conservadora deja un solo grupo y no soporta calibración/test.
 No se declara N_fit, entrenamiento final, congelación científica ni nueve
 estratos aprobados. Los requisitos que necesitan esos insumos siguen pendientes.
+
+## Controles nativos sobre fragmentos anuales — 2026-10-14
+
+El [avance por lotes](A14_NATIVE_CORPUS_PROGRESS_20261014.md) conserva las
+182.277 unidades candidatas y ejecutó 288 controles nativos adicionales sobre
+32 OCID disjuntos en dos lotes. Mantiene los esperados previos al motor,
+importes/ausencias exactos y perfiles ligados a ejecuciones. La compresión
+verificada conserva los originales de evidencia en archivo y distingue sus URI
+archivadas. No sustituye aprobación de normalidad, grupos válidos de
+calibración/test, etiquetas o evaluación final. `N_fit` acreditado continúa cero.

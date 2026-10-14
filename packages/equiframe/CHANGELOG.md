@@ -26,8 +26,12 @@
   readers and portable bundles; pin POSIX directories before reading and compare
   manifest hashes against the same bounded bytes parsed. Historical data stays unchanged.
 - Preserve relative report paths and safe recovery categories with the protected
-  readers. Contract/profile/detector document reads reject special files and use
+  readers. Contract/profile/preprocessor document reads reject special files and use
   a 64 MiB budget; generic document OS errors retain their type/errno without paths.
+- Extend protected reads to detector bundles and detached comparison reports,
+  retaining duplicate/nonfinite rejection, document budgets and generic OS errors.
+  Protect report publication against Windows junction ancestors and preserve
+  caller-selected ordinary parent navigation. No executable model input is added.
 - Protect local artifact copies against special files and linked directories;
   bound verified copies by the declared byte size before publication, reject
   wrong path types explicitly, and preserve exclusive publication and source bytes.
