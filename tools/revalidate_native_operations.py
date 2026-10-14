@@ -316,14 +316,16 @@ def observed(owner, result, fixture):
             "differences": result.counts.difference_records,
         }
     if owner == "migrate":
+        source = result.source.execution if result.source is not None else None
+        target = result.target.execution if result.target is not None else None
         return {
             "complete": result.complete,
             "state": result.state,
-            "source": ef.read_table(result.source.output.data).to_pylist()
-            if result.source is not None and result.source.output is not None
+            "source": ef.read_table(source.output.data).to_pylist()
+            if source is not None and source.output is not None
             else None,
-            "target": ef.read_table(result.target.output.data).to_pylist()
-            if result.target is not None and result.target.output is not None
+            "target": ef.read_table(target.output.data).to_pylist()
+            if target is not None and target.output is not None
             else None,
         }
     if owner == "verify":

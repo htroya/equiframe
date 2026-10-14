@@ -80,3 +80,37 @@ No se modificó el Word, la entrega pública ni el servicio de la tutora. No se
 usaron Codex Security ni agentes, y no se publicó en PyPI/TestPyPI ni se ejecutaron
 Actions. La solicitud posterior a Robot mantiene la condición de siete rubros
 acreditados al 90 % y el corte correspondiente subido.
+
+## Comprobación instalada del corte `f5c898d`
+
+El wheel privado del núcleo tiene SHA-256
+`7ac560cf74dcffb71eb44195bb6d4152aa64780f3e400e08a0309160b6ffa4ed`.
+Los 69 casos nativos pasaron en normal y `-O`: **43 aprobados y 26 rechazos
+esperados por modo**, con catálogo y observaciones idénticos. Se acreditan las
+**177 obligaciones adicionales**. La consolidación `root-consolidated-f5c898d-v1.json`
+registra **7.511 / 9.142**, con **1.631 pendientes**: **73,943338 puntos** con
+el bloque manual pendiente; faltan **16,056662 puntos** para 90 en trazabilidad.
+Quedan 1.077 parámetros, 111 APIs, 51 métodos, 73 campos, 70 propiedades, 34 CLI,
+175 opciones CLI, 18 extras y 22 dependencias. No es un promedio de los siete rubros.
+
+Se conserva el primer intento nativo con cuatro fallos de lectura del propio
+verificador: las ejecuciones de migración están dentro de sus PipelineResult.
+Se corrigió el acceso a esos campos, manteniendo todas las expectativas, casos
+e IDs. Las dos ejecuciones posteriores sobre el mismo wheel cumplieron el
+catálogo congelado. No se reinstaló ni cambió el SDK para esa corrección.
+
+La suite completa Linux de ese wheel encontró una regresión del contrato de
+errores: una ruta ocupada por un archivo regular producía ArtifactIntegrityError
+en lugar del OSError esperado. Se conserva su XML fallido. La corrección de
+fuente mantiene NotADirectoryError sin filenames para archivos regulares y
+ArtifactIntegrityError para enlaces/reparse/archivos especiales. Se añadieron
+trece comprobaciones de conservación de bytes y se repitió el fallo original:
+**84 aprobadas, 18 omitidas y cero fallos**; Mypy en 109 archivos y 71 activos
+también pasaron. La validación del artefacto posterior permanece pendiente.
+Los recibos nativos de `f5c898d` no prueban la aceptación de ese artefacto nuevo.
+
+`annual-cohort-receipts-v1/shard-verification.json` verificó las **182.277 unidades,
+183.891 adjudicaciones y 19 fragmentos**: identidades únicas, orden de procedencia,
+texto decimal exacto, flags, conteos y todos los SHA-256. No volvió a parsear el
+ZIP original ni ejecutó perfiles/motores. El corpus conserva estado PROPOSED,
+normalidad no confirmada, particiones finales pendientes y N_fit acreditado cero.

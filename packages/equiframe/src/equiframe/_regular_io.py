@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import errno
 import os
 import stat
 from collections.abc import Iterator
@@ -59,7 +60,7 @@ def local_input_path(path: Path) -> Path:
     return current
 
 
-def new_directory_path(path: Path) -> Path:
+def new_directory_path(path: Path, *, ordinary_file_error: bool = False) -> Path:
     """Check existing lexical ancestors before creating a new output directory."""
     path = absolute_path(path)
     for item in (*reversed(path.parents), path):
@@ -69,6 +70,12 @@ def new_directory_path(path: Path) -> Path:
             continue
         except OSError as error:
             raise ArtifactIOError("cannot inspect output directory") from error
+        if (
+            ordinary_file_error
+            and stat.S_ISREG(inspected.st_mode)
+            and not (getattr(inspected, "st_file_attributes", 0) & 0x400)
+        ):
+            raise NotADirectoryError(errno.ENOTDIR, "operation output requires a directory")
         if not stat.S_ISDIR(inspected.st_mode) or (
             getattr(inspected, "st_file_attributes", 0) & 0x400
         ):
@@ -86,7 +93,7 @@ def local_output_directory(path: Path) -> Path:
     Returning a path does not create directories or sandbox concurrent filesystem
     owners. Each writer retains its existing exclusive publication mechanism.
     """
-    return new_directory_path(local_input_path(path))
+    return new_directory_path(local_input_path(path), ordinary_file_error=True)
 
 
 def regular_files(directory: Path) -> tuple[Path, ...]:

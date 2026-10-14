@@ -215,6 +215,16 @@ def test_linked_output_root_is_rejected_before_writing(tmp_path, prepared, opera
 
 
 @pytest.mark.parametrize("operation", OPERATIONS)
+def test_occupied_regular_file_retains_os_error_without_writing(tmp_path, prepared, operation):
+    occupied = tmp_path / "occupied"
+    occupied.write_bytes(b"previous bytes")
+    with pytest.raises(NotADirectoryError):
+        invoke(operation, occupied, prepared)
+    assert occupied.read_bytes() == b"previous bytes"
+    assert list(tmp_path.iterdir()) == [occupied]
+
+
+@pytest.mark.parametrize("operation", OPERATIONS)
 def test_ordinary_parent_navigation_retains_compatibility(tmp_path, prepared, operation):
     traversed = tmp_path / "traversed"
     traversed.mkdir()
