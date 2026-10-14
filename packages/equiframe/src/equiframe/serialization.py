@@ -123,11 +123,11 @@ def contract_fingerprint(contract: Contract) -> str:
 
 
 def read_contract(path: str | Path) -> Contract:
-    from equiframe._regular_io import open_regular_file
+    from equiframe._regular_io import local_input_path, open_regular_file
     from equiframe.errors import ArtifactIOError, ResourceLimitError
 
     try:
-        with open_regular_file(Path(path)) as stream:
+        with open_regular_file(local_input_path(Path(path))) as stream:
             document = stream.read(64 * 1024 * 1024 + 1)
     except ArtifactIOError as exc:
         cause = exc.__cause__ if isinstance(exc.__cause__, OSError) else exc

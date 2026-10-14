@@ -58,7 +58,7 @@ def test_cli_io_failure_exits_3(tmp_path: Path) -> None:
     result = runner.invoke(app, ["contract", "validate", str(tmp_path / "missing.json")])
     assert result.exit_code == 3
     assert "operation_failed" in result.stderr
-    assert "hint[io_failure]" in result.stderr
+    assert "hint[missing_path]" in result.stderr
     assert "Traceback" not in result.stderr
 
 

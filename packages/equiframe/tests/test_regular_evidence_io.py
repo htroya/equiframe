@@ -176,3 +176,51 @@ def test_missing_generic_document_keeps_os_error_without_disclosing_its_path(tmp
     assert caught.value.errno == 2
     assert caught.value.filename is None and caught.value.filename2 is None
     assert marker not in str(caught.value)
+
+
+def test_contract_parent_navigation_checks_directories_before_normalizing(tmp_path):
+    from conftest import EXAMPLES
+
+    expected = read_contract(EXAMPLES / "nulls_types.json")
+    path = tmp_path / "contract.json"
+    path.write_bytes((EXAMPLES / "nulls_types.json").read_bytes())
+    child = tmp_path / "child"
+    child.mkdir()
+    assert read_contract(child / ".." / "contract.json") == expected
+    # Parent navigation is specific to explicitly selected contract inputs;
+    # evidence/document readers keep their existing confinement policy.
+    with pytest.raises(ArtifactIntegrityError, match="parent traversal"):
+        read_document(child / ".." / "contract.json")
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows directory junction")
+def test_parent_navigation_cannot_hide_a_windows_junction(tmp_path):
+    real = tmp_path / "real"
+    real.mkdir()
+    link = tmp_path / "linked"
+    completed = subprocess.run(
+        ["cmd", "/c", "mklink", "/J", str(link), str(real)],
+        capture_output=True,
+        check=False,
+        timeout=10,
+    )
+    assert completed.returncode == 0
+    try:
+        with pytest.raises(ArtifactIntegrityError, match="reparse"):
+            read_contract(link / ".." / "contract.json")
+        assert list(real.iterdir()) == []
+    finally:
+        link.rmdir()
+
+
+def test_parent_navigation_cannot_hide_a_posix_directory_symlink(tmp_path):
+    real = tmp_path / "real"
+    real.mkdir()
+    link = tmp_path / "linked"
+    try:
+        link.symlink_to(real, target_is_directory=True)
+    except OSError:
+        pytest.skip("Host does not permit directory symlinks")
+    with pytest.raises(ArtifactIntegrityError, match="symlinks"):
+        read_contract(link / ".." / "contract.json")
+    assert list(real.iterdir()) == []

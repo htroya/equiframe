@@ -7,6 +7,9 @@ historic evidence rewritten. Existing benchmark protocol and APIs unchanged.
   up to 16 creator configurations, requiring the current interpreter's base and
   rejecting cycles, duplicate keys, relative creators, mismatched homes and large
   or linked configurations. Never execute a configured creator or an unbound command.
+- Preserve rejection of missing scale finalization with safe OS error classes and
+  keep missing-directory I/O recovery separate. Refuse linked operation roots
+  and special inventory members before accepting stored measurements.
 
 ## 0.12.0a13 — package quality and producer identity (2026-10-10)
 

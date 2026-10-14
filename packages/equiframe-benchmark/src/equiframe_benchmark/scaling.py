@@ -20,6 +20,7 @@ from typing import Literal, Protocol, cast
 from uuid import uuid4
 
 import equiframe as ef
+from equiframe._regular_io import regular_directory, regular_files
 from equiframe.evidence import describe_file, inventory, load_json, verify_files
 from equiframe.local import local_path
 from pydantic import model_validator
@@ -431,16 +432,21 @@ def measure_scale(spec: ScaleSpec, *, work_dir: Path) -> ScaleRun:
 
 def read_scale(directory: Path) -> ScaleRun:
     """Verify atomic finalization and every retained file; never execute a source."""
-    final = load_json(ScaleFinalization, directory / "finished.json")
+    directory = regular_directory(directory)
+    try:
+        final = load_json(ScaleFinalization, directory / "finished.json")
+    except ef.ArtifactIOError as error:
+        cause = error.__cause__
+        if isinstance(cause, OSError):
+            raise type(cause)(cause.errno, "scale finalization is missing or unreadable") from None
+        raise ef.ArtifactIntegrityError("scale finalization is missing or unreadable") from None
     if final.result.path != "scale.json":
         raise ValueError("unexpected scale result path")
     verify_files(directory, (final.result,))
     result = load_json(ScaleRun, directory / "scale.json")
     verify_files(directory, result.evidence)
     expected = {item.path for item in result.evidence} | {"scale.json", "finished.json"}
-    actual = {
-        path.relative_to(directory).as_posix() for path in directory.rglob("*") if path.is_file()
-    }
+    actual = {path.relative_to(directory).as_posix() for path in regular_files(directory)}
     if actual != expected:
         raise ValueError("scale evidence inventory changed")
     spec = load_json(ScaleSpec, directory / "spec.json")

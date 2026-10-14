@@ -40,6 +40,23 @@ def regular_directory(
     return path
 
 
+def local_input_path(path: Path) -> Path:
+    """Admit explicit local parent navigation after inspecting traversed directories.
+
+    Evidence confinement still uses absolute_path and refuses parent navigation.
+    This helper is for the caller-selected contract input, which has no fixed root.
+    """
+    path = path.absolute()
+    current = Path(path.anchor)
+    for component in path.parts[1:]:
+        if component == "..":
+            regular_directory(current)
+            current = current.parent
+        else:
+            current = current / component
+    return current
+
+
 def new_directory_path(path: Path) -> Path:
     """Check existing lexical ancestors before creating a new output directory."""
     path = absolute_path(path)
