@@ -1,5 +1,3 @@
-## 0.12.0a13 — package quality and producer identity (2026-10-10)
-
 ## 0.12.0a14 — private Alpha, optional standalone EDA
 
 - Add optional `equiframe.eda` and `equiframe eda`/`equiframe-eda`: fixed local
@@ -12,7 +10,15 @@
 - New detector metadata defaults to actual A14 producer, with older producers
   retained as admitted history. This changes the experimental producer schema,
   not trained features or algorithms. No Beta or public distribution claim.
+- Initialize DuckDB UTC after opening its connection without automatic extension
+  downloads, preserving Linux and Windows execution.
+- Inspect EDA paths before resolving them: reject source, output, manifest and
+  evidence symlinks/Windows junctions; confine manifest members to their delivery.
+  Read source manifests with a 16 MiB/2,000-member budget and verify the exact
+  bytes consumed. Protected file reads preserve the existing diagnostic formats.
+- Reject Windows reparse points in comparison-evidence directories and ancestors.
 
+## 0.12.0a13 — package quality and producer identity (2026-10-10)
 
 - Align the current experimental detector-schema inventory with the reviewed
   A13 producer identity. Asset preflight now rejects stale inventory hashes

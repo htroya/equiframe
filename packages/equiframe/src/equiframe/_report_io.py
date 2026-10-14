@@ -153,8 +153,7 @@ def _open_regular(path: Path) -> Iterator[BinaryIO]:
     try:
         before = path.lstat()
         _path_require(
-            stat.S_ISREG(before.st_mode)
-            and not getattr(before, "st_file_attributes", 0) & 0x400,
+            stat.S_ISREG(before.st_mode) and not getattr(before, "st_file_attributes", 0) & 0x400,
             "evidence must be a regular file, not a link or reparse point",
         )
         flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NONBLOCK", 0)
@@ -171,8 +170,7 @@ def _open_regular(path: Path) -> Iterator[BinaryIO]:
             _directory(parent)
         after = os.fstat(descriptor)
         _path_require(
-            stat.S_ISREG(after.st_mode)
-            and not getattr(after, "st_file_attributes", 0) & 0x400,
+            stat.S_ISREG(after.st_mode) and not getattr(after, "st_file_attributes", 0) & 0x400,
             "evidence must remain a regular file without reparse points",
         )
         _require(

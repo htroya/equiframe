@@ -135,6 +135,13 @@ two engines can agree on the same error. R/M/B/H/O and model fitting are unchang
 
 ## Resources and evidence
 
+Source, output, manifest and evidence paths reject symlinks and Windows reparse
+points, including directory ancestors, before resolving the path. Source-delivery
+members must be normalized relative paths inside that delivery. The delivery
+manifest is limited to 16 MiB and 2,000 entries; its trusted SHA-256 identifies
+the exact bytes read. These checks do not grant operating-system access or make
+this library a sandbox for untrusted callbacks.
+
 `Resources` records memory, threads, timeout, temp spill, input bytes/rows,
 columns/groups, top categories, examples, histogram bins and chart rows/bytes.
 DuckDB memory controls its buffer manager, not process RSS. Temporary-disk cap

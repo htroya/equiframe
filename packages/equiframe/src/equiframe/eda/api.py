@@ -18,12 +18,14 @@ from typing import Any, Literal, cast
 from uuid import uuid4
 
 from equiframe import __version__
+from equiframe._report_io import _open_regular
 from equiframe.errors import CapabilityError
 from equiframe.evidence import canonical_bytes, load_json, parse_json, publish_json
 from equiframe.execution_types import TableArtifact
 from equiframe.local import local_path
 
 from ._backend import Backend
+from ._paths import manifest_member, ordinary_path
 from .models import EdaConfig, EdaManifest, EdaResult, Source
 
 LIMITS = (
@@ -81,7 +83,7 @@ def _admit_arrow_schema(schema: Any) -> None:
 
 def _sha(path: Path, checkpoint: Callable[[], None] | None = None) -> str:
     h = hashlib.sha256()
-    with path.open("rb") as stream:
+    with _open_regular(path) as stream:
         while block := stream.read(1024 * 1024):
             if checkpoint is not None:
                 checkpoint()
@@ -92,15 +94,32 @@ def _sha(path: Path, checkpoint: Callable[[], None] | None = None) -> str:
 def _manifest(source: Source, path: Path, output: Path) -> dict[str, Any] | None:
     if source.manifest_path is None:
         return None
-    manifest = Path(source.manifest_path).resolve(strict=True)
+    manifest = ordinary_path(Path(source.manifest_path))
     if output.is_relative_to(manifest.parent):
         raise ValueError("EDA output must be outside the source delivery")
-    if _sha(manifest) != source.manifest_sha256:
+    if manifest.stat().st_size > 16 * 1024**2:
+        raise ValueError("Source delivery manifest exceeds its byte budget")
+    with _open_regular(manifest) as stream:
+        payload = stream.read(16 * 1024**2 + 1)
+    if len(payload) > 16 * 1024**2:
+        raise ValueError("Source delivery manifest exceeds its byte budget")
+    if hashlib.sha256(payload).hexdigest() != source.manifest_sha256:
         raise ValueError("source manifest SHA-256 mismatch")
-    doc = cast("dict[str, Any]", parse_json(manifest.read_bytes()))
+    parsed = parse_json(payload)
+    if not isinstance(parsed, dict):
+        raise ValueError("Source delivery manifest must be an object")
+    doc = parsed
     if doc.get("schema") != "equiframe.sercop-public-dataset-delivery.v1":
         raise ValueError("unsupported external delivery manifest version")
-    matches = [r for r in doc["files"] if (manifest.parent / r["file"]).resolve() == path]
+    records = doc.get("files")
+    if not isinstance(records, list) or len(records) > 2000:
+        raise ValueError("Invalid bounded source delivery inventory")
+    matches = []
+    for record in records:
+        if not isinstance(record, dict):
+            raise ValueError("Invalid source inventory member")
+        if manifest_member(manifest.parent, record.get("file")) == path:
+            matches.append(record)
     if len(matches) != 1:
         raise ValueError("selected source is not a unique manifest member")
     return cast("dict[str, Any]", matches[0])
@@ -132,12 +151,8 @@ def _analyze(
 ) -> EdaResult:
     source = Source.model_validate(source)
     config = EdaConfig.model_validate(config) if config is not None else EdaConfig()
-    output = output.resolve()
-    if Path(source.path).is_symlink():
-        raise ValueError("source symlinks are not admitted")
-    path = Path(source.path).resolve(strict=True)
-    if not path.is_file():
-        raise ValueError("source must be an immutable regular local file")
+    output = ordinary_path(output, directory=True, allow_missing=True)
+    path = ordinary_path(Path(source.path))
     if output.is_relative_to(path.parent):
         raise ValueError("output must be outside the source file directory")
     binding = _manifest(source, path, output)
@@ -183,7 +198,7 @@ def _analyze(
         ):
             raise ValueError("selected source contradicts trusted manifest")
         snapshot = output / ("snapshot." + source.format)
-        with path.open("rb") as reader, snapshot.open("xb") as writer:
+        with _open_regular(path) as reader, snapshot.open("xb") as writer:
             while block := reader.read(1024 * 1024):
                 checkpoint()
                 writer.write(block)
@@ -386,8 +401,10 @@ def analyze_migration(
 
     if side not in ("source", "target"):
         raise ValueError("side must be source or target")
-    root = path.resolve().parent if path.is_file() else path.resolve()
-    if output.resolve().is_relative_to(root):
+    selected = ordinary_path(path, directory=path.is_dir())
+    root = selected.parent if selected.is_file() else selected
+    destination = ordinary_path(output, directory=True, allow_missing=True)
+    if destination.is_relative_to(root):
         raise ValueError("EDA results must be outside the existing migration evidence")
     portable = (root / "bundle.json").is_file()
     if portable:
@@ -452,7 +469,8 @@ def analyze_migration(
 
 def read_result(path: Path) -> EdaResult:
     """Read a closed versioned diagnostic run, checking all recorded byte identities."""
-    root = path if path.is_dir() else path.parent
+    selected = ordinary_path(path, directory=path.is_dir())
+    root = selected if selected.is_dir() else selected.parent
     manifest = load_json(EdaManifest, root / "manifest.json").model_dump(mode="json")
     if manifest.get("schema_version") != "1.0" or manifest.get("kind") != "equiframe.eda":
         raise ValueError("unsupported EDA manifest")
@@ -460,9 +478,7 @@ def read_result(path: Path) -> EdaResult:
     if len(set(names)) != len(names):
         raise ValueError("duplicate EDA inventory member")
     for entry in manifest["files"]:
-        member = root / entry["path"]
-        if member.is_symlink() or not member.resolve().is_relative_to(root.resolve()):
-            raise ValueError("EDA inventory member escapes run")
+        member = manifest_member(root, entry["path"])
         if member.stat().st_size != entry["bytes"] or _sha(member) != entry["sha256"]:
             raise ValueError("EDA result artifact integrity mismatch")
     actual = {
@@ -482,7 +498,11 @@ def read_result(path: Path) -> EdaResult:
         != hashlib.sha256(canonical_bytes(config.model_dump(mode="json"))).hexdigest()
     ):
         raise ValueError("EDA result identity mismatch")
-    if parse_json((root / "findings.json").read_bytes()) != {
+    with _open_regular(root / "findings.json") as stream:
+        findings_raw = stream.read(16 * 1024**2 + 1)
+    if len(findings_raw) > 16 * 1024**2:
+        raise ValueError("EDA findings exceed their byte budget")
+    if parse_json(findings_raw) != {
         "schema_version": "1.0",
         "kind": "equiframe.eda.findings",
         "run_id": result.run_id,
