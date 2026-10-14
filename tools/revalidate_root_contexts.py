@@ -14,9 +14,11 @@ import importlib.util
 import json
 import math
 import platform
+import re
 import stat
 import sys
 from collections import Counter
+from fractions import Fraction
 from pathlib import Path
 
 import equiframe as ef
@@ -35,6 +37,29 @@ BASELINE_HASHES = {
     "9d60c85e1f572e7a223d940b056db60cd8bed5568049df4ed7605a55e18a5200",
     "61f640e16daf7a64d418b09b7ebce961d3f8665d1ba1c9cd40fc41a4c364398a",
 }
+
+
+def verify_baseline_digest(raw, trusted_digest=None):
+    """Require a separately supplied identity for newly executed baselines.
+
+    Without an explicit identity, only the two retained original receipts are
+    admitted. This does not import their pass counts into a newer candidate.
+    """
+    if trusted_digest is not None:
+        owned.require(
+            isinstance(trusted_digest, str)
+            and re.fullmatch(r"[0-9a-f]{64}", trusted_digest) is not None,
+            "Trusted baseline identity must be a lowercase SHA-256",
+        )
+        expected = {trusted_digest}
+    else:
+        expected = BASELINE_HASHES
+    owned.require(
+        hashlib.sha256(raw).hexdigest() in expected,
+        "Root baseline bytes differ from the trusted identity",
+    )
+
+
 MODELS = {
     "Aggregate",
     "AggregateCheck",
@@ -53,14 +78,20 @@ MODELS = {
     "DecimalType",
     "Deduplicate",
     "DetectorDecision",
+    "DetectorCalibration",
+    "DetectorModel",
+    "DetectorScores",
     "DetectorScoreResult",
     "EquiJoin",
+    "EquivalenceDecision",
     "ExecutionOptions",
     "ExecutionResult",
     "EvidenceBundle",
     "EvidenceFile",
     "ExpectedProvenance",
     "FeatureObservation",
+    "FeatureFit",
+    "FeatureMatrix",
     "FieldMapping",
     "Measure",
     "JoinCheck",
@@ -72,6 +103,8 @@ MODELS = {
     "NumericPolicy",
     "OrderCheck",
     "ProfileFeature",
+    "ProfileResult",
+    "PreprocessorBundle",
     "ReportCount",
     "ReportOptions",
     "ReportEvidenceManifest",
@@ -84,6 +117,7 @@ MODELS = {
     "TimestampType",
     "TimestampValue",
     "Tolerance",
+    "VerificationCoverage",
     "Window",
     "WindowMeasure",
     "WorkflowCheckpoint",
@@ -143,7 +177,202 @@ def bounded_json(path):
 
 def context(name, field, value, data, expected):
     updates = {}
-    if name == "AggregateCheck" and field == "measure" and value is None:
+    if name == "EquivalenceDecision":
+        # Authored from the decision consistency contract. This synthetic
+        # metadata context establishes neither equivalence nor scientific O.
+        state = data["state"]
+        complete = data["complete"]
+        failures = data["guarantee_failures"]
+        evidence = data["evidence_status"]
+        if field == "accepted":
+            state = "equivalent" if value else "different"
+        elif field == "code":
+            state = value if value in {"different", "not_evaluable"} else "equivalent"
+            failures = ["required_spec_sha256"] if value == "guarantee_mismatch" else []
+            evidence = (
+                value.removeprefix("evidence_")
+                if value.startswith("evidence_")
+                else "verified"
+            )
+        elif field in {"complete", "counts_final"}:
+            complete = value
+            state = "equivalent" if value else "not_evaluable"
+        elif field == "guarantee_conforms":
+            failures = [] if value else ["required_spec_sha256"]
+        elif field == "evidence_code":
+            evidence = "verified" if value is None else value.removeprefix("evidence_")
+        conforms = not failures
+        evidence_code = (
+            None
+            if evidence in {"not_requested", "verified"}
+            else "evidence_" + evidence
+        )
+        code = (
+            state
+            if state != "equivalent"
+            else "guarantee_mismatch"
+            if not conforms
+            else evidence_code or "equivalent"
+        )
+        updates = {
+            "state": state,
+            "complete": complete,
+            "counts_final": complete,
+            "guarantee_failures": failures,
+            "guarantee_conforms": conforms,
+            "evidence_status": evidence,
+            "evidence_code": evidence_code,
+            "code": code,
+            "accepted": code == "equivalent",
+        }
+    elif name == "VerificationCoverage":
+        if field in {"outputs_requested", "outputs_inspected"}:
+            updates = {"outputs_requested": max(1, value), "outputs_inspected": value}
+            updates["complete"] = value > 0
+        elif field in {"comparisons_requested", "comparisons_completed"}:
+            updates = {"comparisons_requested": value, "comparisons_completed": value}
+    elif name == "DetectorScores":
+        if field == "state" and value == "not_estimable" or field == "reason" and value:
+            updates = {
+                "state": "not_estimable",
+                "values": [],
+                "reason": value if field == "reason" else "synthetic_missing_scores",
+            }
+        else:
+            updates = {"state": "scored", "reason": None}
+    elif name == "DetectorModel":
+        missing = (
+            field == "state"
+            and value == "not_estimable"
+            or field == "reason"
+            and value is not None
+            or field in {"medians", "deviations"}
+            and not value
+        )
+        if missing:
+            updates = {
+                "state": "not_estimable",
+                "reason": value if field == "reason" else "synthetic_missing_training",
+                "trees": [],
+                "effective_samples": None,
+                "medians": [],
+                "deviations": [],
+            }
+        elif (
+            field in {"trees", "effective_samples"}
+            or field == "method"
+            and value == "isolation_forest"
+        ):
+            samples = value if field == "effective_samples" else 2
+            trees = value if field == "trees" else [synthetic_tree(samples)]
+            updates = {
+                "method": "isolation_forest",
+                "state": "fitted",
+                "reason": None,
+                "trees": trees,
+                "effective_samples": samples,
+                "medians": [],
+                "deviations": [],
+            }
+    elif name == "PreprocessorBundle":
+        unavailable = (
+            field == "training_rows"
+            and value == 0
+            or field == "state"
+            and value == "not_estimable"
+        )
+        if unavailable:
+            features = [
+                {
+                    "name": f["name"],
+                    "valid_count": 0,
+                    "median": None,
+                    "reason": "no_valid_training_values",
+                }
+                for f in data["features"]
+            ]
+            updates = {"features": features, "state": "not_estimable"}
+    elif name == "ProfileResult" and field == "complete" and value is False:
+        vector = copy.deepcopy(data["vector"])
+        vector["observations"][0].update(
+            state="not_evaluable",
+            value=None,
+            numerator=None,
+            denominator=None,
+            reason="synthetic_profiling_limit",
+        )
+        updates = {"vector": vector}
+    elif name == "FeatureFit":
+        unavailable = (
+            field == "median"
+            and value is None
+            or field == "reason"
+            and value is not None
+            or field == "valid_count"
+            and value == 0
+        )
+        if unavailable:
+            updates = {
+                "valid_count": 0,
+                "median": None,
+                "reason": value if field == "reason" else "no_valid_training_values",
+            }
+        else:
+            updates = {
+                "valid_count": value if field == "valid_count" else 2,
+                "median": value if field == "median" else 0.5,
+                "reason": None,
+            }
+    elif name == "DetectorCalibration":
+        # Exact rational rank over explicitly authored scores; no model fitting
+        # or scientific calibration is credited by these metadata fixtures.
+        missing = (
+            field == "state"
+            and value == "not_estimable"
+            or field == "reason"
+            and value is not None
+            or field in {"rank", "threshold"}
+            and value is None
+            or field == "sample_count"
+            and value == 0
+            or field == "scores"
+            and not value
+        )
+        if missing:
+            updates = {
+                "state": "not_estimable",
+                "scores": [],
+                "rank": None,
+                "threshold": None,
+                "reason": value
+                if field == "reason"
+                else "synthetic_missing_calibration",
+            }
+        else:
+            scores = data["scores"]
+            if field == "sample_count":
+                scores = [1.0] * value
+            elif field == "rank":
+                # The declared lower rank boundary is one. One explicit score
+                # supplies that boundary without unrelated rank inconsistency.
+                scores = [1.0] if value == 1 else scores
+            elif field == "threshold":
+                scores = [value]
+            n = len(scores)
+            rank = math.ceil((1 - Fraction(data["alpha"])) * n)
+            threshold = sorted(
+                scores, key=lambda s: math.inf if s == "+infinity" else s
+            )[rank - 1]
+            infinite = threshold == "+infinity"
+            updates = {
+                "sample_count": n,
+                "scores": scores,
+                "rank": rank,
+                "threshold": threshold,
+                "state": "not_estimable" if infinite else "ready",
+                "reason": "infinite_calibration_threshold" if infinite else None,
+            }
+    elif name == "AggregateCheck" and field == "measure" and value is None:
         updates["function"] = "count"
     elif name == "Arithmetic" and field == "rounding":
         updates["operation"] = "divide"
@@ -545,6 +774,29 @@ def serialized(name, expected):
     return expected
 
 
+def synthetic_tree(samples):
+    """Three authored nodes; this fixture is not a trained Isolation Forest."""
+    return {
+        "nodes": [
+            {"samples": samples, "left": 1, "right": 2, "feature": 0, "threshold": 0.5},
+            {
+                "samples": samples // 2,
+                "left": None,
+                "right": None,
+                "feature": None,
+                "threshold": None,
+            },
+            {
+                "samples": samples - samples // 2,
+                "left": None,
+                "right": None,
+                "feature": None,
+                "threshold": None,
+            },
+        ]
+    }
+
+
 def prepare(catalog, baseline, discovery, boundary):
     records = {
         r["name"].rsplit(".", 1)[-1]: r for r in discovery.inspect_exports(ef, {})
@@ -587,6 +839,8 @@ def prepare(catalog, baseline, discovery, boundary):
             ("CheckResult", "required"),
             ("CheckResult", "severity"),
             ("WorkflowCheckpoint", "migration"),
+            ("DetectorModel", "medians"),
+            ("DetectorModel", "deviations"),
         }:
             value = declaration["default"]
             data.pop(field, None)
@@ -617,6 +871,8 @@ def prepare(catalog, baseline, discovery, boundary):
                         old = [
                             {"column": "id", "direction": "ascending", "nulls": "first"}
                         ]
+                    if name == "DetectorModel" and field == "trees" and not old:
+                        old = [synthetic_tree(2)]
                     variation = boundary.boundary(
                         getattr(ef, name).model_fields[field].annotation,
                         declaration["bounds"],
@@ -655,6 +911,10 @@ def prepare(catalog, baseline, discovery, boundary):
                         # but cannot satisfy either URI schemes or IANA zones.
                         # Expect semantic rejection without changing the input.
                         admitted = False
+                    if name == "DetectorCalibration" and field == "alpha":
+                        # A length-boundary string need not be a decimal
+                        # probability in (0, 1); preserve it and expect rejection.
+                        admitted = False
         else:
             exclusions[identifier] = "No authored expected for this operation"
             continue
@@ -663,6 +923,11 @@ def prepare(catalog, baseline, discovery, boundary):
         expected[field] = copy.deepcopy(value)
         if admitted:
             context(name, field, value, data, expected)
+        if suffix != "default":
+            owned.require(
+                owned.canonical(data[field]) == owned.canonical(value),
+                "Authored context must preserve the actual tested field value",
+            )
         if suffix == "default":
             data.pop(field, None)
         cases.append(
@@ -670,10 +935,15 @@ def prepare(catalog, baseline, discovery, boundary):
                 "case_id": identifier,
                 "obligations": [identifier],
                 "model": name,
+                "tested_field": field,
+                "tested_value": value,
                 "input": data,
                 "admitted": admitted,
                 "expected": serialized(name, expected) if admitted else None,
-                "basis": "Frozen literal baseline plus authored cross-field/serializer context; no observed oracle",
+                "basis": (
+                    "Frozen literal baseline plus authored cross-field/serializer context; "
+                    "no observed oracle"
+                ),
             }
         )
     return {"cases": cases, "exclusions": exclusions}
@@ -683,14 +953,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--catalog", type=Path, required=True)
     parser.add_argument("--baseline", type=Path, required=True)
+    parser.add_argument(
+        "--baseline-sha256",
+        help="Separately trusted digest of a freshly executed root baseline",
+    )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     catalog_raw, catalog = bounded_json(args.catalog)
     baseline_raw, baseline = bounded_json(args.baseline)
-    owned.require(
-        hashlib.sha256(baseline_raw).hexdigest() in BASELINE_HASHES,
-        "Original root baseline bytes differ",
-    )
+    verify_baseline_digest(baseline_raw, args.baseline_sha256)
     owned.require(
         hashlib.sha256(catalog_raw).hexdigest() == CATALOG_SHA,
         "Frozen original catalogue differs",
@@ -714,6 +985,11 @@ def main():
         and baseline.get("historical_counts_imported") is False
         and baseline.get("total") == 8438
         and baseline.get("verified") == 6201
+        and baseline.get("optimized") is (not __debug__)
+        and isinstance(baseline.get("source_commit"), str)
+        and re.fullmatch(r"[0-9a-f]{40}", baseline["source_commit"]) is not None
+        and isinstance(baseline.get("wheel_sha256"), str)
+        and re.fullmatch(r"[0-9a-f]{64}", baseline["wheel_sha256"]) is not None
         and len(baseline.get("rows", ())) == 8438
         and len({row["id"] for row in baseline["rows"]}) == 8438,
         "Expected complete immutable A14 root baseline required",

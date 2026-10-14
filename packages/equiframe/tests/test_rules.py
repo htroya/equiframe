@@ -262,7 +262,7 @@ def test_limits_cancellation_failure_and_tampering(tmp_path):
     )
     assert (
         bytes_limited.decision == "not_evaluable"
-        and "max_artifact_bytes" in bytes_limited.diagnostic
+        and bytes_limited.diagnostic == "rule_inputs_unavailable"
     )
     token = ef.CancellationToken()
     token.cancel()
@@ -273,7 +273,7 @@ def test_limits_cancellation_failure_and_tampering(tmp_path):
 
     local_path(tampered).write_bytes(b"tampered")
     invalid = ef.evaluate_rules(execution, work_dir=tmp_path / "invalid")
-    assert invalid.decision == "not_evaluable" and "ArtifactIntegrityError" in invalid.diagnostic
+    assert invalid.decision == "not_evaluable" and invalid.diagnostic == "rule_inputs_unavailable"
     failed = execution.model_copy(
         update={
             "state": "failed",
@@ -607,7 +607,7 @@ def test_key_check_requires_compatible_captured_column_type(tmp_path):
         tmp_path,
     )
     assert result.decision == "not_evaluable" and not result.complete
-    assert "incompatible captured type" in result.rules[0].reason
+    assert result.rules[0].reason == "rule_evaluation_failed"
 
 
 def test_key_scope_and_incomplete_policy(tmp_path):

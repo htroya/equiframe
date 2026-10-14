@@ -5,7 +5,7 @@ from pathlib import Path
 
 import typer
 
-from equiframe.errors import EquiFrameError
+from equiframe._error_reporting import report_failure
 from equiframe.evidence import load_json
 
 from .api import analyze, analyze_migration, read_result
@@ -40,9 +40,11 @@ def run(
         result = analyze(
             spec, config=load_json(EdaConfig, config) if config is not None else None, output=output
         )
-    except (OSError, ValueError, TypeError, EquiFrameError) as error:
-        typer.echo(type(error).__name__ + ": " + str(error), err=True)
-        raise typer.Exit(2) from error
+    except Exception as error:
+        typer.echo(
+            report_failure(error, "EDA request failed. Check the inputs and retry."), err=True
+        )
+        raise typer.Exit(2) from None
     typer.echo(
         json.dumps(
             {
@@ -74,9 +76,11 @@ def migration(
             config=load_json(EdaConfig, config) if config is not None else None,
             output=output,
         )
-    except (OSError, ValueError, TypeError, EquiFrameError) as error:
-        typer.echo(type(error).__name__ + ": " + str(error), err=True)
-        raise typer.Exit(2) from error
+    except Exception as error:
+        typer.echo(
+            report_failure(error, "EDA request failed. Check the inputs and retry."), err=True
+        )
+        raise typer.Exit(2) from None
     typer.echo(result.state)
     raise typer.Exit(0 if result.state == "completed" else 3)
 
@@ -86,9 +90,9 @@ def inspect(path: Path) -> None:
     """Check byte identity; 0 intact even for unavailable/failed stored results, 3 corrupt."""
     try:
         result = read_result(path)
-    except (OSError, ValueError, TypeError, EquiFrameError) as error:
-        typer.echo(type(error).__name__ + ": " + str(error), err=True)
-        raise typer.Exit(3) from error
+    except Exception as error:
+        typer.echo(report_failure(error, "EDA evidence could not be verified."), err=True)
+        raise typer.Exit(3) from None
     typer.echo(
         json.dumps({"state": result.state, "run_id": result.run_id, "integrity": "verified"})
     )

@@ -136,7 +136,8 @@ def test_window_error_cannot_be_hidden_by_a_filter(tmp_path):
     for engine in ("pandas", "polars"):
         result = run(filtered, schema, {"input": tied}, engine, tmp_path)
         assert result.state != "completed"
-        assert "ties" in result.problem.message
+        assert result.problem.code == "unsupported_capability"
+        assert result.problem.message == "Execution input could not be validated."
 
 
 @pytest.mark.parametrize(

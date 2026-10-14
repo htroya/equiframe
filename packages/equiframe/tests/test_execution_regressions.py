@@ -459,7 +459,8 @@ def test_zero_column_tables_keep_cardinality_or_reject_explicitly(engine, rows, 
         # Old native conversions cannot preserve N rows with zero columns.
         # A safe refusal is permitted; successful execution may never lose N.
         assert rows > 0 and result.problem.code == "unsupported_capability"
-        assert result.output is None and "dimensions" in result.problem.message
+        assert result.output is None
+        assert result.problem.message == "Execution input could not be validated."
     else:
         assert data(result).num_rows == rows and data(result).num_columns == 0
     assert result.inputs[0].row_count == rows
@@ -512,7 +513,7 @@ def test_polars_lossy_input_conversion_never_runs_callback(axis, monkeypatch, tm
     result = identity("polars", table, tmp_path, callback=forbidden)
     assert result.state == "invalid_input" and result.output is None
     assert result.problem.code == "unsupported_capability"
-    assert "input conversion changed table dimensions" in result.problem.message
+    assert result.problem.message == "Execution input could not be validated."
 
 
 @pytest.mark.parametrize("source_kind", ("arrow", "polars"))
@@ -532,4 +533,4 @@ def test_polars_lossy_arrow_capture_is_explicit_failure(source_kind, monkeypatch
     result = identity("polars", table, tmp_path, source=source)
     assert result.state == "invalid_input" and result.output is None
     assert result.problem.code == "unsupported_capability"
-    assert "changed table dimensions" in result.problem.message
+    assert result.problem.message == "Execution input could not be validated."

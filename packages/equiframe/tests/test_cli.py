@@ -28,7 +28,7 @@ def test_cli_validates_using_the_public_api(path: Path) -> None:
     assert not result.stderr
 
 
-def test_cli_invalid_contract_exits_2_with_location_and_code(tmp_path: Path) -> None:
+def test_cli_invalid_contract_exits_2_with_safe_guidance(tmp_path: Path) -> None:
     path = tmp_path / "invalid.json"
     path.write_text(
         json.dumps(
@@ -38,8 +38,10 @@ def test_cli_invalid_contract_exits_2_with_location_and_code(tmp_path: Path) -> 
     )
     result = runner.invoke(app, ["contract", "validate", str(path)])
     assert result.exit_code == 2
-    assert "$.output.schema_spec.keys[0].columns[0]" in result.stderr
-    assert "[unknown_column]" in result.stderr
+    assert "invalid_input" in result.stderr
+    assert "hint[document_validation]" in result.stderr
+    assert "missing" not in result.stderr
+    assert "Traceback" not in result.stderr
     assert not result.stdout
 
 
@@ -55,7 +57,8 @@ def test_cli_invalid_json_and_version_exit_2(tmp_path: Path) -> None:
 def test_cli_io_failure_exits_3(tmp_path: Path) -> None:
     result = runner.invoke(app, ["contract", "validate", str(tmp_path / "missing.json")])
     assert result.exit_code == 3
-    assert "cannot read contract file" in result.stderr
+    assert "operation_failed" in result.stderr
+    assert "hint[io_failure]" in result.stderr
     assert "Traceback" not in result.stderr
 
 

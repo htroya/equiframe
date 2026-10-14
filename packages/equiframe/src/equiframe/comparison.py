@@ -21,6 +21,7 @@ from typing_extensions import TypeAliasType
 
 from equiframe._comparison_io import batches, file_ref, snapshot
 from equiframe._diff_capture import _CapturedInput, _NativeInput
+from equiframe._error_reporting import report_failure
 from equiframe.comparison_types import (
     AppliedPolicy,
     ComparisonCounts,
@@ -770,7 +771,9 @@ def _compare(
             complete = True
         except (Exception, KeyboardInterrupt) as caught:
             error: BaseException = work.sql_error or caught
-            if isinstance(error, sqlite3.OperationalError) and "full" in str(error):
+            if isinstance(error, sqlite3.OperationalError) and (
+                getattr(error, "sqlite_errorcode", None) == getattr(sqlite3, "SQLITE_FULL", 13)
+            ):
                 error = ResourceLimitError("SQLite disk budget exhausted")
             code = (
                 "cancelled"
@@ -788,10 +791,18 @@ def _compare(
                 if isinstance(error, MissingDependencyError)
                 else "evaluation_failed"
             )
+            safe_message = "Comparison could not be completed: " + code
+            if type(error) is ValueError and len(error.args) == 1 and type(error.args[0]) is str:
+                if error.args == (
+                    "execution_inputs_differ: require the same verified input artifacts",
+                ):
+                    safe_message = "execution_inputs_differ: use identical verified input artifacts"
+                elif error.args == ("execution_parameters_differ",):
+                    safe_message = "execution_parameters_differ: use identical execution parameters"
             diagnostics.append(
                 ComparisonDiagnostic(
                     code=code,
-                    message=str(error) or type(error).__name__,
+                    message=report_failure(error, safe_message),
                     side=side,
                     exception_type=type(error).__name__,
                 )

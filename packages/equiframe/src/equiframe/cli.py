@@ -326,11 +326,9 @@ def validate(path: Path) -> None:
     try:
         contract = read_contract(path)
     except ContractValidationError as exc:
-        typer.echo(str(exc), err=True)
-        raise typer.Exit(code=2) from exc
+        _failure(exc)
     except ContractIOError as exc:
-        typer.echo(str(exc), err=True)
-        raise typer.Exit(code=3) from exc
+        _failure(exc, input_validation=False)
     typer.echo(f"Valid contract: {contract.contract_id} revision {contract.revision}")
     typer.echo("SHA-256 metadata: " + contract_fingerprint(contract))
 

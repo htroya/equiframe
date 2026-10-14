@@ -10,7 +10,6 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-import stat
 from collections import Counter
 from collections.abc import Iterator
 from contextlib import contextmanager, suppress
@@ -21,9 +20,10 @@ from urllib.parse import unquote, urlsplit
 from urllib.request import url2pathname
 
 from equiframe._base import FrozenModel
+from equiframe._regular_io import absolute_path, open_regular_file, regular_directory
 from equiframe.comparison_types import ComparisonDifference, ComparisonResult
 from equiframe.contracts import ColumnKeyScope, SignificantOrder
-from equiframe.errors import ArtifactIntegrityError, ArtifactIOError, ResourceLimitError
+from equiframe.errors import ArtifactIntegrityError, ResourceLimitError
 from equiframe.types import ArtifactRef
 
 _ModelT = TypeVar("_ModelT", bound=FrozenModel)
@@ -93,27 +93,11 @@ def _limits(max_bytes: int, max_records: int, max_examples: int) -> None:
 
 
 def _absolute(path: Path) -> Path:
-    _path_require(".." not in path.parts, "parent traversal is not permitted")
-    # resolve() would erase a symlink before inspection.
-    try:
-        return path.absolute()
-    except OSError as error:
-        raise ArtifactIOError("cannot determine absolute evidence path") from error
+    return absolute_path(path, path_error=EvidencePathError)
 
 
 def _directory(path: Path) -> Path:
-    path = _absolute(path)
-    try:
-        for item in (*reversed(path.parents), path):
-            inspected = item.lstat()
-            _path_require(
-                stat.S_ISDIR(inspected.st_mode)
-                and not getattr(inspected, "st_file_attributes", 0) & 0x400,
-                "evidence directories must not be symlinks or reparse points",
-            )
-    except OSError as error:
-        raise ArtifactIOError("cannot inspect evidence directory") from error
-    return path
+    return regular_directory(path, path_error=EvidencePathError)
 
 
 def _reference_path(ref: ArtifactRef, root: Path) -> Path:
@@ -147,46 +131,8 @@ def _open_regular(path: Path) -> Iterator[BinaryIO]:
     On systems without openat/O_NOFOLLOW, identities are checked around open.
     These cooperative checks do not sandbox a hostile concurrent filesystem.
     """
-    parent = _directory(path.parent)
-    descriptor: int | None = None
-    directory_descriptors: list[int] = []
-    try:
-        before = path.lstat()
-        _path_require(
-            stat.S_ISREG(before.st_mode) and not getattr(before, "st_file_attributes", 0) & 0x400,
-            "evidence must be a regular file, not a link or reparse point",
-        )
-        flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NONBLOCK", 0)
-        if os.open in os.supports_dir_fd and hasattr(os, "O_NOFOLLOW"):
-            directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
-            current = os.open(parent.anchor, directory_flags)
-            directory_descriptors.append(current)
-            for component in parent.parts[1:]:
-                current = os.open(component, directory_flags, dir_fd=current)
-                directory_descriptors.append(current)
-            descriptor = os.open(path.name, flags | os.O_NOFOLLOW, dir_fd=current)
-        else:
-            descriptor = os.open(path, flags)
-            _directory(parent)
-        after = os.fstat(descriptor)
-        _path_require(
-            stat.S_ISREG(after.st_mode) and not getattr(after, "st_file_attributes", 0) & 0x400,
-            "evidence must remain a regular file without reparse points",
-        )
-        _require(
-            (before.st_dev, before.st_ino) == (after.st_dev, after.st_ino),
-            "evidence file changed while opening",
-        )
-        with os.fdopen(descriptor, "rb") as stream:
-            descriptor = None
-            yield stream
-    except OSError as error:
-        raise ArtifactIOError("cannot read evidence file") from error
-    finally:
-        if descriptor is not None:
-            os.close(descriptor)
-        for directory_descriptor in reversed(directory_descriptors):
-            os.close(directory_descriptor)
+    with open_regular_file(path, path_error=EvidencePathError) as stream:
+        yield stream
 
 
 def _object(pairs: list[tuple[str, object]]) -> dict[str, object]:

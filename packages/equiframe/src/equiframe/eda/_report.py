@@ -137,12 +137,14 @@ def publish_report(
                     "chart_state": "completed",
                 }
             )
-        except (ImportError, ValueError, TypeError, _Unavailable, _Cancelled) as error:
-            chart_note = "Requested charts unavailable: " + type(error).__name__
+        except Exception as error:
+            from equiframe._error_reporting import report_failure
+
+            chart_note = "Requested charts unavailable."
             chart_state = (
                 "failed" if isinstance(error, (ValueError, TypeError)) else "not_evaluable"
             )
-            chart_reason = (type(error).__name__ + ": " + str(error)).strip()
+            chart_reason = report_failure(error, "requested_charts_unavailable")
             result = result.model_copy(
                 update={"chart_state": chart_state, "chart_reason": chart_reason}
             )
@@ -154,7 +156,7 @@ def publish_report(
                 result = result.model_copy(
                     update={
                         "state": "not_evaluable",
-                        "reason": "requested_charts_unavailable: " + chart_reason,
+                        "reason": chart_reason,
                     }
                 )
     elif config.charts:

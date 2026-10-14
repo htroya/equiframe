@@ -369,7 +369,7 @@ def test_cancelled_and_failed_remain_distinct(tmp_path):
         EdaConfig(numeric=(NumericRule(column="unknown"),)),
         name="failed",
     )
-    assert failed.state == "failed" and "unknown column" in failed.reason
+    assert failed.state == "failed" and failed.reason == "analysis_failed"
 
 
 @pytest.mark.parametrize("suffix", ["parquet", "arrow"])
@@ -591,13 +591,13 @@ def test_nonfaithful_raw_temporal_transport_is_explicit(tmp_path, suffix):
     table = pa.table({"instant": pa.array([0, 1, 1000], type=pa.timestamp("ns"))})
     result = run(tmp_path, table, suffix=suffix)
     assert result.state == "not_evaluable" and result.rows is None
-    assert "not faithful" in result.reason
+    assert result.reason == "analysis_unavailable"
 
 
 @pytest.mark.parametrize("suffix", ["parquet", "arrow"])
 def test_original_name_collisions_rejected_before_duckdb_rewrite(tmp_path, suffix):
     result = run(tmp_path, pa.table({"Amount": ["1"], "amount": ["2"]}), suffix=suffix)
-    assert result.state == "failed" and "collide before DuckDB" in result.reason
+    assert result.state == "failed" and result.reason == "analysis_failed"
 
 
 def test_derived_name_and_identifier_case_collisions_rejected(tmp_path):
@@ -606,7 +606,7 @@ def test_derived_name_and_identifier_case_collisions_rejected(tmp_path):
         pa.table({"Amount": ["1.00"]}),
         EdaConfig(conversions=(Conversion(column="Amount", target="amount", kind="decimal"),)),
     )
-    assert result.state == "failed" and "new derived name" in result.reason
+    assert result.state == "failed" and result.reason == "analysis_failed"
     with pytest.raises(ValidationError):
         EdaConfig(
             identifiers=("ID",), conversions=(Conversion(column="id", target="n", kind="integer"),)
@@ -712,7 +712,7 @@ def test_linked_migration_byte_change_never_leaves_completed_eda(tmp_path, monke
 
     monkeypatch.setattr(Backend, "convert", concurrent_edit)
     result = analyze_migration(document.parent, output=tmp_path / "eda")
-    assert result.state == "failed" and "byte identity changed" in result.reason
+    assert result.state == "failed" and result.reason == "analysis_failed"
     assert document.read_bytes() == initial + b"\n"  # EDA did not rewrite other actor's edit.
     assert read_result(tmp_path / "eda") == result
 

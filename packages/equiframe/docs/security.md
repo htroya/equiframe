@@ -1,9 +1,9 @@
 # Security boundaries and responsible use
 
 This Alpha candidate is a local Python library, not a sandbox or a hosted service.
-Public release is blocked. The STEP9 security assessment is **incomplete**:
-the managed security-scan execution tools were unavailable, and the separate
-manual review stopped before completion. There is no completed certification,
+Public release is blocked. The historical STEP9 assessment remains **incomplete**.
+The owner subsequently authorized ordinary secure development for A14 on
+2026-10-13; its fixes and regressions are recorded separately below. There is no completed certification,
 universal safety claim or assertion that the code has no vulnerabilities.
 Dependency advisory results, when available, describe a dated snapshot and the
 exact resolved versions; they do not replace a source review.
@@ -58,12 +58,12 @@ comparison contract.
 
 ## Known review limits and reporting
 
-The stopped review observed a special-file availability risk in a bundle reader;
-that path has not been certified fixed. A capture-budget observation also needs
-contract triage; per-comparison limits must not be represented as global quotas.
-No new source-hardening claim is based on that unfinished assessment. Avoid
-untrusted/special-file inputs until the affected paths have an authorized,
-completed review and regression tests.
+The historical review observed a special-file availability risk in a bundle reader.
+The A14 development follow-up reproduced blocking on a POSIX FIFO and added
+regular-file checks to the bundle, JSON, event and file-description readers.
+Capture budgets still require operation-specific interpretation; per-comparison
+limits must not be represented as global quotas. The follow-up does not complete
+or retroactively amend the historical assessment.
 
 There is no assigned security-response owner, verified private reporting channel
 or response-time SLA yet. These are release blockers, not implied commitments by
@@ -76,7 +76,8 @@ post credentials, personal data or a sensitive exploit in a public issue.
 
 ## Consolidation review boundary, 2026-10-06
 
-This consolidation does **not** resume the stopped source-security assessment,
+The following paragraphs describe the historical 2026-10-06 consolidation.
+That consolidation did **not** resume the stopped source-security assessment,
 through a specialized scanner or through an equivalent manual audit. That is a
 real unresolved coverage boundary, distinct from a temporarily missing tool.
 The prior special-file observation and capture-budget contract question remain
@@ -100,3 +101,31 @@ wheel/sdist bytes. Offline regeneration performs no new registry-wide advisory
 query and must not be presented as a current comprehensive vulnerability scan.
 Release and untrusted-input adoption remain blocked on the unresolved assessment
 and owner decisions; a private branch is not a security certification.
+
+## A14 secure-development follow-up, 2026-10-13
+
+Stored operational failure summaries and CLI diagnostics use fixed messages.
+They do not stringify external exceptions or publish their input values, source
+paths or SQL. Optional DEBUG diagnostics contain at most 32 owned frame records
+(module, function, line); external frames are anonymous and values, source text
+and local variables are excluded. A broken logging handler cannot replace the
+operational result. Programmatic validation exceptions and explicitly requested
+raw data remain separate; applications must handle them before showing a UI.
+
+EDA cancellation callbacks must be callable and return actual booleans. A failing
+callback is not called again during error recovery; incomplete analysis persists
+a closed diagnostic code. Unexpected optional-chart failures also remain
+explicitly not evaluable, without exposing third-party exception text.
+
+Evidence readers and bundle inventories inspect lexical ancestors before
+resolution and reject symlinks, Windows reparse points and non-regular files.
+POSIX reads pin directory descriptors and use O_NOFOLLOW/O_NONBLOCK; fallback
+hosts check identities around opening. JSON and bundle documents retain their
+64 MiB limit, and the bundle pin is checked against the bytes actually parsed.
+These cooperative checks are not a filesystem sandbox against hostile mounts
+or concurrent owners. Bundle copies still require a controlled, immutable source.
+
+See the [A14 follow-up record](https://github.com/htroya/equiframe/blob/main/docs/A14_SAFE_ERRORS_EVIDENCE_20261013.md)
+for reproductions and the distinction between source tests and artifact validation.
+This work uses ordinary development tools. It does not invoke Codex Security,
+create parallel agents, publish a package or change Alpha to Beta.

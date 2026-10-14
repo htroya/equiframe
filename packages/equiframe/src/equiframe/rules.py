@@ -19,6 +19,7 @@ from typing import TYPE_CHECKING, BinaryIO, Literal
 from uuid import uuid4
 
 from equiframe._decimal import exact_decimal_context
+from equiframe._error_reporting import report_failure
 from equiframe.comparison_types import ComparisonPolicy, ComparisonValue
 from equiframe.contracts import (
     AggregateCheck,
@@ -621,7 +622,7 @@ def _check(
                 context.checkpoint()
                 implementation.evaluate(definition, context)
             except Exception as error:
-                reason, complete = type(error).__name__ + ": " + str(error), False
+                reason, complete = report_failure(error, "rule_evaluation_failed"), False
                 state = "violated" if context.violations else "not_evaluable"
             else:
                 state = "violated" if context.violations else "satisfied"
@@ -683,7 +684,7 @@ def evaluate_rules(
         context = RuleContext(contract, tables, options, cancellation, start)
         context.checkpoint()
     except Exception as error:
-        diagnostic = type(error).__name__ + ": " + str(error)
+        diagnostic = report_failure(error, "rule_inputs_unavailable")
     preconditions = tuple(
         _check(
             item.requirement,

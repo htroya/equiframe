@@ -1,5 +1,6 @@
 """Adversarial input checks for the private root-trace revalidation tool."""
 
+import hashlib
 import importlib.util
 from pathlib import Path
 
@@ -59,3 +60,19 @@ def test_input_directory_link_is_refused_before_reading(tmp_path):
         pytest.skip("platform lacks symlink permission")
     with pytest.raises(ValueError, match="ordinary directories"):
         checker.bounded_json(link / "candidate.json")
+
+
+@pytest.mark.parametrize("digest", ["", "A" * 64, "0" * 63, "0" * 65, "../receipt"])
+def test_malformed_external_baseline_identity_is_refused(digest):
+    with pytest.raises(ValueError, match="lowercase SHA-256"):
+        checker.verify_baseline_digest(b'{"baseline":"fresh"}', digest)
+
+
+def test_fresh_baseline_requires_explicit_trusted_identity():
+    raw = b'{"baseline":"fresh"}'
+    digest = hashlib.sha256(raw).hexdigest()
+    with pytest.raises(ValueError, match="trusted identity"):
+        checker.verify_baseline_digest(raw)
+    checker.verify_baseline_digest(raw, digest)
+    with pytest.raises(ValueError, match="trusted identity"):
+        checker.verify_baseline_digest(raw + b" ", digest)

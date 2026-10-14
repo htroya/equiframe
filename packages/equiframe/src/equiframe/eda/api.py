@@ -18,6 +18,7 @@ from typing import Any, Literal, cast
 from uuid import uuid4
 
 from equiframe import __version__
+from equiframe._error_reporting import report_failure
 from equiframe._report_io import _open_regular
 from equiframe.errors import CapabilityError
 from equiframe.evidence import canonical_bytes, load_json, parse_json, publish_json
@@ -151,6 +152,8 @@ def _analyze(
 ) -> EdaResult:
     source = Source.model_validate(source)
     config = EdaConfig.model_validate(config) if config is not None else EdaConfig()
+    if cancellation is not None and not callable(cancellation):
+        raise TypeError("cancellation requires a callable returning bool")
     output = ordinary_path(output, directory=True, allow_missing=True)
     path = ordinary_path(Path(source.path))
     if output.is_relative_to(path.parent):
@@ -177,10 +180,24 @@ def _analyze(
     connection: Any = None
     timer: threading.Timer | None = None
     environment = {"python": sys.version, "platform": platform.platform()}
+    cancellation_failure: str | None = None
 
     def checkpoint() -> None:
-        if cancellation is not None and cancellation():
-            raise _Cancelled("cancellation_requested")
+        nonlocal cancellation_failure
+        if cancellation_failure is not None:
+            raise _Unavailable(cancellation_failure)
+        if cancellation is not None:
+            try:
+                requested = cancellation()
+            except Exception as error:
+                report_failure(error, "Cancellation callback failed")
+                cancellation_failure = "cancellation_callback_failed"
+                raise _Unavailable(cancellation_failure) from None
+            if type(requested) is not bool:
+                cancellation_failure = "invalid_cancellation_result"
+                raise _Unavailable(cancellation_failure)
+            if requested:
+                raise _Cancelled("cancellation_requested")
         if time.monotonic() - started >= limits.timeout_seconds:
             raise _Unavailable("timeout_budget_exhausted")
 
@@ -318,9 +335,10 @@ def _analyze(
             "InterruptException",
         }
         state = "not_evaluable" if resource_error else "failed"
-        if cancellation is not None and cancellation():
-            state = "cancelled"
-        reason = (type(error).__name__ + ": " + str(error)).strip()
+        reason = report_failure(
+            error,
+            "analysis_unavailable" if resource_error else "analysis_failed",
+        )
     finally:
         if timer is not None:
             timer.cancel()

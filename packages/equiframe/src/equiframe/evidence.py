@@ -12,7 +12,8 @@ from pydantic import BaseModel
 
 from equiframe._base import FrozenModel, Identifier, NonNegativeInt, Text
 from equiframe._document_io import write_document as _write_document
-from equiframe.errors import ArtifactIntegrityError, ResourceLimitError
+from equiframe._regular_io import open_regular_file, regular_directory, regular_files
+from equiframe.errors import ArtifactIntegrityError, ArtifactIOError, ResourceLimitError
 from equiframe.local import local_path
 from equiframe.pipeline_types import EvidenceFile, PipelineResult
 from equiframe.types import ArtifactRef, Sha256
@@ -61,7 +62,7 @@ def parse_json(data: bytes) -> object:
 
 
 def load_json(model: type[_ModelT], path: Path) -> _ModelT:
-    with path.open("rb") as stream:
+    with open_regular_file(path) as stream:
         data = stream.read(MAX_DOCUMENT_BYTES + 1)
     if len(data) > MAX_DOCUMENT_BYTES:
         raise ResourceLimitError("JSON document exceeds the 64 MiB budget")
@@ -122,7 +123,7 @@ class EventJournal:
 def verify_events(path: Path, *, operation_id: str) -> tuple[EvidenceEvent, ...]:
     head = "0" * 64
     events: list[EvidenceEvent] = []
-    with path.open("rb") as stream:
+    with open_regular_file(path) as stream:
         total = 0
         while raw := stream.readline(1024 * 1024 + 1):
             total += len(raw)
@@ -146,12 +147,12 @@ def verify_events(path: Path, *, operation_id: str) -> tuple[EvidenceEvent, ...]
 
 
 def describe_file(path: Path, directory: Path) -> EvidenceFile:
-    root = directory.resolve()
+    root = regular_directory(directory).resolve()
     if not path.resolve().is_relative_to(root) or path.is_symlink():
         raise ArtifactIntegrityError("evidence file escapes its operation directory")
     digest = hashlib.sha256()
     size = 0
-    with path.open("rb") as stream:
+    with open_regular_file(path) as stream:
         while block := stream.read(1024 * 1024):
             digest.update(block)
             size += len(block)
@@ -161,9 +162,7 @@ def describe_file(path: Path, directory: Path) -> EvidenceFile:
 
 
 def inventory(directory: Path) -> tuple[EvidenceFile, ...]:
-    return tuple(
-        describe_file(path, directory) for path in sorted(directory.rglob("*")) if path.is_file()
-    )
+    return tuple(describe_file(path, directory) for path in regular_files(directory))
 
 
 def verify_files(directory: Path, files: tuple[EvidenceFile, ...]) -> None:
@@ -171,7 +170,7 @@ def verify_files(directory: Path, files: tuple[EvidenceFile, ...]) -> None:
         path = directory / item.path
         try:
             observed = describe_file(path, directory)
-        except OSError as error:
+        except (OSError, ArtifactIOError) as error:
             raise ArtifactIntegrityError("evidence file is missing or unreadable") from error
         if observed != item:
             raise ArtifactIntegrityError("evidence SHA-256 or size mismatch")

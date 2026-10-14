@@ -13,6 +13,7 @@ from uuid import uuid4
 from typing_extensions import TypeAliasType
 
 from equiframe._comparison_io import snapshot
+from equiframe._error_reporting import report_failure
 from equiframe._physical import verify_table_metadata
 from equiframe._report_format_v1 import verification_html_v1, verification_summary_v1
 from equiframe.comparison import compare, iter_differences, read_comparison
@@ -464,7 +465,9 @@ def verify(
                 technical_checks[-1] = _check(
                     "not_evaluable", "Execution evidence could not be captured", name
                 )
-                errors.append(_check("failed", type(error).__name__ + ": " + str(error), name))
+                errors.append(
+                    _check("failed", report_failure(error, "execution_capture_failed"), name)
+                )
         else:
             value = ArtifactRef.model_validate(value)
             technical_checks.append(
@@ -477,7 +480,9 @@ def verify(
             try:
                 captured[name] = capture(value)
             except Exception as error:
-                errors.append(_check("failed", type(error).__name__ + ": " + str(error), name))
+                errors.append(
+                    _check("failed", report_failure(error, "artifact_capture_failed"), name)
+                )
     fixed_expected = None
     expected_engine = None
     if isinstance(expected, ExecutionResult):
@@ -502,7 +507,7 @@ def verify(
         try:
             fixed_expected = capture(expected)
         except Exception as error:
-            errors.append(_check("failed", "Expected capture: " + str(error)))
+            errors.append(_check("failed", report_failure(error, "expected_capture_failed")))
     fixed_snapshots = {name: capture(ref) for name, ref in (snapshots or {}).items()}
     if not fixed_snapshots and executions:
         first = next(iter(executions.values()))

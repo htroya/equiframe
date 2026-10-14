@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import hashlib
-import os
 import shutil
 from pathlib import Path
 from typing import Literal
@@ -12,9 +11,20 @@ from pydantic import model_validator
 from typing_extensions import Self
 
 from equiframe._base import FrozenModel, Text
-from equiframe._path_compat import is_junction
+from equiframe._regular_io import (
+    new_directory_path,
+    open_regular_file,
+    regular_directory,
+    regular_files,
+)
 from equiframe.errors import ArtifactIntegrityError
-from equiframe.evidence import describe_file, load_json, parse_json, publish_json, verify_files
+from equiframe.evidence import (
+    MAX_DOCUMENT_BYTES,
+    describe_file,
+    parse_json,
+    publish_json,
+    verify_files,
+)
 from equiframe.local import _bundle_paths, local_path
 from equiframe.pipeline_types import EvidenceFile
 from equiframe.types import ArtifactRef
@@ -50,17 +60,7 @@ class EvidenceBundle(FrozenModel):
 
 
 def _members(root: Path) -> tuple[Path, ...]:
-    root = root.resolve()
-    members: list[Path] = []
-    for parent, dirs, files in os.walk(root, followlinks=False):
-        for name in (*dirs, *files):
-            p = Path(parent) / name
-            if p.is_symlink() or is_junction(p) or not p.resolve().is_relative_to(root):
-                raise ArtifactIntegrityError(
-                    "portable evidence rejects symlinks and escaping paths"
-                )
-        members.extend(Path(parent) / name for name in files)
-    return tuple(sorted(members))
+    return regular_files(root)
 
 
 def _references(value: object) -> tuple[ArtifactRef, ...]:
@@ -81,7 +81,11 @@ def _document_references(root: Path, members: tuple[Path, ...]) -> dict[str, Art
     result: dict[str, ArtifactRef] = {}
     for path in members:
         if path.suffix == ".json":
-            for ref in _references(parse_json(path.read_bytes())):
+            with open_regular_file(path) as stream:
+                raw = stream.read(MAX_DOCUMENT_BYTES + 1)
+            if len(raw) > MAX_DOCUMENT_BYTES:
+                raise ArtifactIntegrityError("portable document exceeds its byte budget")
+            for ref in _references(parse_json(raw)):
                 if ref.uri in result and result[ref.uri] != ref:
                     raise ArtifactIntegrityError("one artifact URI has conflicting identities")
                 result[ref.uri] = ref
@@ -108,9 +112,11 @@ def export_bundle(source: Path, destination: Path) -> EvidenceBundle:
     No artifact is fetched from outside the source. External provenance can map
     only to an already captured member with exactly the same hash and size.
     """
-    source = source.resolve()
     if source.is_file():
+        with open_regular_file(source):
+            pass
         source = source.parent
+    source = regular_directory(source).resolve()
     names = {
         "migration.json": "migration",
         "verification.json": "verification",
@@ -138,7 +144,7 @@ def export_bundle(source: Path, destination: Path) -> EvidenceBundle:
             path="operation/" + item.path, sha256=item.sha256, size_bytes=item.size_bytes
         )
         mappings.append(BundleReference(uri=ref.uri, member=member))
-    destination = destination.resolve()
+    destination = new_directory_path(destination)
     if destination.is_relative_to(source):
         raise ValueError("portable destination must be outside the source operation")
     destination.mkdir(parents=True, exist_ok=False)
@@ -165,14 +171,16 @@ def export_bundle(source: Path, destination: Path) -> EvidenceBundle:
 def read_bundle(path: Path, *, expected_sha256: str | None = None) -> EvidenceBundle:
     """Verify membership and operation; only None omits the optional manifest pin."""
     root = path if path.is_dir() else path.parent
-    root = root.resolve()
+    root = regular_directory(root).resolve()
     manifest = root / "bundle.json"
-    if (
-        expected_sha256 is not None
-        and hashlib.sha256(manifest.read_bytes()).hexdigest() != expected_sha256
-    ):
+    with open_regular_file(manifest) as stream:
+        raw = stream.read(MAX_DOCUMENT_BYTES + 1)
+    if len(raw) > MAX_DOCUMENT_BYTES:
+        raise ArtifactIntegrityError("portable manifest exceeds its byte budget")
+    if expected_sha256 is not None and hashlib.sha256(raw).hexdigest() != expected_sha256:
         raise ArtifactIntegrityError("portable manifest differs from trusted SHA-256")
-    bundle = load_json(EvidenceBundle, manifest)
+    parse_json(raw)
+    bundle = EvidenceBundle.model_validate_json(raw)
     members = _members(root)
     actual = {p.relative_to(root).as_posix() for p in members if p != manifest}
     if actual != {f.path for f in bundle.files}:
@@ -197,7 +205,7 @@ def import_bundle(
     """Copy to a new directory and verify again; original bytes are preserved."""
     read_bundle(source, expected_sha256=expected_sha256)
     root = source if source.is_dir() else source.parent
-    destination = destination.resolve()
+    destination = new_directory_path(destination)
     if destination.exists() or destination.is_relative_to(root.resolve()):
         raise ValueError("bundle import requires a new destination outside the source")
     shutil.copytree(root, destination)

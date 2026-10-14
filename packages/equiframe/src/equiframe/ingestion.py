@@ -23,6 +23,7 @@ from typing_extensions import Self
 from equiframe._base import FrozenModel, NonNegativeInt, Text, _ExplicitOutcome
 from equiframe._decimal import exact_decimal_context
 from equiframe._document_io import write_document_chunks
+from equiframe._error_reporting import report_failure
 from equiframe.contracts import (
     BooleanType,
     ColumnSpec,
@@ -658,12 +659,22 @@ def ingest_file(
             except (UnicodeError, csv.Error, ValueError) as error:
                 if count >= spec.max_records:
                     raise ResourceLimitError("records exceed ingestion record budget") from error
+                source_code = (
+                    "UnicodeDecodeError:invalid_source_encoding"
+                    if isinstance(error, UnicodeDecodeError)
+                    else "ValueError:empty_json_document"
+                    if type(error) is ValueError
+                    and len(error.args) == 1
+                    and type(error.args[0]) is str
+                    and error.args[0] == "empty_json_document"
+                    else "invalid_ingestion_source"
+                )
                 quarantine.append(
                     QuarantinedRecord(
                         record=count,
                         path="$",
                         original_text="",
-                        code=type(error).__name__ + ":" + str(error),
+                        code=report_failure(error, source_code),
                     )
                 )
                 count += 1

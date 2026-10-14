@@ -19,6 +19,7 @@ from uuid import uuid4
 from pydantic import TypeAdapter, ValidationError
 
 from equiframe._base import Identifier
+from equiframe._error_reporting import report_failure
 from equiframe.contracts import DecimalType, TimestampType
 from equiframe.errors import (
     CapabilityError,
@@ -273,13 +274,31 @@ def execute(
             state = "invalid_input"
         else:
             state = "failed"
+        public_message = {
+            "cancelled": "Execution was cancelled.",
+            "timeout": "Execution exceeded its time budget.",
+            "resource_exhausted": "Execution exceeded a resource budget.",
+            "invalid_input": "Execution input could not be validated.",
+            "failed": "Execution failed. Check the declared engine and configuration.",
+        }[state]
+        # Engine labels come from this closed map, never exception text or SQL.
+        from equiframe.errors import MissingDependencyError
+
+        if isinstance(error, MissingDependencyError):
+            requirements = {
+                "arrow": "equiframe[arrow]",
+                "pandas": "equiframe[pandas]",
+                "polars": "equiframe[polars]",
+                "duckdb": "equiframe[duckdb]",
+            }
+            requirement = requirements.get(plan.engine)
+            if requirement is not None:
+                public_message += " Install " + requirement + " from your reviewed wheelhouse."
         problem = ExecutionProblem(
             code=error.code if isinstance(error, EquiFrameError) else state,
             stage=context.stage,
             exception_type=type(error).__name__,
-            message=str(error)
-            if isinstance(error, EquiFrameError)
-            else "trusted implementation or local operation failed; inspect exception type/stage",
+            message=report_failure(error, public_message),
         )
     result = ExecutionResult(
         run_id=run_id,

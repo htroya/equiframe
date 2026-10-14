@@ -17,6 +17,14 @@
   Read source manifests with a 16 MiB/2,000-member budget and verify the exact
   bytes consumed. Protected file reads preserve the existing diagnostic formats.
 - Reject Windows reparse points in comparison-evidence directories and ancestors.
+- Use fixed operational error messages and bounded, value-free DEBUG frames;
+  do not publish external exception values in EDA, execution, rules, ingestion,
+  comparison or verification results. Preserve closed recovery codes and states.
+- Validate EDA cancellation callbacks and their boolean results, avoid invoking
+  failed callbacks again, and retain incomplete evidence after chart failures.
+- Reject pipes, links, reparse points and special members in generic evidence
+  readers and portable bundles; pin POSIX directories before reading and compare
+  manifest hashes against the same bounded bytes parsed. Historical data stays unchanged.
 
 ## 0.12.0a13 — package quality and producer identity (2026-10-10)
 

@@ -35,6 +35,8 @@ class Report(TypedDict):
 
 FORBIDDEN = ("equiframe_benchmark", "equiframe_data", "equiframe_sercop")
 NEUTRAL = {
+    "equiframe._regular_io": {"equiframe.errors"},
+    "equiframe._error_reporting": set(),
     "equiframe._document_io": {"equiframe.serialization"},
     "equiframe._physical": {
         "equiframe.errors",
