@@ -662,6 +662,13 @@ def ingest_file(
                 source_code = (
                     "UnicodeDecodeError:invalid_source_encoding"
                     if isinstance(error, UnicodeDecodeError)
+                    else "Error:unexpected end of data"
+                    if type(error) is csv.Error
+                    and len(error.args) == 1
+                    and type(error.args[0]) is str
+                    and error.args[0] == "unexpected end of data"
+                    else "Error:invalid_csv_source"
+                    if isinstance(error, csv.Error)
                     else "ValueError:empty_json_document"
                     if type(error) is ValueError
                     and len(error.args) == 1

@@ -25,6 +25,9 @@
 - Reject pipes, links, reparse points and special members in generic evidence
   readers and portable bundles; pin POSIX directories before reading and compare
   manifest hashes against the same bounded bytes parsed. Historical data stays unchanged.
+- Preserve relative report paths and safe recovery categories with the protected
+  readers. Contract/profile/detector document reads reject special files and use
+  a 64 MiB budget; generic document OS errors retain their type/errno without paths.
 
 ## 0.12.0a13 — package quality and producer identity (2026-10-10)
 

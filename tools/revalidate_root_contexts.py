@@ -71,6 +71,8 @@ MODELS = {
     "ColumnSpec",
     "CompilationCheck",
     "ComparisonPolicy",
+    "ComparisonReport",
+    "ComparisonResult",
     "ComparisonValue",
     "ComponentDecision",
     "ConversionReceipt",
@@ -96,6 +98,7 @@ MODELS = {
     "Measure",
     "JoinCheck",
     "IngestionResult",
+    "IngestionSpec",
     "KeySpec",
     "LocalizeTimestamp",
     "NaNPolicy",
@@ -111,6 +114,7 @@ MODELS = {
     "ReportValue",
     "ReportWitness",
     "RuleSpec",
+    "RuleEvaluation",
     "TableArtifact",
     "TableSchema",
     "TimestampPolicy",
@@ -177,7 +181,102 @@ def bounded_json(path):
 
 def context(name, field, value, data, expected):
     updates = {}
-    if name == "EquivalenceDecision":
+    if name == "ComparisonResult":
+        incomplete = (
+            field == "state"
+            and value == "not_evaluable"
+            or field == "complete"
+            and value is False
+            or field == "strategy"
+            and value == "pending"
+            or field in {"left", "right"}
+            and value is None
+        )
+        counts = copy.deepcopy(data["counts"])
+        if incomplete:
+            counts["final"] = False
+            updates = {
+                "state": "not_evaluable",
+                "complete": False,
+                "counts": counts,
+                "diagnostics": [
+                    {
+                        "code": "synthetic_unavailable",
+                        "message": "Authored metadata context",
+                        "side": None,
+                        "exception_type": None,
+                    }
+                ],
+            }
+        elif field == "state" and value == "different":
+            counts.update(difference_records=1, matched_rows=2)
+            updates["counts"] = counts
+        if field == "strategy":
+            updates["selected_key"] = "diff_key" if value == "key" else None
+        elif field == "selected_key" and value is None:
+            updates["strategy"] = "multiset"
+    elif name == "ComparisonReport":
+        incomplete = (
+            field == "state"
+            and value == "not_evaluable"
+            or field == "complete"
+            and value is False
+            or field == "coverage"
+            and value == "partial"
+        )
+        evidence = copy.deepcopy(data["evidence"])
+        counts = copy.deepcopy(data["counts"])
+        if incomplete:
+            evidence.update(evaluation_complete=False, counts_final=False)
+            for count in counts:
+                if count["precision"] == "exact":
+                    count["precision"] = "lower_bound"
+            updates = {
+                "state": "not_evaluable",
+                "complete": False,
+                "coverage": "partial",
+                "evidence": evidence,
+                "counts": counts,
+                "reasons": ["Authored incomplete metadata context"],
+            }
+        elif field == "state" and value == "different":
+            evidence.update(available_records=1, display_complete=False)
+            for count in counts:
+                if count["name"] == "difference_records":
+                    count["value"] = 1
+            updates = {
+                "evidence": evidence,
+                "counts": counts,
+                "reasons": ["Authored different metadata context"],
+            }
+    elif name == "IngestionSpec":
+        if field == "header" and value is False:
+            updates["fieldnames"] = ["n"]
+        elif field == "fieldnames":
+            updates["header"] = False
+        elif field == "records_path":
+            updates["format"] = "json"
+    elif name == "RuleEvaluation":
+        if field == "decision" and value == "alert":
+            rules = copy.deepcopy(data["rules"])
+            rules[0].update(state="violated", violation_count=1)
+            coverage = copy.deepcopy(data["coverage"])
+            coverage.update(alerts=1, finding_count=1, highest_alert_severity="error")
+            updates = {"rules": rules, "coverage": coverage}
+        elif (
+            field == "decision"
+            and value == "not_evaluable"
+            or field == "complete"
+            and value is False
+            or field == "execution_state"
+            and value != "completed"
+            or field == "diagnostic"
+            and value is not None
+        ):
+            updates = {"complete": False, "decision": "not_evaluable"}
+            if field != "diagnostic":
+                updates["diagnostic"] = "Authored incomplete metadata context"
+    elif name == "EquivalenceDecision":
         # Authored from the decision consistency contract. This synthetic
         # metadata context establishes neither equivalence nor scientific O.
         state = data["state"]
@@ -841,6 +940,7 @@ def prepare(catalog, baseline, discovery, boundary):
             ("WorkflowCheckpoint", "migration"),
             ("DetectorModel", "medians"),
             ("DetectorModel", "deviations"),
+            ("ComparisonResult", "selected_key"),
         }:
             value = declaration["default"]
             data.pop(field, None)
@@ -862,6 +962,11 @@ def prepare(catalog, baseline, discovery, boundary):
                         old = ["x"]
                     if name == "RuleSpec" and field == "applicability":
                         old = ["rule_a"]
+                    if name == "IngestionSpec" and field in {
+                        "records_path",
+                        "fieldnames",
+                    }:
+                        old = ["n"]
                     if name in {"Aggregate", "Window"} and field in {
                         "group_by",
                         "partition_by",

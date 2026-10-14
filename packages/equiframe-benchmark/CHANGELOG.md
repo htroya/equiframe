@@ -1,10 +1,14 @@
-## 0.12.0a13 — package quality and producer identity (2026-10-10)
-
 ## 0.12.0a14 — private Alpha pairing
 
 Pair with core A14's optional EDA. No detector training, thesis metrics or
 historic evidence rewritten. Existing benchmark protocol and APIs unchanged.
 
+- Support Windows environments created from another virtual environment. Validate
+  up to 16 creator configurations, requiring the current interpreter's base and
+  rejecting cycles, duplicate keys, relative creators, mismatched homes and large
+  or linked configurations. Never execute a configured creator or an unbound command.
+
+## 0.12.0a13 — package quality and producer identity (2026-10-10)
 
 - Remove a process-test race by capturing OS descendant identities before real
   cleanup instead of requiring the terminated worker to finish writing a file.

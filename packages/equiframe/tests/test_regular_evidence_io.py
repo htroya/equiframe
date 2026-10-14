@@ -8,14 +8,20 @@ from pathlib import Path
 
 import pytest
 
+from equiframe import read_contract
+from equiframe._document_io import read_document
 from equiframe.bundle import export_bundle, read_bundle
 from equiframe.errors import ArtifactIntegrityError
 from equiframe.evidence import EvidenceEvent, describe_file, load_json, verify_events
 
-READERS = ("json", "events", "describe", "bundle", "export")
+READERS = ("json", "events", "describe", "bundle", "export", "contract", "document")
 
 
 def read(operation, root):
+    if operation == "contract":
+        return read_contract(root / "bundle.json")
+    if operation == "document":
+        return read_document(root / "bundle.json")
     if operation == "json":
         return load_json(EvidenceEvent, root / "bundle.json")
     if operation == "events":
@@ -91,12 +97,16 @@ def test_fifo_is_rejected_without_waiting_for_a_writer(tmp_path, operation):
 import json, sys
 from pathlib import Path
 import equiframe
+from equiframe import read_contract
+from equiframe._document_io import read_document
 from equiframe.errors import ArtifactIntegrityError
 from equiframe.bundle import read_bundle, export_bundle
 from equiframe.evidence import EvidenceEvent, load_json, verify_events, describe_file
 operation, root = sys.argv[1], Path(sys.argv[2])
 try:
     if operation == 'json': load_json(EvidenceEvent, root / 'bundle.json')
+    elif operation == 'contract': read_contract(root / 'bundle.json')
+    elif operation == 'document': read_document(root / 'bundle.json')
     elif operation == 'events': verify_events(root / 'bundle.json', operation_id='test')
     elif operation == 'describe': describe_file(root / 'bundle.json', root)
     elif operation == 'bundle': read_bundle(root)
@@ -131,3 +141,38 @@ def test_regular_file_description_preserves_hash_size_and_relative_path(tmp_path
     assert result.size_bytes == len(data)
     assert result.sha256 == hashlib.sha256(data).hexdigest()
     assert path.read_bytes() == data
+
+
+def test_relative_inventory_and_file_descriptions_preserve_the_same_bytes(tmp_path, monkeypatch):
+    from equiframe.evidence import inventory
+
+    monkeypatch.chdir(tmp_path)
+    directory = Path("relative-output")
+    directory.mkdir()
+    path = directory / "document.json"
+    path.write_bytes(b"{}\n")
+    relative = describe_file(path, directory)
+    absolute = describe_file(path.absolute(), directory.absolute())
+    assert relative == absolute
+    assert relative.path == "document.json" and relative.size_bytes == 3
+    assert inventory(directory) == inventory(directory.absolute()) == (relative,)
+    assert path.read_bytes() == b"{}\n"
+
+
+@pytest.mark.parametrize("operation", ["contract", "document"])
+def test_documents_over_the_byte_budget_are_refused_before_parsing(tmp_path, operation):
+    from equiframe.errors import ResourceLimitError
+
+    with (tmp_path / "bundle.json").open("wb") as stream:
+        stream.truncate(64 * 1024 * 1024 + 1)
+    with pytest.raises(ResourceLimitError, match="64 MiB"):
+        read(operation, tmp_path)
+
+
+def test_missing_generic_document_keeps_os_error_without_disclosing_its_path(tmp_path):
+    marker = "SYNTHETIC_PRIVATE_PATH_3921"
+    with pytest.raises(FileNotFoundError) as caught:
+        read_document(tmp_path / marker)
+    assert caught.value.errno == 2
+    assert caught.value.filename is None and caught.value.filename2 is None
+    assert marker not in str(caught.value)

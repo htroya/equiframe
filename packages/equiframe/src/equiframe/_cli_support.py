@@ -27,6 +27,18 @@ from equiframe.errors import (
 
 def failure_hint(error: Exception, *, input_validation: bool = True) -> tuple[str, str]:
     """Return a bounded category and actionable guidance without inspecting payloads."""
+    if isinstance(error, (ArtifactIOError, ContractIOError)) and isinstance(
+        error.__cause__,
+        (
+            FileNotFoundError,
+            FileExistsError,
+            PermissionError,
+            IsADirectoryError,
+            NotADirectoryError,
+        ),
+    ):
+        # Inspect only the immediate OS error class, never its path or message.
+        return failure_hint(error.__cause__, input_validation=input_validation)
     if isinstance(error, FileNotFoundError):
         return "missing_path", "Check that the requested input and its parent directory exist."
     if isinstance(error, FileExistsError):
@@ -59,6 +71,13 @@ def failure_hint(error: Exception, *, input_validation: bool = True) -> tuple[st
     if isinstance(error, (json.JSONDecodeError, UnicodeDecodeError)):
         return "document_syntax", "Use a valid UTF-8 JSON document for the selected command."
     if isinstance(error, (ValidationError, ContractValidationError)):
+        if isinstance(error, ContractValidationError) and any(
+            issue.code == "duplicate_json_key" for issue in error.issues
+        ):
+            return (
+                "duplicate_json_key",
+                "Use one value per JSON member; duplicate keys are refused.",
+            )
         return (
             (
                 "document_validation",

@@ -123,10 +123,19 @@ def contract_fingerprint(contract: Contract) -> str:
 
 
 def read_contract(path: str | Path) -> Contract:
+    from equiframe._regular_io import open_regular_file
+    from equiframe.errors import ArtifactIOError, ResourceLimitError
+
     try:
-        document = Path(path).read_bytes()
+        with open_regular_file(Path(path)) as stream:
+            document = stream.read(64 * 1024 * 1024 + 1)
+    except ArtifactIOError as exc:
+        cause = exc.__cause__ if isinstance(exc.__cause__, OSError) else exc
+        raise ContractIOError("cannot read contract file") from cause
     except (OSError, ValueError) as exc:
-        raise ContractIOError("cannot read contract file: " + ascii(str(path))) from exc
+        raise ContractIOError("cannot read contract file") from exc
+    if len(document) > 64 * 1024 * 1024:
+        raise ResourceLimitError("contract exceeds the 64 MiB document budget")
     return validate_contract(document)
 
 

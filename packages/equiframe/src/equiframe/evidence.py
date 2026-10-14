@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 from equiframe._base import FrozenModel, Identifier, NonNegativeInt, Text
 from equiframe._document_io import write_document as _write_document
-from equiframe._regular_io import open_regular_file, regular_directory, regular_files
+from equiframe._regular_io import absolute_path, open_regular_file, regular_directory, regular_files
 from equiframe.errors import ArtifactIntegrityError, ArtifactIOError, ResourceLimitError
 from equiframe.local import local_path
 from equiframe.pipeline_types import EvidenceFile, PipelineResult
@@ -147,6 +147,7 @@ def verify_events(path: Path, *, operation_id: str) -> tuple[EvidenceEvent, ...]
 
 
 def describe_file(path: Path, directory: Path) -> EvidenceFile:
+    path = absolute_path(path)
     root = regular_directory(directory).resolve()
     if not path.resolve().is_relative_to(root) or path.is_symlink():
         raise ArtifactIntegrityError("evidence file escapes its operation directory")
@@ -157,7 +158,7 @@ def describe_file(path: Path, directory: Path) -> EvidenceFile:
             digest.update(block)
             size += len(block)
     return EvidenceFile(
-        path=path.relative_to(directory).as_posix(), sha256=digest.hexdigest(), size_bytes=size
+        path=path.relative_to(root).as_posix(), sha256=digest.hexdigest(), size_bytes=size
     )
 
 

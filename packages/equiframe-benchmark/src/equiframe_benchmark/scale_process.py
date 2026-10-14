@@ -27,6 +27,8 @@ from pathlib import Path
 from threading import Event, Lock, Thread
 from typing import Annotated, Literal, Protocol, cast
 
+from equiframe._regular_io import open_regular_file
+from equiframe.errors import ArtifactIntegrityError, ArtifactIOError
 from pydantic import Field, model_validator
 from typing_extensions import Self
 
@@ -669,6 +671,61 @@ def _child_exited(process: subprocess.Popen[bytes]) -> bool:
     return process.poll() is not None
 
 
+def _venv_config(path: Path) -> dict[str, str] | None:
+    """Read only bounded, regular venv configuration with unique keys."""
+    try:
+        with open_regular_file(path) as stream:
+            raw = stream.read(64 * 1024 + 1)
+        if len(raw) > 64 * 1024:
+            return None
+        values: dict[str, str] = {}
+        for raw_line in raw.decode("utf-8-sig").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            key, separator, value = line.partition("=")
+            key = key.strip().casefold()
+            if not separator or not key or key in values:
+                return None
+            values[key] = value.strip()
+        implementation = values.get("implementation")
+        if implementation is not None and implementation.casefold() != "cpython":
+            return None
+        return values
+    except (OSError, UnicodeError, ValueError, ArtifactIntegrityError, ArtifactIOError):
+        return None
+
+
+def _creator_matches_base(configured: Path, base: Path, home: Path) -> bool:
+    """Validate at most 16 creator venvs; never execute a configured creator."""
+    seen: set[Path] = set()
+    for _ in range(16):
+        if configured == base:
+            return True
+        if (
+            configured in seen
+            or configured.name.casefold() != base.name.casefold()
+            or configured.parent.name.casefold() != "scripts"
+            or not configured.is_file()
+        ):
+            return False
+        seen.add(configured)
+        values = _venv_config(configured.parent.parent / "pyvenv.cfg")
+        if values is None:
+            return False
+        try:
+            raw_home = Path(values.get("home", ""))
+            creator = Path(values.get("executable", str(home / base.name)))
+            if not raw_home.is_absolute() or not creator.is_absolute():
+                return False
+            if raw_home.resolve(strict=True) != home:
+                return False
+            configured = creator.resolve(strict=True)
+        except (OSError, RuntimeError, ValueError):
+            return False
+    return configured == base
+
+
 def _windows_venv_base_launch(
     command: list[str], environment: dict[str, str]
 ) -> tuple[list[str], dict[str, str]]:
@@ -713,24 +770,10 @@ def _windows_venv_base_launch(
     if launcher.name.casefold() != "python.exe" or launcher.parent.name.casefold() != "scripts":
         return command, environment
     config_path = launcher.parent.parent / "pyvenv.cfg"
+    values = _venv_config(config_path)
+    if values is None:
+        return command, environment
     try:
-        if config_path.is_symlink() or not config_path.is_file():
-            return command, environment
-        if config_path.stat().st_size > 64 * 1024:
-            return command, environment
-        values: dict[str, str] = {}
-        for raw_line in config_path.read_text(encoding="utf-8-sig").splitlines():
-            line = raw_line.strip()
-            if not line or line.startswith("#"):
-                continue
-            raw_key, separator, raw_value = line.partition("=")
-            key = raw_key.strip().casefold()
-            if not separator or not key or key in values:
-                return command, environment
-            values[key] = raw_value.strip()
-        implementation = values.get("implementation")
-        if implementation is not None and implementation.casefold() != "cpython":
-            return command, environment
         raw_home = values.get("home")
         if not raw_home:
             return command, environment
@@ -742,14 +785,14 @@ def _windows_venv_base_launch(
         if not configured.is_absolute():
             return command, environment
         configured = configured.resolve(strict=True)
-    except (OSError, RuntimeError, UnicodeError):
+    except (OSError, RuntimeError, UnicodeError, ValueError):
         return command, environment
     if (
-        configured != base
-        or home != base_prefix
-        or configured.parent != home
-        or configured.name.casefold() != launcher.name.casefold()
-        or not configured.is_file()
+        home != base_prefix
+        or base.parent != home
+        or base.name.casefold() != launcher.name.casefold()
+        or not base.is_file()
+        or not _creator_matches_base(configured, base, home)
     ):
         return command, environment
     prepared_environment = {

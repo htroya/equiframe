@@ -125,6 +125,11 @@ hosts check identities around opening. JSON and bundle documents retain their
 These cooperative checks are not a filesystem sandbox against hostile mounts
 or concurrent owners. Bundle copies still require a controlled, immutable source.
 
+Contract and generic profile/detector document files also use protected regular
+reads with a 64 MiB limit. Generic document readers retain OS exception classes
+and errno for recovery, with fixed messages and no filenames. Relative output
+directories retain relative member names in the published inventory.
+
 See the [A14 follow-up record](https://github.com/htroya/equiframe/blob/main/docs/A14_SAFE_ERRORS_EVIDENCE_20261013.md)
 for reproductions and the distinction between source tests and artifact validation.
 This work uses ordinary development tools. It does not invoke Codex Security,

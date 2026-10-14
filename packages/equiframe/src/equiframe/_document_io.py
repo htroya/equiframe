@@ -10,6 +10,8 @@ from collections.abc import Iterable
 from pathlib import Path
 from uuid import uuid4
 
+from equiframe._regular_io import open_regular_file
+from equiframe.errors import ArtifactIOError, ResourceLimitError
 from equiframe.serialization import _constant, _JsonObject, _unique_objects
 
 
@@ -33,7 +35,18 @@ def write_document_chunks(path: Path, payloads: Iterable[bytes]) -> None:
 
 
 def read_document(path: Path) -> bytes:
-    raw = path.read_bytes()
+    try:
+        with open_regular_file(path) as stream:
+            raw = stream.read(64 * 1024 * 1024 + 1)
+    except ArtifactIOError as error:
+        # Keep the original OS-error contract used by profile/detector and
+        # benchmark readers, while omitting filenames and external messages.
+        cause = error.__cause__
+        if isinstance(cause, OSError):
+            raise type(cause)(cause.errno, "document cannot be read") from None
+        raise
+    if len(raw) > 64 * 1024 * 1024:
+        raise ResourceLimitError("document exceeds the 64 MiB read budget")
     _unique_objects(
         json.loads(raw.decode("utf-8"), object_pairs_hook=_JsonObject, parse_constant=_constant)
     )
