@@ -107,3 +107,56 @@ No se usó Codex Security ni se crearon agentes. No se publicó en PyPI/TestPyPI
 ni se ejecutaron Actions. El Word, los datos compartidos y el servicio de la
 tutora no se modificaron. La solicitud a Robot continúa condicionada a acreditar
 los siete rubros al 90 % y subir el corte correspondiente.
+
+## Corte posterior `8f8138c`: lectores instalados y recuperación
+
+El núcleo corregido se construyó desde
+`8f8138c23992b9df6f531036f001f699bfd0743e`. Su wheel tiene SHA-256
+`42e636ae3ca38633cd6bc3a19ac24d5f8a39e36fd610427dd34603e6e131edd5`;
+su sdist, `3e4435866f5b0f0efe863fb8dbaf4c658afb1c741dae4f03277e97b769628fe3`.
+Benchmark y cliente de datos retienen sus artefactos anteriores identificados.
+
+La revalidación normal/optimizada de ese wheel volvió a acreditar **7.334 / 9.142**,
+con los mismos 1.808 pendientes. En Linux ARM64 pasó su batería propia: **8.205
+aprobadas/16 omitidas** del núcleo, **636/3** del benchmark y **175/0** de datos y
+herramientas. La tanda focalizada registró 175 aprobadas/14 omitidas. Cero fallos
+y errores en las cuatro tandas. La suite completa Windows sigue en ejecución;
+sus comprobaciones de instalación, identidad, documentación, metadatos y
+trazabilidad terminaron sin fallos.
+
+`upgrade-rollback-a13-8f8138c-v1` completó cinco etapas privadas: A13 inicial,
+actualización A14, reversión A13, nueva actualización A14 y recuperación A14
+en otro entorno limpio. Cada etapa resolvió dependencias sin `--no-deps`, pasó
+`pip check`, vinculó todos los bytes instalados y comprobó recorridos con salidas
+esperadas 0/1/3/2, recuperación del consumidor y CLI benchmark. Todos los
+inventarios de evidencia anterior y wheels originales quedaron idénticos. Los
+entornos nuevos se conservan; no se modificaron los originales compartidos.
+
+El expediente SERCOP también se regeneró para las nuevas huellas de reglas.
+Recalculó 216 perfiles/reglas/comparaciones y pasó de nuevo las seis barreras de
+selección. El recibo del verificador tiene SHA-256
+`1989b18e281c694068feaead66811ee066c7196460d9132402a54fb3f948dd4c`.
+Conserva un componente transitivo, etiquetas pendientes y N_fit acreditado cero.
+
+La auditoría ordinaria `ordinary-audit-8f8138c-v1` consultó las 103 dependencias
+públicas exactas: cero vulnerabilidades públicas conocidas en esa consulta.
+Bandit conservó **40 advertencias B608** de construcción SQL del núcleo y cuatro
+de PRNG/subprocesos del benchmark. `review-dispositions.json` registra las 44
+ubicaciones, hashes, razones y límites: identificadores/literales escapados,
+valores vinculados, IR validada, PRNG experimental reproducible y ejecución local
+de comandos de confianza. No se suprimieron reglas. El cliente y gateway no
+registraron advertencias en código de producción; sus pruebas conservaron las
+anotaciones de expectativas y casos negativos. El primer escaneo del cliente
+usó un directorio `src` inexistente; se conserva como intento no válido y se
+repitió sobre su estructura real. No constituye certificación integral ni
+acredita ejecución segura de código hostil proporcionado por un usuario.
+
+La revisión detectó una prueba histórica de recuperación del cliente que
+capturaba cualquier excepción. La corrección exige `FileNotFoundError`, utiliza
+la ruta inexistente de su propio directorio temporal y falla si la entrada se
+acepta. Su comprobación focalizada pasó; no modifica el wheel del cliente.
+
+El enlace de la tutora respondió HTTP 200 el 14 de octubre de 2026 a las
+07:13:28 UTC. El índice conserva SHA-256
+`2bbc4db94ea3ea34ae090f02553438588c37c52414b681bb2a54881c99a2a625`.
+No se cambió el servicio ni la entrega pública.

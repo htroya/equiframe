@@ -251,10 +251,12 @@ def test_carga_fallida_no_toca_snapshot_anterior():
 
         # Intentar cargar con archivo inexistente (falla controlada)
         job_fail = mgr.submit_job("load", "snap-fail", "carga-fail")
+        missing_input_rejected = False
         try:
-            mgr.run_job(job_fail.job_id, {"fact_adjudicacion": Path("no_existe.csv")})
-        except Exception:
-            pass
+            mgr.run_job(job_fail.job_id, {"fact_adjudicacion": base / "no_existe.csv"})
+        except FileNotFoundError:
+            missing_input_rejected = True
+        assert missing_input_rejected
 
         job_fail = mgr.get_job(job_fail.job_id)
         assert job_fail.state == FAILED
