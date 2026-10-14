@@ -21,7 +21,9 @@ from typing_extensions import TypeAliasType
 
 from equiframe._comparison_io import batches, file_ref, snapshot
 from equiframe._diff_capture import _CapturedInput, _NativeInput
+from equiframe._document_io import read_document
 from equiframe._error_reporting import report_failure
+from equiframe._regular_io import local_input_path
 from equiframe.comparison_types import (
     AppliedPolicy,
     ComparisonCounts,
@@ -877,10 +879,7 @@ def _compare(
 
 def read_comparison(path: Path) -> ComparisonResult:
     """Read and strictly revalidate a persisted comparison manifest."""
-    raw = path.read_bytes()
-    _unique_objects(
-        json.loads(raw.decode("utf-8"), object_pairs_hook=_JsonObject, parse_constant=_constant)
-    )
+    raw = read_document(local_input_path(path))
     return ComparisonResult.model_validate_json(raw)
 
 

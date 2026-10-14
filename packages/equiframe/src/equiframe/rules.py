@@ -19,7 +19,9 @@ from typing import TYPE_CHECKING, BinaryIO, Literal
 from uuid import uuid4
 
 from equiframe._decimal import exact_decimal_context
+from equiframe._document_io import read_document
 from equiframe._error_reporting import report_failure
+from equiframe._regular_io import local_input_path
 from equiframe.comparison_types import ComparisonPolicy, ComparisonValue
 from equiframe.contracts import (
     AggregateCheck,
@@ -791,10 +793,7 @@ def evaluate_rules(
 
 def read_rule_evaluation(path: Path) -> RuleEvaluation:
     """Validate manifest structure; call iter_rule_findings to verify referenced bytes."""
-    raw = path.read_bytes()
-    _unique_objects(
-        json.loads(raw.decode("utf-8"), object_pairs_hook=_JsonObject, parse_constant=_constant)
-    )
+    raw = read_document(local_input_path(path))
     return RuleEvaluation.model_validate_json(raw)
 
 

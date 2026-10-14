@@ -8,6 +8,9 @@ documentación](DOCUMENTATION_MAINTENANCE.md).
 
 ## Empezar y resolver una tarea
 
+[Avance A14 del 14 de octubre](A14_CLOSURE_PROGRESS_20261014.md): obligaciones
+acreditadas, pruebas instaladas, preparación de tesis y pendientes hasta el 90 %.
+
 | Quiero… | Leer / hacer | Qué obtengo |
 |---|---|---|
 | Instalar el candidato correcto | [Instalación privada](../packages/equiframe/docs/installed-private.md), [dependencias](../packages/equiframe/docs/dependencies.md) | Entorno y extras identificados; `pip check` y `doctor` no certifican toda la matriz |

@@ -14,10 +14,28 @@ from equiframe.bundle import export_bundle, read_bundle
 from equiframe.errors import ArtifactIntegrityError
 from equiframe.evidence import EvidenceEvent, describe_file, load_json, verify_events
 
-READERS = ("json", "events", "describe", "bundle", "export", "contract", "document")
+READERS = (
+    "json",
+    "events",
+    "describe",
+    "bundle",
+    "export",
+    "contract",
+    "document",
+    "comparison",
+    "rules",
+)
 
 
 def read(operation, root):
+    if operation == "comparison":
+        from equiframe import read_comparison
+
+        return read_comparison(root / "bundle.json")
+    if operation == "rules":
+        from equiframe import read_rule_evaluation
+
+        return read_rule_evaluation(root / "bundle.json")
     if operation == "contract":
         return read_contract(root / "bundle.json")
     if operation == "document":
@@ -107,6 +125,8 @@ try:
     if operation == 'json': load_json(EvidenceEvent, root / 'bundle.json')
     elif operation == 'contract': read_contract(root / 'bundle.json')
     elif operation == 'document': read_document(root / 'bundle.json')
+    elif operation == 'comparison': equiframe.read_comparison(root / 'bundle.json')
+    elif operation == 'rules': equiframe.read_rule_evaluation(root / 'bundle.json')
     elif operation == 'events': verify_events(root / 'bundle.json', operation_id='test')
     elif operation == 'describe': describe_file(root / 'bundle.json', root)
     elif operation == 'bundle': read_bundle(root)
@@ -159,7 +179,7 @@ def test_relative_inventory_and_file_descriptions_preserve_the_same_bytes(tmp_pa
     assert path.read_bytes() == b"{}\n"
 
 
-@pytest.mark.parametrize("operation", ["contract", "document"])
+@pytest.mark.parametrize("operation", ["contract", "document", "comparison", "rules"])
 def test_documents_over_the_byte_budget_are_refused_before_parsing(tmp_path, operation):
     from equiframe.errors import ResourceLimitError
 

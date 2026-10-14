@@ -31,6 +31,8 @@
 - Protect local artifact copies against special files and linked directories;
   bound verified copies by the declared byte size before publication, reject
   wrong path types explicitly, and preserve exclusive publication and source bytes.
+- Apply protected regular-file reads and a 64 MiB budget to comparison, rule
+  evaluation and supplementary diff manifests; preserve strict JSON validation.
 
 ## 0.12.0a13 — package quality and producer identity (2026-10-10)
 

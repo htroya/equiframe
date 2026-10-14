@@ -20,6 +20,8 @@ from equiframe._diff_capture import (
     _NativeInput,
     capture_native,
 )
+from equiframe._document_io import read_document
+from equiframe._regular_io import local_input_path
 from equiframe.comparison import ComparisonInput, _compare, comparison_fingerprint
 from equiframe.comparison_types import ComparisonOptions, ComparisonPolicy, ComparisonResult
 from equiframe.contracts import Contract
@@ -28,7 +30,6 @@ from equiframe.errors import ArtifactIntegrityError, CapabilityError, ExecutionC
 from equiframe.execution import CancellationToken
 from equiframe.execution_types import ExecutionResult, TableArtifact
 from equiframe.local import local_path
-from equiframe.serialization import _constant, _JsonObject, _unique_objects
 from equiframe.tables import ArrowInput
 from equiframe.types import ArtifactRef, Sha256
 
@@ -162,14 +163,9 @@ def read_diff_contract(result: ComparisonResult) -> DiffContract:
     Comparisons made directly with compare have no such companion. Reading
     does not execute the source or query, or verify all comparison evidence.
     """
-    import json
-
     result = ComparisonResult.model_validate(result)
     path = local_path(result.differences).parent / "diff-contract.json"
-    raw = path.read_bytes()
-    _unique_objects(
-        json.loads(raw.decode("utf-8"), object_pairs_hook=_JsonObject, parse_constant=_constant)
-    )
+    raw = read_document(local_input_path(path))
     receipt = _DiffReceipt.model_validate_json(raw)
     declaration = receipt.declaration
     if (
