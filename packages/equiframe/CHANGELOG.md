@@ -33,6 +33,10 @@
   wrong path types explicitly, and preserve exclusive publication and source bytes.
 - Apply protected regular-file reads and a 64 MiB budget to comparison, rule
   evaluation and supplementary diff manifests; preserve strict JSON validation.
+- Check operation work directories before normalization across native APIs;
+  reject linked roots and wrong path types instead of activating falsey defaults.
+  Guard publication subdirectories and document parents; reject special ingestion
+  sources before creating output and bound reads to the remaining source budget.
 
 ## 0.12.0a13 — package quality and producer identity (2026-10-10)
 

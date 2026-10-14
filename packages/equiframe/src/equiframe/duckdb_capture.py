@@ -30,6 +30,7 @@ from equiframe._duckdb_transport import (
     duckdb_parameters,
     verify_duckdb_table,
 )
+from equiframe._regular_io import local_output_directory
 from equiframe.errors import (
     CapabilityError,
     ExecutionCancelled,
@@ -146,6 +147,7 @@ def capture_duckdb(
         raise InvalidExecutionInput(
             "borrowed capture requires exclusive_connection=True and no outstanding reader"
         )
+    work_dir = local_output_directory(work_dir)
     values = _parameters(parameters)
     signal = cancellation if cancellation is not None else CancellationToken()
     started = datetime.now(UTC).isoformat()
@@ -235,7 +237,6 @@ def capture_duckdb(
         reader = relation.to_arrow_reader(checked.batch_rows)
         if not reader.schema.equals(schema, check_metadata=True):
             raise CapabilityError("DuckDB reader schema differs from its admitted native types")
-        work_dir = Path(work_dir).resolve()
         work_dir.mkdir(parents=True, exist_ok=True)
         final = work_dir / ("duckdb-" + uuid4().hex)
         with tempfile.TemporaryDirectory(prefix=".duckdb-capture-", dir=work_dir) as temporary:

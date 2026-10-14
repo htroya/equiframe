@@ -20,6 +20,7 @@ from pydantic import TypeAdapter, ValidationError
 
 from equiframe._base import Identifier
 from equiframe._error_reporting import report_failure
+from equiframe._regular_io import local_output_directory
 from equiframe.contracts import DecimalType, TimestampType
 from equiframe.errors import (
     CapabilityError,
@@ -202,7 +203,11 @@ def execute(
         adapter = native_adapter(plan.engine)
     capabilities = EngineCapabilities.model_validate(adapter.capabilities())
     run_id, execution_id = "run_" + uuid4().hex, "exec_" + uuid4().hex
-    directory = (work_dir or Path.cwd() / "equiframe-runs").resolve() / run_id / execution_id
+    directory = (
+        local_output_directory(Path.cwd() / "equiframe-runs" if work_dir is None else work_dir)
+        / run_id
+        / execution_id
+    )
     directory.mkdir(parents=True, exist_ok=False)
     store = (
         artifact_store

@@ -12,6 +12,7 @@ from uuid import uuid4
 
 from equiframe._document_io import read_document as _read_document
 from equiframe._document_io import write_document as _write_document
+from equiframe._regular_io import local_output_directory
 from equiframe.comparison_types import ComparisonValue
 from equiframe.contracts import ColumnSpec, Family, TimestampPolicy
 from equiframe.errors import (
@@ -382,7 +383,10 @@ def profile_execution(
     } <= {f.name for f in spec.features if f.metric == "conversiones_fallidas"}:
         raise ValueError("conversion receipts must uniquely reference conversion features")
     identifier = "profile_" + uuid4().hex
-    directory = (work_dir or Path.cwd() / "equiframe-runs").resolve() / identifier
+    directory = (
+        local_output_directory(Path.cwd() / "equiframe-runs" if work_dir is None else work_dir)
+        / identifier
+    )
     directory.mkdir(parents=True, exist_ok=False)
     context = _ProfileContext(options, cancellation or CancellationToken())
     context.conversions = {c.feature: c for c in conversions}

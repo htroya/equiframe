@@ -19,6 +19,7 @@ from equiframe._base import (
     _ExplicitOutcome,
     strict_bool_literal,
 )
+from equiframe._regular_io import local_output_directory
 from equiframe.evidence import (
     MAX_DOCUMENT_BYTES,
     EventJournal,
@@ -151,7 +152,10 @@ def reduce_case(
     if sum(table.num_rows for table in tables.values()) > options.max_input_rows:
         raise ValueError("reduction input row budget exceeded")
     identifier = "reduction_" + uuid4().hex
-    directory = (work_dir or Path.cwd() / "equiframe-runs").resolve() / identifier
+    directory = (
+        local_output_directory(Path.cwd() / "equiframe-runs" if work_dir is None else work_dir)
+        / identifier
+    )
     directory.mkdir(parents=True, exist_ok=False)
     token = cancellation if cancellation is not None else CancellationToken()
     journal = EventJournal(directory, identifier)

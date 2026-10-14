@@ -10,6 +10,8 @@ documentación](DOCUMENTATION_MAINTENANCE.md).
 
 [Avance A14 del 14 de octubre](A14_CLOSURE_PROGRESS_20261014.md): obligaciones
 acreditadas, pruebas instaladas, preparación de tesis y pendientes hasta el 90 %.
+[Protección de operaciones y corpus anual propuesto](A14_OPERATION_ROOTS_AND_COHORT_20261014.md):
+validación de directorios y preparación de las unidades OCID completas.
 
 | Quiero… | Leer / hacer | Qué obtengo |
 |---|---|---|

@@ -24,6 +24,7 @@ from equiframe._base import FrozenModel, NonNegativeInt, Text, _ExplicitOutcome
 from equiframe._decimal import exact_decimal_context
 from equiframe._document_io import write_document_chunks
 from equiframe._error_reporting import report_failure
+from equiframe._regular_io import local_input_path, local_output_directory, open_regular_file
 from equiframe.contracts import (
     BooleanType,
     ColumnSpec,
@@ -425,20 +426,21 @@ def ingest_file(
 
     spec = IngestionSpec.model_validate(spec)
     start = time.perf_counter()
-    directory = work_dir.resolve() / ("ingestion_" + uuid4().hex)
-    directory.mkdir(parents=True, exist_ok=False)
-    source_path = path.resolve()
+    directory = local_output_directory(work_dir) / ("ingestion_" + uuid4().hex)
+    source_path = local_input_path(path)
     digest, size = hashlib.sha256(), 0
     preserved = directory / "source.original"
-    with source_path.open("rb") as source_reader, preserved.open("xb") as source_writer:
-        while block := source_reader.read(1024 * 1024):
-            if context:
-                context.check()
-            size += len(block)
-            if size > spec.max_source_bytes:
-                raise ResourceLimitError("source exceeds ingestion byte budget before parsing")
-            digest.update(block)
-            source_writer.write(block)
+    with open_regular_file(source_path) as source_reader:
+        directory.mkdir(parents=True, exist_ok=False)
+        with preserved.open("xb") as source_writer:
+            while block := source_reader.read(min(1024 * 1024, spec.max_source_bytes - size + 1)):
+                if context:
+                    context.check()
+                size += len(block)
+                if size > spec.max_source_bytes:
+                    raise ResourceLimitError("source exceeds ingestion byte budget before parsing")
+                digest.update(block)
+                source_writer.write(block)
     receipt = SourceReceipt(
         uri=source_path.as_uri(),
         preserved_uri=preserved.as_uri(),

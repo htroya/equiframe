@@ -16,6 +16,7 @@ from typing_extensions import TypeAliasType
 from equiframe._comparison_io import snapshot
 from equiframe._duckdb_transport import duckdb_temporal_capabilities
 from equiframe._physical import physical_size
+from equiframe._regular_io import local_output_directory
 from equiframe.adapters import _input_capabilities, native_adapter
 from equiframe.comparison import compare
 from equiframe.comparison_types import ComparisonResult
@@ -254,7 +255,10 @@ def migrate(
         if spec.profile is None:
             raise ValueError("a detector bundle requires an explicit profile")
     identifier = "migration_" + uuid4().hex
-    directory = (work_dir or Path.cwd() / "equiframe-runs").resolve() / identifier
+    directory = (
+        local_output_directory(Path.cwd() / "equiframe-runs" if work_dir is None else work_dir)
+        / identifier
+    )
     directory.mkdir(parents=True, exist_ok=False)
     token = cancellation if cancellation is not None else CancellationToken()
     start = time.perf_counter()

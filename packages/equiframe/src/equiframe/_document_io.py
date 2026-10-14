@@ -10,7 +10,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from uuid import uuid4
 
-from equiframe._regular_io import open_regular_file
+from equiframe._regular_io import local_input_path, open_regular_file, regular_directory
 from equiframe.errors import ArtifactIOError, ResourceLimitError
 from equiframe.serialization import _constant, _JsonObject, _unique_objects
 
@@ -22,6 +22,14 @@ def write_document(path: Path, payload: bytes) -> None:
 
 def write_document_chunks(path: Path, payloads: Iterable[bytes]) -> None:
     """Publish byte chunks exclusively; iterator failures never publish a prefix."""
+    path = local_input_path(path)
+    try:
+        regular_directory(path.parent)
+    except ArtifactIOError as error:
+        cause = error.__cause__
+        if isinstance(cause, OSError):
+            raise type(cause)(cause.errno, "document directory cannot be used") from None
+        raise
     temporary = path.with_name(path.name + "." + uuid4().hex + ".part")
     try:
         with temporary.open("xb") as output:

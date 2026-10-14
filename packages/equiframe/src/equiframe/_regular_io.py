@@ -44,8 +44,10 @@ def local_input_path(path: Path) -> Path:
     """Admit explicit local parent navigation after inspecting traversed directories.
 
     Evidence confinement still uses absolute_path and refuses parent navigation.
-    This helper is for the caller-selected contract input, which has no fixed root.
+    This helper is for caller-selected local paths, which have no fixed root.
     """
+    if not isinstance(path, Path):
+        raise TypeError("local path must be a Path")
     path = path.absolute()
     current = Path(path.anchor)
     for component in path.parts[1:]:
@@ -76,6 +78,15 @@ def new_directory_path(path: Path) -> Path:
 
 def _walk_error(error: OSError) -> None:
     raise ArtifactIOError("cannot inventory evidence directory") from error
+
+
+def local_output_directory(path: Path) -> Path:
+    """Inspect caller-selected ancestors before normalizing a new operation root.
+
+    Returning a path does not create directories or sandbox concurrent filesystem
+    owners. Each writer retains its existing exclusive publication mechanism.
+    """
+    return new_directory_path(local_input_path(path))
 
 
 def regular_files(directory: Path) -> tuple[Path, ...]:

@@ -13,6 +13,7 @@ from uuid import uuid4
 from pydantic import BaseModel
 
 from equiframe._document_io import write_document as _write_document
+from equiframe._regular_io import local_output_directory
 from equiframe.comparison import ComparisonInput, compare
 from equiframe.decision import combine_decisions
 from equiframe.detector_types import DetectorBundle
@@ -128,7 +129,10 @@ def run_pipeline(
         if spec.profile is None:
             raise ValueError("detectors require an explicit profile specification")
     identifier = "pipeline_" + uuid4().hex
-    directory = (work_dir or Path.cwd() / "equiframe-runs").resolve() / identifier
+    directory = (
+        local_output_directory(Path.cwd() / "equiframe-runs" if work_dir is None else work_dir)
+        / identifier
+    )
     directory.mkdir(parents=True, exist_ok=False)
     token = cancellation if cancellation is not None else CancellationToken()
     started_at = datetime.now(UTC).isoformat()

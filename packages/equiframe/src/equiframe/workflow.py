@@ -13,6 +13,7 @@ from pydantic import BeforeValidator, Field, model_validator
 from typing_extensions import Self
 
 from equiframe._base import FrozenModel, Identifier, Text, _ExplicitOutcome, strict_bool_literal
+from equiframe._regular_io import local_output_directory
 from equiframe.errors import ArtifactIntegrityError, ResourceLimitError
 from equiframe.evidence import inventory, load_json, publish_json, verify_files
 from equiframe.execution import CancellationToken, RunContext
@@ -299,7 +300,7 @@ def run_workflow(
     if unknown:
         raise ValueError("expected references contain undeclared stage identifiers")
     start = time.perf_counter()
-    directory = work_dir.resolve() / ("workflow_" + uuid4().hex)
+    directory = local_output_directory(work_dir) / ("workflow_" + uuid4().hex)
     directory.mkdir(parents=True, exist_ok=False)
     token = cancellation or CancellationToken()
     deadline = start + spec.timeout_seconds if spec.timeout_seconds else None

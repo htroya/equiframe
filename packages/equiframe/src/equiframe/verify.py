@@ -15,6 +15,7 @@ from typing_extensions import TypeAliasType
 from equiframe._comparison_io import snapshot
 from equiframe._error_reporting import report_failure
 from equiframe._physical import verify_table_metadata
+from equiframe._regular_io import local_output_directory
 from equiframe._report_format_v1 import verification_html_v1, verification_summary_v1
 from equiframe.comparison import compare, iter_differences, read_comparison
 from equiframe.comparison_types import ComparisonOptions, ComparisonPolicy, ComparisonResult
@@ -408,7 +409,10 @@ def verify(
     opts = ComparisonOptions.model_validate(ComparisonOptions() if options is None else options)
     policy = ComparisonPolicy.model_validate(ComparisonPolicy() if policy is None else policy)
     identifier = "verify_" + uuid4().hex
-    directory = (work_dir or Path.cwd() / "equiframe-runs").resolve() / identifier
+    directory = (
+        local_output_directory(Path.cwd() / "equiframe-runs" if work_dir is None else work_dir)
+        / identifier
+    )
     directory.mkdir(parents=True, exist_ok=False)
     started = datetime.now(UTC).isoformat()
     start = time.perf_counter()

@@ -23,7 +23,7 @@ from equiframe._comparison_io import batches, file_ref, snapshot
 from equiframe._diff_capture import _CapturedInput, _NativeInput
 from equiframe._document_io import read_document
 from equiframe._error_reporting import report_failure
-from equiframe._regular_io import local_input_path
+from equiframe._regular_io import local_input_path, local_output_directory
 from equiframe.comparison_types import (
     AppliedPolicy,
     ComparisonCounts,
@@ -717,7 +717,10 @@ def _compare(
     if reference not in ("peer", "expected"):
         raise ValueError("reference must be peer or expected")
     identifier = "comparison-" + uuid4().hex
-    directory = (work_dir or Path("equiframe-comparisons")).resolve() / identifier
+    directory = (
+        local_output_directory(Path("equiframe-comparisons") if work_dir is None else work_dir)
+        / identifier
+    )
     directory.mkdir(parents=True, exist_ok=False)
     started_at = datetime.now(UTC).isoformat()
     start = time.perf_counter()

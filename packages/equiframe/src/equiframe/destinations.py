@@ -14,6 +14,7 @@ from pydantic import TypeAdapter, model_validator
 from typing_extensions import Self
 
 from equiframe._base import FrozenModel, Identifier, NonNegativeInt
+from equiframe._regular_io import local_output_directory
 from equiframe.errors import ArtifactIntegrityError
 from equiframe.evidence import canonical_bytes, describe_file, load_json, publish_json, verify_files
 from equiframe.local import local_path
@@ -99,7 +100,7 @@ class ParquetDestination:
     """
 
     def __init__(self, root: Path) -> None:
-        self.root = root.resolve()
+        self.root = local_output_directory(root)
 
     def current(self) -> LoadReceipt | None:
         pointer_path = self.root / "current.json"
@@ -181,6 +182,10 @@ class ParquetDestination:
                 }
             )
         ).hexdigest()
+        local_output_directory(self.root)
+        local_output_directory(self.root / "versions")
+        local_output_directory(self.root / ".staging")
+        local_output_directory(self.root / ".validation")
         self.root.mkdir(parents=True, exist_ok=True)
         lock = self.root / ".publication.lock"
         with lock.open("xb") as stream:
