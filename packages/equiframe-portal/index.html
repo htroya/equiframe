@@ -1,0 +1,300 @@
+<!doctype html>
+<title>EquiFrame — Portal SERCOP</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="assets/css/main.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="data/synthetic.js"></script>
+<script src="assets/js/config.js"></script>
+
+<!-- Banner de error API (oculto por defecto) -->
+<div id="api-error" hidden style="position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:6px;padding:8px 16px;font-size:13px;z-index:999;max-width:90vw;text-align:center"></div>
+
+<!-- ── Navegación ──────────────────────────────────────────────────────── -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#inicio">EquiFrame</a>
+    <div class="nav-links">
+      <button class="nav-link" data-page="inicio">Inicio</button>
+      <button class="nav-link" data-page="explorar">Explorar</button>
+      <button class="nav-link" data-page="demos">Demostraciones</button>
+      <button class="nav-link" data-page="resultados">Resultados</button>
+      <button class="nav-link" data-page="datos">Datos</button>
+      <button class="nav-link" data-page="proyecto">Proyecto</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Páginas ─────────────────────────────────────────────────────────── -->
+<main class="main">
+
+<!-- ════════ INICIO ════════ -->
+<div id="page-inicio" class="page">
+  <div class="hero">
+    <div class="container">
+      <span class="hero-tag">Tesis de Maestría — UIDE 2026</span>
+      <h1>Evaluación híbrida de divergencias semánticas en migraciones ETL</h1>
+      <p>EquiFrame compara transformaciones entre Pandas, Polars y DuckDB sobre datos de contratación pública del Ecuador (SERCOP–OCDS 2025), combinando reglas deterministas con Isolation Forest.</p>
+      <div class="hero-btns">
+        <button class="btn btn-primary" onclick="showPage('explorar')">Explorar SERCOP</button>
+        <button class="btn btn-outline" onclick="showPage('demos')">Ver una demostración</button>
+      </div>
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">📊</div>
+          <h3>183 891 adjudicaciones</h3>
+          <p>Corpus SERCOP–OCDS 2025 — snapshot 20261012-v1</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">⚙️</div>
+          <h3>3 parejas de motores</h3>
+          <p>Pandas–Polars, Pandas–DuckDB y Polars–DuckDB</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🔍</div>
+          <h3>Reglas + Isolation Forest</h3>
+          <p>Detección incremental de divergencias semánticas</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🔒</div>
+          <h3>Evidencia trazable</h3>
+          <p>Cada resultado identificado por snapshot, motores y run_id</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ EXPLORAR ════════ -->
+<div id="page-explorar" class="page">
+  <div class="container">
+    <div class="section-header">
+      <h1>Explorar datos SERCOP</h1>
+      <p>Corpus SERCOP–OCDS 2025 · snapshot <span id="snap-label">20261012-v1</span> · <span class="badge badge-blue">Datos sintéticos</span></p>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-bar">
+      <div class="filter-group">
+        <label>Snapshot</label>
+        <select id="f-snapshot">
+          <option value="20261012-v1">12 oct 2026 — v1</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Período</label>
+        <select id="f-periodo">
+          <option value="">Todos</option>
+          <option value="2025-Q1">2025 T1</option>
+          <option value="2025-Q2">2025 T2</option>
+          <option value="2025-Q3">2025 T3</option>
+          <option value="2025-Q4">2025 T4</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Entidad</label>
+        <select id="f-entidad">
+          <option value="">Todas</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Estado</label>
+        <select id="f-estado">
+          <option value="">Todos</option>
+          <option value="active">Activo</option>
+          <option value="complete">Completado</option>
+          <option value="cancelled">Cancelado</option>
+          <option value="pending">Pendiente</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Modalidad</label>
+        <select id="f-modalidad">
+          <option value="">Todas</option>
+          <option value="Subasta Inversa">Subasta Inversa</option>
+          <option value="Cotización">Cotización</option>
+          <option value="Menor Cuantía">Menor Cuantía</option>
+          <option value="Licitación">Licitación</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid" id="kpi-grid"></div>
+
+    <!-- Gráficas -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>Monto adjudicado mensual (USD)</h3>
+        <div class="chart-wrap"><canvas id="chart-serie"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Top 10 entidades por monto</h3>
+        <div class="chart-wrap"><canvas id="chart-entidades"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <h2 style="margin:0">Adjudicaciones</h2>
+      <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Descargar CSV</button>
+    </div>
+    <div class="table-wrap">
+      <table id="tabla-adj">
+        <thead>
+          <tr>
+            <th>OCID</th>
+            <th>Entidad</th>
+            <th>Proveedor</th>
+            <th class="num">Monto (USD)</th>
+            <th>Moneda</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Modalidad</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-adj"></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="paginacion"></div>
+  </div>
+</div>
+
+<!-- ════════ DEMOSTRACIONES ════════ -->
+<div id="page-demos" class="page">
+  <div class="container">
+    <div class="section-header">
+      <h1>Demostraciones EquiFrame</h1>
+      <p>Casos que ilustran por qué una suma correcta no garantiza equivalencia semántica</p>
+    </div>
+
+    <div class="demo-grid" id="demo-grid"></div>
+
+    <div id="demo-detail" style="display:none;border:1px solid var(--border);border-radius:10px;padding:20px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <h2 id="demo-titulo" style="margin:0;flex:1"></h2>
+        <span id="demo-tipo-badge"></span>
+        <span id="demo-resultado-badge"></span>
+      </div>
+      <p id="demo-desc" style="margin-bottom:16px"></p>
+
+      <div class="tabs" id="demo-tabs"></div>
+      <div id="demo-panels"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ RESULTADOS ════════ -->
+<div id="page-resultados" class="page">
+  <div class="container">
+    <div class="section-header">
+      <h1>Resultados y evidencia</h1>
+      <p>Ejecuciones registradas con identidad propia — run_id, motores, familia y estado</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Run ID</th>
+            <th>Pareja</th>
+            <th>Familia</th>
+            <th>Resultado</th>
+            <th class="num">Filas</th>
+            <th class="num">Diferencias</th>
+            <th class="num">Tiempo (s)</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-resultados"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ DATOS ════════ -->
+<div id="page-datos" class="page">
+  <div class="container">
+    <div class="section-header">
+      <h1>Datos y documentación</h1>
+      <p>Catálogo de descargas, diccionario de campos y metodología</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+      <div style="border:1px solid var(--border);border-radius:10px;padding:20px">
+        <h2>Corpus SERCOP–OCDS 2025</h2>
+        <p style="font-size:13px;margin-bottom:12px">183 891 adjudicaciones · snapshot 20261012-v1 · formato Parquet</p>
+        <div style="font-size:12px;color:var(--fg-3);margin-bottom:12px">
+          <div>Fuente: SERCOP Ecuador</div>
+          <div>Estándar: OCDS 1.1</div>
+          <div>Cobertura: enero–diciembre 2025</div>
+          <div>Tamaño: ~45 MB (Parquet)</div>
+        </div>
+        <span class="badge badge-warn">Pendiente — Jhair ETL</span>
+      </div>
+      <div style="border:1px solid var(--border);border-radius:10px;padding:20px">
+        <h2>Diccionario de campos</h2>
+        <p style="font-size:13px;margin-bottom:12px">Definición de cada campo del DW según el estándar OCDS y el modelo dimensional</p>
+        <table style="font-size:12px;width:100%">
+          <tr><td style="padding:3px 0;color:var(--fg-3)">snapshot_id</td><td style="padding:3px 0">Identificador de versión del conjunto</td></tr>
+          <tr><td style="padding:3px 0;color:var(--fg-3)">ocid</td><td style="padding:3px 0">Open Contracting ID del proceso</td></tr>
+          <tr><td style="padding:3px 0;color:var(--fg-3)">award_id</td><td style="padding:3px 0">Identificador de la adjudicación</td></tr>
+          <tr><td style="padding:3px 0;color:var(--fg-3)">monto</td><td style="padding:3px 0">Importe exacto — una vez por adjudicación</td></tr>
+          <tr><td style="padding:3px 0;color:var(--fg-3)">moneda</td><td style="padding:3px 0">Código ISO 4217 (USD)</td></tr>
+        </table>
+      </div>
+      <div style="border:1px solid var(--border);border-radius:10px;padding:20px">
+        <h2>Metodología</h2>
+        <p style="font-size:13px;margin-bottom:12px">Protocolo experimental: contratos, comparación, perfiles, evaluación</p>
+        <ul style="font-size:12px;color:var(--fg-2);padding-left:16px;line-height:1.8">
+          <li>Contratos de transformación por familia</li>
+          <li>EquiFrame Verify (O): resultado esperado independiente</li>
+          <li>Reglas R + Isolation Forest M + MAD B</li>
+          <li>H = R OR M — detección híbrida</li>
+          <li>Soportes pareados por pareja y familia</li>
+          <li>Métricas: precisión, sensibilidad, F1, cobertura, costo</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ PROYECTO ════════ -->
+<div id="page-proyecto" class="page">
+  <div class="container">
+    <div class="section-header">
+      <h1>Proyecto EquiFrame</h1>
+      <p>Biblioteca de validación de equivalencia semántica en migraciones ETL</p>
+    </div>
+    <div style="max-width:720px">
+      <h2>Propósito</h2>
+      <p style="margin-bottom:16px">EquiFrame evalúa si una migración ETL entre motores conserva el contenido y las relaciones exigidos. Detecta divergencias que los controles de suma o conteo no capturan: valores intercambiados, pérdida de precisión, duplicados por join, cambio de zona horaria.</p>
+      <h2>Autores</h2>
+      <p style="margin-bottom:16px">Hernán Troya · Jhair Alarcón · José Gaona<br><span style="font-size:13px;color:var(--fg-3)">Maestría en Ciencia de Datos y Máquinas de Aprendizaje — UIDE, Ecuador 2026</span></p>
+      <h2>Componentes</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:14px">
+          <h3>SnapshotClient</h3>
+          <p style="font-size:12px">Descarga artefactos con verificación SHA-256. Garantiza reproducibilidad por versión.</p>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:14px">
+          <h3>JobManager</h3>
+          <p style="font-size:12px">Gestiona trabajos ETL con escritor único. Estados: PENDING → RUNNING → DONE.</p>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:14px">
+          <h3>DWReader / DWWriter</h3>
+          <p style="font-size:12px">Acceso controlado a DuckDB. Múltiples lectores simultáneos, escritura serializada con lock PID.</p>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:14px">
+          <h3>EquiFrame Verify (O)</h3>
+          <p style="font-size:12px">Procedimiento de validación independiente: resultado esperado + comparación + revisión humana.</p>
+        </div>
+      </div>
+      <h2>Repositorio</h2>
+      <p style="font-size:13px;color:var(--fg-3)">github.com/htroya/equiframe · rama main</p>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script src="assets/js/app.js"></script>
