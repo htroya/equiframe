@@ -37,8 +37,12 @@ python -I -m equiframe_consumer_lab run --all --data /path/to/frozen-data --outp
 ```
 
 Use a supported Python 3.10–3.13 environment and its compatible dependencies.
-Frozen datasets remain outside Git. Their manifest must enumerate every file
-actually consumed, and each digest is checked before and after execution.
+The optional reviewed [offline corpus](../corpus/README.md) is included under
+`validation/corpus/`, with 219 effective public-source records and its own
+attribution, conditions and active manifest. From the repository root, pass
+`--data validation/corpus` to the commands above. Larger and private datasets
+remain outside Git. Each input manifest must enumerate every file actually
+consumed, and each digest is checked before and after execution.
 An empty, incomplete, changed or linked inventory is rejected. Output directories
 must be new; local reports and data never belong in a public commit.
 
@@ -90,8 +94,9 @@ transport to 16 MiB. Comparison, native execution and migration use cooperative
 128 MB native memory setting. The matrix launches one child at a time with a
 300-second process timeout. Program and domain suites stop new work below
 4 GiB of free filesystem space. These settings do not impose a process-RSS cap
-or a total output-directory quota. Frozen inputs, reports and local publication
-outputs must remain outside public commits.
+or a total output-directory quota. Private inputs, reports and local publication
+outputs must remain outside public commits. The reviewed public-source corpus
+is an explicit exception for input data; it is excluded from PyPI distributions.
 
 ## Tests and scope
 
@@ -105,4 +110,4 @@ from these technical checks.
 Original application code is covered by the repository's [MIT license](../../LICENSE)
 from 2026-10-28. Third-party rights and data licenses remain separate.
 The original private history is retained privately; this source application does
-not publish its datasets, old reports or earlier private distribution artifacts.
+not publish private datasets, old reports or earlier private distribution artifacts.

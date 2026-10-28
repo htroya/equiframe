@@ -1,0 +1,66 @@
+{
+  "capture_date": "2026-10-07",
+  "consumer_effective_rows": 219,
+  "copied_unchanged_original_paths": [
+    "NOTAS_DATOS_ES.md",
+    "acquisition-attempt-001.json",
+    "acquisition-attempt-002.json",
+    "conditions.json",
+    "derive_population.py",
+    "documentation-acquisition.json",
+    "provenance.json",
+    "raw/earthquakes.csv",
+    "raw/population.csv",
+    "raw/treasury.json"
+  ],
+  "integration_date": "2026-10-28",
+  "original_blob_bytes": 275233,
+  "original_file_count": 16,
+  "original_git_commit": "e8e17976dfa2c36a5cbcf4c2ec183469a73adbc7",
+  "original_git_manifest_result": "FAIL: population.csv size and SHA-256 differ",
+  "population_recovery": {
+    "derived_sha256": "4eccee3763c96b014aeebb6c87cac36973dbd4f3f2cb4498722390ecc84b2425",
+    "derived_size_bytes": 1708,
+    "method": "stdlib csv.DictReader; SUMLEV=040; sort STATE; POPESTIMATE2024/2025; csv.DictWriter default CRLF",
+    "original_manifest_match": true,
+    "raw_git_sha256": "ce4f9ae29406aea4a9d20c08e2d07690b18a5319cf1fcdd45d98298ec64f5047",
+    "raw_git_size_bytes": 1655,
+    "rows": 52,
+    "source": "raw/population.csv"
+  },
+  "private_bundle_sha256": "27d9a1e79a9e57f8e6c5c84ad8b4c15ea2adcdbd0181189fbeb5085fb1d46ffa",
+  "private_only_originals": [
+    {
+      "path": "failed-attempts/census-api-missing-key.html",
+      "sha256": "c2f4687e09b80676de7f68dec92ebea395209616dbc6f895520e547c5f68c0f5",
+      "size_bytes": 8531
+    },
+    {
+      "path": "failed-attempts/usgs-copyright-empty-http202.html",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "source-docs/census-layout.pdf",
+      "sha256": "20b35f224039faf1f0a09a281b53ece071a31d3a963943046917d6ee5a81c7f2",
+      "size_bytes": 104772
+    },
+    {
+      "path": "source-docs/usgs-api-documentation.html",
+      "sha256": "a34793edb1f2f8542b3c8cfb20cb7a65e342036d4ae496388d141d581009ea9f",
+      "size_bytes": 34875
+    }
+  ],
+  "release_scope": "Post-v0.12.2 optional validation corpus; no package/runtime/release tag change.",
+  "renamed_original": {
+    "manifest.json": "source-manifest.json"
+  },
+  "required_consumer_inputs": [
+    "raw/treasury.json",
+    "raw/earthquakes.csv",
+    "population.csv"
+  ],
+  "reuse_scope": "Agency data conditions remain applicable; no MIT relicensing of data or documents; see README and historical conditions.json.",
+  "schema_version": "1.0",
+  "successful_raw_records": 233
+}

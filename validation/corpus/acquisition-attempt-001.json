@@ -1,0 +1,90 @@
+[
+  {
+    "file": "raw/treasury.json",
+    "url": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/avg_interest_rates?filter=record_date:eq:2025-12-31&page[size]=100",
+    "status": 200,
+    "headers": {
+      "Date": "Wed, 07 Oct 2026 05:17:19 GMT",
+      "Content-Type": "application/json",
+      "Content-Length": "7065",
+      "Connection": "close",
+      "Server": "nginx",
+      "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+      "X-Frame-Options": "SAMEORIGIN",
+      "X-XSS-Protection": "1; mode=block",
+      "Access-Control-Allow-Origin": "*"
+    },
+    "bytes": 7065,
+    "retrieved_at_utc": "2026-10-07T05:17:19.446302+00:00",
+    "original_response_file_name": "treasury.json",
+    "headers_omitted_for_safety": [
+      "Set-Cookie"
+    ],
+    "payload_status": "VALID_DATA",
+    "sha256": "cdb4db03aa33f5c83339bc43409ba81cb7ad8a42b734b09a8a47e3c2b2e972d1"
+  },
+  {
+    "file": "raw/earthquakes.csv",
+    "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=2025-01-01&endtime=2025-01-08&minmagnitude=4&limit=150&orderby=time-asc",
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/csv; charset=utf-8",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Date": "Wed, 07 Oct 2026 05:17:25 GMT",
+      "X-Content-Type-Options": "nosniff",
+      "X-XSS-Protection": "1; mode=block",
+      "Server": "nginx",
+      "Cache-Control": "public, max-age=60",
+      "Expires": "Wed, 07 Oct 2026 05:18:25 GMT",
+      "Last-Modified": "Wed, 07 Oct 2026 05:17:25 GMT",
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Max-Age": "86400",
+      "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+      "X-Frame-Options": "SAMEORIGIN",
+      "Vary": "Accept-Encoding",
+      "X-Cache": "Miss from cloudfront",
+      "Via": "1.1 af85571f12498efdefcadaccc1930a92.cloudfront.net (CloudFront)",
+      "X-Amz-Cf-Pop": "DFW56-P11",
+      "X-Amz-Cf-Id": "WlG121opkUlWPf7uVjeAA7mGcnlaau2ZXlabtmpDLTGuApZFtmOu3g=="
+    },
+    "bytes": 28355,
+    "retrieved_at_utc": "2026-10-07T05:17:25.577907+00:00",
+    "original_response_file_name": "earthquakes.csv",
+    "headers_omitted_for_safety": [],
+    "payload_status": "VALID_DATA",
+    "sha256": "004a78795e611117b78384530a365f914192f98104a1d1ece17eff1be244590a"
+  },
+  {
+    "file": "failed-attempts/census-api-missing-key.html",
+    "url": "https://api.census.gov/data/2021/pep/population?get=NAME,POP_2021&for=state:*",
+    "status": 200,
+    "headers": {
+      "Cache-Control": "private",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+      "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
+      "Referrer-Policy": "same-origin",
+      "Content-Security-Policy": "default-src 'self'; img-src 'self' data:; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content",
+      "X-Content-Type-Options": "nosniff",
+      "Accept-Ranges": "bytes",
+      "ETag": "W/\"8531-1785258963403\"",
+      "Last-Modified": "Tue, 28 Jul 2026 17:16:03 GMT",
+      "Content-Type": "text/html",
+      "Content-Length": "8531",
+      "Date": "Wed, 07 Oct 2026 05:17:35 GMT",
+      "Connection": "close",
+      "Strict-Transport-Security": "max-age=31536000"
+    },
+    "bytes": 8531,
+    "retrieved_at_utc": "2026-10-07T05:17:36.102992+00:00",
+    "original_response_file_name": "population.json",
+    "headers_omitted_for_safety": [
+      "Set-Cookie"
+    ],
+    "payload_status": "FAILED_NOT_DATA",
+    "sha256": "c2f4687e09b80676de7f68dec92ebea395209616dbc6f895520e547c5f68c0f5"
+  }
+]

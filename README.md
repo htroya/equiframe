@@ -30,6 +30,11 @@ Jhair Alarcon's `modalidad` and `procedimiento` contribution and has its own
 synthetic functionality tests. It is provided as repository code outside the
 installable PyPI packages.
 
+The optional [consumer application](validation/consumer/README.md) and its
+[offline public-source corpus](validation/corpus/README.md) also live here.
+The corpus preserves source attribution and checksummed inputs; it is separate
+from the installable packages and from private project data.
+
 ## Install
 
 EquiFrame 0.12.2 supports **Python 3.10, 3.11, 3.12 and 3.13**.
@@ -240,6 +245,11 @@ El [prototipo de almacén SERCOP](validation/sercop_dw/README.md) conserva el ap
 de Jhair Alarcon sobre `modalidad` y `procedimiento`, con pruebas funcionales
 propias. Su código se incluye en este repositorio y queda fuera de los paquetes
 instalables de PyPI.
+
+La [aplicación de validación](validation/consumer/README.md) y su
+[corpus público para uso sin conexión](validation/corpus/README.md) también están
+integrados aquí. El corpus conserva la atribución y la integridad de sus fuentes;
+queda fuera de los paquetes instalables y de los datos privados del proyecto.
 
 La versión **0.12.2** requiere **Python 3.10–3.13**.
 Las interfaces con compromiso de estabilidad y las capacidades experimentales

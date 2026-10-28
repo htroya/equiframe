@@ -1,0 +1,3 @@
+# Preserve checksummed corpus members without checkout conversion.
+* -text
+population.csv -text
