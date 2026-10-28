@@ -128,20 +128,17 @@ Historical version-1 candidates retain their closed policy and exit **3**.
 There is no `--force` or credential switch. The packet does not authenticate
 human approval, and this command never uploads or grants account access.
 
-## CI permissions and provenance
+## Local checks and provenance
 
-The checked-in workflows are manual and disabled by their default inputs.
-A push or PR does not itself run the matrix. Candidate building has `contents:
-read`, pinned official actions, no persisted checkout credentials and no upload
-credential or OIDC permission. Workflow files are a recipe; only a recorded run
-on the exact commit is remote-CI evidence. Dependency advisories are separate
-networked checks and must preserve unknown/unavailable results.
+The public repository ships no GitHub Actions workflows. Run the local candidate
+commands above and retain their exact source identities, environment details,
+exit codes and artifact hashes. A local receipt establishes only the work it
+records; it does not establish that a remote CI job ran. Dependency advisories
+are separate networked checks and retain unknown or unavailable outcomes.
 
-The current release is local and manual. Existing configuration-only or
-historical CI recipes do not authorize publication, and no Actions job is run
-for this release. A future adoption of Trusted Publishing requires a separately
-reviewed protected workflow and real publisher configuration. This possibility
-does not establish that OIDC is configured or used today.
+Publication is manual with a local ephemeral credential. A future adoption of
+Trusted Publishing requires a separately reviewed protected workflow and real
+publisher configuration; OIDC is not configured or used for this release.
 
 ## Correcting a defect
 
