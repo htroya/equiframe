@@ -292,8 +292,8 @@ uv run --locked --all-extras python tools/verify_distribution.py
 ```
 
 `--reinstall-package equiframe` prevents stale local dependency caching while a
-private version is unchanged. The byte-bound candidate driver is
-`python ../equiframe/tools/check_candidate.py --package . --output /absolute/path/new-checks.json`.
+package version is unchanged. From this directory, the byte-bound candidate driver is
+`python ../../tools/check_candidate.py --package . --output /absolute/path/new-checks.json`.
 These are checks to execute, not claims they already passed this artifact.
 Source tests, exact installed tests and remote CI are distinct evidence. Preserve
 historical fixtures, safe failures and methodological boundaries. Follow the core

@@ -68,8 +68,9 @@ claimed complete by a library release.
 
 ## Repeatable candidate checks
 
-From each package, use the exact `uv.lock` and Python interpreter for the chosen
-profile. The core driver supports the benchmark with `--package`:
+From the repository root, select the supported Python interpreter for the chosen
+profile. The driver uses each package's exact `uv.lock` and supports the benchmark
+with `--package`:
 
 ```sh
 python tools/check_candidate.py \

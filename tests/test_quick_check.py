@@ -30,7 +30,11 @@ def test_fixed_selection_is_real_and_nonempty(driver, tmp_path, package):
         package_root = Path(__file__).resolve().parents[1]
         assert all((package_root / test).is_file() for test in selected)
     assert all("--basetemp=" + str(tmp_path / "pytest") in check.command for check in (smoke,))
-    assert all("publish" not in argument for check in checks for argument in check.command)
+    # Interpreter and output paths can contain these words without invoking them.
+    forbidden_commands = {"build", "twine", "publish", "upload", "deploy"}
+    assert all(
+        argument not in forbidden_commands for check in checks for argument in check.command[1:]
+    )
 
 
 def test_source_environment_replaces_ambient_paths(driver, tmp_path, monkeypatch):
