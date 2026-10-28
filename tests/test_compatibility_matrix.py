@@ -629,24 +629,30 @@ def test_successful_subprocess_cannot_hide_artifact_change_during_its_execution(
 
 
 @pytest.mark.parametrize("mutation", ["none", "changed", "missing", "extra"])
-def test_sdist_handbook_is_compared_with_exact_wheel_payload(runner, tmp_path, mutation):
+@pytest.mark.parametrize(
+    "original,destination",
+    [("docs", "equiframe/docs"), ("tools/cyclonedx", "equiframe/_vendor/cyclonedx")],
+)
+def test_sdist_resource_directory_is_compared_with_exact_wheel_payload(
+    runner, tmp_path, mutation, original, destination
+):
     config = (
         b'[project]\nname="equiframe"\n'
-        b'[tool.hatch.build.targets.wheel.force-include]\n"docs"="equiframe/docs"\n'
+        + f'[tool.hatch.build.targets.wheel.force-include]\n"{original}"="{destination}"\n'.encode()
     )
     files = {"equiframe-0.0.0/src/" + name: raw for name, raw in RUNTIME.items()}
     files["equiframe-0.0.0/pyproject.toml"] = config
     files["equiframe-0.0.0/tests/test_synthetic.py"] = b"def test_ok(): assert True\n"
     if mutation != "missing":
-        files["equiframe-0.0.0/docs/index.md"] = (
+        files[f"equiframe-0.0.0/{original}/index.md"] = (
             b"Changed" if mutation == "changed" else b"Handbook"
         )
     if mutation == "extra":
-        files["equiframe-0.0.0/docs/extra.md"] = b"Unexpected"
-    wheel = records({**RUNTIME, "equiframe/docs/index.md": b"Handbook"})
+        files[f"equiframe-0.0.0/{original}/extra.md"] = b"Unexpected"
+    wheel = records({**RUNTIME, destination + "/index.md": b"Handbook"})
     if mutation == "none":
         source = runner["extract_sdist"](make_sdist(tmp_path, files), tmp_path / "out", wheel)
-        assert (source / "docs/index.md").read_bytes() == b"Handbook"
+        assert (source / original / "index.md").read_bytes() == b"Handbook"
     else:
         with pytest.raises(ValueError, match=r"handbook|runtime payload"):
             runner["extract_sdist"](make_sdist(tmp_path, files), tmp_path / "out", wheel)
@@ -657,7 +663,8 @@ def test_sdist_journey_binding_matches_exact_installed_wheel_bytes(runner, tmp_p
     project = (
         b'[project]\nname="equiframe"\nversion="0.0.0"\n'
         b"[tool.hatch.build.targets.wheel.force-include]\n"
-        b'"examples/journeys/demo.py" = "equiframe/examples/journeys/demo.py"\n'
+        b'"examples/journeys/a_pandas_refactor.py" = '
+        b'"equiframe/examples/journeys/a_pandas_refactor.py"\n'
     )
     payload = {
         "equiframe-0.0.0/pyproject.toml": project,
@@ -666,13 +673,98 @@ def test_sdist_journey_binding_matches_exact_installed_wheel_bytes(runner, tmp_p
     }
     original = b'EXPECTED = "synthetic"\n'
     if mutation != "missing":
-        payload["equiframe-0.0.0/examples/journeys/demo.py"] = (
+        payload["equiframe-0.0.0/examples/journeys/a_pandas_refactor.py"] = (
             b"stale" if mutation == "changed" else original
         )
-    expected = records({**RUNTIME, "equiframe/examples/journeys/demo.py": original})
+    expected = records({**RUNTIME, "equiframe/examples/journeys/a_pandas_refactor.py": original})
     if mutation == "none":
         source = runner["extract_sdist"](make_sdist(tmp_path, payload), tmp_path / "out", expected)
-        assert (source / "examples/journeys/demo.py").read_bytes() == original
+        assert (source / "examples/journeys/a_pandas_refactor.py").read_bytes() == original
     else:
         with pytest.raises(ValueError, match=r"source is absent|runtime payload"):
             runner["extract_sdist"](make_sdist(tmp_path, payload), tmp_path / "out", expected)
+
+
+@pytest.mark.parametrize(
+    "original,destination",
+    [
+        (
+            "schemas/r-review-options-1.0.schema.json",
+            "equiframe/schemas/r-review-options-1.0.schema.json",
+        ),
+        (
+            "schemas/r-review-binding-1.0.schema.json",
+            "equiframe/schemas/r-review-binding-1.0.schema.json",
+        ),
+        (
+            "schemas/r-execution-binding-1.0.schema.json",
+            "equiframe/schemas/r-execution-binding-1.0.schema.json",
+        ),
+        (
+            "schemas/r-review-result-1.0.schema.json",
+            "equiframe/schemas/r-review-result-1.0.schema.json",
+        ),
+        (
+            "schemas/reviewed-decision-1.0.schema.json",
+            "equiframe/schemas/reviewed-decision-1.0.schema.json",
+        ),
+        ("examples/eda_generic.py", "equiframe/examples/integrations/eda_generic.py"),
+        ("examples/load_convert_compare.py", "equiframe/examples/load_convert_compare.py"),
+    ],
+)
+@pytest.mark.parametrize("mutation", ["none", "missing", "changed", "extra", "remapped"])
+def test_sdist_binds_only_exact_declared_resource_files(
+    runner, tmp_path, original, destination, mutation
+):
+    declared = runner["tomllib"].loads((TOOLS.parent / "pyproject.toml").read_text("utf-8"))
+    assert (
+        declared["tool"]["hatch"]["build"]["targets"]["wheel"]["force-include"][original]
+        == destination
+    )
+    mapped = destination if mutation != "remapped" else destination + ".remapped"
+    project = (
+        '[project]\nname="equiframe"\nversion="0.0.0"\n'
+        f'[tool.hatch.build.targets.wheel.force-include]\n"{original}"="{mapped}"\n'
+    ).encode()
+    files = {
+        "equiframe-0.0.0/pyproject.toml": project,
+        "equiframe-0.0.0/tests/test_synthetic.py": b"def test_synthetic(): assert True\n",
+        **{"equiframe-0.0.0/src/" + name: raw for name, raw in RUNTIME.items()},
+    }
+    content = b'{"kind":"fixture"}\n' if original.endswith(".json") else b'VALUE="fixture"\n'
+    if mutation != "missing":
+        files["equiframe-0.0.0/" + original] = b"stale" if mutation == "changed" else content
+    wheel = records({**RUNTIME, mapped: content})
+    if mutation == "extra":
+        wheel.update(records({"equiframe/__pycache__/unexpected.pyc": b"cache"}))
+    if mutation == "none":
+        source = runner["extract_sdist"](make_sdist(tmp_path, files), tmp_path / "out", wheel)
+        assert (source / original).read_bytes() == content
+    else:
+        message = (
+            "unsupported wheel force-include mapping"
+            if mutation == "remapped"
+            else r"source is absent|runtime payload"
+        )
+        with pytest.raises(ValueError, match=message):
+            runner["extract_sdist"](make_sdist(tmp_path, files), tmp_path / "out", wheel)
+
+
+@pytest.mark.parametrize("namespace", ["journeys", "integrations"])
+def test_sdist_rejects_coherent_undeclared_example_mappings(runner, tmp_path, namespace):
+    original = f"examples/{namespace}/arbitrary.py"
+    destination = "equiframe/" + original
+    project = (
+        '[project]\nname="equiframe"\nversion="0.0.0"\n'
+        f'[tool.hatch.build.targets.wheel.force-include]\n"{original}"="{destination}"\n'
+    ).encode()
+    content = b'EXAMPLE = "coherent but undeclared"\n'
+    files = {
+        "equiframe-0.0.0/pyproject.toml": project,
+        "equiframe-0.0.0/tests/test_synthetic.py": b"def test_synthetic(): assert True\n",
+        "equiframe-0.0.0/" + original: content,
+        **{"equiframe-0.0.0/src/" + name: raw for name, raw in RUNTIME.items()},
+    }
+    wheel = records({**RUNTIME, destination: content})
+    with pytest.raises(ValueError, match="unsupported wheel force-include mapping"):
+        runner["extract_sdist"](make_sdist(tmp_path, files), tmp_path / "out", wheel)

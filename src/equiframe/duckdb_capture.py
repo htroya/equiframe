@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import tempfile
 import time
 import weakref
@@ -177,6 +178,7 @@ def capture_duckdb(
     watcher: Thread | None = None
     relation: duckdb.DuckDBPyRelation | None = None
     reader: pa.RecordBatchReader | None = None
+    completed = False
     try:
         if session is None:
             session = duckdb.connect(
@@ -290,13 +292,13 @@ def capture_duckdb(
                 receipt.write(artifact.model_dump_json(indent=2) + "\n")
                 receipt.flush()
                 os.fsync(receipt.fileno())
-            # Close native resources and join watcher BEFORE publishing/releasing ownership.
-            stopped.set()
-            watcher.join()
+            # Keep cancellation active until native resources are closed.
             reader.close()
             reader = None
             relation.close()
             relation = None
+            stopped.set()
+            watcher.join()
             if owned:
                 session.close()
                 session = None
@@ -304,6 +306,7 @@ def capture_duckdb(
             if final.exists():
                 raise FileExistsError("capture destination already exists")
             stage.rename(final)
+        completed = True
         return artifact
     except duckdb.OutOfMemoryException as error:
         raise ResourceLimitError("DuckDB capture exhausted engine-managed memory") from error
@@ -315,21 +318,33 @@ def capture_duckdb(
         # Native exceptions may contain SQL literals/paths. Keep those out of ordinary diagnostics.
         raise NativeEngineError("DuckDB capture failed; no complete snapshot published") from error
     finally:
-        stopped.set()
-        if watcher is not None and watcher.ident is not None:
-            watcher.join()
+        primary_error = None if completed else sys.exc_info()[1]
         try:
-            if reader is not None:
-                reader.close()
-        finally:
             try:
-                if relation is not None:
-                    relation.close()
+                if reader is not None:
+                    reader.close()
             finally:
-                if lock is not None:
-                    lock.release()
-                if owned and session is not None:
-                    session.close()
+                try:
+                    # DuckDB close() executes an unstarted lazy relation. If
+                    # export never returned a reader, discard the plan instead:
+                    # cleanup must not start SQL after cancellation or timeout.
+                    if relation is not None and reader is not None:
+                        relation.close()
+                finally:
+                    relation = None
+                    stopped.set()
+                    try:
+                        if watcher is not None and watcher.ident is not None:
+                            watcher.join()
+                    finally:
+                        if lock is not None:
+                            lock.release()
+                        if owned and session is not None:
+                            session.close()
+        except BaseException as cleanup_error:
+            if primary_error is not None:
+                raise primary_error from cleanup_error
+            raise
 
 
 def _write_reader(

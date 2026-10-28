@@ -41,6 +41,106 @@ UTC = _timezone.utc
 PROFILES = ("base", "arrow", "pandas", "polars", "duckdb", "engines", "ml", "all")
 ENDPOINTS = ("minimum", "latest")
 ROOT = Path(__file__).resolve().parents[1]
+EXACT_RESOURCE_FILES = frozenset(
+    {
+        (
+            "examples/eda_generic.py",
+            "equiframe/examples/integrations/eda_generic.py",
+        ),
+        (
+            "examples/integrations/outcome_gates.py",
+            "equiframe/examples/integrations/outcome_gates.py",
+        ),
+        (
+            "examples/integrations/sqlite_snapshot.py",
+            "equiframe/examples/integrations/sqlite_snapshot.py",
+        ),
+        (
+            "examples/integrations/sqlite_snapshot_demo.py",
+            "equiframe/examples/integrations/sqlite_snapshot_demo.py",
+        ),
+        (
+            "examples/integrations/universal_first_use.py",
+            "equiframe/examples/integrations/universal_first_use.py",
+        ),
+        (
+            "examples/journeys/README.md",
+            "equiframe/examples/journeys/README.md",
+        ),
+        (
+            "examples/journeys/__init__.py",
+            "equiframe/examples/journeys/__init__.py",
+        ),
+        (
+            "examples/journeys/a_pandas_refactor.py",
+            "equiframe/examples/journeys/a_pandas_refactor.py",
+        ),
+        (
+            "examples/journeys/b_native_migration.py",
+            "equiframe/examples/journeys/b_native_migration.py",
+        ),
+        (
+            "examples/journeys/c_retail_etl.py",
+            "equiframe/examples/journeys/c_retail_etl.py",
+        ),
+        (
+            "examples/journeys/common.py",
+            "equiframe/examples/journeys/common.py",
+        ),
+        (
+            "examples/journeys/d_financial_reconciliation.py",
+            "equiframe/examples/journeys/d_financial_reconciliation.py",
+        ),
+        (
+            "examples/journeys/e_telemetry.py",
+            "equiframe/examples/journeys/e_telemetry.py",
+        ),
+        (
+            "examples/journeys/f_data_science_preparation.py",
+            "equiframe/examples/journeys/f_data_science_preparation.py",
+        ),
+        (
+            "examples/journeys/g_external_snapshots.py",
+            "equiframe/examples/journeys/g_external_snapshots.py",
+        ),
+        (
+            "examples/journeys/h_portable_ci.py",
+            "equiframe/examples/journeys/h_portable_ci.py",
+        ),
+        (
+            "examples/journeys/requirements.lock",
+            "equiframe/examples/journeys/requirements.lock",
+        ),
+        (
+            "examples/journeys/verify_journeys.py",
+            "equiframe/examples/journeys/verify_journeys.py",
+        ),
+        (
+            "examples/load_convert_compare.py",
+            "equiframe/examples/load_convert_compare.py",
+        ),
+        (
+            "schemas/r-execution-binding-1.0.schema.json",
+            "equiframe/schemas/r-execution-binding-1.0.schema.json",
+        ),
+        (
+            "schemas/r-review-binding-1.0.schema.json",
+            "equiframe/schemas/r-review-binding-1.0.schema.json",
+        ),
+        (
+            "schemas/r-review-options-1.0.schema.json",
+            "equiframe/schemas/r-review-options-1.0.schema.json",
+        ),
+        (
+            "schemas/r-review-result-1.0.schema.json",
+            "equiframe/schemas/r-review-result-1.0.schema.json",
+        ),
+        (
+            "schemas/reviewed-decision-1.0.schema.json",
+            "equiframe/schemas/reviewed-decision-1.0.schema.json",
+        ),
+    }
+)
 INTERPRETER_PROBE = r"""
 import json, os, platform, sys
 print(json.dumps({
@@ -247,26 +347,24 @@ def extract_sdist(sdist: Path, destination: Path, wheel_files: dict[str, dict[st
         .get("force-include", {})
     )
     for original, destination_name in mapping.items():
-        if (original, destination_name) == ("docs", "equiframe/docs"):
-            directory = source / "docs"
+        if (original, destination_name) in {
+            ("docs", "equiframe/docs"),
+            ("tools/cyclonedx", "equiframe/_vendor/cyclonedx"),
+        }:
+            directory = source / original
             if directory.is_symlink() or not directory.is_dir():
                 raise ValueError("packaged handbook source is absent or linked")
             paths = sorted(directory.rglob("*"))
             if any(path.is_symlink() for path in paths):
                 raise ValueError("packaged handbook cannot contain symlinks")
             included = [
-                (path, "equiframe/docs/" + path.relative_to(directory).as_posix())
+                (path, destination_name + "/" + path.relative_to(directory).as_posix())
                 for path in paths
                 if path.is_file()
             ]
             if not included:
                 raise ValueError("packaged handbook is empty")
-        elif (
-            original.startswith(("examples/journeys/", "examples/integrations/"))
-            and destination_name == "equiframe/" + original
-            and PurePosixPath(original).suffix in {".py", ".md", ".lock"}
-            and ".." not in PurePosixPath(original).parts
-        ):
+        elif (original, destination_name) in EXACT_RESOURCE_FILES:
             included = [(source / original, destination_name)]
         else:
             raise ValueError("unsupported wheel force-include mapping")

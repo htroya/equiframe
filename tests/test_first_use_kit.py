@@ -354,24 +354,27 @@ def test_packaged_journey_sources_are_exact_and_exclude_generated_cache(package,
         project.read_text()
         + (
             "\n[tool.hatch.build.targets.wheel.force-include]\n"
-            '"examples/journeys/demo.py" = "equiframe/examples/journeys/demo.py"\n'
+            '"examples/journeys/a_pandas_refactor.py" = '
+            '"equiframe/examples/journeys/a_pandas_refactor.py"\n'
         )
     )
-    example = package / "examples/journeys/demo.py"
+    example = package / "examples/journeys/a_pandas_refactor.py"
     example.parent.mkdir()
     example.write_bytes(b'EXPECTED = "synthetic"\n')
     wheel = next((package / "dist").glob("*.whl"))
     with zipfile.ZipFile(wheel, "a") as archive:
         if mutation != "missing":
             archive.writestr(
-                "equiframe/examples/journeys/demo.py",
+                "equiframe/examples/journeys/a_pandas_refactor.py",
                 b"stale" if mutation == "changed" else example.read_bytes(),
             )
         if mutation == "cache":
-            archive.writestr("equiframe/examples/journeys/__pycache__/demo.pyc", b"stale")
+            archive.writestr(
+                "equiframe/examples/journeys/__pycache__/a_pandas_refactor.pyc", b"stale"
+            )
     if mutation == "none":
         files = BUILD["verify_wheel_source"](wheel, package, "0.0.0")
-        assert files["equiframe/examples/journeys/demo.py"]["sha256"] == (
+        assert files["equiframe/examples/journeys/a_pandas_refactor.py"]["sha256"] == (
             hashlib.sha256(example.read_bytes()).hexdigest()
         )
     else:
@@ -389,39 +392,70 @@ def test_first_use_lock_selects_python_branch_without_changing_hashes(minor):
     assert ("exceptiongroup==" in text) == (minor == "3.10")
 
 
+@pytest.mark.parametrize("namespace", ["journeys", "integrations"])
+def test_first_use_rejects_coherent_undeclared_example_mappings(package, namespace):
+    original = f"examples/{namespace}/arbitrary.py"
+    destination = "equiframe/" + original
+    project = package / "pyproject.toml"
+    project.write_text(
+        project.read_text("utf-8")
+        + f'\n[tool.hatch.build.targets.wheel.force-include]\n"{original}"="{destination}"\n',
+        encoding="utf-8",
+    )
+    example = package / original
+    example.parent.mkdir(parents=True)
+    content = b'EXAMPLE = "coherent but undeclared"\n'
+    example.write_bytes(content)
+    wheel = next((package / "dist").glob("*.whl"))
+    with zipfile.ZipFile(wheel, "a") as archive:
+        archive.writestr(destination, content)
+    with pytest.raises(ValueError, match="unsupported wheel force-include mapping"):
+        BUILD["verify_wheel_source"](wheel, package, "0.0.0")
+
+
 def test_first_use_lock_rejects_unsupported_python_instead_of_reusing_312():
     with pytest.raises(ValueError, match="unsupported first-use Python"):
         BUILD["locked_requirements"](ROOT / "uv.lock", python_minor="3.9")
 
 
 @pytest.mark.parametrize("mutation", ["none", "missing", "changed", "cache", "remapped"])
-def test_first_use_kit_binds_the_declared_eda_example_remap(package, tmp_path, mutation):
-    original = "examples/eda_generic.py"
-    destination = "equiframe/examples/integrations/eda_generic.py"
+@pytest.mark.parametrize(
+    "original,destination",
+    [
+        ("examples/eda_generic.py", "equiframe/examples/integrations/eda_generic.py"),
+        ("examples/load_convert_compare.py", "equiframe/examples/load_convert_compare.py"),
+    ],
+)
+def test_first_use_kit_binds_only_the_declared_example_mappings(
+    package, tmp_path, mutation, original, destination
+):
     configured = BUILD["tomllib"].loads((ROOT / "pyproject.toml").read_text("utf-8"))
     assert (
         configured["tool"]["hatch"]["build"]["targets"]["wheel"]["force-include"][original]
         == destination
     )
     project = package / "pyproject.toml"
-    mapped = destination if mutation != "remapped" else "equiframe/examples/other/eda_generic.py"
+    mapped = (
+        destination
+        if mutation != "remapped"
+        else "equiframe/examples/other/" + Path(destination).name
+    )
     project.write_text(
         project.read_text("utf-8")
         + f'\n[tool.hatch.build.targets.wheel.force-include]\n"{original}" = "{mapped}"\n',
         encoding="utf-8",
     )
-    content = b'EXAMPLE = "synthetic EDA source"\n'
+    content = b'EXAMPLE = "synthetic packaged source"\n'
     (package / original).write_bytes(content)
     wheel = next((package / "dist").glob("*.whl"))
     with zipfile.ZipFile(wheel, "a") as archive:
         if mutation != "missing":
-            archive.writestr(destination, b"stale EDA source" if mutation == "changed" else content)
+            archive.writestr(mapped, b"stale source" if mutation == "changed" else content)
         if mutation == "cache":
-            archive.writestr(
-                "equiframe/examples/integrations/__pycache__/eda_generic.pyc", b"cache"
-            )
+            cached = Path(destination).parent / "__pycache__" / (Path(destination).stem + ".pyc")
+            archive.writestr(cached.as_posix(), b"cache")
     if mutation == "none":
-        kit = tmp_path / "eda-kit"
+        kit = tmp_path / "example-kit"
         manifest = BUILD["build_kit"](kit, package=package)
         assert VERIFY["verify_kit"](kit) == manifest
         assert manifest["runtime_payload"]["files"][destination] == {

@@ -42,13 +42,104 @@ RECIPES = (
     "assertion_ci.py",
     "test_assertion_recipe.py",
 )
-R_REVIEW_SCHEMAS = frozenset(
+EXACT_RESOURCE_FILES = frozenset(
     {
-        "schemas/r-review-options-1.0.schema.json",
-        "schemas/r-review-binding-1.0.schema.json",
-        "schemas/r-execution-binding-1.0.schema.json",
-        "schemas/r-review-result-1.0.schema.json",
-        "schemas/reviewed-decision-1.0.schema.json",
+        (
+            "examples/eda_generic.py",
+            "equiframe/examples/integrations/eda_generic.py",
+        ),
+        (
+            "examples/integrations/outcome_gates.py",
+            "equiframe/examples/integrations/outcome_gates.py",
+        ),
+        (
+            "examples/integrations/sqlite_snapshot.py",
+            "equiframe/examples/integrations/sqlite_snapshot.py",
+        ),
+        (
+            "examples/integrations/sqlite_snapshot_demo.py",
+            "equiframe/examples/integrations/sqlite_snapshot_demo.py",
+        ),
+        (
+            "examples/integrations/universal_first_use.py",
+            "equiframe/examples/integrations/universal_first_use.py",
+        ),
+        (
+            "examples/journeys/README.md",
+            "equiframe/examples/journeys/README.md",
+        ),
+        (
+            "examples/journeys/__init__.py",
+            "equiframe/examples/journeys/__init__.py",
+        ),
+        (
+            "examples/journeys/a_pandas_refactor.py",
+            "equiframe/examples/journeys/a_pandas_refactor.py",
+        ),
+        (
+            "examples/journeys/b_native_migration.py",
+            "equiframe/examples/journeys/b_native_migration.py",
+        ),
+        (
+            "examples/journeys/c_retail_etl.py",
+            "equiframe/examples/journeys/c_retail_etl.py",
+        ),
+        (
+            "examples/journeys/common.py",
+            "equiframe/examples/journeys/common.py",
+        ),
+        (
+            "examples/journeys/d_financial_reconciliation.py",
+            "equiframe/examples/journeys/d_financial_reconciliation.py",
+        ),
+        (
+            "examples/journeys/e_telemetry.py",
+            "equiframe/examples/journeys/e_telemetry.py",
+        ),
+        (
+            "examples/journeys/f_data_science_preparation.py",
+            "equiframe/examples/journeys/f_data_science_preparation.py",
+        ),
+        (
+            "examples/journeys/g_external_snapshots.py",
+            "equiframe/examples/journeys/g_external_snapshots.py",
+        ),
+        (
+            "examples/journeys/h_portable_ci.py",
+            "equiframe/examples/journeys/h_portable_ci.py",
+        ),
+        (
+            "examples/journeys/requirements.lock",
+            "equiframe/examples/journeys/requirements.lock",
+        ),
+        (
+            "examples/journeys/verify_journeys.py",
+            "equiframe/examples/journeys/verify_journeys.py",
+        ),
+        (
+            "examples/load_convert_compare.py",
+            "equiframe/examples/load_convert_compare.py",
+        ),
+        (
+            "schemas/r-execution-binding-1.0.schema.json",
+            "equiframe/schemas/r-execution-binding-1.0.schema.json",
+        ),
+        (
+            "schemas/r-review-binding-1.0.schema.json",
+            "equiframe/schemas/r-review-binding-1.0.schema.json",
+        ),
+        (
+            "schemas/r-review-options-1.0.schema.json",
+            "equiframe/schemas/r-review-options-1.0.schema.json",
+        ),
+        (
+            "schemas/r-review-result-1.0.schema.json",
+            "equiframe/schemas/r-review-result-1.0.schema.json",
+        ),
+        (
+            "schemas/reviewed-decision-1.0.schema.json",
+            "equiframe/schemas/reviewed-decision-1.0.schema.json",
+        ),
     }
 )
 
@@ -201,20 +292,7 @@ def verify_wheel_source(wheel: Path, package: Path, version: str) -> dict[str, d
             ]
             if not included:
                 raise ValueError("packaged handbook is empty")
-        elif (
-            (original in R_REVIEW_SCHEMAS and destination == "equiframe/" + original)
-            or (original, destination)
-            == (
-                "examples/eda_generic.py",
-                "equiframe/examples/integrations/eda_generic.py",
-            )
-            or (
-                original.startswith(("examples/journeys/", "examples/integrations/"))
-                and destination == "equiframe/" + original
-                and Path(original).suffix in {".py", ".md", ".lock"}
-                and ".." not in Path(original).parts
-            )
-        ):
+        elif (original, destination) in EXACT_RESOURCE_FILES:
             included = [(package / original, destination)]
         else:
             raise ValueError("unsupported wheel force-include mapping")

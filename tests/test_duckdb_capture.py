@@ -5,6 +5,7 @@ import json
 import math
 import subprocess
 import sys
+import time
 from datetime import date
 from decimal import Decimal
 from threading import Event, Thread
@@ -365,17 +366,178 @@ def test_cancellation_interrupts_active_native_fetch_and_releases_caller(
     assert_no_capture(tmp_path)
 
 
-def test_native_timeout_fails_closed_and_connection_can_be_reused(connection, tmp_path):
-    with pytest.raises(ef.ExecutionTimeout):
-        capture_duckdb(
-            "SELECT CAST(sum(i % 2) AS BIGINT) AS value FROM range(1000000000000) t(i)",
-            connection=connection,
-            exclusive_connection=True,
-            options=DuckDBCaptureOptions(timeout_seconds=0.05),
-            work_dir=tmp_path,
+def test_native_timeout_fails_closed_and_connection_can_be_reused(tmp_path):
+    # A regression must fail within a bounded child, not freeze the full suite.
+    program = r"""
+import faulthandler, importlib.util, sys
+from pathlib import Path
+from threading import enumerate as threads
+import duckdb
+import equiframe as ef
+faulthandler.enable()
+faulthandler.dump_traceback_later(10)
+spec = importlib.util.spec_from_file_location('equiframe.duckdb_capture', sys.argv[1])
+module = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = module
+spec.loader.exec_module(module)
+work = Path(sys.argv[2])
+with duckdb.connect(config={
+    'autoinstall_known_extensions': False, 'autoload_known_extensions': False
+}) as connection:
+    try:
+        module.capture_duckdb(
+            'SELECT CAST(sum(i % 2) AS BIGINT) AS value FROM range(1000000000000) t(i)',
+            connection=connection, exclusive_connection=True,
+            options=module.DuckDBCaptureOptions(timeout_seconds=0.05), work_dir=work,
         )
-    assert connection.execute("SELECT 42").fetchone() == (42,)
+    except ef.ExecutionTimeout:
+        pass
+    else:
+        raise AssertionError('native timeout did not fire')
+    assert connection.execute('SELECT 42').fetchone() == (42,)
+    assert not list(work.rglob('capture.json'))
+    assert not list(work.rglob('snapshot.arrow'))
+    assert not list(work.glob('.duckdb-capture-*'))
+    assert not any(t.name == 'equiframe-duckdb-capture' for t in threads())
+    artifact = module.capture_duckdb(
+        'SELECT 42 AS value', connection=connection, exclusive_connection=True, work_dir=work,
+    )
+    assert ef.read_table(artifact.data)['value'].to_pylist() == [42]
+assert not any(t.name == 'equiframe-duckdb-capture' for t in threads())
+faulthandler.cancel_dump_traceback_later()
+print('NATIVE_TIMEOUT_AND_CONNECTION_REUSE_PASS')
+"""
+    result = subprocess.run(
+        [sys.executable, "-I", "-B", "-c", program, implementation.__file__, str(tmp_path)],
+        capture_output=True,
+        text=True,
+        timeout=20,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout.strip() == "NATIVE_TIMEOUT_AND_CONNECTION_REUSE_PASS"
+
+
+@pytest.mark.parametrize("abort", ["timeout", "cancelled"])
+def test_aborted_unstarted_relation_does_not_execute_during_cleanup(
+    connection, monkeypatch, tmp_path, abort
+):
+    calls = []
+
+    def record(value):
+        calls.append(value)
+        return value
+
+    connection.create_function("record_unstarted", record, ["BIGINT"], "BIGINT", side_effects=True)
+    token = ef.CancellationToken()
+    original = implementation.duckdb_arrow_schema
+
+    def abort_after_schema(*args):
+        schema = original(*args)
+        if abort == "timeout":
+            time.sleep(0.15)
+        else:
+            token.cancel()
+        return schema
+
+    with monkeypatch.context() as patch:
+        patch.setattr(implementation, "duckdb_arrow_schema", abort_after_schema)
+        expected = ef.ExecutionTimeout if abort == "timeout" else ef.ExecutionCancelled
+        with pytest.raises(expected):
+            capture_duckdb(
+                "SELECT record_unstarted(7) AS value",
+                connection=connection,
+                exclusive_connection=True,
+                cancellation=token,
+                options=DuckDBCaptureOptions(timeout_seconds=0.05 if abort == "timeout" else None),
+                work_dir=tmp_path,
+            )
+    assert calls == []
     assert_no_capture(tmp_path)
+    assert connection.execute("SELECT 42").fetchone() == (42,)
+    artifact = capture_duckdb(
+        "SELECT 42 AS value", connection=connection, exclusive_connection=True, work_dir=tmp_path
+    )
+    assert ef.read_table(artifact.data)["value"].to_pylist() == [42]
+    assert not any(thread.name == "equiframe-duckdb-capture" for thread in threads())
+
+
+def test_export_failure_before_reader_assignment_does_not_replay_native_query(
+    connection, monkeypatch, tmp_path
+):
+    calls = []
+
+    def record(value):
+        calls.append(value)
+        return value
+
+    connection.create_function(
+        "record_export_failure", record, ["BIGINT"], "BIGINT", side_effects=True
+    )
+    token = ef.CancellationToken()
+    original = duckdb.DuckDBPyRelation.to_arrow_reader
+
+    def export_then_fail(relation, *args):
+        reader = original(relation, *args)
+        try:
+            assert reader.read_next_batch().column(0).to_pylist() == [7]
+        finally:
+            reader.close()
+        token.cancel()
+        raise duckdb.InterruptException("synthetic interrupted export")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(duckdb.DuckDBPyRelation, "to_arrow_reader", export_then_fail)
+        with pytest.raises(ef.ExecutionCancelled):
+            capture_duckdb(
+                "SELECT record_export_failure(7) AS value",
+                connection=connection,
+                exclusive_connection=True,
+                cancellation=token,
+                work_dir=tmp_path,
+            )
+    assert calls == [7]
+    assert_no_capture(tmp_path)
+    assert connection.execute("SELECT 42").fetchone() == (42,)
+    artifact = capture_duckdb(
+        "SELECT 42 AS value", connection=connection, exclusive_connection=True, work_dir=tmp_path
+    )
+    assert ef.read_table(artifact.data)["value"].to_pylist() == [42]
+
+
+def test_cleanup_keeps_watcher_and_primary_timeout(connection, monkeypatch, tmp_path):
+    original = duckdb.DuckDBPyRelation.to_arrow_reader
+    cleanup_error = OSError("synthetic cleanup failure")
+
+    class ClosingReader:
+        def __init__(self, reader):
+            self.reader = reader
+            self.schema = reader.schema
+
+        def close(self):
+            assert any(thread.name == "equiframe-duckdb-capture" for thread in threads())
+            self.reader.close()
+            raise cleanup_error
+
+    def fail_write(*args):
+        raise ef.ExecutionTimeout("synthetic primary timeout")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            duckdb.DuckDBPyRelation,
+            "to_arrow_reader",
+            lambda relation, *args: ClosingReader(original(relation, *args)),
+        )
+        patch.setattr(implementation, "_write_reader", fail_write)
+        with pytest.raises(ef.ExecutionTimeout, match="primary timeout") as caught:
+            capture_duckdb(
+                "SELECT 7 AS value",
+                connection=connection,
+                exclusive_connection=True,
+                work_dir=tmp_path,
+            )
+    assert caught.value.__cause__ is cleanup_error
+    assert_no_capture(tmp_path)
+    assert connection.execute("SELECT 42").fetchone() == (42,)
     artifact = capture_duckdb(
         "SELECT 42 AS value", connection=connection, exclusive_connection=True, work_dir=tmp_path
     )

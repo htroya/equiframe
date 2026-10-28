@@ -8,6 +8,10 @@
   README, with direct installation/CLI commands and explicit compatibility scope.
 - Include a self-contained typed example that reads temporary synthetic orders,
   converts Pandas to Polars/DuckDB and detects a deliberate one-row regression.
+- Check exact packaged file mappings in the first-use and compatibility tools;
+  reject undeclared paths, remapped examples and modified payloads.
+- Prevent DuckDB cleanup from starting an unexecuted query after timeout or
+  cancellation; preserve the original failure and allow connection reuse.
 - Derive paired package versions from reviewed Git release tags. Preserve
   historical producer identities and admit the new detector producer explicitly.
 - Add reproducible security-audit input handling and stricter secret-file ignores.
