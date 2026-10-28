@@ -1,9 +1,11 @@
-## 0.12.3 - portable raw-metadata regression
+## 0.12.4 - portable raw-metadata regression
 
+- Keep the paired release-gate negative fixture distinct from the candidate
+  version. The local 0.12.3 attempt retains its original checks and was not uploaded.
 - Construct explicit LF and CRLF PKG-INFO fixture bytes and verify their distinct
   raw SHA-256 identities on each platform. Keep production metadata hashing raw;
   do not normalize line endings or execute a build backend to inventory metadata.
-- Pair exactly with core 0.12.3 and admit its producer in the active schemas,
+- Pair exactly with core 0.12.4 and admit its producer in the active schemas,
   preserving historical schemas, fixtures and scientific outcomes.
 - Require new artifact-bound release checks. Previous 0.12.2 results remain tied
   to their original artifacts and do not establish this candidate's validation

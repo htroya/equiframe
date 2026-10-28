@@ -6,7 +6,7 @@ A8 introduced the interpreter-aware builder. It supplies offline kits when
 generated for an identified artifact. Retained 0.11.1 first-use results remain
 historical; they do not validate a new release. Also see the offline wheelhouse guide.
 
-These recipes describe an identified EquiFrame **0.12.3** first-use kit, when
+These recipes describe an identified EquiFrame **0.12.4** first-use kit, when
 provided, and **the Python minor selected in its manifest (3.10-3.13)**.
 First-use kits are generated separately from the source tree. The kit contains
 the exact wheel, three recipe scripts and their
@@ -50,7 +50,7 @@ Install into the new environment:
 
 ```bash
 python -m pip install --require-hashes --only-binary=:all: -r requirements.lock
-python -m pip install --no-index wheels/equiframe-0.12.3-py3-none-any.whl
+python -m pip install --no-index wheels/equiframe-0.12.4-py3-none-any.whl
 python -m pip check
 python -I -c "import equiframe, sys; print(sys.version); print(equiframe.__file__)"
 ```

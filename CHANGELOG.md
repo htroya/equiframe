@@ -1,6 +1,9 @@
-## 0.12.3 - producer identity and paired release preparation
+## 0.12.4 - producer identity and paired release preparation
 
-- Admit detector producer 0.12.3 and emit that identity for new fits, while
+- Make the publication-packet negative fixture use an explicitly different
+  version and assert that mismatch, so a candidate update cannot make it match.
+  The local 0.12.3 candidate was not uploaded; its checks retain their identities.
+- Admit detector producer 0.12.4 and emit that identity for new fits, while
   preserving supported historical producers and their recorded evidence.
 - Align active producer schemas, reviewed inventories and the exact benchmark
   pairing; the IF/MAD algorithms and public format markers remain unchanged.

@@ -9,16 +9,51 @@ from __future__ import annotations
 
 import csv
 import json
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal, localcontext
 from pathlib import Path
+from typing import Literal, TypeAlias, TypedDict, cast
 
 import pyarrow as pa
 
 import equiframe as ef
 
-from .evidence import require
+from .evidence import JsonObject, require
+
+Columns: TypeAlias = tuple[ef.ColumnSpec, ...]
+Rows: TypeAlias = Sequence[Mapping[str, object]]
+PlanNode: TypeAlias = ef.Scan | ef.Project | ef.Filter | ef.Aggregate | ef.EquiJoin
+
+
+class TreasuryRow(TypedDict):
+    record_date: str
+    security_type: str
+    security: str
+    rate: Decimal
+
+
+class EarthquakeRow(TypedDict):
+    event_id: str
+    network: str
+    magnitude: Decimal
+    observed_at: datetime
+
+
+class NetworkGroup(TypedDict):
+    network: str
+    events: int
+    magnitude_sum: Decimal
+
+
+class PopulationRow(TypedDict):
+    state: str
+    name: str
+    region: str
+    population_start: int
+    population_end: int
+
 
 PROGRAMS = ("reconciliation", "refactor", "migration", "preparation")
 PROGRAM_INPUT_PATHS = {
@@ -31,7 +66,7 @@ ENGINES = ("pandas", "polars", "duckdb")
 VARIANTS = ("good", "defect", "not_evaluable")
 
 
-def string(name: str):
+def string(name: str) -> ef.ColumnSpec:
     return ef.ColumnSpec(
         name=name,
         logical_type=ef.StringType(),
@@ -40,7 +75,7 @@ def string(name: str):
     )
 
 
-def integer(name: str, unit: str, nullable: bool = False):
+def integer(name: str, unit: str, nullable: bool = False) -> ef.ColumnSpec:
     return ef.ColumnSpec(
         name=name,
         logical_type=ef.IntegerType(bits=64, signed=True),
@@ -50,7 +85,9 @@ def integer(name: str, unit: str, nullable: bool = False):
     )
 
 
-def decimal(name: str, precision: int, scale: int, unit: str, nullable: bool = False):
+def decimal(
+    name: str, precision: int, scale: int, unit: str, nullable: bool = False
+) -> ef.ColumnSpec:
     return ef.ColumnSpec(
         name=name,
         logical_type=ef.DecimalType(precision=precision, scale=scale),
@@ -60,7 +97,7 @@ def decimal(name: str, precision: int, scale: int, unit: str, nullable: bool = F
     )
 
 
-def timestamp(name: str):
+def timestamp(name: str) -> ef.ColumnSpec:
     return ef.ColumnSpec(
         name=name,
         logical_type=ef.TimestampType(unit="us", timezone="UTC"),
@@ -77,7 +114,7 @@ def timestamp(name: str):
     )
 
 
-def schema(columns: tuple, keys: tuple[str, ...] = ()):
+def schema(columns: Columns, keys: tuple[str, ...] = ()) -> ef.TableSchema:
     return ef.TableSchema(
         columns=columns,
         keys=(
@@ -96,24 +133,30 @@ def schema(columns: tuple, keys: tuple[str, ...] = ()):
     )
 
 
-def arrow_type(column):
-    kind = column.logical_type.kind
+def arrow_type(column: ef.ColumnSpec) -> pa.DataType:
+    logical_type = column.logical_type
+    kind = logical_type.kind
     if kind == "string":
         return pa.string()
     if kind == "integer":
         return pa.int64()
     if kind == "decimal":
-        return pa.decimal128(column.logical_type.precision, column.logical_type.scale)
+        return pa.decimal128(
+            cast(ef.DecimalType, logical_type).precision, cast(ef.DecimalType, logical_type).scale
+        )
     if kind == "timestamp":
-        return pa.timestamp(column.logical_type.unit, tz=column.logical_type.timezone)
+        return pa.timestamp(
+            cast(ef.TimestampType, logical_type).unit,
+            tz=cast(ef.TimestampType, logical_type).timezone,
+        )
     raise ValueError("Unexpected consumer logical type")
 
 
-def table(rows: list[dict], columns: tuple) -> pa.Table:
+def table(rows: Rows, columns: Columns) -> pa.Table:
     return pa.Table.from_pylist(rows, schema=pa.schema([(c.name, arrow_type(c)) for c in columns]))
 
 
-def project(columns: tuple):
+def project(columns: Columns) -> ef.Project:
     return ef.Project(
         node_id="transformed",
         source="scan",
@@ -129,16 +172,16 @@ class Program:
     description: str
     source_file: Path
     ingestion: ef.IngestionSpec
-    input_columns: tuple
-    output_columns: tuple
+    input_columns: Columns
+    output_columns: Columns
     output_keys: tuple[str, ...]
-    independent_input_rows: list[dict]
-    independent_expected_rows: list[dict]
-    nodes: tuple
-    family: str
+    independent_input_rows: Rows
+    independent_expected_rows: Rows
+    nodes: tuple[PlanNode, ...]
+    family: ef.Family
     defect: str
 
-    def native_source(self, captured: pa.Table, baseline: pa.Table):
+    def native_source(self, captured: pa.Table, baseline: pa.Table) -> ef.LocalDataSource:
         if self.name == "migration":
             # Two declared vintages from the SAME frozen ingestion. Only the new
             # side sees the controlled derived mutation; expected is never an input.
@@ -152,8 +195,10 @@ class Program:
             )
         return ef.LocalDataSource({"records": ef.ArrowInput(captured)})
 
-    def contract(self):
-        inputs = (ef.TableSpec(name="records", schema_spec=schema(self.input_columns)),)
+    def contract(self) -> ef.Contract:
+        inputs: tuple[ef.TableSpec, ...] = (
+            ef.TableSpec(name="records", schema_spec=schema(self.input_columns)),
+        )
         if self.name == "migration":
             inputs = (
                 ef.TableSpec(name="old", schema_spec=schema(self.input_columns[:4])),
@@ -182,7 +227,7 @@ class Program:
             ),
         )
 
-    def spec(self, source_engine: str, target_engine: str, variant: str):
+    def spec(self, source_engine: str, target_engine: str, variant: str) -> ef.MigrationSpec:
         return ef.MigrationSpec(
             contract=self.contract(),
             source_engine=source_engine,
@@ -215,26 +260,30 @@ class Program:
             ),
         )
 
-    def mutate(self, source: pa.Table) -> tuple[pa.Table, dict]:
-        rows = source.to_pylist()
+    def mutate(self, source: pa.Table) -> tuple[pa.Table, JsonObject]:
+        # The captured table was compared with the typed independent input before
+        # mutation; Arrow's Python scalar boundary has no complete static stubs.
+        rows: list[dict[str, object]] = source.to_pylist()
         require(len(rows) >= 2, "Controlled defect requires at least two original records")
         if self.name == "reconciliation":
-            before = [rows[0]["rate"], rows[1]["rate"]]
-            rows[0]["rate"] += Decimal("0.001")
-            rows[1]["rate"] -= Decimal("0.001")
+            before: object = [rows[0]["rate"], rows[1]["rate"]]
+            rows[0]["rate"] = cast(Decimal, rows[0]["rate"]) + Decimal("0.001")
+            rows[1]["rate"] = cast(Decimal, rows[1]["rate"]) - Decimal("0.001")
             require(
-                sum((r["rate"] for r in rows), Decimal(0))
+                sum((cast(Decimal, r["rate"]) for r in rows), Decimal(0))
                 == sum((r["rate"] for r in source.to_pylist()), Decimal(0)),
                 "Compensated defect must preserve the total",
             )
-            delta = {
+            delta: JsonObject = {
                 "rows": [0, 1],
                 "before": before,
                 "after": [rows[0]["rate"], rows[1]["rate"]],
                 "sum_preserved": True,
             }
         elif self.name == "refactor":
-            selected = next(i for i, r in enumerate(rows) if r["magnitude"] >= Decimal("4.5"))
+            selected = next(
+                i for i, r in enumerate(rows) if cast(Decimal, r["magnitude"]) >= Decimal("4.5")
+            )
             removed = rows.pop(selected)
             delta = {"removed_id": removed["event_id"], "rows_removed": 1}
         elif self.name == "migration":
@@ -244,7 +293,7 @@ class Program:
             delta = {"old_state": before, "new_state": "99", "changed_vintage": "population_end"}
         else:
             before = rows[0]["observed_at"]
-            rows[0]["observed_at"] = before + timedelta(hours=1)
+            rows[0]["observed_at"] = cast(datetime, before) + timedelta(hours=1)
             delta = {
                 "event_id": rows[0]["event_id"],
                 "before": before,
@@ -258,7 +307,13 @@ class Program:
         }
 
 
-def _ingestion(format: str, columns: tuple, mapping: tuple[str, ...], *, records_path=()):
+def _ingestion(
+    format: Literal["csv", "json", "jsonl"],
+    columns: Columns,
+    mapping: tuple[str, ...],
+    *,
+    records_path: tuple[str, ...] = (),
+) -> ef.IngestionSpec:
     return ef.IngestionSpec(
         format=format,
         fields=tuple(
@@ -274,6 +329,8 @@ def _ingestion(format: str, columns: tuple, mapping: tuple[str, ...], *, records
 
 def load_program(name: str, data: Path) -> Program:
     scan = ef.Scan(node_id="scan", table="records")
+    cols: Columns
+    out: Columns
     if name == "reconciliation":
         path = data / PROGRAM_INPUT_PATHS[name]
         cols = (
@@ -282,7 +339,7 @@ def load_program(name: str, data: Path) -> Program:
             string("security"),
             decimal("rate", 8, 3, "percentage_points"),
         )
-        rows = [
+        treasury_rows: list[TreasuryRow] = [
             {
                 "record_date": r["record_date"],
                 "security_type": r["security_type_desc"],
@@ -305,8 +362,8 @@ def load_program(name: str, data: Path) -> Program:
             cols,
             cols,
             ("record_date", "security_type", "security"),
-            rows,
-            [dict(r) for r in rows],
+            treasury_rows,
+            [dict(r) for r in treasury_rows],
             (scan, project(cols)),
             "nulls_types",
             "compensated_rate_change",
@@ -320,7 +377,7 @@ def load_program(name: str, data: Path) -> Program:
             timestamp("observed_at"),
         )
         with path.open(encoding="utf-8", newline="") as stream:
-            rows = [
+            earthquake_rows: list[EarthquakeRow] = [
                 {
                     "event_id": r["id"],
                     "network": r["net"],
@@ -336,10 +393,10 @@ def load_program(name: str, data: Path) -> Program:
                 integer("events", "rows"),
                 decimal("magnitude_sum", 12, 3, "magnitude", True),
             )
-            groups = {}
+            groups: dict[str, NetworkGroup] = {}
             with localcontext() as ctx:
                 ctx.prec = 38
-                for r in rows:
+                for r in earthquake_rows:
                     if r["magnitude"] < Decimal("4.5"):
                         continue
                     g = groups.setdefault(
@@ -356,12 +413,12 @@ def load_program(name: str, data: Path) -> Program:
                     left=ef.Column(name="magnitude"),
                     right=ef.LiteralExpression(
                         logical_type=ef.DecimalType(precision=6, scale=3),
-                        value=ef.DecimalValue(value="4.500"),
+                        value=ef.DecimalValue(value=Decimal("4.500")),
                         unit="magnitude",
                     ),
                 ),
             )
-            node = ef.Aggregate(
+            node: ef.Aggregate | ef.Project = ef.Aggregate(
                 node_id="transformed",
                 source="selected",
                 group_by=("network",),
@@ -392,7 +449,7 @@ def load_program(name: str, data: Path) -> Program:
                 cols,
                 out,
                 ("network",),
-                rows,
+                earthquake_rows,
                 list(groups.values()),
                 (scan, selection, node),
                 "aggregations",
@@ -405,7 +462,7 @@ def load_program(name: str, data: Path) -> Program:
                 "observed_at": r["observed_at"],
                 "magnitude_tenths": r["magnitude"] * Decimal("10"),
             }
-            for r in rows
+            for r in earthquake_rows
         ]
         node = ef.Project(
             node_id="transformed",
@@ -420,7 +477,7 @@ def load_program(name: str, data: Path) -> Program:
                         left=ef.Column(name="magnitude"),
                         right=ef.LiteralExpression(
                             logical_type=ef.DecimalType(precision=2, scale=0),
-                            value=ef.DecimalValue(value="10"),
+                            value=ef.DecimalValue(value=Decimal("10")),
                             unit="factor",
                         ),
                         logical_type=ef.DecimalType(precision=8, scale=3),
@@ -438,7 +495,7 @@ def load_program(name: str, data: Path) -> Program:
             cols,
             out,
             ("event_id",),
-            rows,
+            earthquake_rows,
             expected,
             (scan, node),
             "dates",
@@ -454,7 +511,7 @@ def load_program(name: str, data: Path) -> Program:
             integer("population_end", "persons"),
         )
         with path.open(encoding="utf-8", newline="") as stream:
-            rows = [
+            population_rows: list[PopulationRow] = [
                 {
                     "state": r["state"],
                     "name": r["name"],
@@ -472,11 +529,11 @@ def load_program(name: str, data: Path) -> Program:
         )
         expected = [
             {
-                **{c.name: r[c.name] for c in cols[:4]},
+                **{c.name: cast(Mapping[str, object], r)[c.name] for c in cols[:4]},
                 "right.state": r["state"],
                 "right.population_end": r["population_end"],
             }
-            for r in rows
+            for r in population_rows
         ]
         nodes = (
             ef.Scan(node_id="oldscan", table="old"),
@@ -500,7 +557,7 @@ def load_program(name: str, data: Path) -> Program:
             cols,
             out,
             (),
-            rows,
+            population_rows,
             expected,
             nodes,
             "joins",

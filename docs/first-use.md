@@ -3,7 +3,7 @@
 [Install an identified artifact](installed-private.md) · [Arquitecto](arquitecto.md) ·
 [Científico](cientifico.md) · [API](api.md)
 
-For **0.12.3**, use the identified wheel and its reviewed
+For **0.12.4**, use the identified wheel and its reviewed
 dependencies. Run these commands with the Python of that environment, outside
 the source checkout. On Windows, replace `python` with `.venv\Scripts\python.exe`;
 on Linux use `.venv/bin/python`. Activation is optional.

@@ -4,7 +4,7 @@
 
 <a id="english"></a>
 
-> Release target: **0.12.3**. Check the official index for availability and
+> Release target: **0.12.4**. Check the official index for availability and
 > verify the identified artifact hashes. Publication requires the
 > [release gates](docs/releasing.md).
 
@@ -37,14 +37,14 @@ from the installable packages and from private project data.
 
 ## Install
 
-EquiFrame 0.12.3 supports **Python 3.10, 3.11, 3.12 and 3.13**.
+EquiFrame 0.12.4 supports **Python 3.10, 3.11, 3.12 and 3.13**.
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.12.3"
+python -m pip install "equiframe[files,engines,ml]==0.12.4"
 python -m pip check
 ```
 
-The base installation is `python -m pip install equiframe==0.12.3`.
+The base installation is `python -m pip install equiframe==0.12.4`.
 Optional engines and machine-learning libraries are loaded when requested.
 
 | Extra | Purpose |
@@ -224,7 +224,7 @@ and [license scope](https://github.com/htroya/equiframe/blob/main/NOTICE.md).
 
 <a id="espanol"></a>
 
-> Objetivo de versión: **0.12.3**. Consulta su disponibilidad en el índice oficial
+> Objetivo de versión: **0.12.4**. Consulta su disponibilidad en el índice oficial
 > y verifica los hashes de los archivos identificados. La publicación requiere
 > las [comprobaciones de release](docs/releasing.md).
 
@@ -253,7 +253,7 @@ La [aplicación de validación](validation/consumer/README.md) y su
 integrados aquí. El corpus conserva la atribución y la integridad de sus fuentes;
 queda fuera de los paquetes instalables y de los datos privados del proyecto.
 
-La versión **0.12.3** requiere **Python 3.10–3.13**.
+La versión **0.12.4** requiere **Python 3.10–3.13**.
 Las interfaces con compromiso de estabilidad y las capacidades experimentales
 se distinguen en la guía de compatibilidad.
 
@@ -298,24 +298,24 @@ se distinguen en la guía de compatibilidad.
 Instala los extras necesarios para tu trabajo:
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.12.3"
+python -m pip install "equiframe[files,engines,ml]==0.12.4"
 python -m pip check
 ```
 
-La instalación base puede hacerse con `python -m pip install equiframe==0.12.3`.
+La instalación base puede hacerse con `python -m pip install equiframe==0.12.4`.
 Selecciona los extras necesarios para tu trabajo; el núcleo no importa los
 motores opcionales al ejecutar `import equiframe`.
 
 Para instalar un wheel local:
 
 ```bash
-python -m pip install "./equiframe-0.12.3-py3-none-any.whl[files,engines,ml]"
+python -m pip install "./equiframe-0.12.4-py3-none-any.whl[files,engines,ml]"
 ```
 
 El benchmark se instala por separado, después del núcleo:
 
 ```bash
-python -m pip install equiframe-benchmark==0.12.3
+python -m pip install equiframe-benchmark==0.12.4
 ```
 
 Consulta la [guía de instalación](https://github.com/htroya/equiframe/blob/main/docs/installed-private.md) para entornos aislados,

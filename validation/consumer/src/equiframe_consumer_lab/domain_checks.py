@@ -7,20 +7,45 @@ import shutil
 from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
+from typing import TypedDict
 
 import pyarrow as pa
 
 import equiframe as ef
 
-from .evidence import ConsumerError, environment, publish, require, write_json
+from .evidence import ConsumerError, JsonObject, environment, publish, require, write_json
 from .programs import ENGINES, decimal, integer, project, schema, string, table, timestamp
+
+
+class DomainCaseReceipt(TypedDict):
+    domain: str
+    variant: str
+    synthetic: bool
+    direction: str
+    observed_exit_code: int
+    verification: str
+    accepted: bool
+    published: bool
+    native_execution_count: int
+    invalid_type_mutation: dict[str, str] | None
+    stages: list[JsonObject]
+    comparison_max_rows: int
+    fixture_rows: int
+    expected_method: str
+    human_adoption: str
+    status: str
+
 
 DOMAINS = ("finance", "retail", "telemetry")
 VARIANTS = ("good", "different", "invalid")
 
 
-def declarations(domain: str, variant: str):
+def declarations(
+    domain: str, variant: str
+) -> tuple[ef.Contract, ef.RelationalPlan, pa.Table, pa.Table, dict[str, str] | None]:
     """Expected rows are authored literals, never engine-produced outputs."""
+    expected_rows: list[dict[str, object]]
+    rows: list[dict[str, object]]
     if variant not in VARIANTS:
         raise ValueError("Unknown domain variant")
     if domain == "finance":
@@ -125,7 +150,9 @@ def declarations(domain: str, variant: str):
     return declaration, plan, actual, expected, mutation
 
 
-def run_domain_case(output: Path, domain: str, variant: str, source: str, target: str) -> dict:
+def run_domain_case(
+    output: Path, domain: str, variant: str, source: str, target: str
+) -> DomainCaseReceipt:
     require(
         source in ENGINES and target in ENGINES and source != target, "Invalid engine direction"
     )
@@ -196,15 +223,16 @@ def run_domain_case(output: Path, domain: str, variant: str, source: str, target
                 native.verification_source,
                 native.verification_target,
             ):
-                require(result is not None, "Required comparison missing")
+                if result is None:
+                    raise ConsumerError("Required comparison missing")
                 ef.assert_equivalent(result)
             accepted = True
-            require(
-                native.target is not None
-                and native.target.execution is not None
-                and native.target.execution.output is not None,
-                "Accepted native target is unavailable",
-            )
+            if (
+                native.target is None
+                or native.target.execution is None
+                or native.target.execution.output is None
+            ):
+                raise ConsumerError("Accepted native target is unavailable")
             publish(
                 ef.read_table(native.target.execution.output.data),
                 output / "publication",
@@ -217,7 +245,7 @@ def run_domain_case(output: Path, domain: str, variant: str, source: str, target
             )
     if not accepted:
         require(not (output / "publication").exists(), "Rejected domain input was published")
-    record = {
+    record: DomainCaseReceipt = {
         "domain": domain,
         "variant": variant,
         "synthetic": True,
@@ -265,7 +293,7 @@ def run_domains(output: Path) -> int:
             {
                 "status": "FAIL",
                 "consumer_version": "0.1.19",
-                "candidate": "0.12.3",
+                "candidate": "0.12.4",
                 "synthetic": True,
                 "completed_cases": len(records),
                 "records": records,
@@ -279,7 +307,7 @@ def run_domains(output: Path) -> int:
         {
             "status": "PASS",
             "consumer_version": "0.1.19",
-            "candidate": "0.12.3",
+            "candidate": "0.12.4",
             "synthetic": True,
             "environment": env,
             "distinct_cases": len(records),

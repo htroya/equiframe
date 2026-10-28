@@ -14,6 +14,27 @@ import sys
 import uuid
 from collections.abc import Callable, Collection
 from pathlib import Path, PurePosixPath
+from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict, cast
+
+if TYPE_CHECKING:
+    import pyarrow as pa
+
+# Open JSON objects retain the producer's heterogeneous evidence fields. Their
+# existing runtime validation remains authoritative at deserialization boundaries.
+JsonObject: TypeAlias = dict[str, Any]
+
+
+class InventoryMember(TypedDict):
+    path: str
+    size_bytes: int
+    sha256: str
+
+
+class PublicationReceipt(TypedDict):
+    version: str
+    sha256: str
+    rows: int
+    guarantee: str
 
 
 class ConsumerError(RuntimeError):
@@ -23,7 +44,7 @@ class ConsumerError(RuntimeError):
 class PublicationCommittedError(ConsumerError):
     """The pointer commit succeeded, but postcommit confirmation failed."""
 
-    def __init__(self, receipt: dict, cause: Exception):
+    def __init__(self, receipt: PublicationReceipt, cause: Exception):
         self.receipt = dict(receipt)
         super().__init__("Publication committed; confirmation failed: " + type(cause).__name__)
 
@@ -108,7 +129,7 @@ def verify_frozen(
     *,
     required_paths: Collection[str],
     expected_manifest_sha256: str,
-) -> dict:
+) -> JsonObject:
     """Verify every listed member and bind all consumed inputs to one manifest."""
     require(bool(required_paths), "Consumer must declare its frozen input paths")
     required = {_frozen_path(name) for name in required_paths}
@@ -123,7 +144,7 @@ def verify_frozen(
         "Frozen manifest SHA-256 differs",
     )
 
-    def unique_object(pairs: list[tuple[str, object]]) -> dict:
+    def unique_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
         result = {}
         for key, value in pairs:
             require(key not in result, "Duplicate frozen manifest JSON member")
@@ -152,13 +173,13 @@ def verify_frozen(
         path = _frozen_regular_file(data, name)
         require(path.stat().st_size == item["size_bytes"], "Frozen data size differs")
         require(sha256(path) == item["sha256"], "Frozen data SHA-256 differs")
-    return document
+    return cast(JsonObject, document)
 
 
-def environment() -> dict:
+def environment() -> JsonObject:
     import equiframe as ef
 
-    require(importlib.metadata.version("equiframe") == "0.12.3", "Wrong installed core version")
+    require(importlib.metadata.version("equiframe") == "0.12.4", "Wrong installed core version")
     require(
         importlib.metadata.version("equiframe-consumer-lab") == "0.1.19",
         "Wrong installed consumer version",
@@ -175,7 +196,8 @@ def environment() -> dict:
     )
     require(sys.flags.isolated == 1, "Run this consumer with python -I")
     installed_record = importlib.metadata.distribution("equiframe").read_text("RECORD")
-    require(installed_record is not None, "Installed core distribution RECORD is missing")
+    if installed_record is None:
+        raise ConsumerError("Installed core distribution RECORD is missing")
     return {
         "python": sys.version,
         "executable": sys.executable,
@@ -228,13 +250,13 @@ def verify_report(root: Path) -> None:
 
 
 def publish(
-    table: object,
+    table: pa.Table,
     destination: Path,
     *,
     accepted: bool,
     fault: str | None = None,
-    precommit: Callable[[dict], None] | None = None,
-) -> dict:
+    precommit: Callable[[PublicationReceipt], None] | None = None,
+) -> PublicationReceipt:
     """Local app publication: single-writer atomic pointer, never permits a failed gate."""
     require(accepted is True, "Publication requires explicit successful acceptance")
     import pyarrow.parquet as pq
@@ -244,7 +266,7 @@ def publish(
     stage = destination / (".staging-" + run_id)
     stage.mkdir()
     committed = False
-    receipt = None
+    receipt: PublicationReceipt | None = None
     try:
         pq.write_table(table, stage / "data.parquet")
         receipt = {
@@ -275,14 +297,14 @@ def publish(
         return receipt
     except Exception as error:
         if committed:
-            raise PublicationCommittedError(receipt, error) from error
+            raise PublicationCommittedError(cast(PublicationReceipt, receipt), error) from error
         raise
     finally:
         if not committed and stage.exists():
             shutil.rmtree(stage)
 
 
-def inventory(root: Path) -> list[dict]:
+def inventory(root: Path) -> list[InventoryMember]:
     return [
         {
             "path": p.relative_to(root).as_posix(),

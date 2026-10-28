@@ -15,7 +15,7 @@ actual. No necesitas adoptar el benchmark ni desplegar un servicio.
 Para intercambiar CSV, SQL y otras entradas conservando un contrato, usa el
 [recorrido de universalidad en cinco pasos](universalidad-cinco-pasos.md).
 
-El alcance estable objetivo es **0.12.3**. Identifica los bytes de cada artefacto
+El alcance estable objetivo es **0.12.4**. Identifica los bytes de cada artefacto
 por su revisión y SHA-256. El código propio usa MIT y el propietario autorizó
 preparar y publicar manualmente en TestPyPI/PyPI sujeto a los
 [gates de release](releasing.md); autorización no significa publicación terminada.

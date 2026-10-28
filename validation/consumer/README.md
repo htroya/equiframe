@@ -19,7 +19,7 @@ many executed and matched their expected outcomes.
 
 ## Installation and use
 
-The application version is **0.1.19**, paired with **EquiFrame 0.12.3**.
+The application version is **0.1.19**, paired with **EquiFrame 0.12.4**.
 Record the checks actually completed for this pairing. Earlier 0.1.18/core
 0.12.2 runs keep their original source and artifact identities and are not runs
 of this revision.
@@ -114,3 +114,21 @@ Original application code is covered by the repository's [MIT license](../../LIC
 from 2026-10-28. Third-party rights and data licenses remain separate.
 The original private history is retained privately; this source application does
 not publish private datasets, old reports or earlier private distribution artifacts.
+
+## Development type checks
+
+From this component directory, use the reviewed development interpreter and its
+installed matching core dependency:
+
+```bash
+python -m mypy --config-file pyproject.toml
+python -m ruff check --no-cache src
+python -m ruff format --check --no-cache src
+```
+
+The mypy configuration checks all eight application modules in strict mode. Use
+the interpreter selected for the reviewed dependency closure so its standard
+library and installed type stubs share a Python syntax level. Missing-stub
+exceptions cover only the listed third-party libraries; application diagnostics
+are not suppressed. Type checking does not execute the native workflows or
+establish an installed release result.

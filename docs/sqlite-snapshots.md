@@ -32,7 +32,7 @@ in that shared kit are not new dependencies of this producer. Copy **both**
 integration files from the installed wheel's resources (shown below) or the
 corresponding verified source distribution into a new working directory.
 Use a registry artifact only after verifying its project, version and identity;
-the string `0.12.3` alone does not identify bytes. An offline kit is optional,
+the string `0.12.4` alone does not identify bytes. An offline kit is optional,
 not a separate public-release channel promised by this documentation.
 
 For example, after verifying the private kit, use these POSIX commands from
@@ -43,7 +43,7 @@ python3.12 -m venv sqlite-example-env
 sqlite-example-env/bin/python -m pip install --require-hashes --only-binary=:all: \
   -r "$KIT/requirements.lock"
 sqlite-example-env/bin/python -m pip install --no-index \
-  "$KIT/wheels/equiframe-0.12.3-py3-none-any.whl"
+  "$KIT/wheels/equiframe-0.12.4-py3-none-any.whl"
 sqlite-example-env/bin/python -m pip check
 mkdir sqlite-example-work
 sqlite-example-env/bin/python - <<'PY'

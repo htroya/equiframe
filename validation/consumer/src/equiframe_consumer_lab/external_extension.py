@@ -7,7 +7,10 @@ plugin framework. Only Scan + literal Column Project over text/int64 is claimed.
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Mapping
 from dataclasses import dataclass
+from pathlib import Path
+from typing import cast
 
 import polars as pl
 import pyarrow as pa
@@ -33,7 +36,7 @@ class Projection:
 class ProjectionCompiler:
     engine = ENGINE
 
-    def check(self, plan, contract):
+    def check(self, plan: ef.RelationalPlan, contract: ef.Contract) -> ef.CompilationCheck:
         try:
             ef.validate_ir(plan, contract)
             if (
@@ -42,7 +45,7 @@ class ProjectionCompiler:
                 or not isinstance(plan.nodes[1], ef.Project)
             ):
                 raise ValueError("external compiler supports only Scan then Project")
-            scan, project = plan.nodes
+            scan, project = plan.nodes[0], plan.nodes[1]
             if (
                 project.source != scan.node_id
                 or plan.output != project.node_id
@@ -65,15 +68,17 @@ class ProjectionCompiler:
             )
         return ef.CompilationCheck(engine=self.engine, supported=True)
 
-    def compile(self, plan, contract):
+    def compile(self, plan: ef.RelationalPlan, contract: ef.Contract) -> ef.CompiledPlan:
         check = self.check(plan, contract)
         if not check.supported:
             raise ef.CapabilityError(check.diagnostics[0].message)
         ir_hash, contract_hash = ef.ir_fingerprint(plan), ef.contract_fingerprint(contract)
         identifier = "external_" + hashlib.sha256((ir_hash + contract_hash).encode()).hexdigest()
-        scan, project = plan.nodes
+        scan, project = cast(ef.Scan, plan.nodes[0]), cast(ef.Project, plan.nodes[1])
         transformation = Projection(
-            identifier, scan.table, tuple((c.expression.name, c.name) for c in project.columns)
+            identifier,
+            scan.table,
+            tuple((cast(ef.Column, c.expression).name, c.name) for c in project.columns),
         )
         return ef.CompiledPlan(
             engine=self.engine,
@@ -87,10 +92,10 @@ class ProjectionCompiler:
 class ProjectionAdapter:
     engine = ENGINE
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.native_executions = 0
 
-    def capabilities(self):
+    def capabilities(self) -> ef.EngineCapabilities:
         return ef.EngineCapabilities(
             engine=self.engine,
             decimal_precision=1,
@@ -102,7 +107,12 @@ class ProjectionAdapter:
             required_packages=("polars", "pyarrow"),
         )
 
-    def execute(self, transformation, inputs, context):
+    def execute(
+        self,
+        transformation: ef.Transformation,
+        inputs: Mapping[str, ef.LoadedTable],
+        context: ef.RunContext,
+    ) -> ef.LoadedTable:
         if not isinstance(transformation, Projection):
             raise ef.CapabilityError("wrong external transformation type")
         context.check()
@@ -118,7 +128,7 @@ class ProjectionAdapter:
             for f in loaded.table.schema
         ):
             raise ef.CapabilityError("external projection refuses unsupported physical input")
-        frame = pl.from_arrow(loaded.table)
+        frame = cast(pl.DataFrame, pl.from_arrow(loaded.table))
         # get_column resolves a literal name; no wildcard/regex selector is evaluated.
         output = frame.select(
             [frame.get_column(source).alias(target) for source, target in transformation.columns]
@@ -139,11 +149,11 @@ class CapturedSource:
 
     table_names = ("sales",)
 
-    def __init__(self, loaded):
+    def __init__(self, loaded: ef.LoadedTable) -> None:
         self.loaded = loaded
         self.resolutions = 0
 
-    def resolve(self, name, *, context):
+    def resolve(self, name: str, *, context: ef.RunContext) -> ef.LoadedTable:
         if name != "sales":
             raise KeyError(name)
         context.check()
@@ -151,7 +161,7 @@ class CapturedSource:
         return self.loaded
 
 
-def declarations():
+def declarations() -> tuple[ef.Contract, ef.RelationalPlan]:
     columns = (string("sku"), integer("quantity", "item", nullable=True))
     schema = declared_schema(columns, ("sku",))
     contract = ef.Contract(
@@ -189,7 +199,7 @@ def declarations():
     return contract, plan
 
 
-def run(output, variant):
+def run(output: Path, variant: str) -> tuple[ef.MigrationResult, int, int]:
     if variant not in ("good", "different", "invalid"):
         raise ValueError("unknown external fixture variant")
     contract, plan = declarations()

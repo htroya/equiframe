@@ -1,9 +1,12 @@
-## 0.1.19 - exact core 0.12.3 pairing
+## 0.1.19 - exact core 0.12.4 pairing
 
-- Require core 0.12.3 and installed consumer 0.1.19; retain the installed-path and
+- Require core 0.12.4 and installed consumer 0.1.19; retain the installed-path and
   RECORD provenance checks and reject older core or consumer identities.
 - Align current CLI text and new receipt provenance with that pairing. Preserve
   frozen inputs, independent expected calculations and all acceptance gates.
+- Type application rows, publication receipts and native integration ports;
+  narrow optional results after the existing acceptance checks. Add a standalone
+  strict mypy configuration without changing expected outcomes or release inputs.
 - Earlier 0.1.18/core 0.12.2 executions retain their own identities. New executions
   must identify the current pairing; source changes alone are not a completed run.
 

@@ -3,7 +3,7 @@
 [Handbook](index.md) · [Outcome gates](outcome-gates.md) · [Compatibility](compatibility.md)
 
 Private Alpha **0.12.0a14** introduced `equiframe.eda`; that subpackage remains
-experimental in 0.12.3, separately from the stable comparison/migration interfaces.
+experimental in 0.12.4, separately from the stable comparison/migration interfaces.
 It diagnoses one fixed dataset independently of ETL or a migration. It never
 changes a plan, tolerance, expected output, detector bundle or publication gate.
 Install the identified wheel and its `eda` extra (DuckDB and Arrow),

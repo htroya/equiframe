@@ -11,7 +11,7 @@ license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10,<3.14"
 authors = [{name = "EquiFrame consumer validation"}]
-dependencies = ["equiframe[engines]==0.12.3"]
+dependencies = ["equiframe[engines]==0.12.4"]
 classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11", "Programming Language :: Python :: 3.12", "Programming Language :: Python :: 3.13", "Private :: Do Not Upload"]
 
 [project.scripts]
@@ -22,3 +22,11 @@ packages = ["src/equiframe_consumer_lab"]
 
 [tool.hatch.build.targets.sdist]
 include = ["/src", "/tests", "/README.md", "/pyproject.toml", "/CHANGELOG.md", "/LICENSE"]
+
+[tool.mypy]
+strict = true
+files = ["src/equiframe_consumer_lab"]
+
+[[tool.mypy.overrides]]
+module = ["pyarrow", "pyarrow.*", "duckdb", "duckdb.*", "sklearn", "sklearn.*", "plotly", "plotly.*"]
+ignore_missing_imports = true

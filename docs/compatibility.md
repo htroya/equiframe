@@ -4,7 +4,7 @@
 
 ## Admission is not a measured support matrix
 
-The 0.12.3 release contract declares **Python `>=3.10,<3.14`**, meaning 3.10, 3.11, 3.12 and
+The 0.12.4 release contract declares **Python `>=3.10,<3.14`**, meaning 3.10, 3.11, 3.12 and
 3.13. Dependency ranges describe installable admission, not every tested
 combination. A lock captures one resolution; it does not prove every operating
 system, architecture, Python patch or cross-product of package versions works.
@@ -19,7 +19,7 @@ that retains version `0.11.1`.
 
 The following implementation checks actually ran from installed A14 artifacts
 on 27 October 2026. They establish the listed workloads, rather than every input
-or dependency combination. The final 0.12.3 artifact must still pass its own
+or dependency combination. The final 0.12.4 artifact must still pass its own
 [release gates](releasing.md); a version change does not inherit an artifact hash.
 
 | OS / architecture | CPython actually exercised | Observed functional scope |
@@ -56,7 +56,7 @@ Platform-specific skips retain their meaning and are not successful checks.
 No macOS, PyPy, other architecture, every Python patch or full minimum-to-maximum
 dependency cross-product is established by this table. Earlier STEP6 x86_64
 results above retain their own artifact identities; none is silently relabelled
-as a 0.12.3 final-artifact result.
+as a 0.12.4 final-artifact result.
 
 The first-use builder selects an explicit Python minor and its own hash-pinned
 dependency closure. The legacy `requirements.lock` is the 3.12 closure;

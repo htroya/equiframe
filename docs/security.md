@@ -1,7 +1,7 @@
 # Security boundaries and responsible use
 
 EquiFrame is a local Python library, not a sandbox or a hosted service.
-The `0.12.3` release must satisfy the [release gates](releasing.md) before
+The `0.12.4` release must satisfy the [release gates](releasing.md) before
 publication; a version string alone does not establish acceptance. The historical
 STEP9 assessment remains **incomplete** and is not relabelled by a later release.
 Ordinary source review, dependency advisories and security regressions have their

@@ -10,6 +10,7 @@ import sys
 import time
 import traceback
 from pathlib import Path
+from typing import cast
 
 import pyarrow as pa
 
@@ -17,7 +18,9 @@ import equiframe as ef
 
 from .evidence import (
     ConsumerError,
+    JsonObject,
     PublicationCommittedError,
+    PublicationReceipt,
     environment,
     frozen_manifest_sha256,
     inventory,
@@ -34,7 +37,7 @@ from .programs import ENGINES, PROGRAM_INPUT_PATHS, PROGRAMS, VARIANTS, load_pro
 EXPECTED_EXIT = {"good": 0, "defect": 1, "not_evaluable": 3}
 
 
-def comparison_gate(result) -> tuple[bool, str | None]:
+def comparison_gate(result: ef.ComparisonResult) -> tuple[bool, str | None]:
     try:
         ef.assert_equivalent(result)
     except ef.EquivalenceAssertionError as error:
@@ -50,7 +53,7 @@ def run_case(
     )
     output.mkdir(parents=True)
     started = time.monotonic()
-    record = {
+    record: JsonObject = {
         "consumer_version": "0.1.19",
         "program": program,
         "variant": variant,
@@ -103,10 +106,8 @@ def run_case(
         ingestion = ef.ingest_file(
             p.source_file, spec=p.ingestion, work_dir=output / "ingestion", batch_rows=17
         )
-        require(
-            ingestion.state == "completed" and ingestion.output is not None,
-            "Real-data ingestion did not complete",
-        )
+        if ingestion.state != "completed" or ingestion.output is None:
+            raise ConsumerError("Real-data ingestion did not complete")
         record["ingestion"] = {
             "state": ingestion.state,
             "accepted_records": ingestion.accepted_records,
@@ -212,12 +213,12 @@ def run_case(
         )
         record["frozen_data_unchanged"] = True
         if accepted:
-            require(
-                native.target is not None
-                and native.target.execution is not None
-                and native.target.execution.output is not None,
-                "No target materialization",
-            )
+            if (
+                native.target is None
+                or native.target.execution is None
+                or native.target.execution.output is None
+            ):
+                raise ConsumerError("No target materialization")
             result_table = ef.read_table(native.target.execution.output.data)
             record["publication"] = publish(
                 result_table,
@@ -278,7 +279,9 @@ def run_case(
     return code
 
 
-def prepare_publication_receipts(output: Path, record: dict, proposed: dict) -> None:
+def prepare_publication_receipts(
+    output: Path, record: JsonObject, proposed: PublicationReceipt
+) -> None:
     """Required acceptance/evidence receipts are prepared before visibility commit.
 
     The proposed version is explicitly not yet committed. The staging area is
@@ -305,7 +308,7 @@ def prepare_publication_receipts(output: Path, record: dict, proposed: dict) -> 
         )
 
 
-def finalize_case(output: Path, record: dict, code: int) -> int:
+def finalize_case(output: Path, record: JsonObject, code: int) -> int:
     """Final evidence failure never returns successful application acceptance.
 
     Publication is a distinct committed fact: a subsequent evidence write failure
@@ -350,7 +353,7 @@ def finalize_case(output: Path, record: dict, code: int) -> int:
         return 2
 
 
-def _text(value) -> str:
+def _text(value: str | bytes | None) -> str:
     if value is None:
         return ""
     if isinstance(value, bytes):
@@ -364,7 +367,7 @@ def _read_case(
     returncode: int,
     *,
     optimized: bool,
-) -> tuple[dict | None, str | None]:
+) -> tuple[JsonObject | None, str | None]:
     try:
         if not path.is_file():
             return None, "missing_case_receipt"
@@ -400,7 +403,7 @@ def _read_case(
             or child_environment["optimized"] != int(optimized)
         ):
             return None, "case_receipt_interpreter_flags_differ"
-        return case, None
+        return cast(JsonObject, case), None
     except (OSError, UnicodeError, ValueError) as error:
         return None, "unreadable_case_receipt:" + type(error).__name__
 
