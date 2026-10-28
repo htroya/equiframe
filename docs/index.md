@@ -54,8 +54,10 @@ Hernán Troya (`htroya`) is the maintainer and release/security owner, on a
 best-effort basis without a promised backup or response deadline. The public
 [issue channel](https://github.com/htroya/equiframe/issues) and
 [private vulnerability reporting](https://github.com/htroya/equiframe/security/advisories/new)
-were enabled and verified on 27 October 2026. See [maintenance](maintenance.md)
-and [security](security.md); never submit sensitive details in a public issue.
+are reporting routes of the project's single public repository. For each
+release, the maintainer must enable both routes and verify their availability.
+See [maintenance](maintenance.md) and [security](security.md); never submit
+sensitive details in a public issue.
 
 ## Start here
 
@@ -92,8 +94,8 @@ and [security](security.md); never submit sensitive details in a public issue.
 
 The source distribution contains `README.md`, this `docs/` directory, examples,
 tests, tools and JSON schemas. The wheel carries the same handbook as package
-resources under `equiframe/docs/`; it does not require access to the private
-repository. After installing the identified wheel, locate it with:
+resources under `equiframe/docs/`; it does not require a source checkout.
+After installing the identified wheel, locate it with:
 
 ```python
 from importlib.resources import files
@@ -106,7 +108,7 @@ The first-use kit additionally contains the exact wheel, dependency pins and
 hashes, four recipe/test scripts, an integrity verifier and English guides.
 [Recipes](recipes.md) explains its layout. The package's README is also part of
 its distribution metadata. Relative links within this handbook stay within the
-handbook; no private-repository document is required to follow the core guide.
+handbook; no document from another repository is required to follow the core guide.
 
 ## Choosing the right service
 

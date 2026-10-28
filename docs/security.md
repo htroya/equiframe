@@ -69,11 +69,13 @@ or retroactively amend the historical assessment.
 
 Hernán Troya (`htroya`) is responsible for maintenance, releases and security
 response. There is no response-time SLA. Report suspected vulnerabilities through
-the verified [private GitHub reporting channel](https://github.com/htroya/equiframe/security/advisories/new)
-in the public documentation repository. A GitHub account is required; access to
-the private development repository is not. Use
+the [private GitHub reporting channel](https://github.com/htroya/equiframe/security/advisories/new)
+of the project's public repository when that route is available. A GitHub
+account is required. For each release, the maintainer must enable this route
+and the public issue channel and verify their availability. Use
 [public issues](https://github.com/htroya/equiframe/issues) for non-sensitive
-bugs and questions.
+bugs and questions. If private intake cannot be verified, retain sensitive
+details locally until confidential intake can be arranged.
 
 Provide a sanitized reproducer, exact version and artifact hash, dependency and
 runtime versions, expected behaviour and impact. Do not post credentials,

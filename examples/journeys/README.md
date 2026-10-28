@@ -28,4 +28,4 @@ Use a fresh output directory every time. `private/` or `raw/` contains raw
 captures. Only the `reports/` or `public_reports/` subtree is data-minimized.
 A portable bundle, `summary.json`, and `environment.json` are not redacted sharing
 packages. Local Parquet output is local file publication, never package/service
-publication. The repository and package remain private.
+publication. Keep raw captures and local evidence out of public commits.

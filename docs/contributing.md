@@ -3,10 +3,9 @@
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Release process](releasing.md)
 
 The 0.12.2 release contract uses MIT for project-owned code; third-party materials
-retain their notices and licenses. Redistribution rights follow those licenses,
-independently of access to the private development repository. Hernán Troya
-(`htroya`) maintains the project and owns releases/security coordination on a
-best-effort basis without a promised backup or response-time SLA.
+retain their notices and licenses. Redistribution rights follow those licenses.
+Hernán Troya (`htroya`) maintains the project and owns releases/security
+coordination on a best-effort basis without a promised backup or response-time SLA.
 
 The public repository contains the library source, user documentation and tests.
 Open a nonsensitive issue or contribute a focused patch using your own account.

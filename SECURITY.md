@@ -7,10 +7,14 @@ limits are in the [packaged security guide](docs/security.md).
 Historical STEP9 assessments retain their original scope and findings.
 
 Report sensitive vulnerabilities through
-[GitHub private vulnerability reporting](https://github.com/htroya/equiframe/security/advisories/new).
-This private intake is enabled in the public documentation repository.
+[GitHub private vulnerability reporting](https://github.com/htroya/equiframe/security/advisories/new)
+in the project's public repository when that route is available.
 Use [public issues](https://github.com/htroya/equiframe/issues) for ordinary
 bugs without confidential information.
+For each release, the maintainer must enable both reporting routes and verify
+their availability. If private intake cannot be verified, retain sensitive
+details locally until confidential intake can be arranged; never post them in
+a public issue.
 
 Include the package version, interpreter and engine versions, impact, exact
 artifact hash when available, and a minimal sanitized reproducer. Never post

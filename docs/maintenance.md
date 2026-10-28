@@ -29,10 +29,11 @@ comparison maintenance.
 Use [the public issue channel](https://github.com/htroya/equiframe/issues)
 for nonsensitive bugs and minimal synthetic reproductions. Use
 [private vulnerability reporting](https://github.com/htroya/equiframe/security/advisories/new)
-for sensitive security reports. The public repository, issue intake and private
-vulnerability reporting were enabled and verified on 27 October 2026. If a route
-becomes unavailable, contact the owner through the established private project
-channel to arrange safe intake; do not move sensitive details to a public issue.
+for sensitive security reports. Both routes belong to the project's single
+public repository. For each release, the maintainer must enable both routes
+and verify their availability. If private intake cannot be verified, retain
+sensitive details locally until confidential intake can be arranged; do not
+move them to a public issue.
 
 Do not put credentials, real data, personal information or sensitive exploit
 details in a public issue, an ordinary issue with a broader audience, or a
@@ -194,10 +195,11 @@ new release. See [dependency evidence](dependencies.md) and current release gate
 The earlier stopped source-security assessment remains historical and is not
 relabeled as a pass. The owner has now authorized stable-release preparation and
 manual TestPyPI/PyPI publication subject to current security and release gates.
-MIT licensing, the maintainer role and reporting-channel activation are decided
-and verified. Registry ownership, final artifact checks and publication remain
-separate observable steps. Do not claim that authorization fixes a vulnerability or completes
-a security assessment. Scientific acceptance and human adoption are independent
+MIT licensing and the maintainer role are owner decisions. The reporting routes
+must be enabled and their availability verified for each release. Registry
+ownership, final artifact checks and publication remain separate observable
+steps. Do not claim that authorization fixes a vulnerability or completes a
+security assessment. Scientific acceptance and human adoption are independent
 of interface stability and registry publication.
 
 ## Admitting a new engine or integration

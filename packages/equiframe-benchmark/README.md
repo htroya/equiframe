@@ -35,10 +35,12 @@ real-data accuracy, reviewed corpus labels, independent human acceptance,
 external adoption or a deployed service/data warehouse.
 
 Hernán Troya (`htroya`) is the confirmed maintenance, release and security owner,
-with no response-time SLA. Public documentation and ordinary issues are at
-[EquiFrame documentation](https://github.com/htroya/equiframe).
-Sensitive reports use its enabled
+with no response-time SLA. Documentation and reporting routes share the
+[EquiFrame repository](https://github.com/htroya/equiframe).
+Sensitive reports use its
 [private reporting channel](https://github.com/htroya/equiframe/security/advisories/new).
+For each release, the maintainer must enable public issues and private reporting
+and verify their availability.
 Historical Alpha artifacts and results retain their original identity and scope.
 
 The core wheel includes the self-contained English handbook with API, semantics,

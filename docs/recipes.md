@@ -8,7 +8,7 @@ historical; they do not validate a new release. Also see the offline wheelhouse 
 
 These recipes describe an identified EquiFrame **0.12.2** first-use kit, when
 provided, and **the Python minor selected in its manifest (3.10-3.13)**.
-This documentation repository does not host that generated kit. The kit contains
+First-use kits are generated separately from the source tree. The kit contains
 the exact wheel, three recipe scripts and their
 pytest fixture, pinned dependencies with hashes, an integrity verifier and
 English guides. No checkout, real dataset, credential, remote SQL, notebook or
