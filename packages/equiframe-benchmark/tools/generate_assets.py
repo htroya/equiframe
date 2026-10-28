@@ -1,8 +1,12 @@
-"""Generate the benchmark's strict versioned JSON schemas."""
+"""Generate and check the benchmark's strict V1 and V2 JSON schemas."""
 
 import argparse
 import json
+import runpy
 from pathlib import Path
+from typing import cast
+
+from pydantic import BaseModel
 
 from equiframe_benchmark import (
     AwardReconciliationResult,
@@ -106,24 +110,34 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    directory = ROOT / "schemas"
-    directory.mkdir(exist_ok=True)
-    for model in MODELS:
-        path = directory / (model.__name__ + "-1.0.schema.json")
-        payload = (
-            json.dumps(model.model_json_schema(), ensure_ascii=True, sort_keys=True, indent=2)
-            + "\n"
-        )
-        if args.check:
-            if not path.exists() or path.read_text(encoding="utf-8") != payload:
-                raise SystemExit("outdated schema: " + path.name)
-        else:
-            # Schema bytes are release artifacts and one historical schema has a
-            # byte-level compatibility guard.  Disable the host newline
-            # translation so generation is identical on Windows and POSIX.
+    models_v2 = cast(
+        tuple[type[BaseModel], ...],
+        runpy.run_path(str(ROOT / "tools/generate_assets_v2.py"))["MODELS_V2"],
+    )
+    groups = (
+        (ROOT / "schemas", "1.0", MODELS),
+        (ROOT / "schemas/protocol-v2", "2.0", models_v2),
+    )
+    count = 0
+    for directory, schema_version, models in groups:
+        for model in models:
+            count += 1
+            path = directory / (model.__name__ + "-" + schema_version + ".schema.json")
+            payload = (
+                json.dumps(model.model_json_schema(), ensure_ascii=True, sort_keys=True, indent=2)
+                + "\n"
+            )
+            if path.exists() and path.read_text(encoding="utf-8") == payload:
+                # Keep matching historical bytes, including their original line endings.
+                continue
+            if args.check:
+                raise SystemExit(
+                    "outdated schema: " + path.relative_to(ROOT / "schemas").as_posix()
+                )
+            directory.mkdir(parents=True, exist_ok=True)
             with path.open("w", encoding="utf-8", newline="\n") as stream:
                 stream.write(payload)
-    print(f"{len(MODELS)} benchmark schemas verified" if args.check else "schemas generated")
+    print(f"{count} benchmark schemas verified" if args.check else "schemas generated")
 
 
 if __name__ == "__main__":

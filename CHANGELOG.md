@@ -3,6 +3,10 @@
 - Standard repository layout with core source, documentation, tests and metadata
   at the root; the consumer validation application is consolidated separately.
 - Current guides and version checks follow the configured dynamic metadata.
+- Refresh the benchmark's active producer schemas and check both V1 and V2
+  generated assets before building a release.
+- Preserve Jhair Alarcon's SERCOP warehouse contribution as an attributed,
+  optional repository component with explicit paths and transactional loading.
 
 - Publish an English package README and an English-first bilingual repository
   README, with direct installation/CLI commands and explicit compatibility scope.

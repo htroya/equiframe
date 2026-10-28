@@ -25,6 +25,11 @@ checks to an existing application. Contracts describe keys, types, numeric
 precision, missing values, duplicates, order and dates. The library works with
 your own data, independently of procurement schemas, warehouses and cloud services.
 
+The optional [SERCOP warehouse prototype](validation/sercop_dw/README.md) preserves
+Jhair Alarcon's `modalidad` and `procedimiento` contribution and has its own
+synthetic functionality tests. It is provided as repository code outside the
+installable PyPI packages.
+
 ## Install
 
 EquiFrame 0.12.2 supports **Python 3.10, 3.11, 3.12 and 3.13**.
@@ -230,6 +235,11 @@ tipos, precisión numérica, ausencias, claves, duplicados, orden y fechas.
 Se integra en scripts, notebooks y procesos ETL. Ofrece una API Python y una CLI
 para cargar archivos, convertir objetos nativos, comparar resultados y obtener
 informes de las diferencias encontradas.
+
+El [prototipo de almacén SERCOP](validation/sercop_dw/README.md) conserva el aporte
+de Jhair Alarcon sobre `modalidad` y `procedimiento`, con pruebas funcionales
+propias. Su código se incluye en este repositorio y queda fuera de los paquetes
+instalables de PyPI.
 
 La versión **0.12.2** requiere **Python 3.10–3.13**.
 Las interfaces con compromiso de estabilidad y las capacidades experimentales
