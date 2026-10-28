@@ -1,0 +1,152 @@
+{
+  "$defs": {
+    "ComparisonValue": {
+      "additionalProperties": false,
+      "description": "Lossless scalar evidence. Numeric text; dates/instants use integer epochs.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "null",
+            "nan",
+            "infinity",
+            "boolean",
+            "integer",
+            "string",
+            "decimal",
+            "float",
+            "date",
+            "timestamp"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "timezone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timezone"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "s",
+                "ms",
+                "us",
+                "ns"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "ComparisonValue",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "check_id": {
+      "minLength": 1,
+      "title": "Check Id",
+      "type": "string"
+    },
+    "code": {
+      "minLength": 1,
+      "title": "Code",
+      "type": "string"
+    },
+    "column": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Column"
+    },
+    "expected": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ComparisonValue"
+      },
+      "title": "Expected",
+      "type": "array"
+    },
+    "message": {
+      "minLength": 1,
+      "title": "Message",
+      "type": "string"
+    },
+    "observed": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ComparisonValue"
+      },
+      "title": "Observed",
+      "type": "array"
+    },
+    "position": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Position"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "table": {
+      "minLength": 1,
+      "title": "Table",
+      "type": "string"
+    }
+  },
+  "required": [
+    "check_id",
+    "code",
+    "table",
+    "message"
+  ],
+  "title": "RuleFinding",
+  "type": "object"
+}

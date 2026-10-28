@@ -1,0 +1,14 @@
+{
+  "snapshot_id": "synthetic-sercop-offline-v1",
+  "synthetic": true,
+  "scope": "small synthetic CI fixture; never official SERCOP",
+  "receipts": [
+    {
+      "file": "record-0.json",
+      "bytes": 479,
+      "sha256": "458d6279362e6dce2928484ff53516f7d73e7204b149b7f6a332b323844fdfb7",
+      "url": "synthetic:fixture",
+      "extractor_version": "0.11.0"
+    }
+  ]
+}

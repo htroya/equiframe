@@ -1,0 +1,107 @@
+{
+  "$defs": {
+    "BundleReference": {
+      "additionalProperties": false,
+      "properties": {
+        "member": {
+          "$ref": "#/$defs/EvidenceFile"
+        },
+        "uri": {
+          "minLength": 1,
+          "title": "Uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "uri",
+        "member"
+      ],
+      "title": "BundleReference",
+      "type": "object"
+    },
+    "EvidenceFile": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "size_bytes"
+      ],
+      "title": "EvidenceFile",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "files": {
+      "items": {
+        "$ref": "#/$defs/EvidenceFile"
+      },
+      "title": "Files",
+      "type": "array"
+    },
+    "kind": {
+      "enum": [
+        "migration",
+        "verification",
+        "workflow"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "producer": {
+      "const": "equiframe",
+      "default": "equiframe",
+      "title": "Producer",
+      "type": "string"
+    },
+    "producer_version": {
+      "minLength": 1,
+      "title": "Producer Version",
+      "type": "string"
+    },
+    "references": {
+      "items": {
+        "$ref": "#/$defs/BundleReference"
+      },
+      "title": "References",
+      "type": "array"
+    },
+    "root_document": {
+      "minLength": 1,
+      "title": "Root Document",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "kind",
+    "root_document",
+    "files",
+    "references",
+    "producer_version"
+  ],
+  "title": "EvidenceBundle",
+  "type": "object"
+}

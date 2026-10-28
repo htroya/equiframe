@@ -1,0 +1,239 @@
+{
+  "$defs": {
+    "AwardReconciliationSpec": {
+      "additionalProperties": false,
+      "description": "Names and business grain supplied explicitly by the domain owner.",
+      "properties": {
+        "amount_column": {
+          "minLength": 1,
+          "title": "Amount Column",
+          "type": "string"
+        },
+        "award_keys": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Award Keys",
+          "type": "array"
+        },
+        "bridge_award_keys": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Bridge Award Keys",
+          "type": "array"
+        },
+        "currency_column": {
+          "minLength": 1,
+          "title": "Currency Column",
+          "type": "string"
+        },
+        "domain_schema_revision": {
+          "minLength": 1,
+          "title": "Domain Schema Revision",
+          "type": "string"
+        },
+        "max_rows": {
+          "default": 100000,
+          "minimum": 1,
+          "title": "Max Rows",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "supplier_column": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supplier Column"
+        }
+      },
+      "required": [
+        "domain_schema_revision",
+        "award_keys",
+        "amount_column",
+        "currency_column"
+      ],
+      "title": "AwardReconciliationSpec",
+      "type": "object"
+    },
+    "CurrencyReconciliation": {
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "minLength": 1,
+          "title": "Currency",
+          "type": "string"
+        },
+        "currency_assignment_complete": {
+          "default": true,
+          "title": "Currency Assignment Complete",
+          "type": "boolean"
+        },
+        "expected_awards": {
+          "minimum": 0,
+          "title": "Expected Awards",
+          "type": "integer"
+        },
+        "expected_total": {
+          "minLength": 1,
+          "title": "Expected Total",
+          "type": "string"
+        },
+        "observed_awards": {
+          "minimum": 0,
+          "title": "Observed Awards",
+          "type": "integer"
+        },
+        "observed_missing_amounts": {
+          "minimum": 0,
+          "title": "Observed Missing Amounts",
+          "type": "integer"
+        },
+        "observed_total": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Observed Total"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "currency",
+        "expected_awards",
+        "observed_awards",
+        "observed_missing_amounts",
+        "expected_total",
+        "observed_total"
+      ],
+      "title": "CurrencyReconciliation",
+      "type": "object"
+    },
+    "ReconciliationCheck": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "count": {
+          "minimum": 0,
+          "title": "Count",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "conformant",
+            "divergent",
+            "not_evaluable"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "state",
+        "count"
+      ],
+      "title": "ReconciliationCheck",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/ReconciliationCheck"
+      },
+      "title": "Checks",
+      "type": "array"
+    },
+    "currencies": {
+      "items": {
+        "$ref": "#/$defs/CurrencyReconciliation"
+      },
+      "title": "Currencies",
+      "type": "array"
+    },
+    "expected_rows": {
+      "minimum": 0,
+      "title": "Expected Rows",
+      "type": "integer"
+    },
+    "observed_missing_currencies": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Observed Missing Currencies"
+    },
+    "observed_rows": {
+      "minimum": 0,
+      "title": "Observed Rows",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scientific_label_confirmed": {
+      "const": false,
+      "default": false,
+      "title": "Scientific Label Confirmed",
+      "type": "boolean"
+    },
+    "spec": {
+      "$ref": "#/$defs/AwardReconciliationSpec"
+    }
+  },
+  "required": [
+    "spec",
+    "checks",
+    "currencies",
+    "expected_rows",
+    "observed_rows"
+  ],
+  "title": "AwardReconciliationResult",
+  "type": "object"
+}

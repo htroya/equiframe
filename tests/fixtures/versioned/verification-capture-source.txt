@@ -1,0 +1,19 @@
+"""One-time Verify bundle capture from the unmodified historical baseline archive."""
+import shutil
+import sys
+from pathlib import Path
+
+import equiframe as ef
+from test_migration import contract, table
+from test_verify import artifact
+
+source, destination = Path(sys.argv[1]), Path(sys.argv[2])
+assert Path(ef.__file__).resolve().is_relative_to(source.resolve())
+raw = destination.parent / 'verification-capture'
+raw.mkdir(exist_ok=False)
+ref = artifact(raw, 'external', table())
+result = ef.verify({'one': ref}, contract=contract(), expected=ref, work_dir=raw)
+assert result.publishable
+assert result.expected[0].state == 'passed'
+ef.export_bundle(raw / result.verification_id, destination)
+shutil.rmtree(raw)

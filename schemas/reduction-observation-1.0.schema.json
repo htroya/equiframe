@@ -1,0 +1,32 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "failure_signature": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Failure Signature"
+    },
+    "preconditions": {
+      "enum": [
+        "satisfied",
+        "violated",
+        "not_evaluable"
+      ],
+      "title": "Preconditions",
+      "type": "string"
+    }
+  },
+  "required": [
+    "preconditions"
+  ],
+  "title": "ReductionObservation",
+  "type": "object"
+}

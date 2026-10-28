@@ -1,0 +1,55 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "blind_attestation": {
+      "const": true,
+      "title": "Blind Attestation",
+      "type": "boolean"
+    },
+    "label": {
+      "enum": [
+        "normal",
+        "divergent",
+        "not_evaluable"
+      ],
+      "title": "Label",
+      "type": "string"
+    },
+    "packet_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Packet Sha256",
+      "type": "string"
+    },
+    "reason": {
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "recorded_at": {
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T.*(?:Z|\\+00:00)$",
+      "title": "Recorded At",
+      "type": "string"
+    },
+    "reviewer": {
+      "minLength": 1,
+      "title": "Reviewer",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "packet_sha256",
+    "reviewer",
+    "label",
+    "reason",
+    "recorded_at",
+    "blind_attestation"
+  ],
+  "title": "Review",
+  "type": "object"
+}

@@ -1,0 +1,21 @@
+* text=auto
+*.py text eol=lf
+*.R text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sql text eol=lf
+*.sh text eol=lf
+*.lock text eol=lf
+.gitattributes text eol=lf
+LICENSE text eol=lf
+tools/cyclonedx/LICENSE text eol=lf
+packages/equiframe-benchmark/LICENSE text eol=lf
+
+# Historical compatibility fixtures keep their exact recorded bytes.
+tests/fixtures/versioned/** -text
+tests/fixtures/option_trace/catalog-a12.json -text
+tests/fixtures/option_trace/manifest.json -text
+packages/equiframe-benchmark/schemas/SnapshotManifest-1.0.schema.json -text

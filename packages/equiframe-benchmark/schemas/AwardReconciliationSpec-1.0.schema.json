@@ -1,0 +1,71 @@
+{
+  "additionalProperties": false,
+  "description": "Names and business grain supplied explicitly by the domain owner.",
+  "properties": {
+    "amount_column": {
+      "minLength": 1,
+      "title": "Amount Column",
+      "type": "string"
+    },
+    "award_keys": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Award Keys",
+      "type": "array"
+    },
+    "bridge_award_keys": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Bridge Award Keys",
+      "type": "array"
+    },
+    "currency_column": {
+      "minLength": 1,
+      "title": "Currency Column",
+      "type": "string"
+    },
+    "domain_schema_revision": {
+      "minLength": 1,
+      "title": "Domain Schema Revision",
+      "type": "string"
+    },
+    "max_rows": {
+      "default": 100000,
+      "minimum": 1,
+      "title": "Max Rows",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "supplier_column": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Supplier Column"
+    }
+  },
+  "required": [
+    "domain_schema_revision",
+    "award_keys",
+    "amount_column",
+    "currency_column"
+  ],
+  "title": "AwardReconciliationSpec",
+  "type": "object"
+}

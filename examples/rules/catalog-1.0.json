@@ -1,0 +1,334 @@
+{
+  "catalog_id": "equiframe.synthetic.rules",
+  "catalog_revision": 1,
+  "catalog_sha256": "c3575dc33e498ad1bf2147ac8682ca83ee4b139be9068bf0b1d98e7c6d7ec0dd",
+  "entries": [
+    {
+      "contract_file": "../nulls_types.json",
+      "contract_id": "synthetic.nulls_types",
+      "contract_revision": 1,
+      "contract_sha256": "4b38d1947b96967d82e4f97d5fda56577e7af26107befad95ad6014359e6104b",
+      "coverage": {
+        "declared_kinds": [
+          "key",
+          "schema"
+        ],
+        "declared_rule_count": 2,
+        "required_rule_ids": [
+          "output_schema",
+          "family_declaration"
+        ]
+      },
+      "family": "nulls_types",
+      "implementations": {
+        "key": "equiframe.rules._key@1:2399779ed3d697538f2ce95a2fa4391ca173262050a06c502057e6c7d8c4d1de",
+        "schema": "equiframe.rules._schema@1:2399779ed3d697538f2ce95a2fa4391ca173262050a06c502057e6c7d8c4d1de"
+      },
+      "limitations": "Key and schema checks cannot reconstruct failed source-to-output conversions.",
+      "preconditions": [
+        {
+          "precondition_id": "input_schema",
+          "requirement": {
+            "kind": "schema",
+            "table": "source"
+          }
+        }
+      ],
+      "rule_set_sha256": "ec55bb45611d3ad56da7189bb22b3f90ae8a5f999bf90d893daee7f46880cb3e",
+      "rules": [
+        {
+          "applicability": [],
+          "required": true,
+          "revision": 1,
+          "rule_id": "output_schema",
+          "severity": "error",
+          "specification": {
+            "kind": "schema",
+            "table": "result"
+          }
+        },
+        {
+          "applicability": [
+            "input_schema"
+          ],
+          "required": true,
+          "revision": 1,
+          "rule_id": "family_declaration",
+          "severity": "warning",
+          "specification": {
+            "key": "primary",
+            "kind": "key",
+            "table": "result"
+          }
+        }
+      ]
+    },
+    {
+      "contract_file": "../joins.json",
+      "contract_id": "synthetic.joins",
+      "contract_revision": 1,
+      "contract_sha256": "722eb71acb03d39e47ee95da2d1a587c217eb5a89983426a5eec5aa3daa8b361",
+      "coverage": {
+        "declared_kinds": [
+          "join",
+          "schema"
+        ],
+        "declared_rule_count": 2,
+        "required_rule_ids": [
+          "output_schema",
+          "family_declaration"
+        ]
+      },
+      "family": "joins",
+      "implementations": {
+        "join": "equiframe.rules._join@1:2399779ed3d697538f2ce95a2fa4391ca173262050a06c502057e6c7d8c4d1de",
+        "schema": "equiframe.rules._schema@1:2399779ed3d697538f2ce95a2fa4391ca173262050a06c502057e6c7d8c4d1de"
+      },
+      "limitations": "Join checks validate captured input relationships, not the full output projection.",
+      "preconditions": [
+        {
+          "precondition_id": "input_schema",
+          "requirement": {
+            "kind": "schema",
+            "table": "orders"
+          }
+        }
+      ],
+      "rule_set_sha256": "5fff87da299ecdf4621c7e4eebc0b98cde047e713a9e5c13bc40b68c41b53002",
+      "rules": [
+        {
+          "applicability": [],
+          "required": true,
+          "revision": 1,
+          "rule_id": "output_schema",
+          "severity": "error",
+          "specification": {
+            "kind": "schema",
+            "table": "result"
+          }
+        },
+        {
+          "applicability": [
+            "input_schema"
+          ],
+          "required": true,
+          "revision": 1,
+          "rule_id": "family_declaration",
+          "severity": "warning",
+          "specification": {
+            "kind": "join",
+            "left_columns": [
+              "supplier_id"
+            ],
+            "left_table": "orders",
+            "relationship": "many_to_one",
+            "right_columns": [
+              "supplier_id"
+            ],
+            "right_table": "suppliers",
+            "unmatched": "reject"
+          }
+        }
+      ]
+    },
+    {
+      "contract_file": "../duplicates_order.json",
+      "contract_id": "synthetic.duplicates_order",
+      "contract_revision": 1,
+      "contract_sha256": "85a4b83c872ea591d3276348c2111fa77f0e4eb426ca7c0e574a7473d634f3b1",
+      "coverage": {
+        "declared_kinds": [
+          "order",
+          "schema"
+        ],
+        "declared_rule_count": 2,
+        "required_rule_ids": [
+          "output_schema",
+          "family_declaration"
+        ]
+      },
+      "family": "duplicates_order",
+      "implementations": {
+        "order": "equiframe.rules._order@1:2399779ed3d697538f2ce95a2fa4391ca173262050a06c502057e6c7d8c4d1de",
+        "schema": "equiframe.rules._schema@1:2399779ed3d697538f2ce95a2fa4391ca173262050a06c502057e6c7d8c4d1de"
+      },
+      "limitations": "Order check does not prove full multiplicity preservation.",
+      "preconditions": [
+        {
+          "precondition_id": "input_schema",
+          "requirement": {
+            "kind": "schema",
+            "table": "source"
+          }
+        }
+      ],
+      "rule_set_sha256": "22dc5196744d8166eebde60eef57a14ea85c2ce1b66bf67d2735b4d14ad0bed0",
+      "rules": [
+        {
+          "applicability": [],
+          "required": true,
+          "revision": 1,
+          "rule_id": "output_schema",
+          "severity": "error",
+          "specification": {
+            "kind": "schema",
+            "table": "result"
+          }
+        },
+        {
+          "applicability": [
+            "input_schema"
+          ],
+          "required": true,
+          "revision": 1,
+          "rule_id": "family_declaration",
+          "severity": "warning",
+          "specification": {
+            "columns": [
+              "position"
+            ],
+            "kind": "order",
+            "table": "result"
+          }
+        }
+      ]
+    },
+    {
+      "contract_file": "../aggregations.json",
+      "contract_id": "synthetic.aggregations",
+      "contract_revision": 1,
+      "contract_sha256": "a024fd223894131133a9521f27d6043894be061d32b2b4a4a73bbb0596e6c6df",
+      "coverage": {
+        "declared_kinds": [
+          "aggregate",
+          "schema"
+        ],
+        "declared_rule_count": 2,
+        "required_rule_ids": [
+          "output_schema",
+          "family_declaration"
+        ]
+      },
+      "family": "aggregations",
+      "implementations": {
+        "aggregate": "equiframe.rules._aggregate@1:2399779ed3d697538f2ce95a2fa4391ca173262050a06c502057e6c7d8c4d1de",
+        "schema": "equiframe.rules._schema@1:2399779ed3d697538f2ce95a2fa4391ca173262050a06c502057e6c7d8c4d1de"
+      },
+      "limitations": "Only declared sum by currency is reconciled; entity allocation is not checked.",
+      "preconditions": [
+        {
+          "precondition_id": "input_schema",
+          "requirement": {
+            "kind": "schema",
+            "table": "source"
+          }
+        }
+      ],
+      "rule_set_sha256": "509492821ca2cf857a2711bc37484ecf4c982498cc3fa7bbbe546bf329d49160",
+      "rules": [
+        {
+          "applicability": [],
+          "required": true,
+          "revision": 1,
+          "rule_id": "output_schema",
+          "severity": "error",
+          "specification": {
+            "kind": "schema",
+            "table": "result"
+          }
+        },
+        {
+          "applicability": [
+            "input_schema"
+          ],
+          "required": true,
+          "revision": 1,
+          "rule_id": "family_declaration",
+          "severity": "warning",
+          "specification": {
+            "function": "sum",
+            "group_by": [
+              "currency"
+            ],
+            "kind": "aggregate",
+            "measure": "amount",
+            "output_column": "total",
+            "output_table": "result",
+            "table": "source"
+          }
+        }
+      ]
+    },
+    {
+      "contract_file": "../dates.json",
+      "contract_id": "synthetic.dates",
+      "contract_revision": 1,
+      "contract_sha256": "6167525100b21bacd4da10b9348bed92e2b0f5d826dbf064f68ffecbed75eca8",
+      "coverage": {
+        "declared_kinds": [
+          "cardinality",
+          "schema"
+        ],
+        "declared_rule_count": 2,
+        "required_rule_ids": [
+          "output_schema",
+          "family_declaration"
+        ]
+      },
+      "family": "dates",
+      "implementations": {
+        "cardinality": "equiframe.rules._cardinality@1:2399779ed3d697538f2ce95a2fa4391ca173262050a06c502057e6c7d8c4d1de",
+        "schema": "equiframe.rules._schema@1:2399779ed3d697538f2ce95a2fa4391ca173262050a06c502057e6c7d8c4d1de"
+      },
+      "limitations": "Schema and row count do not prove every temporal value retains its entity.",
+      "preconditions": [
+        {
+          "precondition_id": "input_schema",
+          "requirement": {
+            "kind": "schema",
+            "table": "source"
+          }
+        }
+      ],
+      "rule_set_sha256": "73165e027f5813e7a672196cb03fa9a34bc3a358320e9049d7feaf511e13bf52",
+      "rules": [
+        {
+          "applicability": [],
+          "required": true,
+          "revision": 1,
+          "rule_id": "output_schema",
+          "severity": "error",
+          "specification": {
+            "kind": "schema",
+            "table": "result"
+          }
+        },
+        {
+          "applicability": [
+            "input_schema"
+          ],
+          "required": true,
+          "revision": 1,
+          "rule_id": "family_declaration",
+          "severity": "warning",
+          "specification": {
+            "kind": "cardinality",
+            "maximum": null,
+            "minimum": 0,
+            "table": "result"
+          }
+        }
+      ]
+    }
+  ],
+  "options": {
+    "max_artifact_bytes": 134217728,
+    "max_evidence_bytes": 67108864,
+    "max_examples": 20,
+    "max_rows": 1000000,
+    "max_work": 10000000,
+    "timeout_seconds": null
+  },
+  "schema_version": "1.0",
+  "status": "technical synthetic examples; not a reviewed benchmark or DW validation"
+}

@@ -1,0 +1,84 @@
+[build-system]
+requires = ["hatchling==1.28.0", "hatch-vcs==0.5.0", "setuptools-scm==10.3.4"]
+build-backend = "hatchling.build"
+
+[project]
+name = "equiframe-benchmark"
+dynamic = ["version"]
+description = "EquiFrame Verify, paired evaluation and reproducible experimental evidence"
+keywords = ["data-validation", "benchmark", "paired-evaluation", "reproducibility", "dataframes"]
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+requires-python = ">=3.10,<3.14"
+authors = [{ name = "Hernán Troya" }]
+classifiers = ["Development Status :: 4 - Beta", "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11", "Programming Language :: Python :: 3.12", "Programming Language :: Python :: 3.13", "Operating System :: Microsoft :: Windows", "Operating System :: POSIX :: Linux", "Topic :: Software Development :: Libraries :: Python Modules", "Typing :: Typed"]
+dependencies = ["typing-extensions>=4.14,<5", "tomli>=2.2,<3; python_version < '3.11'", "equiframe[arrow]==0.12.2", "packaging>=26,<27"]
+
+[project.urls]
+Homepage = "https://github.com/htroya/equiframe"
+Source = "https://github.com/htroya/equiframe"
+Documentation = "https://github.com/htroya/equiframe/blob/main/docs/index.md"
+"Issue Tracker" = "https://github.com/htroya/equiframe/issues"
+
+[project.scripts]
+equiframe-benchmark-pilot = "equiframe_benchmark.pilot:main"
+equiframe-benchmark = "equiframe_benchmark.cli:main"
+
+[project.optional-dependencies]
+engines = ["equiframe[engines]==0.12.2"]
+ml = ["equiframe[ml]==0.12.2"]
+resources = ["psutil==7.2.2"]
+
+[tool.uv.sources]
+equiframe = { path = "../.." }
+
+[dependency-groups]
+dev = ["build>=1.3,<2", "hatchling==1.28.0", "hatch-vcs==0.5.0", "setuptools-scm==10.3.4", "pytest>=8.4,<10", "hypothesis>=6.140,<7", "ruff>=0.14,<1", "mypy>=1.18,<2", "twine>=6.2,<7"]
+
+[tool.hatch.version]
+source = "vcs"
+tag-pattern = '^v(?P<version>(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))$'
+
+[tool.hatch.version.raw-options]
+search_parent_directories = true
+version_scheme = "no-guess-dev"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/equiframe_benchmark"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"PROTOCOL_V2.md" = "equiframe_benchmark/PROTOCOL_V2.md"
+"schemas/protocol-v2" = "equiframe_benchmark/schemas/protocol-v2"
+
+[tool.hatch.build.targets.wheel.hooks.custom]
+path = "tools/reproducible_wheel.py"
+
+[tool.hatch.build.targets.sdist]
+ignore-vcs = true
+include = ["/src", "/tests", "/tools", "/schemas", "/examples", "/pyproject.toml", "/uv.lock", "/README.md", "/PROTOCOL_V2.md", "/CHANGELOG.md", "/LICENSE", "/THIRD_PARTY_NOTICES.md"]
+
+[tool.hatch.build.targets.sdist.hooks.custom]
+path = "tools/reproducible_wheel.py"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["typer.Option"]
+
+[tool.mypy]
+strict = true
+files = ["src", "tools"]
+
+[[tool.mypy.overrides]]
+module = ["pyarrow", "pyarrow.*", "pandas", "polars", "duckdb"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --basetemp=.pytest-tmp"

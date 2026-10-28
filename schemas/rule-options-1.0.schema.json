@@ -1,0 +1,50 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "max_artifact_bytes": {
+      "default": 134217728,
+      "exclusiveMinimum": 0,
+      "title": "Max Artifact Bytes",
+      "type": "integer"
+    },
+    "max_evidence_bytes": {
+      "default": 67108864,
+      "exclusiveMinimum": 0,
+      "title": "Max Evidence Bytes",
+      "type": "integer"
+    },
+    "max_examples": {
+      "default": 20,
+      "minimum": 0,
+      "title": "Max Examples",
+      "type": "integer"
+    },
+    "max_rows": {
+      "default": 1000000,
+      "exclusiveMinimum": 0,
+      "title": "Max Rows",
+      "type": "integer"
+    },
+    "max_work": {
+      "default": 10000000,
+      "exclusiveMinimum": 0,
+      "title": "Max Work",
+      "type": "integer"
+    },
+    "timeout_seconds": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Timeout Seconds"
+    }
+  },
+  "title": "RuleOptions",
+  "type": "object"
+}

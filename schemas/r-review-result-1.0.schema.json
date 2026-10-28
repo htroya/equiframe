@@ -1,0 +1,207 @@
+{
+  "$defs": {
+    "RReviewBinding": {
+      "additionalProperties": false,
+      "description": "Verified local artifacts whose full observations were sent to R.",
+      "properties": {
+        "comparison_id": {
+          "minLength": 1,
+          "title": "Comparison Id",
+          "type": "string"
+        },
+        "left_artifact_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Left Artifact Sha256",
+          "type": "string"
+        },
+        "right_artifact_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Right Artifact Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "comparison_id",
+        "left_artifact_sha256",
+        "right_artifact_sha256"
+      ],
+      "title": "RReviewBinding",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Independent exact comparison, with unsupported/unavailable states explicit.",
+  "properties": {
+    "binding": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RReviewBinding"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "columns": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Columns",
+      "type": "array"
+    },
+    "complete": {
+      "title": "Complete",
+      "type": "boolean"
+    },
+    "contract_violations": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Contract Violations",
+      "type": "integer"
+    },
+    "diagnostics": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Diagnostics",
+      "type": "array"
+    },
+    "elapsed_seconds": {
+      "minimum": 0,
+      "title": "Elapsed Seconds",
+      "type": "number"
+    },
+    "left_rows": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Left Rows",
+      "type": "integer"
+    },
+    "left_transport_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Left Transport Sha256"
+    },
+    "matched_rows": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Matched Rows",
+      "type": "integer"
+    },
+    "r_version": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "R Version"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    },
+    "returncode": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Returncode"
+    },
+    "reviewer": {
+      "const": "equiframe-base-r-exact-1.0",
+      "default": "equiframe-base-r-exact-1.0",
+      "title": "Reviewer",
+      "type": "string"
+    },
+    "reviewer_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Reviewer Sha256",
+      "type": "string"
+    },
+    "right_rows": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Right Rows",
+      "type": "integer"
+    },
+    "right_transport_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Right Transport Sha256"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "spec_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Spec Sha256",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "equivalent",
+        "different",
+        "not_evaluable"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "unmatched_rows": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Unmatched Rows",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "state",
+    "complete",
+    "spec_sha256",
+    "reviewer_sha256",
+    "elapsed_seconds"
+  ],
+  "title": "RReviewResult",
+  "type": "object"
+}

@@ -1,0 +1,1237 @@
+{
+  "$defs": {
+    "BootstrapPlan": {
+      "additionalProperties": false,
+      "description": "Explicit support justification; a group count alone never proves independence.",
+      "properties": {
+        "confidence": {
+          "default": "0.95",
+          "minLength": 1,
+          "title": "Confidence",
+          "type": "string"
+        },
+        "independence_supported": {
+          "title": "Independence Supported",
+          "type": "boolean"
+        },
+        "min_groups": {
+          "minimum": 1,
+          "title": "Min Groups",
+          "type": "integer"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "repetitions": {
+          "default": 2000,
+          "minimum": 1,
+          "title": "Repetitions",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "seed": {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "seed",
+        "min_groups",
+        "independence_supported",
+        "rationale"
+      ],
+      "title": "BootstrapPlan",
+      "type": "object"
+    },
+    "CommonMethodV2": {
+      "additionalProperties": false,
+      "properties": {
+        "average_precision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MetricValue"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "method": {
+          "enum": [
+            "R",
+            "M",
+            "B",
+            "H"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "metrics": {
+          "$ref": "#/$defs/ConfusionMetrics"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "metrics",
+        "average_precision"
+      ],
+      "title": "CommonMethodV2",
+      "type": "object"
+    },
+    "CommonSupportV2": {
+      "additionalProperties": false,
+      "properties": {
+        "bootstrap": {
+          "$ref": "#/$defs/GroupBootstrapResult"
+        },
+        "case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Case Ids",
+          "type": "array"
+        },
+        "methods": {
+          "items": {
+            "$ref": "#/$defs/CommonMethodV2"
+          },
+          "title": "Methods",
+          "type": "array"
+        },
+        "role": {
+          "const": "additional_common_R_M_B_H",
+          "default": "additional_common_R_M_B_H",
+          "title": "Role",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "case_ids",
+        "methods",
+        "bootstrap"
+      ],
+      "title": "CommonSupportV2",
+      "type": "object"
+    },
+    "ComponentDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "complete": {
+          "title": "Complete",
+          "type": "boolean"
+        },
+        "decision": {
+          "enum": [
+            "alert",
+            "no_alert",
+            "not_evaluable"
+          ],
+          "title": "Decision",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "decision",
+        "complete"
+      ],
+      "title": "ComponentDecision",
+      "type": "object"
+    },
+    "ConfusionMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "f1": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "false_positive_rate": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "fn": {
+          "minimum": 0,
+          "title": "Fn",
+          "type": "integer"
+        },
+        "fp": {
+          "minimum": 0,
+          "title": "Fp",
+          "type": "integer"
+        },
+        "precision": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "recall": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "tn": {
+          "minimum": 0,
+          "title": "Tn",
+          "type": "integer"
+        },
+        "tp": {
+          "minimum": 0,
+          "title": "Tp",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tp",
+        "fp",
+        "fn",
+        "tn",
+        "precision",
+        "recall",
+        "f1",
+        "false_positive_rate"
+      ],
+      "title": "ConfusionMetrics",
+      "type": "object"
+    },
+    "ContrastSpecV2": {
+      "additionalProperties": false,
+      "properties": {
+        "left": {
+          "enum": [
+            "R",
+            "M",
+            "B",
+            "H"
+          ],
+          "title": "Left",
+          "type": "string"
+        },
+        "right": {
+          "enum": [
+            "R",
+            "M",
+            "B",
+            "H"
+          ],
+          "title": "Right",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "left",
+        "right"
+      ],
+      "title": "ContrastSpecV2",
+      "type": "object"
+    },
+    "EvaluationConfigV2": {
+      "additionalProperties": false,
+      "properties": {
+        "bootstrap": {
+          "$ref": "#/$defs/BootstrapPlan"
+        },
+        "contrasts": {
+          "items": {
+            "$ref": "#/$defs/ContrastSpecV2"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "title": "Contrasts",
+          "type": "array"
+        },
+        "expected_families": {
+          "default": [
+            "nulls_types",
+            "joins",
+            "aggregations"
+          ],
+          "items": {
+            "enum": [
+              "nulls_types",
+              "joins",
+              "duplicates_order",
+              "aggregations",
+              "dates"
+            ],
+            "type": "string"
+          },
+          "title": "Expected Families",
+          "type": "array"
+        },
+        "expected_migrations": {
+          "default": [
+            "pandas-polars",
+            "pandas-duckdb",
+            "polars-duckdb"
+          ],
+          "items": {
+            "enum": [
+              "pandas-polars",
+              "pandas-duckdb",
+              "polars-duckdb"
+            ],
+            "type": "string"
+          },
+          "title": "Expected Migrations",
+          "type": "array"
+        },
+        "freeze_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Freeze Sha256"
+        },
+        "mode": {
+          "enum": [
+            "pilot",
+            "final"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "protocol": {
+          "const": "paired-principal-2.0",
+          "default": "paired-principal-2.0",
+          "title": "Protocol",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode",
+        "freeze_sha256",
+        "bootstrap",
+        "contrasts"
+      ],
+      "title": "EvaluationConfigV2",
+      "type": "object"
+    },
+    "EvaluationRecord": {
+      "additionalProperties": false,
+      "description": "One unique native execution; migration is declared, never guessed from IDs.",
+      "properties": {
+        "b": {
+          "$ref": "#/$defs/ComponentDecision"
+        },
+        "b_score": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "const": "+infinity",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "B Score"
+        },
+        "candidate_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Candidate Sha256",
+          "type": "string"
+        },
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "detector_bundle_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Detector Bundle Sha256"
+        },
+        "engine": {
+          "enum": [
+            "pandas",
+            "polars",
+            "duckdb"
+          ],
+          "title": "Engine",
+          "type": "string"
+        },
+        "failure_reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Failure Reason"
+        },
+        "family": {
+          "enum": [
+            "nulls_types",
+            "joins",
+            "duplicates_order",
+            "aggregations",
+            "dates"
+          ],
+          "title": "Family",
+          "type": "string"
+        },
+        "freeze_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Freeze Sha256"
+        },
+        "group_id": {
+          "minLength": 1,
+          "title": "Group Id",
+          "type": "string"
+        },
+        "h": {
+          "$ref": "#/$defs/ComponentDecision"
+        },
+        "m": {
+          "$ref": "#/$defs/ComponentDecision"
+        },
+        "m_score": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "maximum": 1,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "M Score"
+        },
+        "migration": {
+          "minLength": 1,
+          "title": "Migration",
+          "type": "string"
+        },
+        "oracle_label": {
+          "anyOf": [
+            {
+              "enum": [
+                "normal",
+                "divergent"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Oracle Label"
+        },
+        "oracle_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Oracle Sha256"
+        },
+        "oracle_state": {
+          "enum": [
+            "pending",
+            "disagreement",
+            "confirmed",
+            "not_evaluable"
+          ],
+          "title": "Oracle State",
+          "type": "string"
+        },
+        "pipeline_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pipeline Sha256"
+        },
+        "r": {
+          "$ref": "#/$defs/ComponentDecision"
+        },
+        "scenario_id": {
+          "minLength": 1,
+          "title": "Scenario Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "case_id",
+        "scenario_id",
+        "group_id",
+        "family",
+        "migration",
+        "engine",
+        "candidate_sha256",
+        "pipeline_sha256",
+        "oracle_sha256",
+        "oracle_state",
+        "oracle_label",
+        "r",
+        "m",
+        "b",
+        "h",
+        "m_score",
+        "b_score",
+        "detector_bundle_sha256",
+        "freeze_sha256"
+      ],
+      "title": "EvaluationRecord",
+      "type": "object"
+    },
+    "EvaluationStratumV2": {
+      "additionalProperties": false,
+      "properties": {
+        "common": {
+          "$ref": "#/$defs/CommonSupportV2"
+        },
+        "family": {
+          "anyOf": [
+            {
+              "enum": [
+                "nulls_types",
+                "joins",
+                "duplicates_order",
+                "aggregations",
+                "dates"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Family"
+        },
+        "kind": {
+          "enum": [
+            "global",
+            "family",
+            "migration",
+            "family_migration"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "migration": {
+          "anyOf": [
+            {
+              "enum": [
+                "pandas-polars",
+                "pandas-duckdb",
+                "polars-duckdb"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "oracle_confirmed": {
+          "minimum": 0,
+          "title": "Oracle Confirmed",
+          "type": "integer"
+        },
+        "principal": {
+          "items": {
+            "$ref": "#/$defs/PrincipalContrastV2"
+          },
+          "title": "Principal",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "total_cases": {
+          "minimum": 0,
+          "title": "Total Cases",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "family",
+        "migration",
+        "total_cases",
+        "oracle_confirmed",
+        "principal",
+        "common"
+      ],
+      "title": "EvaluationStratumV2",
+      "type": "object"
+    },
+    "GroupBootstrapResult": {
+      "additionalProperties": false,
+      "properties": {
+        "attempted_replicates": {
+          "minimum": 0,
+          "title": "Attempted Replicates",
+          "type": "integer"
+        },
+        "group_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Group Ids",
+          "type": "array"
+        },
+        "intervals": {
+          "items": {
+            "$ref": "#/$defs/IntervalEstimate"
+          },
+          "title": "Intervals",
+          "type": "array"
+        },
+        "lower_rank": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Lower Rank"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "upper_rank": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Upper Rank"
+        }
+      },
+      "required": [
+        "group_ids",
+        "attempted_replicates",
+        "lower_rank",
+        "upper_rank",
+        "intervals"
+      ],
+      "title": "GroupBootstrapResult",
+      "type": "object"
+    },
+    "IntervalEstimate": {
+      "additionalProperties": false,
+      "properties": {
+        "defined_replicates": {
+          "minimum": 0,
+          "title": "Defined Replicates",
+          "type": "integer"
+        },
+        "lower": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Lower"
+        },
+        "metric": {
+          "minLength": 1,
+          "title": "Metric",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "undefined_replicates": {
+          "minimum": 0,
+          "title": "Undefined Replicates",
+          "type": "integer"
+        },
+        "upper": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Upper"
+        }
+      },
+      "required": [
+        "metric",
+        "lower",
+        "upper",
+        "defined_replicates",
+        "undefined_replicates",
+        "reason"
+      ],
+      "title": "IntervalEstimate",
+      "type": "object"
+    },
+    "MetricValue": {
+      "additionalProperties": false,
+      "description": "Exact rational estimate, or an explicit undefined denominator/reason.",
+      "properties": {
+        "denominator": {
+          "minimum": 0,
+          "title": "Denominator",
+          "type": "integer"
+        },
+        "numerator": {
+          "minimum": 0,
+          "title": "Numerator",
+          "type": "integer"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "numerator",
+        "denominator",
+        "value",
+        "reason"
+      ],
+      "title": "MetricValue",
+      "type": "object"
+    },
+    "PairedEstimateV2": {
+      "additionalProperties": false,
+      "properties": {
+        "estimate": {
+          "$ref": "#/$defs/SignedMetricV2"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "estimate"
+      ],
+      "title": "PairedEstimateV2",
+      "type": "object"
+    },
+    "PairwiseComparison": {
+      "additionalProperties": false,
+      "properties": {
+        "coverage_confirmed": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "coverage_scheduled": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "divergent_cases": {
+          "minimum": 0,
+          "title": "Divergent Cases",
+          "type": "integer"
+        },
+        "exclusions": {
+          "items": {
+            "$ref": "#/$defs/PairwiseExclusion"
+          },
+          "title": "Exclusions",
+          "type": "array"
+        },
+        "group_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Group Ids",
+          "type": "array"
+        },
+        "left_method": {
+          "enum": [
+            "R",
+            "M",
+            "B",
+            "H"
+          ],
+          "title": "Left Method",
+          "type": "string"
+        },
+        "left_metrics": {
+          "$ref": "#/$defs/ConfusionMetrics"
+        },
+        "left_only": {
+          "$ref": "#/$defs/PairwiseDirection"
+        },
+        "left_partial_alert_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Left Partial Alert Case Ids",
+          "type": "array"
+        },
+        "normal_cases": {
+          "minimum": 0,
+          "title": "Normal Cases",
+          "type": "integer"
+        },
+        "right_method": {
+          "enum": [
+            "R",
+            "M",
+            "B",
+            "H"
+          ],
+          "title": "Right Method",
+          "type": "string"
+        },
+        "right_metrics": {
+          "$ref": "#/$defs/ConfusionMetrics"
+        },
+        "right_only": {
+          "$ref": "#/$defs/PairwiseDirection"
+        },
+        "right_partial_alert_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Right Partial Alert Case Ids",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "support_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Support Case Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "left_method",
+        "right_method",
+        "support_case_ids",
+        "group_ids",
+        "divergent_cases",
+        "normal_cases",
+        "coverage_confirmed",
+        "coverage_scheduled",
+        "left_metrics",
+        "right_metrics",
+        "left_only",
+        "right_only",
+        "exclusions",
+        "left_partial_alert_case_ids",
+        "right_partial_alert_case_ids"
+      ],
+      "title": "PairwiseComparison",
+      "type": "object"
+    },
+    "PairwiseDirection": {
+      "additionalProperties": false,
+      "description": "Alerts unique to one method on the shared complete, labelled support.",
+      "properties": {
+        "additional_false_positive_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Additional False Positive Case Ids",
+          "type": "array"
+        },
+        "additional_false_positive_rate": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "additional_true_positive_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Additional True Positive Case Ids",
+          "type": "array"
+        },
+        "additional_true_positive_rate": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "method": {
+          "enum": [
+            "R",
+            "M",
+            "B",
+            "H"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "reference": {
+          "enum": [
+            "R",
+            "M",
+            "B",
+            "H"
+          ],
+          "title": "Reference",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "reference",
+        "additional_true_positive_case_ids",
+        "additional_false_positive_case_ids",
+        "additional_true_positive_rate",
+        "additional_false_positive_rate"
+      ],
+      "title": "PairwiseDirection",
+      "type": "object"
+    },
+    "PairwiseExclusion": {
+      "additionalProperties": false,
+      "properties": {
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "oracle_state": {
+          "enum": [
+            "pending",
+            "disagreement",
+            "confirmed",
+            "not_evaluable"
+          ],
+          "title": "Oracle State",
+          "type": "string"
+        },
+        "reasons": {
+          "items": {
+            "enum": [
+              "oracle_unconfirmed",
+              "left_incomplete",
+              "right_incomplete"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Reasons",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "case_id",
+        "oracle_state",
+        "reasons"
+      ],
+      "title": "PairwiseExclusion",
+      "type": "object"
+    },
+    "PrincipalContrastV2": {
+      "additionalProperties": false,
+      "properties": {
+        "bootstrap": {
+          "$ref": "#/$defs/GroupBootstrapResult"
+        },
+        "comparison": {
+          "$ref": "#/$defs/PairwiseComparison"
+        },
+        "estimates": {
+          "items": {
+            "$ref": "#/$defs/PairedEstimateV2"
+          },
+          "title": "Estimates",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "comparison",
+        "estimates",
+        "bootstrap"
+      ],
+      "title": "PrincipalContrastV2",
+      "type": "object"
+    },
+    "SignedMetricV2": {
+      "additionalProperties": false,
+      "properties": {
+        "denominator": {
+          "minimum": 0,
+          "title": "Denominator",
+          "type": "integer"
+        },
+        "numerator": {
+          "title": "Numerator",
+          "type": "integer"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "numerator",
+        "denominator",
+        "value",
+        "reason"
+      ],
+      "title": "SignedMetricV2",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "analysis_role": {
+      "const": "principal_paired",
+      "default": "principal_paired",
+      "title": "Analysis Role",
+      "type": "string"
+    },
+    "config": {
+      "$ref": "#/$defs/EvaluationConfigV2"
+    },
+    "config_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Config Sha256",
+      "type": "string"
+    },
+    "protocol_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Protocol Sha256",
+      "type": "string"
+    },
+    "records": {
+      "items": {
+        "$ref": "#/$defs/EvaluationRecord"
+      },
+      "title": "Records",
+      "type": "array"
+    },
+    "records_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Records Sha256",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scientific": {
+      "title": "Scientific",
+      "type": "boolean"
+    },
+    "strata": {
+      "items": {
+        "$ref": "#/$defs/EvaluationStratumV2"
+      },
+      "title": "Strata",
+      "type": "array"
+    }
+  },
+  "required": [
+    "scientific",
+    "config_sha256",
+    "protocol_sha256",
+    "records_sha256",
+    "config",
+    "records",
+    "strata"
+  ],
+  "title": "EvaluationReportV2",
+  "type": "object"
+}

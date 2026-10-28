@@ -1,0 +1,28 @@
+{
+  "additionalProperties": false,
+  "description": "Verified local artifacts whose full observations were sent to R.",
+  "properties": {
+    "comparison_id": {
+      "minLength": 1,
+      "title": "Comparison Id",
+      "type": "string"
+    },
+    "left_artifact_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Left Artifact Sha256",
+      "type": "string"
+    },
+    "right_artifact_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Right Artifact Sha256",
+      "type": "string"
+    }
+  },
+  "required": [
+    "comparison_id",
+    "left_artifact_sha256",
+    "right_artifact_sha256"
+  ],
+  "title": "RReviewBinding",
+  "type": "object"
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": "2.0",
+  "publication_enabled": false,
+  "publication_mode": "manual",
+  "target_version": "0.12.2",
+  "distributions": ["equiframe", "equiframe-benchmark"],
+  "name_control_modes": ["existing_projects", "initial_upload_attempt"],
+  "initial_upload_scope": "Authenticated account and two current public 404 observations permit only an authorized initial upload attempt. Absence establishes no reservation, project ownership or guaranteed index admission; acceptance must be observed after upload.",
+  "indices": {
+    "testpypi": "https://test.pypi.org/legacy/",
+    "pypi": "https://upload.pypi.org/legacy/"
+  },
+  "required_technical_stages": [
+    "locked_sync", "ruff_check", "ruff_format", "mypy", "assets", "pytest",
+    "build", "twine", "distribution"
+  ],
+  "maximum_observation_age_days": 7,
+  "required_gates": {
+    "testpypi": [
+      "license_review", "public_documentation", "name_control", "publisher_protection",
+      "dependency_security_review", "source_security_review", "independent_release_review",
+      "owner_release_authorization"
+    ],
+    "pypi": [
+      "license_review", "public_documentation", "name_control", "publisher_protection",
+      "dependency_security_review", "source_security_review", "independent_release_review",
+      "owner_release_authorization", "testpypi_artifact_identity", "testpypi_downloaded_consumer"
+    ]
+  },
+  "scope": "Manual release of identified software artifacts. Thesis acceptance, scientific conclusions and real adoption remain separate and are not asserted by a software release.",
+  "authorization_scope": "The owner's current instruction authorizes preparation and manual TestPyPI then PyPI publication after applicable gates pass. This policy and supplied JSON never authenticate that instruction or grant upload access.",
+  "legacy_policy": {
+    "schema_version": "1.0",
+    "publication_enabled": false,
+    "pending_decisions": [
+      "Owner must choose the distribution channel and approve public disclosure.",
+      "Owner must assign release and vulnerability-response responsibility and a verified private reporting channel.",
+      "Complete STEP10 and the separately requested global review before any public release.",
+      "Confirm names, public documentation access, account ownership and publication protections in a separately authorized task.",
+      "Review exact artifact-bound dependency licenses, current vulnerability evidence and source-security findings; unresolved or unavailable checks are blockers.",
+      "Authorize publication of the exact version and artifact hashes after all gates pass."
+    ]
+  }
+}

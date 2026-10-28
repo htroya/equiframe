@@ -1,0 +1,90 @@
+{
+  "$defs": {
+    "SchemaRef": {
+      "additionalProperties": false,
+      "properties": {
+        "revision": {
+          "exclusiveMinimum": 0,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "schema_id": {
+          "minLength": 1,
+          "title": "Schema Id",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_id",
+        "revision",
+        "sha256"
+      ],
+      "title": "SchemaRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "enum": [
+        "json",
+        "jsonl",
+        "arrow",
+        "parquet"
+      ],
+      "title": "Format",
+      "type": "string"
+    },
+    "media_type": {
+      "minLength": 1,
+      "title": "Media Type",
+      "type": "string"
+    },
+    "schema_ref": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SchemaRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "schema_version": {
+      "const": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Sha256",
+      "type": "string"
+    },
+    "size_bytes": {
+      "minimum": 0,
+      "title": "Size Bytes",
+      "type": "integer"
+    },
+    "uri": {
+      "minLength": 1,
+      "title": "Uri",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "uri",
+    "sha256",
+    "format",
+    "media_type",
+    "size_bytes"
+  ],
+  "title": "ArtifactRef",
+  "type": "object"
+}

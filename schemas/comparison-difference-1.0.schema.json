@@ -1,0 +1,199 @@
+{
+  "$defs": {
+    "ComparisonValue": {
+      "additionalProperties": false,
+      "description": "Lossless scalar evidence. Numeric text; dates/instants use integer epochs.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "null",
+            "nan",
+            "infinity",
+            "boolean",
+            "integer",
+            "string",
+            "decimal",
+            "float",
+            "date",
+            "timestamp"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "timezone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timezone"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "s",
+                "ms",
+                "us",
+                "ns"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "ComparisonValue",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "category": {
+      "enum": [
+        "contract",
+        "content",
+        "schema"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "code": {
+      "minLength": 1,
+      "title": "Code",
+      "type": "string"
+    },
+    "column": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Column"
+    },
+    "key": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ComparisonValue"
+      },
+      "title": "Key",
+      "type": "array"
+    },
+    "left": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ComparisonValue"
+      },
+      "title": "Left",
+      "type": "array"
+    },
+    "left_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Left Count",
+      "type": "integer"
+    },
+    "message": {
+      "minLength": 1,
+      "title": "Message",
+      "type": "string"
+    },
+    "other_position": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Other Position"
+    },
+    "position": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Position"
+    },
+    "right": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ComparisonValue"
+      },
+      "title": "Right",
+      "type": "array"
+    },
+    "right_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Right Count",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "side": {
+      "anyOf": [
+        {
+          "enum": [
+            "left",
+            "right"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Side"
+    }
+  },
+  "required": [
+    "category",
+    "code",
+    "message"
+  ],
+  "title": "ComparisonDifference",
+  "type": "object"
+}

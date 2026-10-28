@@ -1,0 +1,20 @@
+{
+  "additionalProperties": false,
+  "description": "Per-input eager capture limits, separate from comparison budgets.\n\n``max_bytes`` bounds native estimated size before copying/conversion and\ncaptured Arrow data plus meaningful index buffers afterward. Intermediate\nallocations, Python overhead and serialization buffers are not hard-capped.\nPassing an actual DuckDB relation explicitly authorizes consuming that\nrelation. Capture limits rows with max_rows+1 and checks Arrow batches before\ndetachment. Native planning/first-batch allocations are cooperative, not hard\nmemory/time limits. Polars lazy frames, SQL strings and connections are not\naccepted as native tables.",
+  "properties": {
+    "max_bytes": {
+      "default": 268435456,
+      "exclusiveMinimum": 0,
+      "title": "Max Bytes",
+      "type": "integer"
+    },
+    "max_rows": {
+      "default": 1000000,
+      "exclusiveMinimum": 0,
+      "title": "Max Rows",
+      "type": "integer"
+    }
+  },
+  "title": "DiffCaptureOptions",
+  "type": "object"
+}

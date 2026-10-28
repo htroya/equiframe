@@ -1,0 +1,704 @@
+{
+  "$defs": {
+    "LicenseMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Expression"
+        },
+        "file": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "File"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Text"
+        }
+      },
+      "required": [
+        "expression",
+        "file",
+        "text"
+      ],
+      "title": "LicenseMetadata",
+      "type": "object"
+    },
+    "NameCheck": {
+      "additionalProperties": false,
+      "description": "Injected observation; an HTTP response is not evidence of ownership.",
+      "properties": {
+        "control_evidence": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Control Evidence"
+        },
+        "controlled": {
+          "default": false,
+          "title": "Controlled",
+          "type": "boolean"
+        },
+        "fetched_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Fetched At"
+        },
+        "http_status": {
+          "anyOf": [
+            {
+              "maximum": 599,
+              "minimum": 100,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Http Status"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "query_url": {
+          "minLength": 1,
+          "title": "Query Url",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "not_found",
+            "exists",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "query_url",
+        "fetched_at",
+        "http_status",
+        "status"
+      ],
+      "title": "NameCheck",
+      "type": "object"
+    },
+    "OptionalDependencies": {
+      "additionalProperties": false,
+      "properties": {
+        "extra": {
+          "minLength": 1,
+          "title": "Extra",
+          "type": "string"
+        },
+        "requirements": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Requirements",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "extra",
+        "requirements"
+      ],
+      "title": "OptionalDependencies",
+      "type": "object"
+    },
+    "ProjectDistributionMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_name": {
+          "minLength": 1,
+          "title": "Canonical Name",
+          "type": "string"
+        },
+        "classifiers": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Classifiers",
+          "type": "array"
+        },
+        "dependencies": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Dependencies",
+          "type": "array"
+        },
+        "license": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LicenseMetadata"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "license_file_patterns": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "License File Patterns",
+          "type": "array"
+        },
+        "license_files": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "License Files",
+          "type": "array"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "optional_dependencies": {
+          "items": {
+            "$ref": "#/$defs/OptionalDependencies"
+          },
+          "title": "Optional Dependencies",
+          "type": "array"
+        },
+        "readme": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReadmeMetadata"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "requires_python": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Requires Python"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "typed_markers": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Typed Markers",
+          "type": "array"
+        },
+        "urls": {
+          "items": {
+            "$ref": "#/$defs/ProjectURL"
+          },
+          "title": "Urls",
+          "type": "array"
+        },
+        "version": {
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "canonical_name",
+        "version",
+        "requires_python",
+        "dependencies",
+        "optional_dependencies",
+        "classifiers",
+        "urls",
+        "readme",
+        "license",
+        "license_file_patterns",
+        "license_files",
+        "typed_markers"
+      ],
+      "title": "ProjectDistributionMetadata",
+      "type": "object"
+    },
+    "ProjectURL": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "url": {
+          "minLength": 1,
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "url"
+      ],
+      "title": "ProjectURL",
+      "type": "object"
+    },
+    "ReadmeMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "content_type": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Content Type"
+        },
+        "file": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "File"
+        },
+        "inline_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Inline Text"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "file",
+        "inline_text",
+        "content_type"
+      ],
+      "title": "ReadmeMetadata",
+      "type": "object"
+    },
+    "SourceFileEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "relative_path": {
+          "minLength": 1,
+          "title": "Relative Path",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "relative_path",
+        "sha256",
+        "size_bytes"
+      ],
+      "title": "SourceFileEvidence",
+      "type": "object"
+    },
+    "WheelDistributionMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_name": {
+          "minLength": 1,
+          "title": "Canonical Name",
+          "type": "string"
+        },
+        "classifiers": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Classifiers",
+          "type": "array"
+        },
+        "dependencies": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Dependencies",
+          "type": "array"
+        },
+        "expanded_size_bytes": {
+          "maximum": 536870912,
+          "minimum": 0,
+          "title": "Expanded Size Bytes",
+          "type": "integer"
+        },
+        "extras": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Extras",
+          "type": "array"
+        },
+        "license_expression": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "License Expression"
+        },
+        "license_files": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "License Files",
+          "type": "array"
+        },
+        "license_text": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "License Text"
+        },
+        "member_count": {
+          "maximum": 10000,
+          "minimum": 1,
+          "title": "Member Count",
+          "type": "integer"
+        },
+        "metadata_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Metadata Sha256",
+          "type": "string"
+        },
+        "metadata_version": {
+          "minLength": 1,
+          "title": "Metadata Version",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "requires_python": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Requires Python"
+        },
+        "root_is_purelib": {
+          "title": "Root Is Purelib",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Tags",
+          "type": "array"
+        },
+        "typed_markers": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Typed Markers",
+          "type": "array"
+        },
+        "urls": {
+          "items": {
+            "$ref": "#/$defs/ProjectURL"
+          },
+          "title": "Urls",
+          "type": "array"
+        },
+        "version": {
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        },
+        "wheel_metadata_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Wheel Metadata Sha256",
+          "type": "string"
+        },
+        "wheel_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Wheel Sha256",
+          "type": "string"
+        },
+        "wheel_size_bytes": {
+          "minimum": 0,
+          "title": "Wheel Size Bytes",
+          "type": "integer"
+        },
+        "wheel_version": {
+          "const": "1.0",
+          "title": "Wheel Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "wheel_sha256",
+        "wheel_size_bytes",
+        "metadata_sha256",
+        "wheel_metadata_sha256",
+        "metadata_version",
+        "name",
+        "canonical_name",
+        "version",
+        "requires_python",
+        "dependencies",
+        "extras",
+        "classifiers",
+        "urls",
+        "license_expression",
+        "license_text",
+        "license_files",
+        "typed_markers",
+        "wheel_version",
+        "root_is_purelib",
+        "tags",
+        "member_count",
+        "expanded_size_bytes"
+      ],
+      "title": "WheelDistributionMetadata",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "build_install_verified": {
+      "const": false,
+      "default": false,
+      "title": "Build Install Verified",
+      "type": "boolean"
+    },
+    "lock_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Lock Sha256"
+    },
+    "name_check": {
+      "$ref": "#/$defs/NameCheck"
+    },
+    "package_directory": {
+      "minLength": 1,
+      "title": "Package Directory",
+      "type": "string"
+    },
+    "pending_conditions": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Pending Conditions",
+      "type": "array"
+    },
+    "project": {
+      "$ref": "#/$defs/ProjectDistributionMetadata"
+    },
+    "publication_ready": {
+      "const": false,
+      "default": false,
+      "title": "Publication Ready",
+      "type": "boolean"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_available": {
+      "const": true,
+      "default": true,
+      "title": "Source Available",
+      "type": "boolean"
+    },
+    "source_files": {
+      "items": {
+        "$ref": "#/$defs/SourceFileEvidence"
+      },
+      "title": "Source Files",
+      "type": "array"
+    },
+    "source_manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Manifest Sha256",
+      "type": "string"
+    },
+    "technical_inventory_complete": {
+      "title": "Technical Inventory Complete",
+      "type": "boolean"
+    },
+    "wheel": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/WheelDistributionMetadata"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "wheel_metadata_verified": {
+      "title": "Wheel Metadata Verified",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "package_directory",
+    "project",
+    "source_files",
+    "source_manifest_sha256",
+    "lock_sha256",
+    "wheel",
+    "name_check",
+    "pending_conditions",
+    "wheel_metadata_verified",
+    "technical_inventory_complete"
+  ],
+  "title": "DistributionReadiness",
+  "type": "object"
+}

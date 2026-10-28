@@ -1,0 +1,127 @@
+{
+  "$defs": {
+    "FreezeCount": {
+      "additionalProperties": false,
+      "properties": {
+        "cases": {
+          "minimum": 0,
+          "title": "Cases",
+          "type": "integer"
+        },
+        "confirmed": {
+          "minimum": 0,
+          "title": "Confirmed",
+          "type": "integer"
+        },
+        "disagreement": {
+          "minimum": 0,
+          "title": "Disagreement",
+          "type": "integer"
+        },
+        "family": {
+          "enum": [
+            "nulls_types",
+            "joins",
+            "duplicates_order",
+            "aggregations",
+            "dates"
+          ],
+          "title": "Family",
+          "type": "string"
+        },
+        "not_evaluable": {
+          "minimum": 0,
+          "title": "Not Evaluable",
+          "type": "integer"
+        },
+        "partition": {
+          "enum": [
+            "training",
+            "calibration",
+            "test"
+          ],
+          "title": "Partition",
+          "type": "string"
+        },
+        "pending": {
+          "minimum": 0,
+          "title": "Pending",
+          "type": "integer"
+        },
+        "scenarios": {
+          "minimum": 0,
+          "title": "Scenarios",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "family",
+        "partition",
+        "scenarios",
+        "cases",
+        "confirmed",
+        "pending",
+        "disagreement",
+        "not_evaluable"
+      ],
+      "title": "FreezeCount",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "blockers": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Blockers",
+      "type": "array"
+    },
+    "counts": {
+      "items": {
+        "$ref": "#/$defs/FreezeCount"
+      },
+      "title": "Counts",
+      "type": "array"
+    },
+    "definition_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Definition Sha256",
+      "type": "string"
+    },
+    "integrity_blockers": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Integrity Blockers",
+      "type": "array"
+    },
+    "ready": {
+      "title": "Ready",
+      "type": "boolean"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "definition_sha256",
+    "ready",
+    "blockers",
+    "integrity_blockers",
+    "counts"
+  ],
+  "title": "FreezeAudit",
+  "type": "object"
+}

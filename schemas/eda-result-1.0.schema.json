@@ -1,0 +1,574 @@
+{
+  "$defs": {
+    "ColumnProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "distinct_present": {
+          "minimum": 0,
+          "title": "Distinct Present",
+          "type": "integer"
+        },
+        "empty": {
+          "minimum": 0,
+          "title": "Empty",
+          "type": "integer"
+        },
+        "empty_rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Empty Rate"
+        },
+        "frequencies": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Frequencies",
+          "type": "array"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "nan": {
+          "minimum": 0,
+          "title": "Nan",
+          "type": "integer"
+        },
+        "nan_rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Nan Rate"
+        },
+        "nonfinite": {
+          "minimum": 0,
+          "title": "Nonfinite",
+          "type": "integer"
+        },
+        "null_rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Null Rate"
+        },
+        "nulls": {
+          "minimum": 0,
+          "title": "Nulls",
+          "type": "integer"
+        },
+        "physical_type": {
+          "minLength": 1,
+          "title": "Physical Type",
+          "type": "string"
+        },
+        "rows": {
+          "minimum": 0,
+          "title": "Rows",
+          "type": "integer"
+        },
+        "valid": {
+          "minimum": 0,
+          "title": "Valid",
+          "type": "integer"
+        },
+        "zero": {
+          "minimum": 0,
+          "title": "Zero",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "physical_type",
+        "rows",
+        "nulls",
+        "nan",
+        "empty",
+        "zero",
+        "nonfinite",
+        "valid",
+        "distinct_present",
+        "null_rate",
+        "empty_rate",
+        "nan_rate",
+        "frequencies"
+      ],
+      "title": "ColumnProfile",
+      "type": "object"
+    },
+    "DuplicateProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "denominator": {
+          "minimum": 0,
+          "title": "Denominator",
+          "type": "integer"
+        },
+        "examples": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Examples",
+          "type": "array"
+        },
+        "excess_rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Excess Rate"
+        },
+        "excess_rows": {
+          "minimum": 0,
+          "title": "Excess Rows",
+          "type": "integer"
+        },
+        "incomplete_rows": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Incomplete Rows",
+          "type": "integer"
+        },
+        "involved_rows": {
+          "minimum": 0,
+          "title": "Involved Rows",
+          "type": "integer"
+        },
+        "policy": {
+          "minLength": 1,
+          "title": "Policy",
+          "type": "string"
+        },
+        "repeated_groups": {
+          "minimum": 0,
+          "title": "Repeated Groups",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "columns",
+        "denominator",
+        "policy",
+        "repeated_groups",
+        "involved_rows",
+        "excess_rows",
+        "excess_rate",
+        "examples"
+      ],
+      "title": "DuplicateProfile",
+      "type": "object"
+    },
+    "Finding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "column": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Column"
+        },
+        "count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Count"
+        },
+        "denominator": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Denominator"
+        },
+        "examples": {
+          "default": [],
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Examples",
+          "type": "array"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "observation",
+            "rule_violation",
+            "not_evaluable"
+          ],
+          "title": "Severity",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "reason"
+      ],
+      "title": "Finding",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "delimiter": {
+          "default": ",",
+          "maxLength": 1,
+          "minLength": 1,
+          "title": "Delimiter",
+          "type": "string"
+        },
+        "expected_bytes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Bytes"
+        },
+        "expected_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Sha256"
+        },
+        "format": {
+          "default": "parquet",
+          "enum": [
+            "parquet",
+            "csv",
+            "arrow"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "manifest_path": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Manifest Path"
+        },
+        "manifest_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Manifest Sha256"
+        },
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "minLength": 1,
+          "title": "Snapshot Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "snapshot_id"
+      ],
+      "title": "Source",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "calculation_elapsed_seconds": {
+      "default": 0.0,
+      "minimum": 0,
+      "title": "Calculation Elapsed Seconds",
+      "type": "number"
+    },
+    "chart_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Chart Reason"
+    },
+    "chart_state": {
+      "default": "not_requested",
+      "enum": [
+        "completed",
+        "not_requested",
+        "not_evaluable",
+        "failed"
+      ],
+      "title": "Chart State",
+      "type": "string"
+    },
+    "columns": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ColumnProfile"
+      },
+      "title": "Columns",
+      "type": "array"
+    },
+    "config_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Config Sha256",
+      "type": "string"
+    },
+    "conversions": {
+      "default": [],
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Conversions",
+      "type": "array"
+    },
+    "duplicates": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/DuplicateProfile"
+      },
+      "title": "Duplicates",
+      "type": "array"
+    },
+    "elapsed_seconds": {
+      "minimum": 0,
+      "title": "Elapsed Seconds",
+      "type": "number"
+    },
+    "environment": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Environment",
+      "type": "object"
+    },
+    "evidence_links": {
+      "default": [],
+      "items": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "type": "object"
+      },
+      "title": "Evidence Links",
+      "type": "array"
+    },
+    "findings": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "limits": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Limits",
+      "type": "array"
+    },
+    "numeric": {
+      "default": [],
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Numeric",
+      "type": "array"
+    },
+    "producer_version": {
+      "minLength": 1,
+      "title": "Producer Version",
+      "type": "string"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Reason"
+    },
+    "rows": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Rows"
+    },
+    "run_id": {
+      "minLength": 1,
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "snapshot_complete": {
+      "default": false,
+      "title": "Snapshot Complete",
+      "type": "boolean"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/Source"
+    },
+    "source_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Source Sha256"
+    },
+    "source_unchanged": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Source Unchanged"
+    },
+    "state": {
+      "enum": [
+        "completed",
+        "not_evaluable",
+        "failed",
+        "cancelled"
+      ],
+      "title": "State",
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "producer_version",
+    "snapshot_id",
+    "state",
+    "reason",
+    "elapsed_seconds",
+    "source",
+    "source_sha256",
+    "source_unchanged",
+    "config_sha256",
+    "rows",
+    "environment",
+    "limits"
+  ],
+  "title": "EdaResult",
+  "type": "object"
+}

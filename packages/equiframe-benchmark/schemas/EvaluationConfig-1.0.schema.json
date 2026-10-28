@@ -1,0 +1,126 @@
+{
+  "$defs": {
+    "BootstrapPlan": {
+      "additionalProperties": false,
+      "description": "Explicit support justification; a group count alone never proves independence.",
+      "properties": {
+        "confidence": {
+          "default": "0.95",
+          "minLength": 1,
+          "title": "Confidence",
+          "type": "string"
+        },
+        "independence_supported": {
+          "title": "Independence Supported",
+          "type": "boolean"
+        },
+        "min_groups": {
+          "minimum": 1,
+          "title": "Min Groups",
+          "type": "integer"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "repetitions": {
+          "default": 2000,
+          "minimum": 1,
+          "title": "Repetitions",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "seed": {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "seed",
+        "min_groups",
+        "independence_supported",
+        "rationale"
+      ],
+      "title": "BootstrapPlan",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "bootstrap": {
+      "$ref": "#/$defs/BootstrapPlan"
+    },
+    "expected_families": {
+      "default": [
+        "nulls_types",
+        "joins",
+        "duplicates_order",
+        "aggregations",
+        "dates"
+      ],
+      "items": {
+        "enum": [
+          "nulls_types",
+          "joins",
+          "duplicates_order",
+          "aggregations",
+          "dates"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Expected Families",
+      "type": "array"
+    },
+    "expected_migrations": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Expected Migrations",
+      "type": "array"
+    },
+    "freeze_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Freeze Sha256"
+    },
+    "mode": {
+      "enum": [
+        "pilot",
+        "final"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "mode",
+    "freeze_sha256",
+    "bootstrap"
+  ],
+  "title": "EvaluationConfig",
+  "type": "object"
+}

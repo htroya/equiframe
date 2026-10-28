@@ -1,0 +1,80 @@
+{
+  "additionalProperties": false,
+  "description": "Separate disclosure/inspection budgets; existing raw capture is unchanged.\n\nValues, names and free-form producer text are withheld by default. Reproduction\nexports require both disclosure opt-ins and cannot redact selected columns.\nNo setting grants operating-system permissions or deletes original evidence.",
+  "properties": {
+    "include_metadata": {
+      "default": false,
+      "title": "Include Metadata",
+      "type": "boolean"
+    },
+    "include_values": {
+      "default": false,
+      "title": "Include Values",
+      "type": "boolean"
+    },
+    "max_evidence_bytes": {
+      "default": 67108864,
+      "exclusiveMinimum": 0,
+      "title": "Max Evidence Bytes",
+      "type": "integer"
+    },
+    "max_examples": {
+      "default": 20,
+      "maximum": 10000,
+      "minimum": 0,
+      "title": "Max Examples",
+      "type": "integer"
+    },
+    "max_records": {
+      "default": 100000,
+      "exclusiveMinimum": 0,
+      "maximum": 1000000,
+      "title": "Max Records",
+      "type": "integer"
+    },
+    "max_report_bytes": {
+      "default": 2097152,
+      "exclusiveMinimum": 0,
+      "title": "Max Report Bytes",
+      "type": "integer"
+    },
+    "max_value_chars": {
+      "default": 4096,
+      "maximum": 1048576,
+      "minimum": 16,
+      "title": "Max Value Chars",
+      "type": "integer"
+    },
+    "mode": {
+      "default": "diagnostic",
+      "enum": [
+        "diagnostic",
+        "detail",
+        "reproduction"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "redact_columns": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Redact Columns",
+      "type": "array"
+    },
+    "require_exhaustive": {
+      "default": false,
+      "title": "Require Exhaustive",
+      "type": "boolean"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "title": "ReportOptions",
+  "type": "object"
+}

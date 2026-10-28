@@ -1,0 +1,50 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "arbitrator": {
+      "minLength": 1,
+      "title": "Arbitrator",
+      "type": "string"
+    },
+    "assigned_at": {
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T.*(?:Z|\\+00:00)$",
+      "title": "Assigned At",
+      "type": "string"
+    },
+    "packet_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Packet Sha256",
+      "type": "string"
+    },
+    "reviewers": {
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "minLength": 1,
+          "type": "string"
+        }
+      ],
+      "title": "Reviewers",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "packet_sha256",
+    "reviewers",
+    "arbitrator",
+    "assigned_at"
+  ],
+  "title": "ReviewAssignment",
+  "type": "object"
+}

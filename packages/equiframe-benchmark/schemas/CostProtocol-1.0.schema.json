@@ -1,0 +1,78 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "cache_policy": {
+      "minLength": 1,
+      "title": "Cache Policy",
+      "type": "string"
+    },
+    "concurrent_loads": {
+      "minLength": 1,
+      "title": "Concurrent Loads",
+      "type": "string"
+    },
+    "controls_rationale": {
+      "minLength": 1,
+      "title": "Controls Rationale",
+      "type": "string"
+    },
+    "memory_budget_bytes": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Memory Budget Bytes"
+    },
+    "repetitions": {
+      "const": 5,
+      "default": 5,
+      "title": "Repetitions",
+      "type": "integer"
+    },
+    "sample_interval_seconds": {
+      "default": 0.01,
+      "maximum": 1,
+      "minimum": 0.001,
+      "title": "Sample Interval Seconds",
+      "type": "number"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "seed": {
+      "maximum": 4294967295,
+      "minimum": 0,
+      "title": "Seed",
+      "type": "integer"
+    },
+    "threads": {
+      "exclusiveMinimum": 0,
+      "title": "Threads",
+      "type": "integer"
+    },
+    "warmups": {
+      "const": 1,
+      "default": 1,
+      "title": "Warmups",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "seed",
+    "cache_policy",
+    "threads",
+    "concurrent_loads",
+    "controls_rationale"
+  ],
+  "title": "CostProtocol",
+  "type": "object"
+}

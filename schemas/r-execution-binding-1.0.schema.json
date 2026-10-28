@@ -1,0 +1,46 @@
+{
+  "additionalProperties": false,
+  "description": "Actual execution/profile/IF result associated by the bound finalizer.",
+  "properties": {
+    "detection_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Detection Sha256",
+      "type": "string"
+    },
+    "execution_id": {
+      "minLength": 1,
+      "title": "Execution Id",
+      "type": "string"
+    },
+    "execution_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Execution Sha256",
+      "type": "string"
+    },
+    "output_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Output Sha256",
+      "type": "string"
+    },
+    "profile_id": {
+      "minLength": 1,
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "profile_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Profile Sha256",
+      "type": "string"
+    }
+  },
+  "required": [
+    "execution_id",
+    "execution_sha256",
+    "profile_id",
+    "profile_sha256",
+    "detection_sha256",
+    "output_sha256"
+  ],
+  "title": "RExecutionBinding",
+  "type": "object"
+}

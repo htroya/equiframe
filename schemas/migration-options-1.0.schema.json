@@ -1,0 +1,32 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "max_capture_bytes": {
+      "default": 536870912,
+      "exclusiveMinimum": 0,
+      "title": "Max Capture Bytes",
+      "type": "integer"
+    },
+    "max_capture_rows": {
+      "default": 10000000,
+      "minimum": 0,
+      "title": "Max Capture Rows",
+      "type": "integer"
+    },
+    "timeout_seconds": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Timeout Seconds"
+    }
+  },
+  "title": "MigrationOptions",
+  "type": "object"
+}

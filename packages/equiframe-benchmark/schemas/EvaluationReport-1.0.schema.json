@@ -1,0 +1,998 @@
+{
+  "$defs": {
+    "AveragePrecisionEvaluation": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "enum": [
+            "M",
+            "B"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "own_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Own Case Ids",
+          "type": "array"
+        },
+        "own_support": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "principal": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "principal_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Principal Case Ids",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "principal_case_ids",
+        "own_case_ids",
+        "principal",
+        "own_support"
+      ],
+      "title": "AveragePrecisionEvaluation",
+      "type": "object"
+    },
+    "BootstrapPlan": {
+      "additionalProperties": false,
+      "description": "Explicit support justification; a group count alone never proves independence.",
+      "properties": {
+        "confidence": {
+          "default": "0.95",
+          "minLength": 1,
+          "title": "Confidence",
+          "type": "string"
+        },
+        "independence_supported": {
+          "title": "Independence Supported",
+          "type": "boolean"
+        },
+        "min_groups": {
+          "minimum": 1,
+          "title": "Min Groups",
+          "type": "integer"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "repetitions": {
+          "default": 2000,
+          "minimum": 1,
+          "title": "Repetitions",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "seed": {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "seed",
+        "min_groups",
+        "independence_supported",
+        "rationale"
+      ],
+      "title": "BootstrapPlan",
+      "type": "object"
+    },
+    "ComponentDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "complete": {
+          "title": "Complete",
+          "type": "boolean"
+        },
+        "decision": {
+          "enum": [
+            "alert",
+            "no_alert",
+            "not_evaluable"
+          ],
+          "title": "Decision",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "decision",
+        "complete"
+      ],
+      "title": "ComponentDecision",
+      "type": "object"
+    },
+    "ConfusionMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "f1": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "false_positive_rate": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "fn": {
+          "minimum": 0,
+          "title": "Fn",
+          "type": "integer"
+        },
+        "fp": {
+          "minimum": 0,
+          "title": "Fp",
+          "type": "integer"
+        },
+        "precision": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "recall": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "tn": {
+          "minimum": 0,
+          "title": "Tn",
+          "type": "integer"
+        },
+        "tp": {
+          "minimum": 0,
+          "title": "Tp",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tp",
+        "fp",
+        "fn",
+        "tn",
+        "precision",
+        "recall",
+        "f1",
+        "false_positive_rate"
+      ],
+      "title": "ConfusionMetrics",
+      "type": "object"
+    },
+    "CoverageSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "excluded_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Excluded Case Ids",
+          "type": "array"
+        },
+        "failed_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Failed Case Ids",
+          "type": "array"
+        },
+        "oracle_confirmed": {
+          "minimum": 0,
+          "title": "Oracle Confirmed",
+          "type": "integer"
+        },
+        "oracle_disagreement": {
+          "minimum": 0,
+          "title": "Oracle Disagreement",
+          "type": "integer"
+        },
+        "oracle_not_evaluable": {
+          "minimum": 0,
+          "title": "Oracle Not Evaluable",
+          "type": "integer"
+        },
+        "oracle_pending": {
+          "minimum": 0,
+          "title": "Oracle Pending",
+          "type": "integer"
+        },
+        "principal_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Principal Case Ids",
+          "type": "array"
+        },
+        "principal_coverage": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "total_cases": {
+          "minimum": 0,
+          "title": "Total Cases",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "total_cases",
+        "oracle_confirmed",
+        "oracle_pending",
+        "oracle_disagreement",
+        "oracle_not_evaluable",
+        "failed_case_ids",
+        "principal_case_ids",
+        "excluded_case_ids",
+        "principal_coverage"
+      ],
+      "title": "CoverageSummary",
+      "type": "object"
+    },
+    "EvaluationConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "bootstrap": {
+          "$ref": "#/$defs/BootstrapPlan"
+        },
+        "expected_families": {
+          "default": [
+            "nulls_types",
+            "joins",
+            "duplicates_order",
+            "aggregations",
+            "dates"
+          ],
+          "items": {
+            "enum": [
+              "nulls_types",
+              "joins",
+              "duplicates_order",
+              "aggregations",
+              "dates"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Expected Families",
+          "type": "array"
+        },
+        "expected_migrations": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Expected Migrations",
+          "type": "array"
+        },
+        "freeze_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Freeze Sha256"
+        },
+        "mode": {
+          "enum": [
+            "pilot",
+            "final"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode",
+        "freeze_sha256",
+        "bootstrap"
+      ],
+      "title": "EvaluationConfig",
+      "type": "object"
+    },
+    "EvaluationRecord": {
+      "additionalProperties": false,
+      "description": "One unique native execution; migration is declared, never guessed from IDs.",
+      "properties": {
+        "b": {
+          "$ref": "#/$defs/ComponentDecision"
+        },
+        "b_score": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "const": "+infinity",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "B Score"
+        },
+        "candidate_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Candidate Sha256",
+          "type": "string"
+        },
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "detector_bundle_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Detector Bundle Sha256"
+        },
+        "engine": {
+          "enum": [
+            "pandas",
+            "polars",
+            "duckdb"
+          ],
+          "title": "Engine",
+          "type": "string"
+        },
+        "failure_reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Failure Reason"
+        },
+        "family": {
+          "enum": [
+            "nulls_types",
+            "joins",
+            "duplicates_order",
+            "aggregations",
+            "dates"
+          ],
+          "title": "Family",
+          "type": "string"
+        },
+        "freeze_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Freeze Sha256"
+        },
+        "group_id": {
+          "minLength": 1,
+          "title": "Group Id",
+          "type": "string"
+        },
+        "h": {
+          "$ref": "#/$defs/ComponentDecision"
+        },
+        "m": {
+          "$ref": "#/$defs/ComponentDecision"
+        },
+        "m_score": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "maximum": 1,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "M Score"
+        },
+        "migration": {
+          "minLength": 1,
+          "title": "Migration",
+          "type": "string"
+        },
+        "oracle_label": {
+          "anyOf": [
+            {
+              "enum": [
+                "normal",
+                "divergent"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Oracle Label"
+        },
+        "oracle_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Oracle Sha256"
+        },
+        "oracle_state": {
+          "enum": [
+            "pending",
+            "disagreement",
+            "confirmed",
+            "not_evaluable"
+          ],
+          "title": "Oracle State",
+          "type": "string"
+        },
+        "pipeline_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pipeline Sha256"
+        },
+        "r": {
+          "$ref": "#/$defs/ComponentDecision"
+        },
+        "scenario_id": {
+          "minLength": 1,
+          "title": "Scenario Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "case_id",
+        "scenario_id",
+        "group_id",
+        "family",
+        "migration",
+        "engine",
+        "candidate_sha256",
+        "pipeline_sha256",
+        "oracle_sha256",
+        "oracle_state",
+        "oracle_label",
+        "r",
+        "m",
+        "b",
+        "h",
+        "m_score",
+        "b_score",
+        "detector_bundle_sha256",
+        "freeze_sha256"
+      ],
+      "title": "EvaluationRecord",
+      "type": "object"
+    },
+    "EvaluationStratum": {
+      "additionalProperties": false,
+      "properties": {
+        "average_precision": {
+          "items": {
+            "$ref": "#/$defs/AveragePrecisionEvaluation"
+          },
+          "title": "Average Precision",
+          "type": "array"
+        },
+        "bootstrap": {
+          "$ref": "#/$defs/GroupBootstrapResult"
+        },
+        "coverage": {
+          "$ref": "#/$defs/CoverageSummary"
+        },
+        "family": {
+          "anyOf": [
+            {
+              "enum": [
+                "nulls_types",
+                "joins",
+                "duplicates_order",
+                "aggregations",
+                "dates"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Family"
+        },
+        "incremental": {
+          "$ref": "#/$defs/IncrementalEvaluation"
+        },
+        "kind": {
+          "enum": [
+            "global",
+            "family",
+            "migration",
+            "family_migration"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "methods": {
+          "items": {
+            "$ref": "#/$defs/MethodEvaluation"
+          },
+          "title": "Methods",
+          "type": "array"
+        },
+        "migration": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "family",
+        "migration",
+        "coverage",
+        "methods",
+        "average_precision",
+        "incremental",
+        "bootstrap"
+      ],
+      "title": "EvaluationStratum",
+      "type": "object"
+    },
+    "GroupBootstrapResult": {
+      "additionalProperties": false,
+      "properties": {
+        "attempted_replicates": {
+          "minimum": 0,
+          "title": "Attempted Replicates",
+          "type": "integer"
+        },
+        "group_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Group Ids",
+          "type": "array"
+        },
+        "intervals": {
+          "items": {
+            "$ref": "#/$defs/IntervalEstimate"
+          },
+          "title": "Intervals",
+          "type": "array"
+        },
+        "lower_rank": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Lower Rank"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "upper_rank": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Upper Rank"
+        }
+      },
+      "required": [
+        "group_ids",
+        "attempted_replicates",
+        "lower_rank",
+        "upper_rank",
+        "intervals"
+      ],
+      "title": "GroupBootstrapResult",
+      "type": "object"
+    },
+    "IncrementalEvaluation": {
+      "additionalProperties": false,
+      "properties": {
+        "additional_false_positive_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Additional False Positive Case Ids",
+          "type": "array"
+        },
+        "additional_false_positive_rate": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "additional_true_positive_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Additional True Positive Case Ids",
+          "type": "array"
+        },
+        "additional_true_positive_rate": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "additional_true_positive_case_ids",
+        "additional_false_positive_case_ids",
+        "additional_true_positive_rate",
+        "additional_false_positive_rate"
+      ],
+      "title": "IncrementalEvaluation",
+      "type": "object"
+    },
+    "IntervalEstimate": {
+      "additionalProperties": false,
+      "properties": {
+        "defined_replicates": {
+          "minimum": 0,
+          "title": "Defined Replicates",
+          "type": "integer"
+        },
+        "lower": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Lower"
+        },
+        "metric": {
+          "minLength": 1,
+          "title": "Metric",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "undefined_replicates": {
+          "minimum": 0,
+          "title": "Undefined Replicates",
+          "type": "integer"
+        },
+        "upper": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Upper"
+        }
+      },
+      "required": [
+        "metric",
+        "lower",
+        "upper",
+        "defined_replicates",
+        "undefined_replicates",
+        "reason"
+      ],
+      "title": "IntervalEstimate",
+      "type": "object"
+    },
+    "MethodEvaluation": {
+      "additionalProperties": false,
+      "properties": {
+        "complete_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Complete Case Ids",
+          "type": "array"
+        },
+        "coverage": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "method": {
+          "enum": [
+            "R",
+            "M",
+            "B",
+            "H"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "own_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Own Case Ids",
+          "type": "array"
+        },
+        "own_support": {
+          "$ref": "#/$defs/ConfusionMetrics"
+        },
+        "partial_alert_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Partial Alert Case Ids",
+          "type": "array"
+        },
+        "principal": {
+          "$ref": "#/$defs/ConfusionMetrics"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "unavailable_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Unavailable Case Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "method",
+        "complete_case_ids",
+        "own_case_ids",
+        "partial_alert_case_ids",
+        "unavailable_case_ids",
+        "coverage",
+        "principal",
+        "own_support"
+      ],
+      "title": "MethodEvaluation",
+      "type": "object"
+    },
+    "MetricValue": {
+      "additionalProperties": false,
+      "description": "Exact rational estimate, or an explicit undefined denominator/reason.",
+      "properties": {
+        "denominator": {
+          "minimum": 0,
+          "title": "Denominator",
+          "type": "integer"
+        },
+        "numerator": {
+          "minimum": 0,
+          "title": "Numerator",
+          "type": "integer"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "numerator",
+        "denominator",
+        "value",
+        "reason"
+      ],
+      "title": "MetricValue",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Self-contained derived report, recalculated on every model/JSON validation.",
+  "properties": {
+    "config": {
+      "$ref": "#/$defs/EvaluationConfig"
+    },
+    "config_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Config Sha256",
+      "type": "string"
+    },
+    "protocol_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Protocol Sha256",
+      "type": "string"
+    },
+    "records": {
+      "items": {
+        "$ref": "#/$defs/EvaluationRecord"
+      },
+      "title": "Records",
+      "type": "array"
+    },
+    "records_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Records Sha256",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scientific": {
+      "title": "Scientific",
+      "type": "boolean"
+    },
+    "strata": {
+      "items": {
+        "$ref": "#/$defs/EvaluationStratum"
+      },
+      "title": "Strata",
+      "type": "array"
+    }
+  },
+  "required": [
+    "scientific",
+    "config_sha256",
+    "protocol_sha256",
+    "records_sha256",
+    "config",
+    "records",
+    "strata"
+  ],
+  "title": "EvaluationReport",
+  "type": "object"
+}

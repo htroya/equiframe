@@ -1,0 +1,42 @@
+{
+  "additionalProperties": false,
+  "description": "The sole matrix for both M and B. Row metadata is deliberately absent.",
+  "properties": {
+    "columns": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Columns",
+      "type": "array"
+    },
+    "preprocessor_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Preprocessor Sha256",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "values": {
+      "items": {
+        "items": {
+          "type": "number"
+        },
+        "type": "array"
+      },
+      "title": "Values",
+      "type": "array"
+    }
+  },
+  "required": [
+    "preprocessor_sha256",
+    "columns",
+    "values"
+  ],
+  "title": "FeatureMatrix",
+  "type": "object"
+}

@@ -1,0 +1,52 @@
+{
+  "additionalProperties": false,
+  "description": "Explicit support justification; a group count alone never proves independence.",
+  "properties": {
+    "confidence": {
+      "default": "0.95",
+      "minLength": 1,
+      "title": "Confidence",
+      "type": "string"
+    },
+    "independence_supported": {
+      "title": "Independence Supported",
+      "type": "boolean"
+    },
+    "min_groups": {
+      "minimum": 1,
+      "title": "Min Groups",
+      "type": "integer"
+    },
+    "rationale": {
+      "minLength": 1,
+      "title": "Rationale",
+      "type": "string"
+    },
+    "repetitions": {
+      "default": 2000,
+      "minimum": 1,
+      "title": "Repetitions",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "seed": {
+      "maximum": 4294967295,
+      "minimum": 0,
+      "title": "Seed",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "seed",
+    "min_groups",
+    "independence_supported",
+    "rationale"
+  ],
+  "title": "BootstrapPlan",
+  "type": "object"
+}

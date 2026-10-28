@@ -1,0 +1,90 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "delimiter": {
+      "default": ",",
+      "maxLength": 1,
+      "minLength": 1,
+      "title": "Delimiter",
+      "type": "string"
+    },
+    "expected_bytes": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Bytes"
+    },
+    "expected_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Sha256"
+    },
+    "format": {
+      "default": "parquet",
+      "enum": [
+        "parquet",
+        "csv",
+        "arrow"
+      ],
+      "title": "Format",
+      "type": "string"
+    },
+    "manifest_path": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Manifest Path"
+    },
+    "manifest_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Manifest Sha256"
+    },
+    "path": {
+      "minLength": 1,
+      "title": "Path",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "title": "Snapshot Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "path",
+    "snapshot_id"
+  ],
+  "title": "Source",
+  "type": "object"
+}

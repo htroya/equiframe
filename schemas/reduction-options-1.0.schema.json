@@ -1,0 +1,32 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "confirmations": {
+      "default": 2,
+      "maximum": 5,
+      "minimum": 1,
+      "title": "Confirmations",
+      "type": "integer"
+    },
+    "max_evaluations": {
+      "default": 100,
+      "exclusiveMinimum": 0,
+      "title": "Max Evaluations",
+      "type": "integer"
+    },
+    "max_input_rows": {
+      "default": 100000,
+      "exclusiveMinimum": 0,
+      "title": "Max Input Rows",
+      "type": "integer"
+    },
+    "timeout_seconds": {
+      "default": 60.0,
+      "exclusiveMinimum": 0,
+      "title": "Timeout Seconds",
+      "type": "number"
+    }
+  },
+  "title": "ReductionOptions",
+  "type": "object"
+}

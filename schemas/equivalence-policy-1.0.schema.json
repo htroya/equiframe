@@ -1,0 +1,79 @@
+{
+  "additionalProperties": false,
+  "description": "Require complete output-schema equivalence, optionally pinning its context.\n\nNo setting weakens evaluation, changes a comparison policy, permits partial\nresults or asserts independent correctness. Persisted inspection requires an\nexplicit evidence_root and verifies the current manifest and all differences\nwithin these budgets; source captures are not opened.",
+  "properties": {
+    "guarantee": {
+      "const": "observed_contract",
+      "default": "observed_contract",
+      "title": "Guarantee",
+      "type": "string"
+    },
+    "max_evidence_bytes": {
+      "default": 67108864,
+      "exclusiveMinimum": 0,
+      "title": "Max Evidence Bytes",
+      "type": "integer"
+    },
+    "max_records": {
+      "default": 100000,
+      "exclusiveMinimum": 0,
+      "title": "Max Records",
+      "type": "integer"
+    },
+    "require_persisted_evidence": {
+      "default": false,
+      "title": "Require Persisted Evidence",
+      "type": "boolean"
+    },
+    "required_contract_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Required Contract Sha256"
+    },
+    "required_reference": {
+      "anyOf": [
+        {
+          "enum": [
+            "peer",
+            "expected"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Required Reference"
+    },
+    "required_spec_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Required Spec Sha256"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "title": "EquivalencePolicy",
+  "type": "object"
+}

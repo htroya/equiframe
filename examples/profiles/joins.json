@@ -1,0 +1,57 @@
+{
+  "family": "joins",
+  "feature_version": "1.0",
+  "features": [
+    {
+      "columns": [],
+      "denominator_table": null,
+      "metric": "log_filas",
+      "name": "rows",
+      "null_matches": null,
+      "right_columns": [],
+      "right_table": null,
+      "table": "result",
+      "target": null
+    },
+    {
+      "columns": [],
+      "denominator_table": "orders",
+      "metric": "razon_salida_entrada",
+      "name": "row_ratio",
+      "null_matches": null,
+      "right_columns": [],
+      "right_table": null,
+      "table": "result",
+      "target": null
+    },
+    {
+      "columns": [
+        "supplier_id"
+      ],
+      "denominator_table": null,
+      "metric": "claves_sin_pareja",
+      "name": "unmatched",
+      "null_matches": "never",
+      "right_columns": [
+        "supplier_id"
+      ],
+      "right_table": "suppliers",
+      "table": "orders",
+      "target": null
+    },
+    {
+      "columns": [
+        "name"
+      ],
+      "denominator_table": null,
+      "metric": "tasa_nulos",
+      "name": "name_nulls",
+      "null_matches": null,
+      "right_columns": [],
+      "right_table": null,
+      "table": "result",
+      "target": null
+    }
+  ],
+  "schema_version": "1.0"
+}

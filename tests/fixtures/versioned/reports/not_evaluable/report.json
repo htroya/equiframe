@@ -1,0 +1,150 @@
+{
+  "schema_version": "1.0",
+  "state": "not_evaluable",
+  "complete": false,
+  "scope": "output_schema",
+  "reference": "expected",
+  "strategy": "pending",
+  "coverage": "partial",
+  "contract_sha256": "6d76c05db723588c0314ca17b8c8953c8032798110e72eafb7e8f001c13faaca",
+  "spec_sha256": "d93d5635fd99ae3531c6e7497d1f9827411d05bcf816a32a8ff56c0448aa3076",
+  "counts": [
+    {
+      "name": "candidate_rows",
+      "value": 1,
+      "precision": "lower_bound",
+      "unit": "rows"
+    },
+    {
+      "name": "reference_rows",
+      "value": null,
+      "precision": "unknown",
+      "unit": "rows"
+    },
+    {
+      "name": "matched_rows",
+      "value": null,
+      "precision": "unknown",
+      "unit": "rows"
+    },
+    {
+      "name": "difference_records",
+      "value": 0,
+      "precision": "lower_bound",
+      "unit": "records"
+    },
+    {
+      "name": "contract_violations",
+      "value": 0,
+      "precision": "lower_bound",
+      "unit": "records"
+    },
+    {
+      "name": "added_rows",
+      "value": null,
+      "precision": "unknown",
+      "unit": "rows"
+    },
+    {
+      "name": "removed_rows",
+      "value": null,
+      "precision": "unknown",
+      "unit": "rows"
+    },
+    {
+      "name": "modified_rows",
+      "value": null,
+      "precision": "unknown",
+      "unit": "rows"
+    },
+    {
+      "name": "candidate_excess_occurrences",
+      "value": null,
+      "precision": "unknown",
+      "unit": "occurrences"
+    },
+    {
+      "name": "reference_excess_occurrences",
+      "value": null,
+      "precision": "unknown",
+      "unit": "occurrences"
+    }
+  ],
+  "reasons": [
+    "resource_exhausted: Evaluation stopped at a resource budget"
+  ],
+  "next_action": "Resolve the diagnostic and rerun the comparison before accepting equivalence",
+  "policies": [
+    {
+      "name": "column_order",
+      "value": "significant"
+    },
+    {
+      "name": "physical_types",
+      "value": "exact"
+    },
+    {
+      "name": "index",
+      "value": "reject"
+    },
+    {
+      "name": "multiplicity",
+      "value": "preserve"
+    },
+    {
+      "name": "row_order",
+      "value": "ignored"
+    },
+    {
+      "name": "alignment",
+      "value": "pending"
+    },
+    {
+      "name": "key_validation",
+      "value": "no validated key alignment"
+    },
+    {
+      "name": "declared_key_1",
+      "value": "{\"columns\": [\"column_1\"], \"scope_columns\": [], \"unique\": true, \"incomplete\": \"reject\", \"selected\": false}"
+    },
+    {
+      "name": "column_1",
+      "value": "{\"allowed_values_count\": 0, \"logical_type\": {\"bits\": 64, \"kind\": \"integer\", \"signed\": true}, \"null_policy\": {\"representations\": [\"null\"]}, \"nullable\": true, \"numeric_policy\": {\"comparison\": \"exact\", \"rounding\": null, \"tolerance\": null, \"unit\": \"[redacted]\"}}"
+    },
+    {
+      "name": "column_2",
+      "value": "{\"allowed_values_count\": 0, \"logical_type\": {\"bits\": 64, \"kind\": \"integer\", \"signed\": true}, \"null_policy\": {\"representations\": [\"null\"]}, \"nullable\": true, \"numeric_policy\": {\"comparison\": \"exact\", \"rounding\": null, \"tolerance\": null, \"unit\": \"[redacted]\"}}"
+    }
+  ],
+  "examples": [],
+  "evidence": {
+    "schema_version": "1.0",
+    "mode": "diagnostic",
+    "inspection": "result_only",
+    "evaluation_complete": false,
+    "counts_final": false,
+    "available_records": 0,
+    "included_examples": 0,
+    "display_complete": true,
+    "values_withheld": true,
+    "metadata_withheld": true,
+    "raw_retention": "unchanged_in_original_comparison",
+    "report_retention": "until_caller_deletes",
+    "access": "caller_managed_local_storage_no_encryption",
+    "required_exhaustive": false,
+    "acceptance": "satisfied",
+    "unmet_requirements": [],
+    "reproduction": "not_requested",
+    "reproduction_scope": "materialized_comparison_only_no_transform_reexecution"
+  },
+  "options": {
+    "mode": "diagnostic",
+    "include_values": false,
+    "include_metadata": false,
+    "redacted_column_count": 0,
+    "max_examples": 20,
+    "max_value_chars": 4096,
+    "max_report_bytes": 2097152,
+    "require_exhaustive": false
+  }
+}

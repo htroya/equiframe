@@ -1,0 +1,53 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "authors": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Authors",
+      "type": "array"
+    },
+    "derived_from_engines": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Derived From Engines",
+      "type": "array"
+    },
+    "expected_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Expected Sha256",
+      "type": "string"
+    },
+    "implementation_authors": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Implementation Authors",
+      "type": "array"
+    },
+    "independence_declared": {
+      "default": false,
+      "title": "Independence Declared",
+      "type": "boolean"
+    },
+    "method": {
+      "minLength": 1,
+      "title": "Method",
+      "type": "string"
+    }
+  },
+  "required": [
+    "expected_sha256",
+    "method",
+    "authors"
+  ],
+  "title": "ExpectedProvenance",
+  "type": "object"
+}

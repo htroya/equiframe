@@ -1,0 +1,327 @@
+{
+  "$defs": {
+    "CommonMethodV2": {
+      "additionalProperties": false,
+      "properties": {
+        "average_precision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MetricValue"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "method": {
+          "enum": [
+            "R",
+            "M",
+            "B",
+            "H"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "metrics": {
+          "$ref": "#/$defs/ConfusionMetrics"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "metrics",
+        "average_precision"
+      ],
+      "title": "CommonMethodV2",
+      "type": "object"
+    },
+    "ConfusionMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "f1": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "false_positive_rate": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "fn": {
+          "minimum": 0,
+          "title": "Fn",
+          "type": "integer"
+        },
+        "fp": {
+          "minimum": 0,
+          "title": "Fp",
+          "type": "integer"
+        },
+        "precision": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "recall": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "tn": {
+          "minimum": 0,
+          "title": "Tn",
+          "type": "integer"
+        },
+        "tp": {
+          "minimum": 0,
+          "title": "Tp",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tp",
+        "fp",
+        "fn",
+        "tn",
+        "precision",
+        "recall",
+        "f1",
+        "false_positive_rate"
+      ],
+      "title": "ConfusionMetrics",
+      "type": "object"
+    },
+    "GroupBootstrapResult": {
+      "additionalProperties": false,
+      "properties": {
+        "attempted_replicates": {
+          "minimum": 0,
+          "title": "Attempted Replicates",
+          "type": "integer"
+        },
+        "group_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Group Ids",
+          "type": "array"
+        },
+        "intervals": {
+          "items": {
+            "$ref": "#/$defs/IntervalEstimate"
+          },
+          "title": "Intervals",
+          "type": "array"
+        },
+        "lower_rank": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Lower Rank"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "upper_rank": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Upper Rank"
+        }
+      },
+      "required": [
+        "group_ids",
+        "attempted_replicates",
+        "lower_rank",
+        "upper_rank",
+        "intervals"
+      ],
+      "title": "GroupBootstrapResult",
+      "type": "object"
+    },
+    "IntervalEstimate": {
+      "additionalProperties": false,
+      "properties": {
+        "defined_replicates": {
+          "minimum": 0,
+          "title": "Defined Replicates",
+          "type": "integer"
+        },
+        "lower": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Lower"
+        },
+        "metric": {
+          "minLength": 1,
+          "title": "Metric",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "undefined_replicates": {
+          "minimum": 0,
+          "title": "Undefined Replicates",
+          "type": "integer"
+        },
+        "upper": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Upper"
+        }
+      },
+      "required": [
+        "metric",
+        "lower",
+        "upper",
+        "defined_replicates",
+        "undefined_replicates",
+        "reason"
+      ],
+      "title": "IntervalEstimate",
+      "type": "object"
+    },
+    "MetricValue": {
+      "additionalProperties": false,
+      "description": "Exact rational estimate, or an explicit undefined denominator/reason.",
+      "properties": {
+        "denominator": {
+          "minimum": 0,
+          "title": "Denominator",
+          "type": "integer"
+        },
+        "numerator": {
+          "minimum": 0,
+          "title": "Numerator",
+          "type": "integer"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "numerator",
+        "denominator",
+        "value",
+        "reason"
+      ],
+      "title": "MetricValue",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "bootstrap": {
+      "$ref": "#/$defs/GroupBootstrapResult"
+    },
+    "case_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Case Ids",
+      "type": "array"
+    },
+    "methods": {
+      "items": {
+        "$ref": "#/$defs/CommonMethodV2"
+      },
+      "title": "Methods",
+      "type": "array"
+    },
+    "role": {
+      "const": "additional_common_R_M_B_H",
+      "default": "additional_common_R_M_B_H",
+      "title": "Role",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "case_ids",
+    "methods",
+    "bootstrap"
+  ],
+  "title": "CommonSupportV2",
+  "type": "object"
+}

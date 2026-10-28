@@ -1,0 +1,12 @@
+{
+  "schema_version": "equiframe.option-cases-manifest/1.0",
+  "catalog": "catalog-a12.json",
+  "sha256": "0f580cf50b0b9e1fd29e0d419f874b1330b1b0b585d8c8fee2f83e12d3ef404b",
+  "bytes": 5070258,
+  "unique_cases": 3443,
+  "seed_models": 191,
+  "obligation_ids_sha256": "fcd8fc749a8c911de684a746cbb5405823dec0f9351abf515781226f7818c68e",
+  "source_commit": "8df0173b98398e2a4f3ef3c5e8216f079a541922",
+  "wheel_sha256": "1d769926f3003686a0b728cebc6163c939e5b33f7278b86182877b816b8a3c88",
+  "scope": "Synthetic metadata construction, serialization and rejection; no native execution claim"
+}

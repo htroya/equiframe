@@ -1,0 +1,66 @@
+{
+  "$defs": {
+    "ComponentDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "complete": {
+          "title": "Complete",
+          "type": "boolean"
+        },
+        "decision": {
+          "enum": [
+            "alert",
+            "no_alert",
+            "not_evaluable"
+          ],
+          "title": "Decision",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "decision",
+        "complete"
+      ],
+      "title": "ComponentDecision",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "m": {
+      "$ref": "#/$defs/ComponentDecision"
+    },
+    "r": {
+      "$ref": "#/$defs/ComponentDecision"
+    },
+    "result": {
+      "$ref": "#/$defs/ComponentDecision"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "r",
+    "m",
+    "result"
+  ],
+  "title": "HybridDecision",
+  "type": "object"
+}

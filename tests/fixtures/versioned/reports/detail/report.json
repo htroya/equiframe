@@ -1,0 +1,213 @@
+{
+  "schema_version": "1.0",
+  "state": "different",
+  "complete": true,
+  "scope": "output_schema",
+  "reference": "expected",
+  "strategy": "key",
+  "coverage": "complete",
+  "contract_sha256": "6d76c05db723588c0314ca17b8c8953c8032798110e72eafb7e8f001c13faaca",
+  "spec_sha256": "d93d5635fd99ae3531c6e7497d1f9827411d05bcf816a32a8ff56c0448aa3076",
+  "counts": [
+    {
+      "name": "candidate_rows",
+      "value": 2,
+      "precision": "exact",
+      "unit": "rows"
+    },
+    {
+      "name": "reference_rows",
+      "value": 2,
+      "precision": "exact",
+      "unit": "rows"
+    },
+    {
+      "name": "matched_rows",
+      "value": 1,
+      "precision": "exact",
+      "unit": "rows"
+    },
+    {
+      "name": "difference_records",
+      "value": 1,
+      "precision": "exact",
+      "unit": "records"
+    },
+    {
+      "name": "contract_violations",
+      "value": 0,
+      "precision": "exact",
+      "unit": "records"
+    },
+    {
+      "name": "added_rows",
+      "value": 0,
+      "precision": "exact",
+      "unit": "rows"
+    },
+    {
+      "name": "removed_rows",
+      "value": 0,
+      "precision": "exact",
+      "unit": "rows"
+    },
+    {
+      "name": "modified_rows",
+      "value": 1,
+      "precision": "exact",
+      "unit": "rows"
+    },
+    {
+      "name": "candidate_excess_occurrences",
+      "value": null,
+      "precision": "unknown",
+      "unit": "occurrences"
+    },
+    {
+      "name": "reference_excess_occurrences",
+      "value": null,
+      "precision": "unknown",
+      "unit": "occurrences"
+    }
+  ],
+  "reasons": [
+    "cell_value: Aligned values differ under the declared policy"
+  ],
+  "next_action": "Review the witnesses and declared policies, then correct the candidate or explicitly revise the contract",
+  "policies": [
+    {
+      "name": "column_order",
+      "value": "significant"
+    },
+    {
+      "name": "physical_types",
+      "value": "exact"
+    },
+    {
+      "name": "index",
+      "value": "reject"
+    },
+    {
+      "name": "multiplicity",
+      "value": "preserve"
+    },
+    {
+      "name": "row_order",
+      "value": "ignored"
+    },
+    {
+      "name": "alignment",
+      "value": "key"
+    },
+    {
+      "name": "key_validation",
+      "value": "globally validated"
+    },
+    {
+      "name": "declared_key_1",
+      "value": "{\"columns\": [\"id\"], \"scope_columns\": [], \"unique\": true, \"incomplete\": \"reject\", \"selected\": true}"
+    },
+    {
+      "name": "id",
+      "value": "{\"allowed_values_count\": 0, \"logical_type\": {\"bits\": 64, \"kind\": \"integer\", \"signed\": true}, \"null_policy\": {\"representations\": [\"null\"]}, \"nullable\": true, \"numeric_policy\": {\"comparison\": \"exact\", \"rounding\": null, \"tolerance\": null, \"unit\": \"count\"}}"
+    },
+    {
+      "name": "value",
+      "value": "{\"allowed_values_count\": 0, \"logical_type\": {\"bits\": 64, \"kind\": \"integer\", \"signed\": true}, \"null_policy\": {\"representations\": [\"null\"]}, \"nullable\": true, \"numeric_policy\": {\"comparison\": \"exact\", \"rounding\": null, \"tolerance\": null, \"unit\": \"count\"}}"
+    }
+  ],
+  "examples": [
+    {
+      "category": "content",
+      "code": "cell_value",
+      "reason": "Aligned values differ under the declared policy",
+      "position": 0,
+      "other_position": 0,
+      "column": "value",
+      "columns": [
+        "id",
+        "value"
+      ],
+      "key_columns": [
+        "id"
+      ],
+      "key": [
+        {
+          "disclosure": "visible",
+          "kind": "integer",
+          "representation": "integer(1)",
+          "native_type": null,
+          "physical_type": "int64",
+          "value": {
+            "kind": "integer",
+            "value": "1",
+            "unit": null,
+            "timezone": null
+          }
+        }
+      ],
+      "candidate": [
+        {
+          "disclosure": "visible",
+          "kind": "integer",
+          "representation": "integer(11)",
+          "native_type": null,
+          "physical_type": "int64",
+          "value": {
+            "kind": "integer",
+            "value": "11",
+            "unit": null,
+            "timezone": null
+          }
+        }
+      ],
+      "reference": [
+        {
+          "disclosure": "visible",
+          "kind": "integer",
+          "representation": "integer(10)",
+          "native_type": null,
+          "physical_type": "int64",
+          "value": {
+            "kind": "integer",
+            "value": "10",
+            "unit": null,
+            "timezone": null
+          }
+        }
+      ],
+      "candidate_count": 1,
+      "reference_count": 1
+    }
+  ],
+  "evidence": {
+    "schema_version": "1.0",
+    "mode": "detail",
+    "inspection": "verified_differences",
+    "evaluation_complete": true,
+    "counts_final": true,
+    "available_records": 1,
+    "included_examples": 1,
+    "display_complete": true,
+    "values_withheld": false,
+    "metadata_withheld": false,
+    "raw_retention": "unchanged_in_original_comparison",
+    "report_retention": "until_caller_deletes",
+    "access": "caller_managed_local_storage_no_encryption",
+    "required_exhaustive": false,
+    "acceptance": "satisfied",
+    "unmet_requirements": [],
+    "reproduction": "not_requested",
+    "reproduction_scope": "materialized_comparison_only_no_transform_reexecution"
+  },
+  "options": {
+    "mode": "detail",
+    "include_values": true,
+    "include_metadata": true,
+    "redacted_column_count": 0,
+    "max_examples": 20,
+    "max_value_chars": 4096,
+    "max_report_bytes": 2097152,
+    "require_exhaustive": false
+  }
+}

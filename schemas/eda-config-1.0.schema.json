@@ -1,0 +1,354 @@
+{
+  "$defs": {
+    "Conversion": {
+      "additionalProperties": false,
+      "properties": {
+        "column": {
+          "minLength": 1,
+          "title": "Column",
+          "type": "string"
+        },
+        "empty": {
+          "default": "invalid",
+          "enum": [
+            "invalid",
+            "missing"
+          ],
+          "title": "Empty",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "decimal",
+            "integer",
+            "date",
+            "timestamp"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "precision": {
+          "default": 38,
+          "maximum": 38,
+          "minimum": 1,
+          "title": "Precision",
+          "type": "integer"
+        },
+        "scale": {
+          "default": 6,
+          "maximum": 18,
+          "minimum": 0,
+          "title": "Scale",
+          "type": "integer"
+        },
+        "target": {
+          "minLength": 1,
+          "title": "Target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "column",
+        "target",
+        "kind"
+      ],
+      "title": "Conversion",
+      "type": "object"
+    },
+    "KeyRule": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "empty_is_missing": {
+          "default": true,
+          "title": "Empty Is Missing",
+          "type": "boolean"
+        },
+        "incomplete": {
+          "default": "exclude",
+          "enum": [
+            "exclude",
+            "include",
+            "reject"
+          ],
+          "title": "Incomplete",
+          "type": "string"
+        },
+        "require_unique": {
+          "default": false,
+          "title": "Require Unique",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "columns"
+      ],
+      "title": "KeyRule",
+      "type": "object"
+    },
+    "NumericRule": {
+      "additionalProperties": false,
+      "properties": {
+        "column": {
+          "minLength": 1,
+          "title": "Column",
+          "type": "string"
+        },
+        "currency_column": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency Column"
+        },
+        "groups": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Groups",
+          "type": "array"
+        },
+        "min_support": {
+          "default": 5,
+          "minimum": 2,
+          "title": "Min Support",
+          "type": "integer"
+        },
+        "monetary": {
+          "default": false,
+          "title": "Monetary",
+          "type": "boolean"
+        },
+        "multiplier": {
+          "default": 1.5,
+          "exclusiveMinimum": 0,
+          "title": "Multiplier",
+          "type": "number"
+        },
+        "outliers": {
+          "default": "iqr",
+          "enum": [
+            "iqr",
+            "mad",
+            "none"
+          ],
+          "title": "Outliers",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "column"
+      ],
+      "title": "NumericRule",
+      "type": "object"
+    },
+    "Resources": {
+      "additionalProperties": false,
+      "properties": {
+        "chart_rows": {
+          "default": 200,
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Chart Rows",
+          "type": "integer"
+        },
+        "examples": {
+          "default": 10,
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Examples",
+          "type": "integer"
+        },
+        "histogram_bins": {
+          "default": 20,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Histogram Bins",
+          "type": "integer"
+        },
+        "max_columns": {
+          "default": 256,
+          "maximum": 1000,
+          "minimum": 1,
+          "title": "Max Columns",
+          "type": "integer"
+        },
+        "max_groups": {
+          "default": 100,
+          "maximum": 1000,
+          "minimum": 1,
+          "title": "Max Groups",
+          "type": "integer"
+        },
+        "max_input_bytes": {
+          "default": 536870912,
+          "exclusiveMinimum": 0,
+          "title": "Max Input Bytes",
+          "type": "integer"
+        },
+        "max_report_bytes": {
+          "default": 33554432,
+          "minimum": 1,
+          "title": "Max Report Bytes",
+          "type": "integer"
+        },
+        "max_rows": {
+          "default": 10000000,
+          "minimum": 0,
+          "title": "Max Rows",
+          "type": "integer"
+        },
+        "memory_mb": {
+          "default": 512,
+          "maximum": 65536,
+          "minimum": 16,
+          "title": "Memory Mb",
+          "type": "integer"
+        },
+        "temp_disk_mb": {
+          "default": 256,
+          "minimum": 1,
+          "title": "Temp Disk Mb",
+          "type": "integer"
+        },
+        "threads": {
+          "default": 1,
+          "maximum": 64,
+          "minimum": 1,
+          "title": "Threads",
+          "type": "integer"
+        },
+        "timeout_seconds": {
+          "default": 300.0,
+          "exclusiveMinimum": 0,
+          "title": "Timeout Seconds",
+          "type": "number"
+        },
+        "top_categories": {
+          "default": 10,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Top Categories",
+          "type": "integer"
+        }
+      },
+      "title": "Resources",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "charts": {
+      "default": false,
+      "title": "Charts",
+      "type": "boolean"
+    },
+    "conversions": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Conversion"
+      },
+      "title": "Conversions",
+      "type": "array"
+    },
+    "identifiers": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Identifiers",
+      "type": "array"
+    },
+    "keys": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/KeyRule"
+      },
+      "title": "Keys",
+      "type": "array"
+    },
+    "numeric": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/NumericRule"
+      },
+      "title": "Numeric",
+      "type": "array"
+    },
+    "percentiles": {
+      "default": [
+        0.25,
+        0.5,
+        0.75
+      ],
+      "items": {
+        "maximum": 1,
+        "minimum": 0,
+        "type": "number"
+      },
+      "title": "Percentiles",
+      "type": "array"
+    },
+    "resources": {
+      "$ref": "#/$defs/Resources"
+    },
+    "rules_id": {
+      "default": "generic",
+      "minLength": 1,
+      "title": "Rules Id",
+      "type": "string"
+    },
+    "rules_revision": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Rules Revision",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "stddev": {
+      "default": "population",
+      "enum": [
+        "population",
+        "sample"
+      ],
+      "title": "Stddev",
+      "type": "string"
+    }
+  },
+  "title": "EdaConfig",
+  "type": "object"
+}
