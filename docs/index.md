@@ -36,7 +36,7 @@ Consulta [fuentes](universal-sources.md), [ventanas](migration-ir.md) y
 
 ## Release status
 
-This handbook describes **0.12.2**, preserving the **0.12.0 stable release contract**. Preparation and
+This handbook targets **0.12.3**, preserving the **0.12.0 stable release contract**. Preparation and
 publication are separate: the owner has authorized a manual TestPyPI rehearsal
 followed by PyPI, subject to the [release gates](releasing.md). Until registry
 ownership, uploads and clean consumer installation are actually verified, those

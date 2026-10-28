@@ -240,7 +240,7 @@ def factual_packet(root: Path, *, target: str = "testpypi") -> tuple[Path, dict[
     packet = {
         "schema_version": "2.0",
         "target": target,
-        "version": "0.12.2",
+        "version": "0.12.3",
         "source_commit": COMMIT,
         "artifacts": artifacts,
         "gates": [
@@ -263,7 +263,7 @@ def save_packet(path: Path, packet: dict[str, Any]) -> None:
     path.write_text(json.dumps(packet))
 
 
-@pytest.mark.parametrize("version", ["0.12.0", "0.12.1"])
+@pytest.mark.parametrize("version", ["0.12.0", "0.12.1", "0.12.2"])
 def test_previous_testpypi_version_cannot_inherit_current_release_readiness(
     tmp_path: Path, version: str
 ) -> None:
@@ -288,7 +288,7 @@ def initial_upload_details(target: str) -> dict[str, Any]:
 
 @pytest.mark.parametrize("target", ["testpypi", "pypi"])
 def test_initial_upload_scope_never_claims_name_ownership(tmp_path: Path, target: str) -> None:
-    candidate(tmp_path, "0.12.2")
+    candidate(tmp_path, "0.12.3")
     path, packet = factual_packet(tmp_path, target=target)
     gate = next(item for item in packet["gates"] if item["id"] == "name_control")
     gate["details"] = initial_upload_details(target)
@@ -345,7 +345,7 @@ def test_initial_upload_scope_never_claims_name_ownership(tmp_path: Path, target
 def test_initial_upload_rejects_unverified_mixed_or_ownership_claims(
     tmp_path: Path, field: str, value: Any
 ) -> None:
-    candidate(tmp_path, "0.12.2")
+    candidate(tmp_path, "0.12.3")
     path, packet = factual_packet(tmp_path)
     gate = next(item for item in packet["gates"] if item["id"] == "name_control")
     gate["details"] = initial_upload_details("testpypi")
@@ -360,7 +360,7 @@ def test_initial_upload_rejects_unverified_mixed_or_ownership_claims(
 def test_initial_upload_still_requires_account_protection_and_owner_task(
     tmp_path: Path, gate_name: str
 ) -> None:
-    candidate(tmp_path, "0.12.2")
+    candidate(tmp_path, "0.12.3")
     path, packet = factual_packet(tmp_path)
     next(item for item in packet["gates"] if item["id"] == "name_control")["details"] = (
         initial_upload_details("testpypi")
@@ -376,7 +376,7 @@ def test_initial_upload_still_requires_account_protection_and_owner_task(
 def test_existing_project_ownership_cannot_be_inferred_from_404(
     tmp_path: Path, mode: str | None
 ) -> None:
-    candidate(tmp_path, "0.12.2")
+    candidate(tmp_path, "0.12.3")
     path, packet = factual_packet(tmp_path)
     details = next(item for item in packet["gates"] if item["id"] == "name_control")["details"]
     if mode is None:
@@ -390,7 +390,7 @@ def test_existing_project_ownership_cannot_be_inferred_from_404(
 
 @pytest.mark.parametrize("target", ["testpypi", "pypi"])
 def test_v2_exact_complete_packet_checks_consistency_only(tmp_path: Path, target: str) -> None:
-    candidate(tmp_path, "0.12.2")
+    candidate(tmp_path, "0.12.3")
     path, _ = factual_packet(tmp_path, target=target)
     report = MODULE["check_candidate"](tmp_path, COMMIT, target=target, gate_packet=path)
     assert report["publication_ready"] is True
@@ -402,7 +402,7 @@ def test_v2_exact_complete_packet_checks_consistency_only(tmp_path: Path, target
 
 
 def test_v2_absent_packet_and_unspecified_index_remain_blocked(tmp_path: Path) -> None:
-    candidate(tmp_path, "0.12.2")
+    candidate(tmp_path, "0.12.3")
     for options in ({}, {"target": "testpypi"}):
         report = MODULE["check_candidate"](tmp_path, COMMIT, **options)
         assert not report["publication_ready"] and report["pending_decisions"]
@@ -410,7 +410,7 @@ def test_v2_absent_packet_and_unspecified_index_remain_blocked(tmp_path: Path) -
 
 @pytest.mark.parametrize("state", ["FAIL", "UNKNOWN", "MISSING"])
 def test_v2_failed_unknown_or_missing_gate_blocks(tmp_path: Path, state: str) -> None:
-    candidate(tmp_path, "0.12.2")
+    candidate(tmp_path, "0.12.3")
     path, packet = factual_packet(tmp_path)
     if state == "MISSING":
         packet["gates"] = packet["gates"][1:]
@@ -442,7 +442,7 @@ def test_v2_failed_unknown_or_missing_gate_blocks(tmp_path: Path, state: str) ->
 def test_v2_pass_word_cannot_replace_required_facts(
     tmp_path: Path, gate: str, field: str, value: Any
 ) -> None:
-    candidate(tmp_path, "0.12.2")
+    candidate(tmp_path, "0.12.3")
     path, packet = factual_packet(tmp_path)
     next(item for item in packet["gates"] if item["id"] == gate)["details"][field] = value
     save_packet(path, packet)
@@ -453,7 +453,7 @@ def test_v2_pass_word_cannot_replace_required_facts(
 
 @pytest.mark.parametrize("offset", [timedelta(days=-8), timedelta(minutes=10)])
 def test_v2_stale_or_future_observations_block(tmp_path: Path, offset: timedelta) -> None:
-    candidate(tmp_path, "0.12.2")
+    candidate(tmp_path, "0.12.3")
     path, packet = factual_packet(tmp_path)
     packet["gates"][0]["observed_at"] = (datetime.now(timezone.utc) + offset).isoformat()
     save_packet(path, packet)
@@ -469,7 +469,7 @@ def test_v2_stale_or_future_observations_block(tmp_path: Path, offset: timedelta
 def test_v2_packet_is_bound_to_exact_source_bytes_and_index(
     tmp_path: Path, field: str, value: Any
 ) -> None:
-    candidate(tmp_path, "0.12.2")
+    candidate(tmp_path, "0.12.3")
     path, packet = factual_packet(tmp_path)
     packet[field] = value
     save_packet(path, packet)
@@ -478,7 +478,7 @@ def test_v2_packet_is_bound_to_exact_source_bytes_and_index(
 
 
 def test_v2_pypi_requires_actual_testpypi_download_inventory(tmp_path: Path) -> None:
-    candidate(tmp_path, "0.12.2")
+    candidate(tmp_path, "0.12.3")
     path, packet = factual_packet(tmp_path, target="pypi")
     gate = next(g for g in packet["gates"] if g["id"] == "testpypi_downloaded_consumer")
     gate["details"]["downloaded_artifacts"] = []
@@ -490,7 +490,7 @@ def test_v2_pypi_requires_actual_testpypi_download_inventory(tmp_path: Path) -> 
 def test_v2_duplicate_gate_and_dropped_policy_gate_are_rejected(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    candidate(tmp_path, "0.12.2")
+    candidate(tmp_path, "0.12.3")
     path, packet = factual_packet(tmp_path)
     packet["gates"][-1] = packet["gates"][0]
     save_packet(path, packet)
@@ -514,7 +514,7 @@ def test_historical_candidate_cannot_enter_new_route(tmp_path: Path) -> None:
 def test_v2_cli_exit_zero_is_consistency_not_upload(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    candidate(tmp_path, "0.12.2")
+    candidate(tmp_path, "0.12.3")
     path, _ = factual_packet(tmp_path)
     monkeypatch.setattr(
         sys,
@@ -573,7 +573,7 @@ def test_standalone_v1_policy_remains_closed(
 
 
 def test_v2_all_nine_technical_gates_remain_mandatory(tmp_path: Path) -> None:
-    files = candidate(tmp_path, "0.12.2")
+    files = candidate(tmp_path, "0.12.3")
     path, _ = factual_packet(tmp_path)
     edit(files["core"], "successful_stages", [], section="check_completion")
     with pytest.raises(ValueError, match="incomplete or unbound"):

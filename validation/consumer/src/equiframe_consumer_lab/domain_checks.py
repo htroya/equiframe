@@ -264,8 +264,8 @@ def run_domains(output: Path) -> int:
             output / "summary.json",
             {
                 "status": "FAIL",
-                "consumer_version": "0.1.18",
-                "candidate": "0.12.2",
+                "consumer_version": "0.1.19",
+                "candidate": "0.12.3",
                 "synthetic": True,
                 "completed_cases": len(records),
                 "records": records,
@@ -278,8 +278,8 @@ def run_domains(output: Path) -> int:
         output / "summary.json",
         {
             "status": "PASS",
-            "consumer_version": "0.1.18",
-            "candidate": "0.12.2",
+            "consumer_version": "0.1.19",
+            "candidate": "0.12.3",
             "synthetic": True,
             "environment": env,
             "distinct_cases": len(records),

@@ -1,3 +1,14 @@
+## 0.12.3 - producer identity and paired release preparation
+
+- Admit detector producer 0.12.3 and emit that identity for new fits, while
+  preserving supported historical producers and their recorded evidence.
+- Align active producer schemas, reviewed inventories and the exact benchmark
+  pairing; the IF/MAD algorithms and public format markers remain unchanged.
+- Update current installation guides and the source-only consumer application
+  0.1.19 for the new target. Preserve the frozen validation corpus.
+- Keep the public 0.12.2 tag and its results unchanged. Validation and publication
+  of this new candidate require their own commit, artifact hashes and gates.
+
 ## 0.12.2 — English distribution and release hardening
 
 - Standard repository layout with core source, documentation, tests and metadata

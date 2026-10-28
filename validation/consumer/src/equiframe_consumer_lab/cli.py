@@ -12,7 +12,7 @@ from .runner import fault_checks, run_all, run_case
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Independent offline consumer of installed EquiFrame 0.12.2"
+        description="Independent offline consumer of installed EquiFrame 0.12.3"
     )
     sub = parser.add_subparsers(dest="command", required=True)
     run = sub.add_parser(

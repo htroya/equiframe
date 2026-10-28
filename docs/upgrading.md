@@ -3,6 +3,30 @@
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Security](security.md) ·
 [Release/rollback](releasing.md)
 
+## 0.12.3 candidate: raw metadata and producer identity
+
+This source revision prepares the exactly paired 0.12.3 core and benchmark.
+Its release checks require artifact-bound receipts, and index availability must
+be observed directly. The 0.12.2 tag, artifacts and successful, failed or
+incomplete checks retain their original identities.
+
+The benchmark's passive-metadata regression now constructs explicit LF and CRLF
+bytes and checks each raw SHA-256. The inventory still hashes the file as read;
+it does not normalize line endings to accept different bytes. This corrects a
+Windows test-fixture expectation rather than changing metadata-reader behavior.
+
+New detector fits identify producer 0.12.3. The new reader continues to admit
+supported older producers, including 0.12.2, without rewriting their evidence.
+A 0.12.2 reader does not automatically admit a 0.12.3 producer. Keep the matching
+reader and artifact hashes; never replace the recorded producer to force an
+older reader to accept a bundle. The IF/MAD algorithms and public format markers
+remain unchanged. Active schemas and their reviewed inventories follow the
+explicit producer admission.
+
+The source-only consumer application 0.1.19 requires core 0.12.3. Earlier
+0.1.18/core 0.12.2 runs remain evidence of that pairing, not executions of the new
+application or release. Its frozen corpus is unchanged.
+
 ## 0.12.2 compatible patch
 
 This patch retains the reviewed 0.12.0 public API and file-format contracts. Its

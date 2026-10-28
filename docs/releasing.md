@@ -2,8 +2,12 @@
 
 ## Current state
 
-The release target is `equiframe 0.12.2` with the exactly paired
-`equiframe-benchmark 0.12.2`, identified by commit and artifact SHA-256.
+The release target is `equiframe 0.12.3` with the exactly paired
+`equiframe-benchmark 0.12.3`, identified by commit and artifact SHA-256.
+Source preparation does not establish validation or publication: verify the
+artifact-bound receipts and official index inventory. The public 0.12.2 tag and
+its receipts retain their original identities; the new patch must
+pass its own checks and must not replace the previous candidate's bytes.
 On 2026-10-27 the owner authorized manual publication to TestPyPI followed by
 PyPI after the release checks pass. Publication is established by the observed
 index inventories and clean downloaded consumers, not by this guide or a build.

@@ -5,7 +5,7 @@
 
 ## Maintainer and best-effort support
 
-For the 0.12.2 release, the project owner has assigned **Hernán Troya (`htroya`)**
+The project owner has assigned **Hernán Troya (`htroya`)**
 responsibility for maintenance, releases and security coordination. This is
 best-effort maintenance by one owner, not a staffed service or support contract.
 No backup, on-call coverage, numeric response deadline or SLA is promised.

@@ -19,7 +19,10 @@ many executed and matched their expected outcomes.
 
 ## Installation and use
 
-The application version is **0.1.18**, paired with **EquiFrame 0.12.2**.
+The application version is **0.1.19**, paired with **EquiFrame 0.12.3**.
+Record the checks actually completed for this pairing. Earlier 0.1.18/core
+0.12.2 runs keep their original source and artifact identities and are not runs
+of this revision.
 Build it with the existing development toolchain:
 
 ```bash
@@ -30,7 +33,7 @@ Install its wheel and the matching core with normal dependency resolution from
 a reviewed local wheelhouse. Run outside the source checkout:
 
 ```bash
-python -m pip install --no-index --find-links /path/to/wheelhouse equiframe-consumer-lab==0.1.18
+python -m pip install --no-index --find-links /path/to/wheelhouse equiframe-consumer-lab==0.1.19
 python -m pip check
 python -I -m equiframe_consumer_lab --help
 python -I -m equiframe_consumer_lab run --all --data /path/to/frozen-data --output /path/to/new-run

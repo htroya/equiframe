@@ -414,14 +414,24 @@ def test_dynamic_metadata_is_not_executed_or_presented_as_verified(tmp_path):
         inspect_distribution(source(tmp_path, project))
 
 
-@pytest.mark.parametrize("identified_by", ["wheel", "pkg_info", "both"])
+@pytest.mark.parametrize(
+    ("identified_by", "newline"),
+    [
+        pytest.param("wheel", "\n", id="wheel"),
+        pytest.param("pkg_info", "\n", id="pkg-info-lf"),
+        pytest.param("pkg_info", "\r\n", id="pkg-info-crlf"),
+        pytest.param("both", "\n", id="both-lf"),
+        pytest.param("both", "\r\n", id="both-crlf"),
+    ],
+)
 def test_dynamic_version_uses_identified_passive_metadata_without_executing_code(
-    tmp_path, identified_by
+    tmp_path, identified_by, newline
 ):
     project = PROJECT.replace('version = "0.10.0"', 'dynamic = ["version"]')
     package = source(tmp_path, project)
+    metadata_bytes = METADATA.replace("\n", newline).encode("utf-8")
     if identified_by in {"pkg_info", "both"}:
-        (package / "PKG-INFO").write_text(METADATA, encoding="utf-8")
+        (package / "PKG-INFO").write_bytes(metadata_bytes)
     identified = wheel(tmp_path) if identified_by in {"wheel", "both"} else None
     result = inspect_distribution(package, identified)
     assert result.project.version == "0.10.0"
@@ -430,7 +440,10 @@ def test_dynamic_version_uses_identified_passive_metadata_without_executing_code
     assert "pending_build_install_verification" in result.pending_conditions
     if identified_by in {"pkg_info", "both"}:
         record = next(item for item in result.source_files if item.relative_path == "PKG-INFO")
-        assert record.sha256 == hashlib.sha256(METADATA.encode()).hexdigest()
+        assert record.sha256 == hashlib.sha256(metadata_bytes).hexdigest()
+        assert record.size_bytes == len(metadata_bytes)
+        if newline == "\r\n":
+            assert record.sha256 != hashlib.sha256(METADATA.encode("utf-8")).hexdigest()
     if identified is None:
         assert "pending_wheel_metadata" in result.pending_conditions
 

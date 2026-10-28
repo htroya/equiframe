@@ -2,7 +2,7 @@
   "schema_version": "2.0",
   "publication_enabled": false,
   "publication_mode": "manual",
-  "target_version": "0.12.2",
+  "target_version": "0.12.3",
   "distributions": ["equiframe", "equiframe-benchmark"],
   "name_control_modes": ["existing_projects", "initial_upload_attempt"],
   "initial_upload_scope": "Authenticated account and two current public 404 observations permit only an authorized initial upload attempt. Absence establishes no reservation, project ownership or guaranteed index admission; acceptance must be observed after upload.",

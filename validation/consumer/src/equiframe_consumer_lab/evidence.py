@@ -158,9 +158,9 @@ def verify_frozen(
 def environment() -> dict:
     import equiframe as ef
 
-    require(importlib.metadata.version("equiframe") == "0.12.2", "Wrong installed core version")
+    require(importlib.metadata.version("equiframe") == "0.12.3", "Wrong installed core version")
     require(
-        importlib.metadata.version("equiframe-consumer-lab") == "0.1.18",
+        importlib.metadata.version("equiframe-consumer-lab") == "0.1.19",
         "Wrong installed consumer version",
     )
     package = Path(ef.__file__).resolve()

@@ -17,7 +17,7 @@ receipts. No callbacks, models or hidden datasets are downloaded.
 
 ## Installation outside the checkout
 
-The commands below use an identified **0.12.2 offline wheelhouse**, with a
+The commands below use an identified **0.12.3 offline wheelhouse**, with a
 matching identity for the actual CPython 3.10–3.13 minor and platform. Follow
 [installed-private.md](installed-private.md) for normal resolution, `pip check`,
 import verification and the separate complete hash-lock trial. Use `[engines]`
@@ -28,7 +28,7 @@ Run from a fresh consumer directory outside the checkout:
 python3.12 -m venv .venv
 WHEELHOUSE=/absolute/path/reviewed-wheelhouse
 .venv/bin/python -I -m pip install --no-index --find-links "$WHEELHOUSE" \
-  'equiframe[engines]==0.12.2' --report install-report.json
+  'equiframe[engines]==0.12.3' --report install-report.json
 .venv/bin/python -I -m pip check
 .venv/bin/python -I -c 'import equiframe, sys; print(sys.executable); print(equiframe.__file__); print(equiframe.__version__)'
 .venv/bin/python -I -m equiframe.examples.journeys.verify_journeys --output acceptance

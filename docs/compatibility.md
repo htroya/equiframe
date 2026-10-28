@@ -4,7 +4,7 @@
 
 ## Admission is not a measured support matrix
 
-The 0.12.2 release contract declares **Python `>=3.10,<3.14`**, meaning 3.10, 3.11, 3.12 and
+The 0.12.3 release contract declares **Python `>=3.10,<3.14`**, meaning 3.10, 3.11, 3.12 and
 3.13. Dependency ranges describe installable admission, not every tested
 combination. A lock captures one resolution; it does not prove every operating
 system, architecture, Python patch or cross-product of package versions works.
@@ -19,7 +19,7 @@ that retains version `0.11.1`.
 
 The following implementation checks actually ran from installed A14 artifacts
 on 27 October 2026. They establish the listed workloads, rather than every input
-or dependency combination. The final 0.12.2 artifact must still pass its own
+or dependency combination. The final 0.12.3 artifact must still pass its own
 [release gates](releasing.md); a version change does not inherit an artifact hash.
 
 | OS / architecture | CPython actually exercised | Observed functional scope |
@@ -56,7 +56,7 @@ Platform-specific skips retain their meaning and are not successful checks.
 No macOS, PyPy, other architecture, every Python patch or full minimum-to-maximum
 dependency cross-product is established by this table. Earlier STEP6 x86_64
 results above retain their own artifact identities; none is silently relabelled
-as a 0.12.2 final-artifact result.
+as a 0.12.3 final-artifact result.
 
 The first-use builder selects an explicit Python minor and its own hash-pinned
 dependency closure. The legacy `requirements.lock` is the 3.12 closure;
@@ -70,7 +70,7 @@ The installed wheel metadata is authoritative. Current direct ranges are:
 
 | Profile | Dependencies |
 |---|---|
-| Base | typing-extensions `>=4.14,<5`; pydantic `>=2.12,<3`; typer `>=0.20,<1`; tzdata `>=2025.2` |
+| Base | typing-extensions `>=4.14,<5`; pydantic `>=2.12,<3`; typer `>=0.20,<1`; tzdata `>=2025.2,<2027` |
 | `arrow` | pyarrow `>=23.0.1,<26` |
 | `pandas` | pandas `>=2.2,<4`, excluding `3.0.3`, `3.0.4`, `3.0.5`, `3.0.6`; pyarrow `>=23.0.1,<26` |
 | `polars` | polars `>=1.30,<2`; pyarrow `>=23.0.1,<26` |

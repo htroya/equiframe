@@ -2,7 +2,7 @@
 
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Release process](releasing.md)
 
-The 0.12.2 release contract uses MIT for project-owned code; third-party materials
+The 0.12.3 release contract uses MIT for project-owned code; third-party materials
 retain their notices and licenses. Redistribution rights follow those licenses.
 Hernán Troya (`htroya`) maintains the project and owns releases/security
 coordination on a best-effort basis without a promised backup or response-time SLA.
@@ -133,11 +133,11 @@ signature sketches or consumer-specific request templates as such.
 
 ## CI and publishing permissions
 
-The project's existing CI is manually dispatched; platform jobs require explicit
-selection/authorization. Pushing a branch or creating a PR does not prove the
-matrix ran. Verify the exact workflow run, commit, environment and artifact before
-claiming remote results. CI should use least privilege, and publication remains
-a separate protected owner decision.
+The public repository ships no GitHub Actions workflows, and this release uses
+local manual checks. Pushing a branch or creating a PR does not execute or prove
+a compatibility matrix. Identify the actual command, source, environment and
+artifacts before claiming results. Any future hosted CI requires separate review
+and least privilege; publication remains a separate protected owner decision.
 
 Building locally, checking Twine metadata, producing an SBOM or installing by
 local wheel does not publish, reserve a project name or approve licensing.

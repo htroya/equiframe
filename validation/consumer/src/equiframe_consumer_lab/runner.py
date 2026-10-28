@@ -51,7 +51,7 @@ def run_case(
     output.mkdir(parents=True)
     started = time.monotonic()
     record = {
-        "consumer_version": "0.1.18",
+        "consumer_version": "0.1.19",
         "program": program,
         "variant": variant,
         "direction": source + "->" + target,
@@ -573,7 +573,7 @@ def run_all(data: Path, output: Path, *, require_optimized: bool = False) -> int
     )
     passed = complete and all(r["harness_pass"] for r in records) and not terminal_errors
     summary = {
-        "consumer_version": "0.1.18",
+        "consumer_version": "0.1.19",
         "status": "PASS" if passed else ("FAIL" if complete else "PARTIAL"),
         "planned_cases": len(planned),
         "distinct_cases": len(records),

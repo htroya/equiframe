@@ -1,3 +1,12 @@
+## 0.1.19 - exact core 0.12.3 pairing
+
+- Require core 0.12.3 and installed consumer 0.1.19; retain the installed-path and
+  RECORD provenance checks and reject older core or consumer identities.
+- Align current CLI text and new receipt provenance with that pairing. Preserve
+  frozen inputs, independent expected calculations and all acceptance gates.
+- Earlier 0.1.18/core 0.12.2 executions retain their own identities. New executions
+  must identify the current pairing; source changes alone are not a completed run.
+
 ## 0.1.17 (2026-10-15)
 
 Pair the private application with exactly EquiFrame 0.12.0a14 and identify the

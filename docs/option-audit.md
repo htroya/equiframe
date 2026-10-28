@@ -9,12 +9,12 @@ commit. It refuses imports outside that environment's site-packages and checks
 every shipped package file against the wheel before recording an inventory.
 
 ```bash
-python -I option_inventory.py --wheel equiframe-0.12.2-py3-none-any.whl \
+python -I option_inventory.py --wheel equiframe-0.12.3-py3-none-any.whl \
   --commit EXACT_40_CHARACTER_COMMIT --output inventory.json --matrix obligations.json
 ```
 
 To include the separate benchmark, install it normally and add `--benchmark
---benchmark-wheel equiframe_benchmark-0.12.2-py3-none-any.whl`.
+--benchmark-wheel equiframe_benchmark-0.12.3-py3-none-any.whl`.
 The inspection harness uses only dependencies already declared by the inspected
 packages. It never executes default factories merely to discover their names.
 

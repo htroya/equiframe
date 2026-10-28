@@ -1,14 +1,19 @@
-# EquiFrame Benchmark 0.12.2
+# EquiFrame Benchmark 0.12.3
+
+> Release target: **0.12.3**. Check the official index for availability and
+> verify the identified artifact hashes. Publication requires artifact-bound
+> release checks; prior candidate results keep their own identities.
 
 **Experimental evaluation, reproducible evidence and bounded engineering costs.**
 
 [Principal paired protocol V2](PROTOCOL_V2.md) provides a separately versioned
 freeze → native study → paired evaluation → seven tables → portable reproduction
 route for the three primary families and three engine pairs. V1 readers,
-fingerprints and common-support results remain unchanged. Twenty-four focused
-engineering checks cover the new route, including real API/CLI roundtrips over
-fictional held-out native cases and portable reproduction. These checks provide no scientific approval;
-final protocol review remains an explicit requirement.
+fingerprints and common-support results remain unchanged. Earlier protocol
+work included twenty-four focused engineering checks, with API/CLI roundtrips
+over fictional held-out native cases and portable reproduction. Those results
+retain their original source and artifact identities; they do not establish
+0.12.3 validation or scientific approval. Final protocol review remains required.
 
 `equiframe-benchmark` is separate from the core `equiframe` package. It provides
 scenario catalogs, independent-review records, grouped splits, reviewed normal
@@ -18,7 +23,7 @@ detector features.
 
 ## Release scope and compatibility
 
-This distribution is paired exactly with `equiframe[arrow]==0.12.2` and
+This distribution is paired exactly with `equiframe[arrow]==0.12.3` and
 supports Python `>=3.10,<3.14`. Original code is licensed under [MIT](LICENSE);
 dependencies retain their own terms in [third-party notices](THIRD_PARTY_NOTICES.md).
 
@@ -66,8 +71,8 @@ In a fresh directory outside the repository, using a POSIX shell:
 ```bash
 python3.12 -m venv .venv
 . .venv/bin/activate
-CORE=/absolute/path/equiframe-0.12.2-py3-none-any.whl
-BENCH=/absolute/path/equiframe_benchmark-0.12.2-py3-none-any.whl
+CORE=/absolute/path/equiframe-0.12.3-py3-none-any.whl
+BENCH=/absolute/path/equiframe_benchmark-0.12.3-py3-none-any.whl
 WHEELHOUSE=/absolute/path/reviewed-wheelhouse
 python -m pip install --no-index --find-links "$WHEELHOUSE" "${CORE}[engines]" "${BENCH}[resources]"
 python -m pip check

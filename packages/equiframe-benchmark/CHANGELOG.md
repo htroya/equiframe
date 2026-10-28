@@ -1,3 +1,14 @@
+## 0.12.3 - portable raw-metadata regression
+
+- Construct explicit LF and CRLF PKG-INFO fixture bytes and verify their distinct
+  raw SHA-256 identities on each platform. Keep production metadata hashing raw;
+  do not normalize line endings or execute a build backend to inventory metadata.
+- Pair exactly with core 0.12.3 and admit its producer in the active schemas,
+  preserving historical schemas, fixtures and scientific outcomes.
+- Require new artifact-bound release checks. Previous 0.12.2 results remain tied
+  to their original artifacts and do not establish this candidate's validation
+  or publication.
+
 ## 0.12.2 — paired tagged release
 
 - Pair exactly with core `equiframe 0.12.2`, using Git-derived release versions.

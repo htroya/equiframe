@@ -13,7 +13,7 @@ license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 requires-python = ">=3.10,<3.14"
 authors = [{ name = "Hernán Troya" }]
 classifiers = ["Development Status :: 4 - Beta", "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11", "Programming Language :: Python :: 3.12", "Programming Language :: Python :: 3.13", "Operating System :: Microsoft :: Windows", "Operating System :: POSIX :: Linux", "Topic :: Software Development :: Libraries :: Python Modules", "Typing :: Typed"]
-dependencies = ["typing-extensions>=4.14,<5", "tomli>=2.2,<3; python_version < '3.11'", "equiframe[arrow]==0.12.2", "packaging>=26,<27"]
+dependencies = ["typing-extensions>=4.14,<5", "tomli>=2.2,<3; python_version < '3.11'", "equiframe[arrow]==0.12.3", "packaging>=26,<27"]
 
 [project.urls]
 Homepage = "https://github.com/htroya/equiframe"
@@ -26,8 +26,8 @@ equiframe-benchmark-pilot = "equiframe_benchmark.pilot:main"
 equiframe-benchmark = "equiframe_benchmark.cli:main"
 
 [project.optional-dependencies]
-engines = ["equiframe[engines]==0.12.2"]
-ml = ["equiframe[ml]==0.12.2"]
+engines = ["equiframe[engines]==0.12.3"]
+ml = ["equiframe[ml]==0.12.3"]
 resources = ["psutil==7.2.2"]
 
 [tool.uv.sources]

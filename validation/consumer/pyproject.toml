@@ -4,14 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "equiframe-consumer-lab"
-version = "0.1.18"
+version = "0.1.19"
 description = "Independent offline validation application for EquiFrame"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10,<3.14"
 authors = [{name = "EquiFrame consumer validation"}]
-dependencies = ["equiframe[engines]==0.12.2"]
+dependencies = ["equiframe[engines]==0.12.3"]
 classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11", "Programming Language :: Python :: 3.12", "Programming Language :: Python :: 3.13", "Private :: Do Not Upload"]
 
 [project.scripts]
