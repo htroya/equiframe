@@ -17,16 +17,20 @@ else:
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CORE = (
-    ROOT
-    / tomllib.loads((ROOT / "pyproject.toml").read_text("utf-8"))["tool"]["uv"]["sources"][
-        "equiframe"
-    ]["path"]
-).resolve()
 
 
 def run(args: list[str], cwd: Path, env: dict[str, str]) -> None:
     subprocess.run(args, cwd=cwd, env=env, check=True)
+
+
+def stage_installed_test_inputs(package: Path, work: Path) -> None:
+    """Copy the fixed shipped inputs required by the installed test suite."""
+    for name in ("tests", "examples", "schemas"):
+        shutil.copytree(package / name, work / name, ignore=shutil.ignore_patterns("__pycache__"))
+    tools = work / "tools"
+    tools.mkdir()
+    for name in ("generate_assets.py", "generate_assets_v2.py", "verify_distribution.py"):
+        shutil.copy2(package / "tools" / name, tools / name)
 
 
 def main() -> None:
@@ -39,16 +43,22 @@ def main() -> None:
     uv = shutil.which(args.uv)
     if uv is None:
         raise SystemExit("uv must be on PATH")
+    core = (
+        ROOT
+        / tomllib.loads((ROOT / "pyproject.toml").read_text("utf-8"))["tool"]["uv"]["sources"][
+            "equiframe"
+        ]["path"]
+    ).resolve()
     repository = Path(
         subprocess.check_output(
             ["git", "rev-parse", "--show-toplevel"], cwd=ROOT, text=True
         ).strip()
     ).resolve()
-    version = runpy.run_path(str(CORE / "tools" / "release_version.py"))["project_version"]
+    version = runpy.run_path(str(core / "tools" / "release_version.py"))["project_version"]
     package_version = version(ROOT, require_tag=True)
-    core_version = version(CORE, require_tag=True)
+    core_version = version(core, require_tag=True)
     wheel = ROOT / "dist" / f"equiframe_benchmark-{package_version}-py3-none-any.whl"
-    core_wheel = CORE / "dist" / f"equiframe-{core_version}-py3-none-any.whl"
+    core_wheel = core / "dist" / f"equiframe-{core_version}-py3-none-any.whl"
     sdist = ROOT / "dist" / f"equiframe_benchmark-{package_version}.tar.gz"
     for artifact in (wheel, core_wheel, sdist):
         if not artifact.is_file():
@@ -106,7 +116,7 @@ def main() -> None:
                 "install",
                 "--no-index",
                 "--find-links",
-                str(CORE / "dist"),
+                str(core / "dist"),
                 "--find-links",
                 str(ROOT / "dist"),
                 f"equiframe=={core_version}",
@@ -138,15 +148,9 @@ assert importlib.metadata.version('equiframe') == sys.argv[3]
             work,
             env,
         )
-        shutil.copytree(
-            ROOT / "tests", work / "tests", ignore=shutil.ignore_patterns("__pycache__")
-        )
-        shutil.copytree(
-            ROOT / "examples", work / "examples", ignore=shutil.ignore_patterns("__pycache__")
-        )
-        shutil.copytree(ROOT / "schemas", work / "schemas")
+        stage_installed_test_inputs(ROOT, work)
         sources = work / "declared-source-packages"
-        for project in (CORE, ROOT):
+        for project in (core, ROOT):
             metadata = tomllib.loads((project / "pyproject.toml").read_text("utf-8"))["project"]
             target = sources / metadata["name"]
             target.mkdir(parents=True)

@@ -2,7 +2,10 @@
 
 import hashlib
 import json
+import runpy
 import stat
+import subprocess
+import sys
 from datetime import datetime
 from datetime import timezone as _timezone
 from pathlib import Path
@@ -48,6 +51,24 @@ Root-Is-Purelib: true
 Tag: py3-none-any
 """
 PREFIX = "unit_pkg-0.10.0.dist-info/"
+
+
+def test_installed_test_staging_runs_the_delivered_asset_command(tmp_path):
+    package = Path(__file__).resolve().parents[1]
+    namespace = runpy.run_path(str(package / "tools" / "verify_distribution.py"))
+    work = tmp_path / "installed-tests"
+    work.mkdir()
+    namespace["stage_installed_test_inputs"](package, work)
+    result = subprocess.run(
+        [sys.executable, "-I", "-B", str(work / "tools" / "generate_assets.py"), "--check"],
+        cwd=work,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout.strip() == "58 benchmark schemas verified"
+    assert not result.stderr.strip()
 
 
 def source(tmp_path: Path, project: str = PROJECT) -> Path:
