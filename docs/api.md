@@ -2,7 +2,7 @@
 
 [Handbook](index.md) · [Choose an API](choosing-api.md) · [Semantics](semantics.md) · [Compatibility](compatibility.md)
 
-Use `import equiframe as ef`. This reference describes the 0.12.0 implemented
+Use `import equiframe as ef`. This reference describes the 0.13.0 implemented
 entry points and their bounded stability contracts. Signatures below use Python notation;
 `...` in a signature means the other documented optional arguments, not an
 executable example. The exhaustive exported namespace is `ef.__all__` and its
@@ -141,6 +141,22 @@ See [semantics](semantics.md) for key, bag and sequence guarantees.
 matching, time and evidence. `DiffCaptureOptions` controls native capture
 separately. They are cooperative budgets; [defaults and costs](performance.md)
 are not hard resource quotas.
+
+### Grouped numeric comparison (0.13.0)
+
+```text
+compare_grouped(candidate, expected, *, by, column, options=None,
+                capture_options=None, cancellation=None) -> GroupedComparisonResult
+```
+
+Compare exact sums for arbitrary keys and a numeric column. Accepts eager native
+DataFrames, Arrow/`ArrowInput` and explicit DuckDB relations. Options/results are
+`GroupedComparisonOptions`, `GroupedComparisonResult` and `GroupedDifference`;
+`GroupedComparisonInput` describes the admitted input types. Metrics expose exact
+Fraction ratios with explicit denominators, zero-reference changes, group and
+comparison coverage, and bounded examples. See the
+[definitions, examples and failure contract](grouped-comparison.md).
+Aggregate agreement is independent of row equivalence and existing profiles.
 
 ## 3. Explicit acceptance in tests and pipelines
 

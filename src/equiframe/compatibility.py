@@ -108,6 +108,13 @@ def get_compatibility_policy() -> CompatibilityPolicy:
 
 
 _STABLE_SCOPE_COMMITMENTS = {
+    "grouped": (
+        "Exact grouped sums over bounded native captures with arbitrary explicit keys and "
+        "numeric columns; reference-based relative differences, separate zero-baseline "
+        "changes and explicit coverage. Invalid measures never become zero or disappear. "
+        "Aggregate agreement is descriptive and does not establish row equivalence, "
+        "rule acceptance or detector input. Limits are cooperative."
+    ),
     "datasets": (
         "Local bytes and effective read options identify the source; ambiguous structure "
         "requires an explicit choice. Conversion validates complete values, column order "

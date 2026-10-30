@@ -1,0 +1,179 @@
+{
+  "$defs": {
+    "ComparisonValue": {
+      "additionalProperties": false,
+      "description": "Lossless scalar evidence. Numeric text; dates/instants use integer epochs.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "null",
+            "nan",
+            "infinity",
+            "boolean",
+            "integer",
+            "string",
+            "decimal",
+            "float",
+            "date",
+            "timestamp"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "timezone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timezone"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "s",
+                "ms",
+                "us",
+                "ns"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "ComparisonValue",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One group; absent, invalid and zero totals have different meanings.",
+  "properties": {
+    "absolute_difference": {
+      "anyOf": [
+        {
+          "maxLength": 4096,
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:/[1-9][0-9]*)?$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Absolute Difference"
+    },
+    "candidate_rows": {
+      "minimum": 0,
+      "title": "Candidate Rows",
+      "type": "integer"
+    },
+    "candidate_total": {
+      "anyOf": [
+        {
+          "maxLength": 4096,
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:/[1-9][0-9]*)?$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Candidate Total"
+    },
+    "expected_rows": {
+      "minimum": 0,
+      "title": "Expected Rows",
+      "type": "integer"
+    },
+    "expected_total": {
+      "anyOf": [
+        {
+          "maxLength": 4096,
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:/[1-9][0-9]*)?$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Expected Total"
+    },
+    "issues": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Issues",
+      "type": "array"
+    },
+    "key": {
+      "items": {
+        "$ref": "#/$defs/ComparisonValue"
+      },
+      "title": "Key",
+      "type": "array"
+    },
+    "relative_difference": {
+      "anyOf": [
+        {
+          "maxLength": 4096,
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:/[1-9][0-9]*)?$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Relative Difference"
+    },
+    "state": {
+      "enum": [
+        "unchanged",
+        "modified",
+        "added",
+        "removed",
+        "not_evaluable"
+      ],
+      "title": "State",
+      "type": "string"
+    }
+  },
+  "required": [
+    "key",
+    "state",
+    "candidate_rows",
+    "expected_rows",
+    "candidate_total",
+    "expected_total",
+    "absolute_difference",
+    "relative_difference"
+  ],
+  "title": "GroupedDifference",
+  "type": "object"
+}

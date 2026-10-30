@@ -569,6 +569,10 @@ def main() -> None:
             "equiframe/schemas/r-execution-binding-1.0.schema.json",
             "equiframe/schemas/r-review-result-1.0.schema.json",
             "equiframe/schemas/reviewed-decision-1.0.schema.json",
+            "equiframe/schemas/grouped-comparison-options-1.0.schema.json",
+            "equiframe/schemas/grouped-comparison-result-1.0.schema.json",
+            "equiframe/schemas/grouped-difference-1.0.schema.json",
+            "equiframe/examples/grouped_compare.py",
         }
         if not required.issubset(names):
             raise RuntimeError("wheel is missing typed public files or reader/reviewer resources")
@@ -632,7 +636,8 @@ from importlib.resources import files
 handbook = files('equiframe').joinpath('docs')
 for title in ('index','quickstart','recipes','api','semantics','compatibility',
               'performance','upgrading','contributing','security','releasing','dependencies',
-              'adoption','maintenance','extending','lectura-conversion','r_review'):
+              'adoption','maintenance','extending','lectura-conversion','r_review',
+              'grouped-comparison'):
     assert handbook.joinpath(title + '.md').read_text(encoding='utf-8').strip()
 assert equiframe.__version__ == importlib.metadata.version('equiframe') == sys.argv[1]
 for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy', 'pyarrow',
@@ -660,6 +665,16 @@ assert equiframe.SnapshotManifest.model_json_schema()
 assert callable(equiframe.SnapshotDataSource) and callable(equiframe.snapshot_fingerprint)
 assert callable(equiframe.load_dataset) and callable(equiframe.inspect_dataset)
 assert callable(equiframe.convert_dataset)
+assert callable(equiframe.compare_grouped)
+assert equiframe.GroupedComparisonOptions().max_groups == 100_000
+import json
+for filename, model in (
+    ('grouped-comparison-options', equiframe.GroupedComparisonOptions),
+    ('grouped-comparison-result', equiframe.GroupedComparisonResult),
+    ('grouped-difference', equiframe.GroupedDifference),
+):
+    resource = files('equiframe').joinpath('schemas', filename + '-1.0.schema.json')
+    assert json.loads(resource.read_text(encoding='utf-8')) == model.model_json_schema()
 assert callable(equiframe.DatasetSource) and callable(equiframe.DatasetProvenance)
 assert callable(equiframe.review_with_r) and callable(equiframe.finalize_with_r)
 assert callable(equiframe.finalize_execution_with_r)
@@ -777,6 +792,15 @@ print('Installed wheel API roundtrips all five fixtures exactly')
             "src/equiframe/datasets.py",
             "src/equiframe/_dataset_provenance.py",
             "src/equiframe/r_review.py",
+            "src/equiframe/grouped.py",
+            "src/equiframe/grouped_types.py",
+            "tests/test_grouped.py",
+            "tests/test_grouped_matrix.py",
+            "examples/grouped_compare.py",
+            "docs/grouped-comparison.md",
+            "schemas/grouped-comparison-options-1.0.schema.json",
+            "schemas/grouped-comparison-result-1.0.schema.json",
+            "schemas/grouped-difference-1.0.schema.json",
             "src/equiframe/_r_review.R",
             "schemas/r-review-options-1.0.schema.json",
             "schemas/r-review-binding-1.0.schema.json",
@@ -850,6 +874,19 @@ import equiframe
 assert Path(equiframe.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
 """
         run([str(source_python), "-I", "-c", location_check], cwd=source, env=source_env)
+        run(
+            [
+                str(source_python),
+                "-I",
+                "-c",
+                "import runpy; from importlib.resources import files; "
+                "p = files('equiframe').joinpath('examples', 'grouped_compare.py'); "
+                "runpy.run_path(str(p), "
+                "run_name='__main__')",
+            ],
+            cwd=work,
+            env=source_env,
+        )
         run(
             [str(source_python), "-I", "tools/generate_assets.py", "--check"],
             cwd=source,

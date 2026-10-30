@@ -52,6 +52,7 @@ These public classes reject truth testing. No new public base class is exported.
 | `ComparisonResult` | `assert_equivalent(result)`, or the explicit state/completeness and guarantee policy |
 | `EquivalenceDecision` | `.accepted`, with guarantee and evidence diagnostics |
 | `ComparisonReport` | Presentation only; gate the original comparison |
+| `GroupedComparisonResult` | `.complete`, modified/zero-reference metrics and explicit coverage; grouped sums do not establish row equivalence |
 | `ExecutionResult` | `.state`; `completed` only establishes execution completion |
 | `PipelineResult` | `.complete`, `.exit_code`, requested R/M/B/H and comparison outcomes |
 | `MigrationResult` | `.state`, `.verification`, `.complete`, `.exit_code`; peer agreement alone is not expected-output correctness |

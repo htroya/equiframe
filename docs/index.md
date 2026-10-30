@@ -1,5 +1,9 @@
 # EquiFrame user handbook
 
+[Grouped numeric comparison](grouped-comparison.md), new in 0.13.0: compare sums
+for any grouping columns and numeric measure, with explicit coverage and
+zero-reference changes.
+
 [File loading and data conversion](lectura-conversion.md) creates Pandas inputs
 from JSON, Excel, TXT, XML, CSV, Parquet or GeoJSON and offers Polars/DuckDB targets.
 [Optional independent review in R](r_review.md) adds a second exact comparison
@@ -36,7 +40,7 @@ Consulta [fuentes](universal-sources.md), [ventanas](migration-ir.md) y
 
 ## Release status
 
-This handbook targets **0.12.4**, preserving the **0.12.0 stable release contract**. Preparation and
+This handbook targets **0.13.0**, preserving the **0.12.0 stable release contract**. Preparation and
 publication are separate: the owner has authorized a manual TestPyPI rehearsal
 followed by PyPI, subject to the [release gates](releasing.md). Until registry
 ownership, uploads and clean consumer installation are actually verified, those

@@ -1,0 +1,60 @@
+{
+  "additionalProperties": false,
+  "description": "Exact tolerances, explicit NULL-key policy and cooperative work limits.",
+  "properties": {
+    "absolute_tolerance": {
+      "default": "0",
+      "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+      "title": "Absolute Tolerance",
+      "type": "string"
+    },
+    "max_examples": {
+      "default": 20,
+      "minimum": 0,
+      "title": "Max Examples",
+      "type": "integer"
+    },
+    "max_groups": {
+      "default": 100000,
+      "exclusiveMinimum": 0,
+      "title": "Max Groups",
+      "type": "integer"
+    },
+    "max_work": {
+      "default": 10000000,
+      "exclusiveMinimum": 0,
+      "title": "Max Work",
+      "type": "integer"
+    },
+    "null_keys": {
+      "default": "reject",
+      "enum": [
+        "reject",
+        "group"
+      ],
+      "title": "Null Keys",
+      "type": "string"
+    },
+    "relative_tolerance": {
+      "default": "0",
+      "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+      "title": "Relative Tolerance",
+      "type": "string"
+    },
+    "timeout_seconds": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Timeout Seconds"
+    }
+  },
+  "title": "GroupedComparisonOptions",
+  "type": "object"
+}

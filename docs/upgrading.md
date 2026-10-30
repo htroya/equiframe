@@ -3,6 +3,20 @@
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Security](security.md) ·
 [Release/rollback](releasing.md)
 
+## 0.13.0: additive grouped numeric comparison
+
+Existing callers need no changes. `compare_grouped` adds a separate reusable
+comparison of exact grouped sums, with arbitrary keys and a numeric column.
+See the [guide](grouped-comparison.md) for formulas, missing/zero handling,
+coverage and examples. Existing `diff`, contract, profile, rule, model and
+R-review behavior is preserved; the new result is not an equivalence gate.
+
+New detector fits identify producer 0.13.0; supported older producers, including
+0.12.4, remain readable. Readers from older versions do not automatically admit
+new producer identities. Keep the matching reader when exchanging new bundles.
+The paired benchmark requires core 0.13.0. The original v0.12.4 tag and index
+artifacts retain their bytes and remain available for pinned consumers.
+
 ## 0.12.4 candidate: raw metadata and producer identity
 
 This source revision prepares the exactly paired 0.12.4 core and benchmark.

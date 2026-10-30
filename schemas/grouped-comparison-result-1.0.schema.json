@@ -1,0 +1,461 @@
+{
+  "$defs": {
+    "ComparisonValue": {
+      "additionalProperties": false,
+      "description": "Lossless scalar evidence. Numeric text; dates/instants use integer epochs.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "null",
+            "nan",
+            "infinity",
+            "boolean",
+            "integer",
+            "string",
+            "decimal",
+            "float",
+            "date",
+            "timestamp"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "timezone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timezone"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "s",
+                "ms",
+                "us",
+                "ns"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "ComparisonValue",
+      "type": "object"
+    },
+    "GroupedComparisonOptions": {
+      "additionalProperties": false,
+      "description": "Exact tolerances, explicit NULL-key policy and cooperative work limits.",
+      "properties": {
+        "absolute_tolerance": {
+          "default": "0",
+          "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+          "title": "Absolute Tolerance",
+          "type": "string"
+        },
+        "max_examples": {
+          "default": 20,
+          "minimum": 0,
+          "title": "Max Examples",
+          "type": "integer"
+        },
+        "max_groups": {
+          "default": 100000,
+          "exclusiveMinimum": 0,
+          "title": "Max Groups",
+          "type": "integer"
+        },
+        "max_work": {
+          "default": 10000000,
+          "exclusiveMinimum": 0,
+          "title": "Max Work",
+          "type": "integer"
+        },
+        "null_keys": {
+          "default": "reject",
+          "enum": [
+            "reject",
+            "group"
+          ],
+          "title": "Null Keys",
+          "type": "string"
+        },
+        "relative_tolerance": {
+          "default": "0",
+          "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+          "title": "Relative Tolerance",
+          "type": "string"
+        },
+        "timeout_seconds": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timeout Seconds"
+        }
+      },
+      "title": "GroupedComparisonOptions",
+      "type": "object"
+    },
+    "GroupedDifference": {
+      "additionalProperties": false,
+      "description": "One group; absent, invalid and zero totals have different meanings.",
+      "properties": {
+        "absolute_difference": {
+          "anyOf": [
+            {
+              "maxLength": 4096,
+              "pattern": "^-?(?:0|[1-9][0-9]*)(?:/[1-9][0-9]*)?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Absolute Difference"
+        },
+        "candidate_rows": {
+          "minimum": 0,
+          "title": "Candidate Rows",
+          "type": "integer"
+        },
+        "candidate_total": {
+          "anyOf": [
+            {
+              "maxLength": 4096,
+              "pattern": "^-?(?:0|[1-9][0-9]*)(?:/[1-9][0-9]*)?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Candidate Total"
+        },
+        "expected_rows": {
+          "minimum": 0,
+          "title": "Expected Rows",
+          "type": "integer"
+        },
+        "expected_total": {
+          "anyOf": [
+            {
+              "maxLength": 4096,
+              "pattern": "^-?(?:0|[1-9][0-9]*)(?:/[1-9][0-9]*)?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Expected Total"
+        },
+        "issues": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Issues",
+          "type": "array"
+        },
+        "key": {
+          "items": {
+            "$ref": "#/$defs/ComparisonValue"
+          },
+          "title": "Key",
+          "type": "array"
+        },
+        "relative_difference": {
+          "anyOf": [
+            {
+              "maxLength": 4096,
+              "pattern": "^-?(?:0|[1-9][0-9]*)(?:/[1-9][0-9]*)?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Relative Difference"
+        },
+        "state": {
+          "enum": [
+            "unchanged",
+            "modified",
+            "added",
+            "removed",
+            "not_evaluable"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "state",
+        "candidate_rows",
+        "expected_rows",
+        "candidate_total",
+        "expected_total",
+        "absolute_difference",
+        "relative_difference"
+      ],
+      "title": "GroupedDifference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Descriptive aggregate metrics, never a row-equivalence acceptance gate.\n\nRatios are exact Fractions (JSON strings). None denotes an empty denominator.\nExamples are bounded independently of the full summary evaluation.",
+  "properties": {
+    "added_groups": {
+      "minimum": 0,
+      "title": "Added Groups",
+      "type": "integer"
+    },
+    "aggregation": {
+      "const": "sum",
+      "default": "sum",
+      "title": "Aggregation",
+      "type": "string"
+    },
+    "by": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "By",
+      "type": "array"
+    },
+    "candidate_groups": {
+      "minimum": 0,
+      "title": "Candidate Groups",
+      "type": "integer"
+    },
+    "candidate_rows": {
+      "minimum": 0,
+      "title": "Candidate Rows",
+      "type": "integer"
+    },
+    "changed_from_zero_groups": {
+      "minimum": 0,
+      "title": "Changed From Zero Groups",
+      "type": "integer"
+    },
+    "changed_from_zero_proportion": {
+      "anyOf": [
+        {
+          "maxLength": 4096,
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:/[1-9][0-9]*)?$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Changed From Zero Proportion"
+    },
+    "column": {
+      "minLength": 1,
+      "title": "Column",
+      "type": "string"
+    },
+    "common_groups": {
+      "minimum": 0,
+      "title": "Common Groups",
+      "type": "integer"
+    },
+    "comparable_groups": {
+      "minimum": 0,
+      "title": "Comparable Groups",
+      "type": "integer"
+    },
+    "comparison_coverage": {
+      "anyOf": [
+        {
+          "maxLength": 4096,
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:/[1-9][0-9]*)?$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Comparison Coverage"
+    },
+    "complete": {
+      "title": "Complete",
+      "type": "boolean"
+    },
+    "examples": {
+      "items": {
+        "$ref": "#/$defs/GroupedDifference"
+      },
+      "title": "Examples",
+      "type": "array"
+    },
+    "examples_complete": {
+      "title": "Examples Complete",
+      "type": "boolean"
+    },
+    "expected_groups": {
+      "minimum": 0,
+      "title": "Expected Groups",
+      "type": "integer"
+    },
+    "expected_rows": {
+      "minimum": 0,
+      "title": "Expected Rows",
+      "type": "integer"
+    },
+    "group_coverage": {
+      "anyOf": [
+        {
+          "maxLength": 4096,
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:/[1-9][0-9]*)?$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Group Coverage"
+    },
+    "maximum_relative_difference": {
+      "anyOf": [
+        {
+          "maxLength": 4096,
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:/[1-9][0-9]*)?$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Maximum Relative Difference"
+    },
+    "modified_group_proportion": {
+      "anyOf": [
+        {
+          "maxLength": 4096,
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:/[1-9][0-9]*)?$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Modified Group Proportion"
+    },
+    "modified_groups": {
+      "minimum": 0,
+      "title": "Modified Groups",
+      "type": "integer"
+    },
+    "options": {
+      "$ref": "#/$defs/GroupedComparisonOptions"
+    },
+    "reference_coverage": {
+      "anyOf": [
+        {
+          "maxLength": 4096,
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:/[1-9][0-9]*)?$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Reference Coverage"
+    },
+    "removed_groups": {
+      "minimum": 0,
+      "title": "Removed Groups",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "unavailable_groups": {
+      "minimum": 0,
+      "title": "Unavailable Groups",
+      "type": "integer"
+    },
+    "union_groups": {
+      "minimum": 0,
+      "title": "Union Groups",
+      "type": "integer"
+    },
+    "zero_baseline_groups": {
+      "minimum": 0,
+      "title": "Zero Baseline Groups",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "by",
+    "column",
+    "options",
+    "candidate_rows",
+    "expected_rows",
+    "candidate_groups",
+    "expected_groups",
+    "common_groups",
+    "union_groups",
+    "comparable_groups",
+    "modified_groups",
+    "added_groups",
+    "removed_groups",
+    "unavailable_groups",
+    "zero_baseline_groups",
+    "changed_from_zero_groups",
+    "modified_group_proportion",
+    "maximum_relative_difference",
+    "changed_from_zero_proportion",
+    "group_coverage",
+    "comparison_coverage",
+    "reference_coverage",
+    "complete",
+    "examples",
+    "examples_complete"
+  ],
+  "title": "GroupedComparisonResult",
+  "type": "object"
+}

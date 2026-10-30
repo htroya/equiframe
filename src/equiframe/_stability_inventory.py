@@ -139,15 +139,25 @@ STABLE_R_REVIEW_API = (
     "review_with_r",
 )
 
+STABLE_GROUPED_API = (
+    "GroupedComparisonInput",
+    "GroupedComparisonOptions",
+    "GroupedComparisonResult",
+    "GroupedDifference",
+    "compare_grouped",
+)
+
 STABLE_FEATURE_SCOPES = (
     ("datasets", STABLE_DATASETS_API),
     ("capture", STABLE_CAPTURE_API),
     ("migration", STABLE_MIGRATION_API),
     ("detection", STABLE_DETECTION_API),
     ("r_review", STABLE_R_REVIEW_API),
+    ("grouped", STABLE_GROUPED_API),
 )
 
 STABLE_API = (
+    *STABLE_GROUPED_API,
     "AdapterCapability",
     "AggregateCheck",
     "AppliedPolicy",
@@ -418,6 +428,21 @@ EXPERIMENTAL_API = (
 # Tuple: file name, classification, canonical schema SHA-256.
 SCHEMA_INVENTORY = (
     (
+        "grouped-comparison-options-1.0.schema.json",
+        "stable",
+        "eb873a8ce26dce603ef3ca35166ddd5762df87b56c8540e31fae9f452c96d0b2",
+    ),
+    (
+        "grouped-comparison-result-1.0.schema.json",
+        "stable",
+        "111ec9631b150dae0636d2c826e365e682cd565321d8263d7d424cfac62b1a32",
+    ),
+    (
+        "grouped-difference-1.0.schema.json",
+        "stable",
+        "070a9e3846fac9b5e400039027a3f9da0d5ef843be0e6db23e68f5e734e7d505",
+    ),
+    (
         "artifact-ref-1.0.schema.json",
         "stable",
         "a07bfab18772f05d5eb78a9a2ea5967808320d306b162553a7ea93c96e6a7b70",
@@ -465,12 +490,12 @@ SCHEMA_INVENTORY = (
     (
         "detector-bundle-1.0.schema.json",
         "stable",
-        "adea73af8d4ca17c1a0e40c82ea40d3c9ce7ac841bd7d2b001f5eb94d529d720",
+        "7f3f4284a87c9dd64dbd6f9136de117b3346b0b4df0ffea9b2b1eb20d706dc32",
     ),
     (
         "detector-fit-1.0.schema.json",
         "stable",
-        "3e5a0cacede941489b5e2121f387dad8233e61fb75cbfba16921551842f3fca8",
+        "98617a1a2f322484d1b66aec11527883e15a93a6b8c18941085dde511699953a",
     ),
     (
         "detector-score-result-1.0.schema.json",
@@ -994,6 +1019,12 @@ CLI_INVENTORY = (
 
 # Exact stable function signatures and stable model shapes; review changes explicitly.
 API_SIGNATURES = {
+    "compare_grouped": (
+        "(candidate: 'GroupedComparisonInput', expected: 'GroupedComparisonInput', *, "
+        "by: 'Sequence[str]', column: 'str', options: 'GroupedComparisonOptions | None' = None, "
+        "capture_options: 'DiffCaptureOptions | None' = None, "
+        "cancellation: 'CancellationToken | None' = None) -> 'GroupedComparisonResult'"
+    ),
     "calibrate_detectors": (
         "(fit: equiframe.detector_types.DetectorFit, calibration: equiframe.det"
         "ector_types.NormalCalibrationProfiles, *, alpha: str) -> equiframe.det"
@@ -1243,6 +1274,9 @@ API_SIGNATURES = {
 }
 
 MODEL_SHAPES = {
+    "GroupedComparisonOptions": "eb873a8ce26dce603ef3ca35166ddd5762df87b56c8540e31fae9f452c96d0b2",
+    "GroupedComparisonResult": "111ec9631b150dae0636d2c826e365e682cd565321d8263d7d424cfac62b1a32",
+    "GroupedDifference": "070a9e3846fac9b5e400039027a3f9da0d5ef843be0e6db23e68f5e734e7d505",
     "StageRecord": "a901e1f35808cb0de9a2b2995307192ec43703726d1a58b21753b4944959fe85",
     "Aggregate": "b6c5b7eda83ce13cecbdfeda861e5221b0866072e4a2c91f0b551d2f38db0547",
     "Arithmetic": "0d1893e3cb2f948a9d190c6f8e9d9a03adfc54ee83d7b4be75c5255a7f3357e7",
@@ -1262,15 +1296,15 @@ MODEL_SHAPES = {
     "DecimalRound": "274dd2c88fdf2418a295e2504554bc0103a1adf1ebe2f99b3e43cb2dd1be945c",
     "Deduplicate": "d64ccbc7cf6847b828c6ae6ed651f07ffac86cc4984626ff47767c78a086e8a3",
     "DetectionResult": "dabd0f1de4a7437b89572330096c38375e081618f032e3d9cdde05fa45a56b87",
-    "DetectorBundle": "adea73af8d4ca17c1a0e40c82ea40d3c9ce7ac841bd7d2b001f5eb94d529d720",
+    "DetectorBundle": "7f3f4284a87c9dd64dbd6f9136de117b3346b0b4df0ffea9b2b1eb20d706dc32",
     "DetectorCalibration": "d7fda2ce2f914d7433b4fff257366b670d7e1c0d0decd6b6a2df8085bd32a348",
     "DetectorDecision": "feb569e4caa62d6ad8c2cd03280250647e97100feb892925e817ad87f66074ee",
-    "DetectorFit": "3e5a0cacede941489b5e2121f387dad8233e61fb75cbfba16921551842f3fca8",
+    "DetectorFit": "98617a1a2f322484d1b66aec11527883e15a93a6b8c18941085dde511699953a",
     "DetectorModel": "dee1cff255a5d462627ce82f1242b7534672f6027c56cf6b3568c87ed41c2d8f",
     "DetectorScoreResult": "d2ba844388cabad55c1cf29428e86611b69b66572dc7f47d3eab2584eec83cf1",
     "DetectorScores": "d8df865c220ee33bf48c392c4fed85d696a79113cf4b14eee5d8bd12fcc6faa9",
     "DetectorSupport": "0c0f7a369a4aa1979c4fb9d799f3340e4088908e0221b3ef1ceaac8cf2f5e48d",
-    "DetectorVersions": "914636cc8205656279395c20e994aebb7a90a58fc2c5b14f2792029c81c08103",
+    "DetectorVersions": "2fc28296def12e3427aba21d7ce7fc1b9863eba0741306f2caa8fed212269db7",
     "DuckDBCaptureOptions": "5ccc6cf33a1ef7ff7b915aaf35f7090c6987b7ef66f76a92994e33e767257f7a",
     "EquiJoin": "ea9df499c66b7d86babd5fdb25c946fd484cd635a2a7eb73efbd840c94132b73",
     "EvidenceFile": "30cdc2ca75fa18ebf2f510e308f8e91ecae6d73fd91acd3b9083396bb3c3887f",

@@ -1,3 +1,21 @@
+## 0.13.0 - reusable comparison of grouped numeric sums
+
+- Add stable `compare_grouped(candidate, expected, by=..., column=...)` for
+  arbitrary grouping columns and numeric measures in Arrow, Pandas, Polars and
+  explicitly supplied DuckDB relations. No procurement-specific fields or
+  dependencies are required.
+- Sum integers, Decimals and finite IEEE floats with exact rational arithmetic.
+  Report modified-group proportion, maximum reference-relative difference,
+  zero-baseline changes, added/removed groups and three explicit coverage ratios.
+- Keep missing groups distinct from zero totals. NULL, NaN and infinite measures
+  make a common group unavailable. NULL keys require opt-in; unsupported inputs,
+  cancellation and exhausted budgets raise without returning partial success.
+- Add typed options/results, exact JSON ratio strings, bounded group examples,
+  a general guide and independent regression tests. Existing comparison,
+  profiles, rules, Isolation Forest, MAD and R-review semantics are unchanged.
+- Admit producer 0.13.0 while retaining readers for supported older evidence;
+  pair the benchmark with core 0.13.0. Preserve the original 0.12.4 tag and files.
+
 ## 0.12.4 - producer identity and paired release preparation
 
 - Make the publication-packet negative fixture use an explicitly different

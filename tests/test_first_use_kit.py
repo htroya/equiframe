@@ -424,6 +424,19 @@ def test_first_use_lock_rejects_unsupported_python_instead_of_reusing_312():
     [
         ("examples/eda_generic.py", "equiframe/examples/integrations/eda_generic.py"),
         ("examples/load_convert_compare.py", "equiframe/examples/load_convert_compare.py"),
+        ("examples/grouped_compare.py", "equiframe/examples/grouped_compare.py"),
+        (
+            "schemas/grouped-comparison-options-1.0.schema.json",
+            "equiframe/schemas/grouped-comparison-options-1.0.schema.json",
+        ),
+        (
+            "schemas/grouped-comparison-result-1.0.schema.json",
+            "equiframe/schemas/grouped-comparison-result-1.0.schema.json",
+        ),
+        (
+            "schemas/grouped-difference-1.0.schema.json",
+            "equiframe/schemas/grouped-difference-1.0.schema.json",
+        ),
     ],
 )
 def test_first_use_kit_binds_only_the_declared_example_mappings(
@@ -446,6 +459,7 @@ def test_first_use_kit_binds_only_the_declared_example_mappings(
         encoding="utf-8",
     )
     content = b'EXAMPLE = "synthetic packaged source"\n'
+    (package / original).parent.mkdir(parents=True, exist_ok=True)
     (package / original).write_bytes(content)
     wheel = next((package / "dist").glob("*.whl"))
     with zipfile.ZipFile(wheel, "a") as archive:
