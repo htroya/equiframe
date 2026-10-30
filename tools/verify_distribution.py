@@ -56,13 +56,14 @@ def single(pattern: str) -> Path:
 
 
 def readme_consumer_script(readme: str) -> str:
-    """Execute the three literal blocks with files and independent assertions."""
+    """Execute all four literal blocks with files and independent assertions."""
     blocks = [part.split("```", 1)[0] for part in readme.split("```python\n")[1:]]
     if (
-        len(blocks) != 3
+        len(blocks) != 4
         or 'ef.load_dataset("orders.json")' not in blocks[0]
         or 'ef.load_dataset("orders.parquet"' not in blocks[1]
         or "ef.diff(" not in blocks[2]
+        or "summary = ef.compare_grouped(" not in blocks[3]
     ):
         raise RuntimeError("README examples changed; review the installed consumer assertions")
     fixtures = """
@@ -96,9 +97,32 @@ except ef.EquivalenceAssertionError as _qa_error:
     assert _qa_error.code == "different"
 else:
     raise AssertionError("README regression was accepted")
-print("Three literal README blocks verified: JSON/Parquet 30000 rows and value 200 -> 201")
 """
-    return fixtures + blocks[0] + loaded + blocks[1] + parquet + blocks[2] + comparison
+    grouped = """
+from fractions import Fraction as _qa_Fraction
+assert summary.candidate_groups == summary.expected_groups == 4
+assert summary.common_groups == summary.comparable_groups == 3
+assert summary.union_groups == 5 and summary.modified_groups == 2
+assert summary.modified_group_proportion == _qa_Fraction(2, 3)
+assert summary.maximum_relative_difference == _qa_Fraction(1, 2)
+assert summary.changed_from_zero_groups == summary.zero_baseline_groups == 1
+assert summary.added_groups == summary.removed_groups == 1
+assert summary.group_coverage == summary.comparison_coverage == _qa_Fraction(3, 5)
+assert summary.reference_coverage == _qa_Fraction(3, 4)
+assert summary.complete is True and summary.unavailable_groups == 0
+print("Four literal README blocks verified: load, convert, row regression and exact grouped sums")
+"""
+    return (
+        fixtures
+        + blocks[0]
+        + loaded
+        + blocks[1]
+        + parquet
+        + blocks[2]
+        + comparison
+        + blocks[3]
+        + grouped
+    )
 
 
 def sync_consumer(

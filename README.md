@@ -4,7 +4,7 @@
 
 <a id="english"></a>
 
-> Release target: **0.13.0**. Check the official index for availability and
+> Release target: **0.13.1**. Check the official index for availability and
 > verify the identified artifact hashes. Publication requires the
 > [release gates](docs/releasing.md).
 
@@ -30,11 +30,11 @@ your own data, independently of procurement schemas, warehouses and cloud servic
 EquiFrame supports **Python 3.10, 3.11, 3.12 and 3.13**.
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.13.0"
+python -m pip install "equiframe[files,engines,ml]==0.13.1"
 python -m pip check
 ```
 
-The base installation is `python -m pip install equiframe==0.13.0`.
+The base installation is `python -m pip install equiframe==0.13.1`.
 Optional engines and machine-learning libraries are loaded when requested.
 
 | Extra | Purpose |
@@ -136,9 +136,26 @@ unavailable-component states when deciding whether to accept a migration.
 
 ## Compare amounts by arbitrary groups
 
-New in 0.13.0, compare exact sums for any grouping columns and numeric measure:
+New in 0.13.1, compare exact sums for any grouping columns and numeric measure:
 
 ```python
+import pyarrow as pa
+import equiframe as ef
+
+expected = pa.table(
+    {
+        "branch": ["A", "A", "B", "C", "D"],
+        "currency": ["USD"] * 5,
+        "sales": [40, 60, 0, 50, 9],
+    }
+)
+candidate = pa.table(
+    {
+        "branch": ["A", "A", "B", "C", "E"],
+        "currency": ["USD"] * 5,
+        "sales": [90, 60, 25, 50, 7],
+    }
+)
 summary = ef.compare_grouped(
     candidate,
     expected,
@@ -237,7 +254,7 @@ and [license scope](https://github.com/htroya/equiframe/blob/main/NOTICE.md).
 
 <a id="espanol"></a>
 
-> Objetivo de versión: **0.13.0**. Consulta su disponibilidad en el índice oficial
+> Objetivo de versión: **0.13.1**. Consulta su disponibilidad en el índice oficial
 > y verifica los hashes de los archivos identificados. La publicación requiere
 > las [comprobaciones de release](docs/releasing.md).
 
@@ -301,24 +318,24 @@ estables y las capacidades experimentales.
 Instala los extras necesarios para tu trabajo:
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.13.0"
+python -m pip install "equiframe[files,engines,ml]==0.13.1"
 python -m pip check
 ```
 
-La instalación base puede hacerse con `python -m pip install equiframe==0.13.0`.
+La instalación base puede hacerse con `python -m pip install equiframe==0.13.1`.
 Selecciona los extras necesarios para tu trabajo; el núcleo no importa los
 motores opcionales al ejecutar `import equiframe`.
 
 Para instalar un wheel local:
 
 ```bash
-python -m pip install "./equiframe-0.13.0-py3-none-any.whl[files,engines,ml]"
+python -m pip install "./equiframe-0.13.1-py3-none-any.whl[files,engines,ml]"
 ```
 
 El benchmark se instala por separado, después del núcleo:
 
 ```bash
-python -m pip install equiframe-benchmark==0.13.0
+python -m pip install equiframe-benchmark==0.13.1
 ```
 
 Consulta la [guía de instalación](https://github.com/htroya/equiframe/blob/main/docs/installed-private.md) para entornos aislados,
@@ -402,10 +419,27 @@ capturas de archivos o resultados de una ejecución.
 
 ### Comparar montos por grupos
 
-La versión 0.13.0 añade `compare_grouped` para cualquier clave de agrupación y
+La versión 0.13.1 añade `compare_grouped` para cualquier clave de agrupación y
 columna numérica. Por ejemplo:
 
 ```python
+import pyarrow as pa
+import equiframe as ef
+
+referencia = pa.table(
+    {
+        "entidad": ["A", "A", "B", "C", "D"],
+        "moneda": ["USD"] * 5,
+        "monto": [40, 60, 0, 50, 9],
+    }
+)
+candidato = pa.table(
+    {
+        "entidad": ["A", "A", "B", "C", "E"],
+        "moneda": ["USD"] * 5,
+        "monto": [90, 60, 25, 50, 7],
+    }
+)
 resumen = ef.compare_grouped(
     candidato,
     referencia,

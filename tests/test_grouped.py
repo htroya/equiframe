@@ -555,3 +555,97 @@ def test_capture_rejects_meaningful_index_metadata_and_small_byte_limit():
     decorated = arrow.replace_schema_metadata({"unit": "USD"})
     with pytest.raises(ef.CapabilityError, match="metadata"):
         ef.compare_grouped(decorated, arrow, by=("branch",), column="sales")
+
+
+@pytest.mark.parametrize(
+    "changes",
+    [
+        pytest.param({"key": []}, id="empty-key"),
+        pytest.param({"candidate_rows": 0, "expected_rows": 0}, id="no-observed-rows"),
+        pytest.param({"issues": ["candidate_null", "candidate_null"]}, id="duplicate-issues"),
+        pytest.param({"issues": ["candidate_invalid"]}, id="unknown-issue"),
+        pytest.param({"candidate_rows": 0}, id="total-on-absent-side"),
+        pytest.param({"candidate_total": None}, id="missing-valid-total"),
+        pytest.param(
+            {"candidate_total": None, "issues": ["candidate_null"]},
+            id="invalid-group-claims-comparability",
+        ),
+        pytest.param({"absolute_difference": "0"}, id="false-exact-difference"),
+        pytest.param({"state": "added"}, id="unpaired-group-claims-numeric-difference"),
+        pytest.param(
+            {"state": "added", "absolute_difference": None, "relative_difference": None},
+            id="added-group-present-in-reference",
+        ),
+        pytest.param(
+            {"state": "removed", "absolute_difference": None, "relative_difference": None},
+            id="removed-group-present-in-candidate",
+        ),
+        pytest.param(
+            {"state": "not_evaluable", "absolute_difference": None, "relative_difference": None},
+            id="unavailable-group-without-invalid-measure",
+        ),
+        pytest.param({"key": [{"kind": "integer", "value": "9" * 4097}]}, id="key-text-limit"),
+        pytest.param({"key": [{"kind": "decimal", "value": "9" * 77}]}, id="key-precision-limit"),
+        pytest.param(
+            {"key": [{"kind": "decimal", "value": "0." + "1" * 77}]}, id="key-scale-limit"
+        ),
+    ],
+)
+def test_standalone_group_reader_rejects_impossible_presence_and_measure_evidence(changes):
+    # A hand-written valid group: candidate 2, reference 1, exact delta and ratio 1.
+    payload = {
+        "key": [{"kind": "string", "value": "a"}],
+        "state": "modified",
+        "candidate_rows": 1,
+        "expected_rows": 1,
+        "candidate_total": "2",
+        "expected_total": "1",
+        "absolute_difference": "1",
+        "relative_difference": "1",
+        "issues": [],
+    }
+    valid = ef.GroupedDifference.model_validate_json(json.dumps(payload))
+    assert valid.candidate_total == 2 and valid.expected_total == valid.absolute_difference == 1
+    payload.update(changes)
+    with pytest.raises(ValidationError):
+        ef.GroupedDifference.model_validate_json(json.dumps(payload))
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "duplicate-grouping-column",
+        "measure-is-grouping-column",
+        "missing-supported-maximum",
+        "example-bound",
+        "key-width",
+        "mixed-key-types",
+        "classification-vs-tolerance",
+        "example-above-maximum",
+    ],
+)
+def test_summary_reader_rejects_contradictory_structure_and_retained_metrics(mutation):
+    result = ef.compare_grouped(
+        table(["a", "b"], [2, 2]), table(["a", "b"], [1, 1]), by=("branch",), column="sales"
+    )
+    assert result.common_groups == result.modified_groups == 2
+    assert result.maximum_relative_difference == 1
+    payload = json.loads(result.model_dump_json())
+    if mutation == "duplicate-grouping-column":
+        payload["by"] = ["branch", "branch"]
+    elif mutation == "measure-is-grouping-column":
+        payload["column"] = "branch"
+    elif mutation == "missing-supported-maximum":
+        payload["maximum_relative_difference"] = None
+    elif mutation == "example-bound":
+        payload["options"]["max_examples"] = 1
+    elif mutation == "key-width":
+        payload["examples"][0]["key"].append({"kind": "string", "value": "extra"})
+    elif mutation == "mixed-key-types":
+        payload["examples"][1]["key"] = [{"kind": "integer", "value": "2"}]
+    elif mutation == "classification-vs-tolerance":
+        payload["examples"][0]["state"] = "unchanged"
+    else:
+        payload["maximum_relative_difference"] = "1/2"
+    with pytest.raises(ValidationError):
+        ef.GroupedComparisonResult.model_validate_json(json.dumps(payload))

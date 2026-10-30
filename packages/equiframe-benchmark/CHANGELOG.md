@@ -1,6 +1,6 @@
-## 0.13.0 - paired grouped-comparison release
+## 0.13.1 - paired grouped-comparison release
 
-- Pair exactly with core 0.13.0 and admit its detector producer in active schemas.
+- Pair exactly with core 0.13.1 and admit its detector producer in active schemas.
 - Preserve existing benchmark protocols, algorithms and historical evidence.
 - Grouped numeric comparison is a reusable core API and does not introduce
   procurement-specific formulas or change benchmark/detector inputs.

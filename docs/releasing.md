@@ -2,8 +2,8 @@
 
 ## Current state
 
-The release target is `equiframe 0.13.0` with the exactly paired
-`equiframe-benchmark 0.13.0`, identified by commit and artifact SHA-256.
+The release target is `equiframe 0.13.1` with the exactly paired
+`equiframe-benchmark 0.13.1`, identified by commit and artifact SHA-256.
 Source preparation does not establish validation or publication: verify the
 artifact-bound receipts and official index inventory. The public 0.12.2 tag and
 its receipts retain their original identities. The local 0.12.3 candidate tag
@@ -54,6 +54,11 @@ history.
 On 2026-10-29 the owner requested the additive 0.13.0 grouped-comparison
 release, publication on PyPI and upload of the complete source to GitHub main.
 Use the same manual TestPyPI-first process. Preserve v0.12.4 and its artifacts.
+
+On 2026-10-30 the local `v0.13.0` candidate failed its installed-distribution
+check: the README gained a fourth Python example, while its consumer verifier
+required three. No 0.13.0 files were uploaded. Preserve that tag and its failure
+receipts; 0.13.1 corrects and executes all four examples under its own identity.
 
 ## Tagged versions
 

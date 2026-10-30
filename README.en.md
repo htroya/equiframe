@@ -1,6 +1,6 @@
 # EquiFrame: semantic comparison and dataframe migration
 
-> Release target: **0.13.0**. Check the official index for availability and
+> Release target: **0.13.1**. Check the official index for availability and
 > verify the identified artifact hashes. Publication requires the
 > [release gates](https://github.com/htroya/equiframe/blob/main/docs/releasing.md).
 
@@ -21,14 +21,14 @@ your own data, independently of procurement schemas, warehouses and cloud servic
 
 ## Install
 
-EquiFrame 0.13.0 supports **Python 3.10, 3.11, 3.12 and 3.13**.
+EquiFrame 0.13.1 supports **Python 3.10, 3.11, 3.12 and 3.13**.
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.13.0"
+python -m pip install "equiframe[files,engines,ml]==0.13.1"
 python -m pip check
 ```
 
-The base installation is `python -m pip install equiframe==0.13.0`.
+The base installation is `python -m pip install equiframe==0.13.1`.
 Optional engines and machine-learning libraries are loaded when requested.
 
 | Extra | Purpose |
@@ -130,9 +130,26 @@ unavailable-component states when deciding whether to accept a migration.
 
 ## Compare amounts by arbitrary groups
 
-New in 0.13.0, compare exact sums for any grouping columns and numeric measure:
+New in 0.13.1, compare exact sums for any grouping columns and numeric measure:
 
 ```python
+import pyarrow as pa
+import equiframe as ef
+
+expected = pa.table(
+    {
+        "branch": ["A", "A", "B", "C", "D"],
+        "currency": ["USD"] * 5,
+        "sales": [40, 60, 0, 50, 9],
+    }
+)
+candidate = pa.table(
+    {
+        "branch": ["A", "A", "B", "C", "E"],
+        "currency": ["USD"] * 5,
+        "sales": [90, 60, 25, 50, 7],
+    }
+)
 summary = ef.compare_grouped(
     candidate,
     expected,

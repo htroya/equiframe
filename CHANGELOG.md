@@ -1,4 +1,8 @@
-## 0.13.0 - reusable comparison of grouped numeric sums
+## 0.13.1 - reusable comparison of grouped numeric sums
+
+- Preserve the unuploaded local 0.13.0 candidate and its failed check. Correct
+  the installed README verifier to execute all four examples, including exact
+  grouped sums, with independent expected metrics and runnable inputs.
 
 - Add stable `compare_grouped(candidate, expected, by=..., column=...)` for
   arbitrary grouping columns and numeric measures in Arrow, Pandas, Polars and
@@ -13,8 +17,8 @@
 - Add typed options/results, exact JSON ratio strings, bounded group examples,
   a general guide and independent regression tests. Existing comparison,
   profiles, rules, Isolation Forest, MAD and R-review semantics are unchanged.
-- Admit producer 0.13.0 while retaining readers for supported older evidence;
-  pair the benchmark with core 0.13.0. Preserve the original 0.12.4 tag and files.
+- Admit producer 0.13.1 while retaining readers for supported older evidence;
+  pair the benchmark with core 0.13.1. Preserve the original 0.12.4 tag and files.
 
 ## 0.12.4 - producer identity and paired release preparation
 
