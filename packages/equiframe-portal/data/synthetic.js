@@ -47,12 +47,30 @@ EQ.adjudicaciones = Array.from({ length: 50 }, (_, i) => ({
   award_id:   `AWD-2025-${String(10000 + i).padStart(6,"0")}`,
   entidad:    EQ.top_entidades[i % 10].entidad,
   proveedor:  `Proveedor S.A. ${1000 + (i * 7) % 900}`,
-  monto:      Math.round((50000 + Math.random() * 4950000) * 100) / 100,
+  monto:      Math.round((50000 + (i * 123456.78) % 4950000) * 100) / 100,
   moneda:     "USD",
   fecha:      `2025-${String((i % 12) + 1).padStart(2,"0")}-${String((i % 28) + 1).padStart(2,"0")}`,
   estado:     ["active","complete","cancelled","pending"][i % 4],
   modalidad:  ["Subasta Inversa","Cotización","Menor Cuantía","Licitación"][i % 4],
 }));
+
+EQ.procedimientos = Array.from({ length: 50 }, (_, i) => ({
+  ocid:               `ocds-lcuori-${String(1000 + i).padStart(6,"0")}`,
+  entidad:            EQ.top_entidades[i % 10].entidad,
+  objeto:             ["Adquisición de medicamentos esenciales","Construcción de aulas modulares","Mantenimiento vial regional","Suministro de equipos TI","Servicios de limpieza institucional","Dotación de uniformes escolares","Obras de alcantarillado","Consultoría técnica especializada"][i % 8],
+  modalidad:          ["Subasta Inversa","Cotización","Menor Cuantía","Licitación"][i % 4],
+  monto_referencial:  Math.round((80000 + (i * 234567.89) % 5000000) * 100) / 100,
+  estado:             ["active","complete","cancelled","pending"][i % 4],
+  fecha_publicacion:  `2025-${String((i % 12) + 1).padStart(2,"0")}-${String((i % 15) + 1).padStart(2,"0")}`,
+  fecha_adjudicacion: i % 4 !== 2 ? `2025-${String((i % 12) + 1).padStart(2,"0")}-${String((i % 28) + 1).padStart(2,"0")}` : null,
+  num_adjudicaciones: i % 4 !== 2 ? (i % 3) + 1 : 0,
+}));
+
+EQ.montos_por_moneda = [
+  { moneda: "USD", codigo: "USD", descripcion: "Dólar estadounidense", total_adjudicaciones: 183705, monto_total: 4869840218.50, porcentaje: 99.95 },
+  { moneda: "EUR", codigo: "EUR", descripcion: "Euro",                 total_adjudicaciones: 152,    monto_total: 1980000.00,    porcentaje: 0.04 },
+  { moneda: "GBP", codigo: "GBP", descripcion: "Libra esterlina",      total_adjudicaciones: 34,     monto_total: 520000.00,     porcentaje: 0.01 },
+];
 
 EQ.demos = {
   montos_intercambiados: {
@@ -140,9 +158,90 @@ EQ.demos = {
 };
 
 EQ.resultados = [
-  { run_id: "run-20261012-001", pareja: "Pandas→Polars",  familia: "ausencias_tipos",  resultado: "OK",          filas: 183891, diferencias: 0,  tiempo_s: 4.2,  fecha: "2026-10-12" },
-  { run_id: "run-20261012-002", pareja: "Pandas→DuckDB",  familia: "ausencias_tipos",  resultado: "DIVERGENCIA", filas: 183891, diferencias: 3,  tiempo_s: 6.1,  fecha: "2026-10-12" },
-  { run_id: "run-20261012-003", pareja: "Polars→DuckDB",  familia: "uniones",          resultado: "OK",          filas: 183891, diferencias: 0,  tiempo_s: 5.8,  fecha: "2026-10-12" },
-  { run_id: "run-20261012-004", pareja: "Pandas→Polars",  familia: "agregaciones",     resultado: "OK",          filas: 183891, diferencias: 0,  tiempo_s: 3.9,  fecha: "2026-10-12" },
-  { run_id: "run-20261012-005", pareja: "Pandas→DuckDB",  familia: "agregaciones",     resultado: "DIVERGENCIA", filas: 183891, diferencias: 1,  tiempo_s: 7.2,  fecha: "2026-10-12" },
+  {
+    run_id: "run-20261012-001", pareja: "Pandas→Polars", familia: "ausencias_tipos",
+    filas: 183891, tiempo_s: 4.2, memoria_mb: 98.4, fecha: "2026-10-12",
+    resultado_R: "OK",          diferencias_R: 0,
+    resultado_M: "OK",          diferencias_M: 0, puntuacion_anomalia: 0.08,
+    resultado_B: "OK",          diferencias_B: 0,
+    resultado:   "OK",          diferencias: 0,
+    m_disponible: true,
+    notas_R: "Sin infracciones de contrato detectadas.",
+    notas_M: "Perfil dentro del rango normal. Puntuación de anomalía: 0.08 (umbral 0.5).",
+    notas_B: "MAD = 0 — ninguna variable supera k=3 desviaciones.",
+  },
+  {
+    run_id: "run-20261012-002", pareja: "Pandas→DuckDB", familia: "ausencias_tipos",
+    filas: 183891, tiempo_s: 6.1, memoria_mb: 134.2, fecha: "2026-10-12",
+    resultado_R: "DIVERGENCIA",  diferencias_R: 2,
+    resultado_M: "DIVERGENCIA",  diferencias_M: 1, puntuacion_anomalia: 0.74,
+    resultado_B: "OK",           diferencias_B: 0,
+    resultado:   "DIVERGENCIA",  diferencias: 3,
+    m_disponible: true,
+    notas_R: "Campo 'ocid' leído como integer en DuckDB (pierde ceros iniciales). Campo 'fecha_adjudicacion' cambia zona horaria a UTC.",
+    notas_M: "Puntuación de anomalía: 0.74 — perfil inusual en ratio nulos/tipos. Detectó diferencia en proporción de tipos de dato.",
+    notas_B: "MAD dentro de rango normal para esta familia — no detectó diferencias.",
+  },
+  {
+    run_id: "run-20261012-003", pareja: "Polars→DuckDB", familia: "uniones",
+    filas: 183891, tiempo_s: 5.8, memoria_mb: 121.7, fecha: "2026-10-12",
+    resultado_R: "OK",           diferencias_R: 0,
+    resultado_M: "OK",           diferencias_M: 0, puntuacion_anomalia: 0.19,
+    resultado_B: "OK",           diferencias_B: 0,
+    resultado:   "OK",           diferencias: 0,
+    m_disponible: true,
+    notas_R: "LEFT JOIN preservado. Cardinalidad correcta. Claves huérfanas documentadas (3 adjudicaciones sin proveedor).",
+    notas_M: "Puntuación de anomalía: 0.19 — perfil normal.",
+    notas_B: "Sin anomalías estadísticas.",
+  },
+  {
+    run_id: "run-20261012-004", pareja: "Pandas→Polars", familia: "agregaciones",
+    filas: 183891, tiempo_s: 3.9, memoria_mb: 87.1, fecha: "2026-10-12",
+    resultado_R: "OK",           diferencias_R: 0,
+    resultado_M: null,           diferencias_M: null, puntuacion_anomalia: null,
+    resultado_B: "OK",           diferencias_B: 0,
+    resultado:   "OK",           diferencias: 0,
+    m_disponible: false,
+    notas_R: "Sumas y conteos por entidad coinciden exactamente.",
+    notas_M: null,
+    notas_B: "MAD dentro de rango. Variación de montos < 0.001 %.",
+  },
+  {
+    run_id: "run-20261012-005", pareja: "Pandas→DuckDB", familia: "agregaciones",
+    filas: 183891, tiempo_s: 7.2, memoria_mb: 148.9, fecha: "2026-10-12",
+    resultado_R: "DIVERGENCIA",  diferencias_R: 1,
+    resultado_M: null,           diferencias_M: null, puntuacion_anomalia: null,
+    resultado_B: "DIVERGENCIA",  diferencias_B: 1,
+    resultado:   "DIVERGENCIA",  diferencias: 1,
+    m_disponible: false,
+    notas_R: "Suma de montos para entidad 'IESS' difiere en 0.01 USD por acumulación de errores de punto flotante entre Python y DuckDB.",
+    notas_M: null,
+    notas_B: "MAD detectó anomalía en variable 'monto_sum' para IESS: |xi - mediana| > 3 × MAD.",
+  },
 ];
+
+EQ.componentes_estado = {
+  R: {
+    clave: "R", nombre: "Reglas deterministas", disponible: true,
+    descripcion: "Verificaciones explícitas del contrato: ausencias, tipos, cardinalidad, claves, orden.",
+    runs_completados: 5, runs_total: 9,
+  },
+  M: {
+    clave: "M", nombre: "Isolation Forest", disponible: true,
+    descripcion: "Detector de anomalías entrenado con 23 726 perfiles de ejecuciones canónicas.",
+    runs_completados: 3, runs_total: 9,
+    modelo_fecha: "2026-10-10", n_perfiles: 23726,
+    familias_disponibles: ["ausencias_tipos", "uniones"],
+    familias_pendientes: ["agregaciones"],
+  },
+  B: {
+    clave: "B", nombre: "MAD (baseline estadístico)", disponible: true,
+    descripcion: "Desviación absoluta de la mediana variable a variable. Referencia independiente.",
+    runs_completados: 5, runs_total: 9,
+  },
+  H: {
+    clave: "H", nombre: "Híbrido (R OR M)", disponible: true,
+    descripcion: "Resultado final: alerta si R o M detectan divergencia. Si M no está disponible, H = R.",
+    runs_completados: 5, runs_total: 9,
+  },
+};

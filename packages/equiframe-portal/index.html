@@ -3,10 +3,1184 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="assets/css/main.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* EquiFrame Portal — estilos principales */
+:root {
+  --bg:       #ffffff;
+  --bg-2:     #f8fafc;
+  --bg-3:     #f1f5f9;
+  --border:   #e2e8f0;
+  --border-s: #cbd5e1;
+  --fg:       #0f172a;
+  --fg-2:     #334155;
+  --fg-3:     #64748b;
+  --fg-4:     #94a3b8;
+  --accent:   #1a3a5c;
+  --accent-l: #2563eb;
+  --accent-bg:#eff6ff;
+  --ok:       #059669;
+  --ok-bg:    #d1fae5;
+  --warn:     #b45309;
+  --warn-bg:  #fef3c7;
+  --err:      #dc2626;
+  --err-bg:   #fee2e2;
+  --purple:   #7c3aed;
+  --purple-bg:#f5f3ff;
+  --kpi-blue:   #2563eb;
+  --kpi-green:  #059669;
+  --kpi-purple: #7c3aed;
+  --kpi-orange: #d97706;
+  --radius:   8px;
+  --radius-lg:12px;
+  --max-w:    1300px;
+  --nav-h:    56px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+  color-scheme: light;
+  --arch-compare-bg: #dbeafe; --arch-compare-stroke: #2563eb;
+  --arch-r-bg: #eff6ff;   --arch-r-stroke: #2563eb;
+  --arch-m-bg: #f5f3ff;   --arch-m-stroke: #7c3aed;
+  --arch-b-bg: #ecfdf5;   --arch-b-stroke: #059669;
+  --arch-h-bg: #fffbeb;   --arch-h-stroke: #d97706;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:       #0f172a;
+    --bg-2:     #1e293b;
+    --bg-3:     #1e2535;
+    --border:   #1e293b;
+    --border-s: #334155;
+    --fg:       #f1f5f9;
+    --fg-2:     #cbd5e1;
+    --fg-3:     #94a3b8;
+    --fg-4:     #64748b;
+    --accent-bg:#1e3a5f;
+    --ok-bg:    #064e3b;
+    --warn-bg:  #451a03;
+    --err-bg:   #450a0a;
+    --purple-bg:#2e1065;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.4);
+    color-scheme: dark;
+    --arch-compare-bg: #1e3a5f; --arch-r-bg: #1a2d4a;
+    --arch-m-bg: #241650; --arch-b-bg: #0d2a1c; --arch-h-bg: #2d1f08;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:       #0f172a;
+  --bg-2:     #1e293b;
+  --bg-3:     #1e2535;
+  --border:   #1e293b;
+  --border-s: #334155;
+  --fg:       #f1f5f9;
+  --fg-2:     #cbd5e1;
+  --fg-3:     #94a3b8;
+  --fg-4:     #64748b;
+  --accent-bg:#1e3a5f;
+  --ok-bg:    #064e3b;
+  --warn-bg:  #451a03;
+  --err-bg:   #450a0a;
+  --purple-bg:#2e1065;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.4);
+  color-scheme: dark;
+  --arch-compare-bg: #1e3a5f; --arch-r-bg: #1a2d4a;
+  --arch-m-bg: #241650; --arch-b-bg: #0d2a1c; --arch-h-bg: #2d1f08;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+  display: flex; align-items: center;
+  box-shadow: var(--shadow-sm);
+}
+.nav-inner {
+  max-width: var(--max-w);
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 max(20px, env(safe-area-inset-left, 0px)) 0 max(20px, env(safe-area-inset-right, 0px));
+  display: flex; align-items: center; gap: 8px;
+}
+.nav-brand {
+  font-weight: 700; font-size: 15px; color: var(--accent);
+  text-decoration: none; margin-right: 20px; white-space: nowrap;
+  letter-spacing: -.02em;
+}
+.nav-brand::before {
+  content: '⬡ ';
+  color: var(--accent-l);
+  font-size: 13px;
+}
+.nav-links { display: flex; gap: 2px; flex: 1; overflow-x: auto; }
+.nav-link {
+  padding: 6px 13px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 500; color: var(--fg-3);
+  text-decoration: none; cursor: pointer;
+  white-space: nowrap; border: none; background: none;
+  transition: background .15s, color .15s;
+}
+.nav-link:hover  { background: var(--bg-3); color: var(--fg); }
+.nav-link.active { background: var(--accent-bg); color: var(--accent-l); font-weight: 600; }
+
+.main {
+  margin-top: var(--nav-h);
+  min-height: calc(100vh - var(--nav-h));
+}
+.page { display: none; }
+.page.active { display: block; }
+
+.container {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 40px max(20px, env(safe-area-inset-left, 0px));
+}
+
+h1 { font-size: 26px; font-weight: 700; color: var(--accent); text-wrap: balance; letter-spacing: -.02em; }
+h2 { font-size: 17px; font-weight: 600; color: var(--fg); text-wrap: balance; margin-bottom: 10px; }
+h3 { font-size: 13px; font-weight: 600; color: var(--fg-2); margin-bottom: 6px; }
+p  { color: var(--fg-2); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 20px; border-radius: var(--radius);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  text-decoration: none; border: 1px solid transparent;
+  transition: all .15s;
+}
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-primary { background: var(--accent-l); color: #fff; }
+.btn-outline  { background: transparent; color: var(--accent-l); border-color: var(--accent-l); }
+.btn-ghost    { background: var(--bg-3); color: var(--fg-2); border-color: var(--border); }
+.btn-ghost:hover { background: var(--bg-2); color: var(--fg); }
+.btn-sm { padding: 5px 13px; font-size: 12px; }
+
+.project-links {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px;
+}
+.project-link {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 14px 20px;
+  text-decoration: none; color: var(--fg);
+  transition: box-shadow .15s, transform .15s;
+  flex: 1; min-width: 160px;
+}
+.project-link:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.project-link-icon { font-size: 24px; }
+.project-link strong { display: block; font-size: 14px; font-weight: 600; color: var(--fg); }
+.project-link small  { font-size: 12px; color: var(--fg-3); }
+
+.project-body {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 40px; align-items: start;
+}
+@media (max-width: 720px) { .project-body { grid-template-columns: 1fr; } }
+
+.project-col { min-width: 0; }
+
+.feature-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.feature-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14px; color: var(--fg-2); line-height: 1.5;
+}
+.feature-check { color: var(--ok); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+.install-block {
+  background: var(--bg-3); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 14px 16px;
+  position: relative;
+}
+.install-label {
+  font-size: 11px; font-weight: 600; color: var(--fg-3);
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px;
+}
+.install-code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 13px; color: var(--fg); white-space: pre; overflow-x: auto;
+  line-height: 1.5;
+}
+.copy-btn {
+  position: absolute; top: 10px; right: 10px;
+  padding: 4px 10px; font-size: 11px; font-weight: 600;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); cursor: pointer; color: var(--fg-3);
+  transition: color .15s, border-color .15s;
+}
+.copy-btn:hover { color: var(--accent-l); border-color: var(--accent-l); }
+.copy-btn.copied { color: var(--ok); border-color: var(--ok); }
+
+.compat-grid {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+}
+.compat-badge {
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+}
+.compat-badge.green  { background: var(--ok-bg);    color: var(--ok); }
+.compat-badge.blue   { background: var(--accent-bg); color: var(--accent-l); }
+.compat-badge.purple { background: var(--purple-bg); color: var(--purple); }
+.compat-badge.orange { background: var(--warn-bg);   color: var(--warn); }
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px; margin-bottom: 28px;
+}
+.kpi {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow .2s, transform .2s;
+}
+.kpi::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.kpi:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.kpi-blue::before   { background: var(--kpi-blue); }
+.kpi-green::before  { background: var(--kpi-green); }
+.kpi-purple::before { background: var(--kpi-purple); }
+.kpi-orange::before { background: var(--kpi-orange); }
+
+.kpi-icon {
+  font-size: 22px; margin-bottom: 10px;
+  display: block;
+}
+.kpi-label {
+  font-size: 11px; font-weight: 600; color: var(--fg-3);
+  text-transform: uppercase; letter-spacing: .06em;
+}
+.kpi-value {
+  font-size: 28px; font-weight: 700; line-height: 1.15;
+  margin: 6px 0 3px;
+  letter-spacing: -.03em;
+}
+.kpi-blue   .kpi-value { color: var(--kpi-blue); }
+.kpi-green  .kpi-value { color: var(--kpi-green); }
+.kpi-purple .kpi-value { color: var(--kpi-purple); }
+.kpi-orange .kpi-value { color: var(--kpi-orange); }
+.kpi-sub    { font-size: 11px; color: var(--fg-4); }
+
+.table-wrap { overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  text-align: left; padding: 10px 14px;
+  background: var(--bg-2); border-bottom: 1px solid var(--border-s);
+  font-size: 11px; font-weight: 600; color: var(--fg-3);
+  text-transform: uppercase; letter-spacing: .05em; white-space: nowrap;
+}
+thead th.num { text-align: right; }
+tbody tr { border-bottom: 1px solid var(--border); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--bg-2); }
+tbody td { padding: 9px 14px; color: var(--fg-2); vertical-align: middle; }
+tbody td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tbody td.mono { font-family: ui-monospace, monospace; font-size: 12px; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700;
+  padding: 3px 9px; border-radius: 20px; white-space: nowrap;
+  letter-spacing: .03em;
+}
+.badge-ok     { background: var(--ok-bg);     color: var(--ok);     }
+.badge-warn   { background: var(--warn-bg);   color: var(--warn);   }
+.badge-err    { background: var(--err-bg);    color: var(--err);    }
+.badge-purple { background: var(--purple-bg); color: var(--purple); }
+.badge-blue   { background: var(--accent-bg); color: var(--accent-l); }
+
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px; margin-bottom: 28px;
+}
+.chart-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+}
+.chart-card h3 {
+  margin-bottom: 14px;
+  font-size: 13px; font-weight: 600;
+  color: var(--fg-2); text-align: center;
+  text-transform: uppercase; letter-spacing: .05em;
+}
+.chart-wrap { position: relative; height: 210px; }
+
+.filters-bar {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+  margin-bottom: 24px; padding: 16px 20px;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.filter-group { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.filter-group label { font-size: 11px; font-weight: 600; color: var(--fg-3); text-transform: uppercase; letter-spacing: .05em; }
+.filter-group select,
+.filter-group input[type="date"] {
+  padding: 6px 10px; border-radius: var(--radius);
+  border: 1px solid var(--border-s); background: var(--bg);
+  font-size: 13px; color: var(--fg); min-width: 120px;
+}
+select, input[type=text] {
+  padding: 6px 10px; border: 1px solid var(--border-s);
+  border-radius: var(--radius); font-size: 13px;
+  background: var(--bg); color: var(--fg);
+  min-width: 130px;
+  transition: border-color .15s;
+}
+select:focus, input[type=text]:focus {
+  outline: none; border-color: var(--accent-l);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+}
+
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.tab {
+  padding: 7px 16px; font-size: 13px; font-weight: 500; color: var(--fg-3);
+  cursor: pointer; border: none; background: none;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .15s;
+}
+.tab:hover  { color: var(--fg); }
+.tab.active { color: var(--accent-l); border-color: var(--accent-l); font-weight: 600; }
+.tab-panel  { display: none; }
+.tab-panel.active { display: block; }
+
+.demo-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px; margin-bottom: 28px;
+}
+.demo-card {
+  border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px;
+  cursor: pointer; transition: border-color .15s, box-shadow .15s, transform .15s;
+  box-shadow: var(--shadow-sm);
+}
+.demo-card:hover { border-color: var(--accent-l); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.demo-card.selected { border-color: var(--accent-l); background: var(--accent-bg); }
+.demo-card h3 { color: var(--accent); margin-bottom: 6px; }
+.demo-card p  { font-size: 12.5px; max-width: none; }
+
+.diff-row-err  { background: var(--err-bg); }
+.diff-row-warn { background: var(--warn-bg); }
+
+.pagination {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; margin-top: 16px;
+  font-size: 13px; color: var(--fg-3);
+}
+.pagination button {
+  padding: 5px 12px; border: 1px solid var(--border-s);
+  border-radius: var(--radius); background: var(--bg); color: var(--fg);
+  cursor: pointer; font-size: 12px; font-weight: 500;
+  transition: background .15s;
+}
+.pagination button:disabled { opacity: .4; cursor: default; }
+.pagination button:not(:disabled):hover { background: var(--bg-3); border-color: var(--accent-l); }
+
+.hero {
+  padding: 80px 0 64px;
+  background: linear-gradient(135deg, #f0f7ff 0%, #fafbff 50%, #f5f3ff 100%);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+.hero .container { text-align: center; }
+.hero-tag {
+  display: inline-block; font-size: 11px; font-weight: 700;
+  padding: 4px 12px; border-radius: 20px; margin-bottom: 20px;
+  background: var(--accent-bg); color: var(--accent-l);
+  text-transform: uppercase; letter-spacing: .06em;
+  border: 1px solid rgba(37,99,235,.2);
+}
+.hero h1 {
+  font-size: 36px; margin-bottom: 14px;
+  max-width: 680px; margin-left: auto; margin-right: auto;
+  letter-spacing: -.03em; line-height: 1.2;
+}
+.hero h1 em { font-style: normal; color: var(--accent-l); }
+.hero p  {
+  font-size: 16px; margin-bottom: 32px; color: var(--fg-2);
+  max-width: 580px; margin-left: auto; margin-right: auto;
+}
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+.features {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0; padding: 52px 0 8px;
+}
+.feature {
+  padding: 24px 20px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+.feature:last-child { border-right: none; }
+.feature-icon {
+  font-size: 24px; margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px; border-radius: 12px;
+  background: var(--accent-bg);
+  margin: 0 auto 12px;
+}
+.feature h3 { color: var(--accent); margin-bottom: 5px; font-size: 15px; }
+.feature p  { font-size: 12.5px; max-width: none; }
+
+.section-header {
+  margin-bottom: 28px;
+  text-align: center;
+}
+.section-header h1 { margin-bottom: 8px; }
+.section-header p {
+  color: var(--fg-3); font-size: 14px;
+  max-width: 600px; margin: 0 auto;
+}
+
+.datos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+.datos-card {
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 24px; box-shadow: var(--shadow-sm);
+  background: var(--bg);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.datos-card-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.datos-card-icon.blue   { background: #dbeafe; }
+.datos-card-icon.green  { background: #d1fae5; }
+.datos-card-icon.purple { background: #ede9fe; }
+.datos-card h2 { font-size: 16px; margin-bottom: 2px; }
+.datos-card p  { font-size: 13px; max-width: none; color: var(--fg-3); }
+.datos-meta {
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 12px; color: var(--fg-3);
+  padding: 12px 0; border-top: 1px solid var(--border);
+}
+.datos-meta span { display: flex; align-items: center; gap: 6px; }
+.datos-meta span::before { content: '·'; color: var(--fg-4); }
+.dict-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.dict-table tr { border-bottom: 1px solid var(--border); }
+.dict-table tr:last-child { border-bottom: none; }
+.dict-table td { padding: 6px 0; vertical-align: top; }
+.dict-table td:first-child {
+  font-family: ui-monospace, monospace; font-size: 11px;
+  color: var(--accent-l); font-weight: 600; white-space: nowrap;
+  padding-right: 12px; width: 110px;
+}
+.metodologia-list {
+  display: flex; flex-direction: column; gap: 8px;
+  font-size: 13px;
+}
+.metodologia-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 10px; border-radius: var(--radius);
+  background: var(--bg-2);
+}
+.metodologia-item .step {
+  width: 22px; height: 22px; min-width: 22px;
+  border-radius: 50%; background: var(--accent-l); color: #fff;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.metodologia-item p { font-size: 12px; max-width: none; margin: 0; color: var(--fg-2); }
+
+.dw-status {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: var(--radius);
+  font-size: 12px; font-weight: 600;
+  margin-top: 8px;
+}
+.dw-status.pending {
+  background: var(--warn-bg); color: var(--warn);
+  border: 1px solid #fde68a;
+}
+.dw-status.pending::before { content: '⏳'; }
+.dw-status.ready {
+  background: var(--ok-bg); color: var(--ok);
+  border: 1px solid #6ee7b7;
+}
+.dw-status.ready::before { content: '✓'; font-weight: 900; }
+
+.resultados-stats {
+  display: flex; gap: 20px; flex-wrap: wrap;
+  margin-bottom: 20px; justify-content: center;
+}
+.res-stat {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 600;
+  border: 1px solid var(--border); background: var(--bg-2);
+}
+
+.view-tabs {
+  display: flex; gap: 4px; margin-bottom: 16px;
+  border-bottom: 2px solid var(--border); padding-bottom: 0;
+}
+.view-tab {
+  padding: 8px 18px; font-size: 13px; font-weight: 600;
+  border: none; background: none; color: var(--fg-3);
+  cursor: pointer; border-radius: var(--radius) var(--radius) 0 0;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  transition: color .15s;
+}
+.view-tab:hover  { color: var(--fg); background: var(--bg-2); }
+.view-tab.active { color: var(--accent-l); border-bottom-color: var(--accent-l); }
+
+.view-panel { display: none; }
+.view-panel.active { display: block; }
+
+.view-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.view-count { font-size: 13px; color: var(--fg-3); }
+
+.monedas-snap {
+  font-size: 12px; color: var(--fg-3); margin-bottom: 16px;
+  padding: 6px 12px; background: var(--bg-2);
+  border-radius: var(--radius); display: inline-block;
+  border: 1px solid var(--border);
+}
+.monedas-grid { display: flex; flex-direction: column; gap: 12px; max-width: 640px; }
+.moneda-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+}
+.moneda-codigo {
+  font-size: 18px; font-weight: 700; color: var(--accent);
+  font-family: ui-monospace, monospace; margin-bottom: 2px;
+}
+.moneda-desc { font-size: 13px; color: var(--fg-3); margin-bottom: 12px; }
+.moneda-monto { font-size: 22px; font-weight: 700; color: var(--fg); margin-bottom: 8px; }
+.moneda-meta  { display: flex; justify-content: space-between; font-size: 12px; color: var(--fg-3); margin-bottom: 10px; }
+.moneda-pct   { font-weight: 600; color: var(--accent-l); }
+.moneda-bar   { height: 6px; background: var(--bg-3); border-radius: 3px; overflow: hidden; }
+.moneda-bar-fill { height: 100%; background: var(--accent-l); border-radius: 3px; transition: width .4s; }
+
+.comp-status-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 14px; margin-bottom: 24px;
+}
+@media (max-width: 900px) { .comp-status-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 500px) { .comp-status-grid { grid-template-columns: 1fr; } }
+
+.comp-status-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.comp-status-top {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+}
+.comp-status-letra {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800; flex-shrink: 0;
+}
+.comp-r .comp-status-letra   { background: var(--accent-bg); color: var(--accent-l); }
+.comp-m .comp-status-letra   { background: var(--purple-bg); color: var(--purple); }
+.comp-b .comp-status-letra   { background: var(--ok-bg);     color: var(--ok); }
+.comp-h .comp-status-letra   { background: var(--warn-bg);   color: var(--warn); }
+
+.comp-status-nombre { font-size: 12px; font-weight: 600; color: var(--fg); flex: 1; }
+.comp-status-dot    { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-ok { background: var(--ok); }
+.dot-na { background: var(--fg-4); }
+
+.comp-status-desc { font-size: 11px; color: var(--fg-3); line-height: 1.5; margin-bottom: 8px; }
+.comp-extra    { font-size: 11px; color: var(--fg-2); margin-bottom: 4px; }
+.comp-pending  { font-size: 11px; color: var(--warn); }
+.comp-progress { height: 4px; background: var(--bg-3); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+.comp-progress-fill { height: 100%; border-radius: 2px; background: var(--accent-l); transition: width .4s; }
+
+.comp-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  font-size: 11px; font-weight: 800;
+}
+.comp-badge-ok   { background: var(--ok-bg);   color: var(--ok); }
+.comp-badge-err  { background: var(--err-bg);   color: var(--err); }
+.comp-badge-warn { background: var(--warn-bg);  color: var(--warn); }
+.comp-badge-na   { background: var(--bg-3);     color: var(--fg-4); font-size: 14px; }
+
+.run-row:hover { background: var(--bg-2); }
+.run-row-selected { background: var(--accent-bg) !important; }
+
+.run-detail-panel {
+  margin-top: 20px; border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 24px;
+  box-shadow: var(--shadow-md);
+}
+.run-detail-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; margin-bottom: 20px; flex-wrap: wrap;
+}
+
+.run-comp-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+}
+@media (max-width: 900px) { .run-comp-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 500px) { .run-comp-grid { grid-template-columns: 1fr; } }
+
+.run-comp-card {
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 16px; display: flex; flex-direction: column; gap: 8px;
+}
+.run-comp-ok   { border-top: 3px solid var(--ok);     }
+.run-comp-err  { border-top: 3px solid var(--err);    }
+.run-comp-warn { border-top: 3px solid var(--warn);   }
+.run-comp-na   { border-top: 3px solid var(--fg-4);   background: var(--bg-2); }
+
+.run-comp-top   { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.run-comp-letra {
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800;
+  background: var(--bg-3); color: var(--fg-2); flex-shrink: 0;
+}
+.run-comp-nombre { font-size: 12px; font-weight: 600; color: var(--fg); flex: 1; }
+.run-comp-badge  { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; white-space: nowrap; }
+.run-comp-badge-ok   { background: var(--ok-bg);   color: var(--ok); }
+.run-comp-badge-err  { background: var(--err-bg);  color: var(--err); }
+.run-comp-badge-warn { background: var(--warn-bg); color: var(--warn); }
+
+.run-comp-diffs  { font-size: 18px; font-weight: 700; color: var(--fg); }
+.run-comp-extra  { font-size: 11px; color: var(--fg-3); }
+.run-comp-notas  { font-size: 11px; color: var(--fg-2); line-height: 1.5; margin: 0; }
+
+.run-comp-unavail {
+  background: var(--warn-bg); border: 1px solid #fde68a;
+  border-radius: var(--radius); padding: 10px 12px;
+}
+.run-comp-unavail span { font-weight: 700; font-size: 12px; color: var(--warn); display: block; margin-bottom: 6px; }
+.run-comp-unavail p    { font-size: 11px; color: var(--fg-2); line-height: 1.5; margin: 0; max-width: none; }
+
+.comparar-layout {
+  display: grid; grid-template-columns: 380px 1fr;
+  gap: 28px; align-items: start;
+}
+@media (max-width: 900px) { .comparar-layout { grid-template-columns: 1fr; } }
+
+.cmp-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+.cmp-card h2 { margin-bottom: 20px; }
+
+.cmp-field { margin-bottom: 20px; }
+.cmp-field label {
+  display: block; font-size: 11px; font-weight: 700; color: var(--fg-3);
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px;
+}
+.cmp-field select {
+  width: 100%; padding: 8px 10px; border-radius: var(--radius);
+  border: 1px solid var(--border-s); background: var(--bg); color: var(--fg);
+  font-size: 13px;
+}
+.cmp-help { font-size: 11px; color: var(--fg-4); margin-top: 5px; }
+
+.cmp-radio-group { display: flex; flex-direction: column; gap: 6px; }
+.cmp-radio {
+  display: flex; align-items: center;
+  padding: 10px 14px; border-radius: var(--radius);
+  border: 1px solid var(--border); cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.cmp-radio input[type="radio"] { display: none; }
+.cmp-radio:hover  { border-color: var(--border-s); background: var(--bg-2); }
+.cmp-radio.active { border-color: var(--accent-l); background: var(--accent-bg); }
+.cmp-radio-label  { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; }
+.cmp-radio-icon   { font-size: 16px; width: 24px; text-align: center; }
+
+.cmp-placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 60px 24px;
+  border: 1px dashed var(--border-s); border-radius: var(--radius-lg);
+  color: var(--fg-3);
+}
+.cmp-placeholder-icon { font-size: 40px; margin-bottom: 16px; opacity: .3; }
+.cmp-placeholder p    { font-size: 14px; max-width: 320px; }
+
+.cmp-spinner-icon {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 3px solid var(--border-s); border-top-color: var(--accent-l);
+  animation: spin .8s linear infinite; margin-bottom: 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.cmp-banner {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 18px 20px; border-radius: var(--radius-lg);
+  margin-bottom: 20px; border: 1px solid transparent;
+}
+.cmp-banner-ok      { background: var(--ok-bg);     border-color: #6ee7b7; }
+.cmp-banner-warn    { background: var(--warn-bg);    border-color: #fde68a; }
+.cmp-banner-err     { background: var(--err-bg);     border-color: #fca5a5; }
+.cmp-banner-partial { background: var(--purple-bg);  border-color: #c4b5fd; }
+.cmp-banner-icono {
+  font-size: 22px; font-weight: 900; flex-shrink: 0; margin-top: 1px;
+}
+.cmp-banner-ok   .cmp-banner-icono { color: var(--ok); }
+.cmp-banner-warn .cmp-banner-icono { color: var(--warn); }
+.cmp-banner-err  .cmp-banner-icono { color: var(--err); }
+.cmp-banner-partial .cmp-banner-icono { color: var(--purple); }
+.cmp-banner-titulo { font-weight: 700; font-size: 15px; color: var(--fg); margin-bottom: 3px; }
+.cmp-banner-sub    { font-size: 13px; color: var(--fg-2); }
+
+.cmp-metricas {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 10px; margin-bottom: 20px;
+}
+@media (max-width: 600px) { .cmp-metricas { grid-template-columns: repeat(2, 1fr); } }
+.cmp-metrica {
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px 14px; text-align: center;
+}
+.cmp-metrica-val { font-size: 18px; font-weight: 700; color: var(--accent); }
+.cmp-metrica-lbl { font-size: 11px; color: var(--fg-3); margin-top: 2px; text-transform: uppercase; letter-spacing: .04em; }
+
+.cmp-error-box {
+  background: var(--err-bg); border: 1px solid #fca5a5;
+  border-radius: var(--radius); padding: 14px 16px;
+  font-size: 13px; color: var(--fg); margin-bottom: 16px; line-height: 1.6;
+}
+.cmp-advertencias {
+  background: var(--warn-bg); border: 1px solid #fde68a;
+  border-radius: var(--radius); padding: 14px 16px;
+  font-size: 13px; color: var(--fg); margin-bottom: 16px; line-height: 1.6;
+}
+.cmp-trace {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px;
+  padding: 12px 14px; background: var(--bg-2);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: 11px; color: var(--fg-3);
+}
+.cmp-trace code {
+  font-family: ui-monospace, monospace; font-size: 11px;
+  color: var(--accent-l); background: var(--accent-bg);
+  padding: 1px 5px; border-radius: 3px;
+}
+
+@media (max-width: 768px) {
+  .charts-row { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 26px; }
+  .kpi-value { font-size: 24px; }
+  .feature { border-right: none; border-bottom: 1px solid var(--border); }
+  .feature:last-child { border-bottom: none; }
+  .datos-grid { grid-template-columns: 1fr; }
+  .hyp-grid { grid-template-columns: 1fr; }
+  .progress-grid { grid-template-columns: 1fr; }
+  .comparar-layout { grid-template-columns: 1fr; }
+}
+
+.proj-sect {
+  font-size: 1.1rem; font-weight: 700;
+  margin: 32px 0 6px; color: var(--fg);
+}
+.proj-sect-sub {
+  font-size: 13px; color: var(--fg-3); margin: 0 0 14px;
+}
+
+.hyp-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
+}
+.hyp-card {
+  background: var(--surface,var(--bg-2));
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 18px;
+}
+.hyp-tag {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 8px;
+  font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 10px;
+}
+.hyp-h1 { background: var(--accent-l); }
+.hyp-h2 { background: #7c3aed; }
+.hyp-h3 { background: #059669; }
+.hyp-card p { font-size: 13.5px; line-height: 1.65; color: var(--fg-2); margin: 0; }
+
+.strata-wrap { overflow-x: auto; margin-bottom: 6px; }
+.strata-table { border-collapse: collapse; min-width: 480px; width: 100%; }
+.strata-table th, .strata-table td {
+  border: 1px solid var(--border); padding: 9px 14px; font-size: 13px;
+}
+.strata-table th {
+  background: var(--bg-2); color: var(--fg-2);
+  font-weight: 600; text-align: center;
+}
+.strata-row-header { font-weight: 600; background: var(--bg-2) !important; white-space: nowrap; color: var(--fg); }
+.strata-cell { text-align: center; vertical-align: middle; }
+.strata-ok  { color: var(--ok); font-weight: 600; }
+.strata-div { color: var(--err); font-weight: 600; }
+.strata-pend{ color: var(--fg-3); }
+.strata-bar-wrap {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 13px; color: var(--fg-2); margin: 10px 0 4px;
+}
+.strata-bar {
+  flex: 1; height: 7px; background: var(--border);
+  border-radius: 4px; overflow: hidden;
+}
+.strata-bar-fill {
+  height: 100%; background: var(--accent-l);
+  border-radius: 4px; transition: width .6s ease;
+}
+
+.arch-diagram {
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px; overflow-x: auto;
+}
+.arch-svg { display: block; min-width: 560px; max-width: 100%; height: auto; }
+.arch-input-box  { fill: var(--bg-2); stroke: var(--border-s); }
+.arch-compare-box{ fill: var(--arch-compare-bg); stroke: var(--arch-compare-stroke); }
+.arch-r-box  { fill: var(--arch-r-bg); stroke: var(--arch-r-stroke); }
+.arch-m-box  { fill: var(--arch-m-bg); stroke: var(--arch-m-stroke); }
+.arch-b-box  { fill: var(--arch-b-bg); stroke: var(--arch-b-stroke); }
+.arch-h-box  { fill: var(--arch-h-bg); stroke: var(--arch-h-stroke); }
+.arch-label  { fill: var(--fg); font-family: Inter,system-ui,sans-serif; }
+.arch-sub    { fill: var(--fg-3); font-family: Inter,system-ui,sans-serif; }
+.arch-line   { stroke: var(--fg-3); stroke-width: 1.5; fill: none; }
+.arch-line-dash { stroke: var(--fg-3); stroke-width: 1.5; fill: none; stroke-dasharray: 4 3; }
+.arch-arrow-head{ fill: var(--fg-3); }
+.arch-note {
+  font-size: 12.5px; color: var(--fg-3); margin-top: 10px;
+  padding: 10px 14px; border-left: 3px solid var(--border-s);
+  background: var(--bg-2); border-radius: 0 6px 6px 0;
+  line-height: 1.5;
+}
+
+.progress-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.progress-card {
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px;
+}
+.progress-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+}
+.progress-header h3 { margin: 0; font-size: 15px; font-weight: 700; }
+.ptag {
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; white-space: nowrap; flex-shrink: 0;
+}
+.ptag-green  { background: #dcfce7; color: #15803d; }
+.ptag-yellow { background: #fef9c3; color: #a16207; }
+.progress-items {
+  display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;
+}
+.progress-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 13px; line-height: 1.45; color: var(--fg-2);
+}
+.progress-item .pi { flex-shrink: 0; margin-top: 1px; }
+.progress-footer {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  border-top: 1px solid var(--border); padding-top: 10px;
+}
+.progress-footer a, .progress-footer button.lnk {
+  color: var(--accent-l); font-size: 13px; font-weight: 500;
+  text-decoration: none; background: none; border: none;
+  padding: 0; cursor: pointer;
+}
+.progress-footer a:hover, .progress-footer button.lnk:hover { text-decoration: underline; }
+
+.proj-authors {
+  margin-top: 28px; padding: 18px;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 10px; font-size: 14px; color: var(--fg-2);
+}
+.proj-authors p { margin-bottom: 4px; }
+.proj-authors p:last-child { margin: 0; }
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="data/synthetic.js"></script>
-<script src="assets/js/config.js"></script>
+<script>
+// Datos sintéticos — misma forma que la API real cuando Jhair publique el DW
+const EQ = {};
+
+EQ.snapshots = [
+  { id: "20261012-v1", label: "12 oct 2026 — v1", fecha: "2026-10-12", registros: 183891 },
+];
+
+EQ.indicadores = {
+  total_adjudicaciones: 183891,
+  monto_total_usd: 4872340218.50,
+  entidades_unicas: 1247,
+  proveedores_unicos: 38902,
+};
+
+EQ.serie_temporal = [
+  { mes: "Ene 2025", monto: 312400000, adjudicaciones: 12840 },
+  { mes: "Feb 2025", monto: 287600000, adjudicaciones: 11230 },
+  { mes: "Mar 2025", monto: 345800000, adjudicaciones: 14120 },
+  { mes: "Abr 2025", monto: 398100000, adjudicaciones: 15670 },
+  { mes: "May 2025", monto: 421300000, adjudicaciones: 16890 },
+  { mes: "Jun 2025", monto: 389700000, adjudicaciones: 15340 },
+  { mes: "Jul 2025", monto: 356200000, adjudicaciones: 14050 },
+  { mes: "Ago 2025", monto: 412800000, adjudicaciones: 16200 },
+  { mes: "Sep 2025", monto: 445600000, adjudicaciones: 17430 },
+  { mes: "Oct 2025", monto: 503100000, adjudicaciones: 19280 },
+  { mes: "Nov 2025", monto: 489900000, adjudicaciones: 18760 },
+  { mes: "Dic 2025", monto: 509840218, adjudicaciones: 22079 },
+];
+
+EQ.top_entidades = [
+  { entidad: "Ministerio de Salud Pública", monto: 892340000, adjudicaciones: 18230 },
+  { entidad: "Ministerio de Educación",     monto: 743120000, adjudicaciones: 14870 },
+  { entidad: "Ministerio de Obras Públicas",monto: 698450000, adjudicaciones: 9340  },
+  { entidad: "IESS",                        monto: 612300000, adjudicaciones: 11230 },
+  { entidad: "Ministerio de Defensa",       monto: 487600000, adjudicaciones: 7890  },
+  { entidad: "Ministerio del Interior",     monto: 312400000, adjudicaciones: 6120  },
+  { entidad: "Petroecuador",               monto: 298700000, adjudicaciones: 4230  },
+  { entidad: "SENESCYT",                   monto: 213400000, adjudicaciones: 5670  },
+  { entidad: "Municipio de Guayaquil",      monto: 198200000, adjudicaciones: 3840  },
+  { entidad: "Municipio de Quito",          monto: 187600000, adjudicaciones: 3540  },
+];
+
+EQ.adjudicaciones = Array.from({ length: 50 }, (_, i) => ({
+  ocid:       `ocds-lcuori-${String(1000 + i).padStart(6,"0")}`,
+  award_id:   `AWD-2025-${String(10000 + i).padStart(6,"0")}`,
+  entidad:    EQ.top_entidades[i % 10].entidad,
+  proveedor:  `Proveedor S.A. ${1000 + (i * 7) % 900}`,
+  monto:      Math.round((50000 + (i * 123456.78) % 4950000) * 100) / 100,
+  moneda:     "USD",
+  fecha:      `2025-${String((i % 12) + 1).padStart(2,"0")}-${String((i % 28) + 1).padStart(2,"0")}`,
+  estado:     ["active","complete","cancelled","pending"][i % 4],
+  modalidad:  ["Subasta Inversa","Cotización","Menor Cuantía","Licitación"][i % 4],
+}));
+
+EQ.procedimientos = Array.from({ length: 50 }, (_, i) => ({
+  ocid:               `ocds-lcuori-${String(1000 + i).padStart(6,"0")}`,
+  entidad:            EQ.top_entidades[i % 10].entidad,
+  objeto:             ["Adquisición de medicamentos esenciales","Construcción de aulas modulares","Mantenimiento vial regional","Suministro de equipos TI","Servicios de limpieza institucional","Dotación de uniformes escolares","Obras de alcantarillado","Consultoría técnica especializada"][i % 8],
+  modalidad:          ["Subasta Inversa","Cotización","Menor Cuantía","Licitación"][i % 4],
+  monto_referencial:  Math.round((80000 + (i * 234567.89) % 5000000) * 100) / 100,
+  estado:             ["active","complete","cancelled","pending"][i % 4],
+  fecha_publicacion:  `2025-${String((i % 12) + 1).padStart(2,"0")}-${String((i % 15) + 1).padStart(2,"0")}`,
+  fecha_adjudicacion: i % 4 !== 2 ? `2025-${String((i % 12) + 1).padStart(2,"0")}-${String((i % 28) + 1).padStart(2,"0")}` : null,
+  num_adjudicaciones: i % 4 !== 2 ? (i % 3) + 1 : 0,
+}));
+
+EQ.montos_por_moneda = [
+  { moneda: "USD", codigo: "USD", descripcion: "Dólar estadounidense", total_adjudicaciones: 183705, monto_total: 4869840218.50, porcentaje: 99.95 },
+  { moneda: "EUR", codigo: "EUR", descripcion: "Euro",                 total_adjudicaciones: 152,    monto_total: 1980000.00,    porcentaje: 0.04 },
+  { moneda: "GBP", codigo: "GBP", descripcion: "Libra esterlina",      total_adjudicaciones: 34,     monto_total: 520000.00,     porcentaje: 0.01 },
+];
+
+EQ.demos = {
+  montos_intercambiados: {
+    titulo: "Montos intercambiados",
+    descripcion: "Dos adjudicaciones conservan un total de 300,00 USD. La salida intercambia los valores: el total es correcto pero los montos individuales están asignados a la entidad equivocada.",
+    tipo_datos: "sintéticos",
+    entrada: [
+      { ocid: "ocds-001", entidad: "Entidad A", monto: 100.00 },
+      { ocid: "ocds-002", entidad: "Entidad B", monto: 200.00 },
+    ],
+    salida_pandas: [
+      { ocid: "ocds-001", entidad: "Entidad A", monto: 100.00 },
+      { ocid: "ocds-002", entidad: "Entidad B", monto: 200.00 },
+    ],
+    salida_polars: [
+      { ocid: "ocds-001", entidad: "Entidad A", monto: 200.00 },
+      { ocid: "ocds-002", entidad: "Entidad B", monto: 100.00 },
+    ],
+    diferencias: [
+      { campo: "monto", ocid: "ocds-001", esperado: 100.00, obtenido: 200.00, tipo: "valor_incorrecto" },
+      { campo: "monto", ocid: "ocds-002", esperado: 200.00, obtenido: 100.00, tipo: "valor_incorrecto" },
+    ],
+    contrato: { suma_total: 300.00, igualdad_exacta_por_clave: true },
+    resultado: "DIVERGENCIA",
+    motor_origen: "Pandas", motor_destino: "Polars",
+  },
+  duplicados_orden: {
+    titulo: "Duplicados y orden",
+    descripcion: "Un JOIN puede multiplicar filas si hay claves duplicadas. La suma de montos cambia aunque el esquema sea idéntico.",
+    tipo_datos: "sintéticos",
+    entrada: [
+      { award_id: "A1", monto: 500.00, proveedor_id: "P1" },
+      { award_id: "A1", monto: 500.00, proveedor_id: "P2" },
+    ],
+    salida_pandas: [
+      { award_id: "A1", monto: 500.00, proveedor_id: "P1", nombre: "Empresa X" },
+      { award_id: "A1", monto: 500.00, proveedor_id: "P2", nombre: "Empresa Y" },
+    ],
+    salida_polars: [
+      { award_id: "A1", monto: 500.00, proveedor_id: "P2", nombre: "Empresa Y" },
+      { award_id: "A1", monto: 500.00, proveedor_id: "P1", nombre: "Empresa X" },
+    ],
+    diferencias: [
+      { campo: "orden_filas", descripcion: "Polars no garantiza orden sin ORDER BY explícito", tipo: "orden" },
+    ],
+    contrato: { filas_esperadas: 2, duplicados_permitidos: false },
+    resultado: "OK_CON_ADVERTENCIA",
+    motor_origen: "Pandas", motor_destino: "Polars",
+  },
+  tipos_fechas: {
+    titulo: "Tipos y fechas",
+    descripcion: "Identificadores leídos como entero pierden ceros iniciales. Zonas horarias distintas producen fechas diferentes al comparar.",
+    tipo_datos: "sintéticos",
+    entrada: [
+      { ocid: "0012345", fecha_adjudicacion: "2025-03-15T00:00:00-05:00", monto: 1234.56 },
+    ],
+    salida_pandas: [
+      { ocid: "0012345", fecha_adjudicacion: "2025-03-15T00:00:00-05:00", monto: 1234.56 },
+    ],
+    salida_duckdb: [
+      { ocid: 12345, fecha_adjudicacion: "2025-03-15T05:00:00Z", monto: 1234.56 },
+    ],
+    diferencias: [
+      { campo: "ocid", tipo: "tipo_dato", pandas: "string '0012345'", duckdb: "integer 12345" },
+      { campo: "fecha_adjudicacion", tipo: "zona_horaria", pandas: "-05:00", duckdb: "UTC" },
+    ],
+    contrato: { ocid_tipo: "string", fecha_con_zona: true },
+    resultado: "DIVERGENCIA",
+    motor_origen: "Pandas", motor_destino: "DuckDB",
+  },
+  migracion_motores: {
+    titulo: "Migración entre motores",
+    descripcion: "Misma transformación de agregación ejecutada en Pandas, Polars y DuckDB. Se compara el resultado por clave.",
+    tipo_datos: "sintéticos",
+    parejas: ["Pandas→Polars", "Pandas→DuckDB", "Polars→DuckDB"],
+    resumen: [
+      { pareja: "Pandas→Polars",  resultado: "OK",         diferencias: 0, filas: 183891 },
+      { pareja: "Pandas→DuckDB",  resultado: "DIVERGENCIA",diferencias: 3, filas: 183891 },
+      { pareja: "Polars→DuckDB",  resultado: "DIVERGENCIA",diferencias: 3, filas: 183891 },
+    ],
+    contrato: { agrupacion: ["entidad_id"], suma: "monto", moneda_separada: true },
+    resultado: "DIVERGENCIA_PARCIAL",
+    motor_origen: "Pandas",
+  },
+};
+
+EQ.resultados = [
+  {
+    run_id: "run-20261012-001", pareja: "Pandas→Polars", familia: "ausencias_tipos",
+    filas: 183891, tiempo_s: 4.2, memoria_mb: 98.4, fecha: "2026-10-12",
+    resultado_R: "OK",          diferencias_R: 0,
+    resultado_M: "OK",          diferencias_M: 0, puntuacion_anomalia: 0.08,
+    resultado_B: "OK",          diferencias_B: 0,
+    resultado:   "OK",          diferencias: 0,
+    m_disponible: true,
+    notas_R: "Sin infracciones de contrato detectadas.",
+    notas_M: "Perfil dentro del rango normal. Puntuación de anomalía: 0.08 (umbral 0.5).",
+    notas_B: "MAD = 0 — ninguna variable supera k=3 desviaciones.",
+  },
+  {
+    run_id: "run-20261012-002", pareja: "Pandas→DuckDB", familia: "ausencias_tipos",
+    filas: 183891, tiempo_s: 6.1, memoria_mb: 134.2, fecha: "2026-10-12",
+    resultado_R: "DIVERGENCIA",  diferencias_R: 2,
+    resultado_M: "DIVERGENCIA",  diferencias_M: 1, puntuacion_anomalia: 0.74,
+    resultado_B: "OK",           diferencias_B: 0,
+    resultado:   "DIVERGENCIA",  diferencias: 3,
+    m_disponible: true,
+    notas_R: "Campo 'ocid' leído como integer en DuckDB (pierde ceros iniciales). Campo 'fecha_adjudicacion' cambia zona horaria a UTC.",
+    notas_M: "Puntuación de anomalía: 0.74 — perfil inusual en ratio nulos/tipos. Detectó diferencia en proporción de tipos de dato.",
+    notas_B: "MAD dentro de rango normal para esta familia — no detectó diferencias.",
+  },
+  {
+    run_id: "run-20261012-003", pareja: "Polars→DuckDB", familia: "uniones",
+    filas: 183891, tiempo_s: 5.8, memoria_mb: 121.7, fecha: "2026-10-12",
+    resultado_R: "OK",           diferencias_R: 0,
+    resultado_M: "OK",           diferencias_M: 0, puntuacion_anomalia: 0.19,
+    resultado_B: "OK",           diferencias_B: 0,
+    resultado:   "OK",           diferencias: 0,
+    m_disponible: true,
+    notas_R: "LEFT JOIN preservado. Cardinalidad correcta. Claves huérfanas documentadas (3 adjudicaciones sin proveedor).",
+    notas_M: "Puntuación de anomalía: 0.19 — perfil normal.",
+    notas_B: "Sin anomalías estadísticas.",
+  },
+  {
+    run_id: "run-20261012-004", pareja: "Pandas→Polars", familia: "agregaciones",
+    filas: 183891, tiempo_s: 3.9, memoria_mb: 87.1, fecha: "2026-10-12",
+    resultado_R: "OK",           diferencias_R: 0,
+    resultado_M: null,           diferencias_M: null, puntuacion_anomalia: null,
+    resultado_B: "OK",           diferencias_B: 0,
+    resultado:   "OK",           diferencias: 0,
+    m_disponible: false,
+    notas_R: "Sumas y conteos por entidad coinciden exactamente.",
+    notas_M: null,
+    notas_B: "MAD dentro de rango. Variación de montos < 0.001 %.",
+  },
+  {
+    run_id: "run-20261012-005", pareja: "Pandas→DuckDB", familia: "agregaciones",
+    filas: 183891, tiempo_s: 7.2, memoria_mb: 148.9, fecha: "2026-10-12",
+    resultado_R: "DIVERGENCIA",  diferencias_R: 1,
+    resultado_M: null,           diferencias_M: null, puntuacion_anomalia: null,
+    resultado_B: "DIVERGENCIA",  diferencias_B: 1,
+    resultado:   "DIVERGENCIA",  diferencias: 1,
+    m_disponible: false,
+    notas_R: "Suma de montos para entidad 'IESS' difiere en 0.01 USD por acumulación de errores de punto flotante entre Python y DuckDB.",
+    notas_M: null,
+    notas_B: "MAD detectó anomalía en variable 'monto_sum' para IESS: |xi - mediana| > 3 × MAD.",
+  },
+];
+
+EQ.componentes_estado = {
+  R: {
+    clave: "R", nombre: "Reglas deterministas", disponible: true,
+    descripcion: "Verificaciones explícitas del contrato: ausencias, tipos, cardinalidad, claves, orden.",
+    runs_completados: 5, runs_total: 9,
+  },
+  M: {
+    clave: "M", nombre: "Isolation Forest", disponible: true,
+    descripcion: "Detector de anomalías entrenado con 23 726 perfiles de ejecuciones canónicas.",
+    runs_completados: 3, runs_total: 9,
+    modelo_fecha: "2026-10-10", n_perfiles: 23726,
+    familias_disponibles: ["ausencias_tipos", "uniones"],
+    familias_pendientes: ["agregaciones"],
+  },
+  B: {
+    clave: "B", nombre: "MAD (baseline estadístico)", disponible: true,
+    descripcion: "Desviación absoluta de la mediana variable a variable. Referencia independiente.",
+    runs_completados: 5, runs_total: 9,
+  },
+  H: {
+    clave: "H", nombre: "Híbrido (R OR M)", disponible: true,
+    descripcion: "Resultado final: alerta si R o M detectan divergencia. Si M no está disponible, H = R.",
+    runs_completados: 5, runs_total: 9,
+  },
+};
+</script>
+<script>
+const API_URL = '';
+const EQ_CONFIG = {
+  apiUrl:     API_URL,
+  useRealApi: API_URL !== '',
+  snapshotId: '20261012-v1',
+};
+</script>
 
 <!-- Banner de error API (oculto por defecto) -->
 <div id="api-error" hidden style="position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:6px;padding:8px 16px;font-size:13px;z-index:999;max-width:90vw;text-align:center"></div>
@@ -18,6 +1192,7 @@
     <div class="nav-links">
       <button class="nav-link" data-page="inicio">Inicio</button>
       <button class="nav-link" data-page="explorar">Explorar</button>
+      <button class="nav-link" data-page="comparar">Comparar</button>
       <button class="nav-link" data-page="demos">Demostraciones</button>
       <button class="nav-link" data-page="resultados">Resultados</button>
       <button class="nav-link" data-page="datos">Datos</button>
@@ -34,11 +1209,13 @@
   <div class="hero">
     <div class="container">
       <span class="hero-tag">Tesis de Maestría — UIDE 2026</span>
-      <h1>Evaluación híbrida de divergencias semánticas en migraciones ETL</h1>
-      <p>EquiFrame compara transformaciones entre Pandas, Polars y DuckDB sobre datos de contratación pública del Ecuador (SERCOP–OCDS 2025), combinando reglas deterministas con Isolation Forest.</p>
+      <h1>Evaluación híbrida de divergencias semánticas en <em>migraciones ETL</em></h1>
+      <p>EquiFrame compara transformaciones entre Pandas, Polars y DuckDB sobre datos de contratación pública del Ecuador (SERCOP–OCDS 2025), combinando reglas deterministas con Isolation Forest para detectar divergencias que los controles de suma o conteo no capturan.</p>
       <div class="hero-btns">
         <button class="btn btn-primary" onclick="showPage('explorar')">Explorar SERCOP</button>
         <button class="btn btn-outline" onclick="showPage('demos')">Ver una demostración</button>
+        <a class="btn btn-ghost" href="https://github.com/htroya/equiframe" target="_blank" rel="noopener">GitHub ↗</a>
+        <a class="btn btn-ghost" href="https://pypi.org/project/equiframe/0.12.4/" target="_blank" rel="noopener">PyPI 0.12.4 ↗</a>
       </div>
       <div class="features">
         <div class="feature">
@@ -79,23 +1256,23 @@
       <div class="filter-group">
         <label>Snapshot</label>
         <select id="f-snapshot">
-          <option value="20261012-v1">12 oct 2026 — v1</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label>Período</label>
-        <select id="f-periodo">
-          <option value="">Todos</option>
-          <option value="2025-Q1">2025 T1</option>
-          <option value="2025-Q2">2025 T2</option>
-          <option value="2025-Q3">2025 T3</option>
-          <option value="2025-Q4">2025 T4</option>
+          <option value="20261012-v1">20261012-v1</option>
         </select>
       </div>
       <div class="filter-group">
         <label>Entidad</label>
         <select id="f-entidad">
           <option value="">Todas</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Modalidad</label>
+        <select id="f-modalidad">
+          <option value="">Todas</option>
+          <option value="Subasta Inversa">Subasta Inversa</option>
+          <option value="Cotización">Cotización</option>
+          <option value="Menor Cuantía">Menor Cuantía</option>
+          <option value="Licitación">Licitación</option>
         </select>
       </div>
       <div class="filter-group">
@@ -109,15 +1286,14 @@
         </select>
       </div>
       <div class="filter-group">
-        <label>Modalidad</label>
-        <select id="f-modalidad">
-          <option value="">Todas</option>
-          <option value="Subasta Inversa">Subasta Inversa</option>
-          <option value="Cotización">Cotización</option>
-          <option value="Menor Cuantía">Menor Cuantía</option>
-          <option value="Licitación">Licitación</option>
-        </select>
+        <label>Desde</label>
+        <input type="date" id="f-fecha-desde" value="2025-01-01">
       </div>
+      <div class="filter-group">
+        <label>Hasta</label>
+        <input type="date" id="f-fecha-hasta" value="2025-12-31">
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="limpiarFiltros()">✕ Limpiar</button>
     </div>
 
     <!-- KPIs -->
@@ -135,29 +1311,209 @@
       </div>
     </div>
 
-    <!-- Tabla -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <h2 style="margin:0">Adjudicaciones</h2>
-      <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Descargar CSV</button>
+    <!-- Tabs de vista -->
+    <div class="view-tabs">
+      <button class="view-tab active" id="vtab-adj"      onclick="switchView('adj')">📋 Adjudicaciones</button>
+      <button class="view-tab"        id="vtab-proc"     onclick="switchView('proc')">📄 Procedimientos</button>
+      <button class="view-tab"        id="vtab-monedas"  onclick="switchView('monedas')">💱 Por moneda</button>
     </div>
-    <div class="table-wrap">
-      <table id="tabla-adj">
-        <thead>
-          <tr>
-            <th>OCID</th>
-            <th>Entidad</th>
-            <th>Proveedor</th>
-            <th class="num">Monto (USD)</th>
-            <th>Moneda</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-            <th>Modalidad</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-adj"></tbody>
-      </table>
+
+    <!-- Vista: Adjudicaciones -->
+    <div id="view-adj" class="view-panel active">
+      <div class="view-toolbar">
+        <span id="adj-count" class="view-count"></span>
+        <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table id="tabla-adj">
+          <thead><tr>
+            <th>OCID</th><th>Entidad</th><th>Proveedor</th>
+            <th class="num">Monto</th><th>Moneda</th>
+            <th>Fecha</th><th>Estado</th><th>Modalidad</th>
+          </tr></thead>
+          <tbody id="tbody-adj"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="paginacion"></div>
     </div>
-    <div class="pagination" id="paginacion"></div>
+
+    <!-- Vista: Procedimientos -->
+    <div id="view-proc" class="view-panel">
+      <div class="view-toolbar">
+        <span id="proc-count" class="view-count"></span>
+        <button class="btn btn-outline btn-sm" onclick="exportProcCSV()">⬇ CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table id="tabla-proc">
+          <thead><tr>
+            <th>OCID</th><th>Entidad</th><th>Objeto</th>
+            <th>Modalidad</th><th class="num">Monto ref.</th>
+            <th>Publicación</th><th>Adjudicación</th><th>Estado</th>
+          </tr></thead>
+          <tbody id="tbody-proc"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="paginacion-proc"></div>
+    </div>
+
+    <!-- Vista: Por moneda -->
+    <div id="view-monedas" class="view-panel">
+      <div class="monedas-grid" id="monedas-grid"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════ COMPARAR ════════ -->
+<div id="page-comparar" class="page">
+  <div class="container">
+    <div class="section-header">
+      <h1>Comparar transformaciones ETL</h1>
+      <p>Selecciona la pareja de motores y la familia de operación · EquiFrame ejecuta la comparación y reporta equivalencia o divergencias</p>
+    </div>
+
+    <div class="comparar-layout">
+
+      <!-- ── Formulario ── -->
+      <div class="comparar-form-col">
+        <div class="cmp-card">
+          <h2>Configuración</h2>
+
+          <div class="cmp-field">
+            <label>Snapshot</label>
+            <select id="cmp-snapshot">
+              <option value="20261012-v1">20261012-v1 · 183 891 adjudicaciones</option>
+            </select>
+          </div>
+
+          <div class="cmp-field">
+            <label>Pareja de motores</label>
+            <div class="cmp-radio-group" id="cmp-pareja">
+              <label class="cmp-radio active">
+                <input type="radio" name="pareja" value="pandas_polars" checked>
+                <span class="cmp-radio-label">
+                  <span class="cmp-radio-icon">⚡</span>
+                  <span>Pandas → Polars</span>
+                </span>
+              </label>
+              <label class="cmp-radio">
+                <input type="radio" name="pareja" value="pandas_duckdb">
+                <span class="cmp-radio-label">
+                  <span class="cmp-radio-icon">🦆</span>
+                  <span>Pandas → DuckDB</span>
+                </span>
+              </label>
+              <label class="cmp-radio">
+                <input type="radio" name="pareja" value="polars_duckdb">
+                <span class="cmp-radio-label">
+                  <span class="cmp-radio-icon">🔀</span>
+                  <span>Polars → DuckDB</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div class="cmp-field">
+            <label>Familia de operación</label>
+            <div class="cmp-radio-group" id="cmp-familia">
+              <label class="cmp-radio active">
+                <input type="radio" name="familia" value="ausencias_tipos" checked>
+                <span class="cmp-radio-label">
+                  <span class="cmp-radio-icon">🔎</span>
+                  <span>Ausencias y tipos</span>
+                </span>
+              </label>
+              <label class="cmp-radio">
+                <input type="radio" name="familia" value="uniones">
+                <span class="cmp-radio-label">
+                  <span class="cmp-radio-icon">🔗</span>
+                  <span>Uniones (JOIN)</span>
+                </span>
+              </label>
+              <label class="cmp-radio">
+                <input type="radio" name="familia" value="agregaciones">
+                <span class="cmp-radio-label">
+                  <span class="cmp-radio-icon">∑</span>
+                  <span>Agregaciones</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div class="cmp-field">
+            <label>Tamaño de muestra</label>
+            <select id="cmp-muestra">
+              <option value="1000">1 000 registros (rápido ~5 s)</option>
+              <option value="10000">10 000 registros (~15 s)</option>
+              <option value="50000">50 000 registros (~45 s)</option>
+              <option value="0">Corpus completo — 183 891 (lento)</option>
+            </select>
+            <p class="cmp-help">En modo sintético la muestra es ilustrativa.</p>
+          </div>
+
+          <button class="btn btn-primary" id="cmp-ejecutar" onclick="ejecutarComparacion()" style="width:100%;margin-top:8px">
+            ▶ Ejecutar comparación
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Panel resultados ── -->
+      <div class="comparar-result-col">
+
+        <!-- Estado inicial -->
+        <div id="cmp-estado-inicial" class="cmp-placeholder">
+          <div class="cmp-placeholder-icon">⬡</div>
+          <p>Configura los parámetros y pulsa <strong>Ejecutar comparación</strong></p>
+          <p style="font-size:12px;margin-top:6px">El resultado incluirá run ID, métricas de ejecución y, si hay divergencias, la tabla de diferencias fila a fila.</p>
+        </div>
+
+        <!-- Spinner -->
+        <div id="cmp-spinner" hidden class="cmp-placeholder">
+          <div class="cmp-spinner-icon"></div>
+          <p id="cmp-spinner-msg">Ejecutando…</p>
+        </div>
+
+        <!-- Resultado -->
+        <div id="cmp-resultado" hidden>
+
+          <!-- Banner de estado -->
+          <div id="cmp-banner" class="cmp-banner">
+            <div id="cmp-banner-icono" class="cmp-banner-icono"></div>
+            <div>
+              <div id="cmp-banner-titulo" class="cmp-banner-titulo"></div>
+              <div id="cmp-banner-sub"    class="cmp-banner-sub"></div>
+            </div>
+          </div>
+
+          <!-- Métricas -->
+          <div class="cmp-metricas" id="cmp-metricas"></div>
+
+          <!-- Error comprensible -->
+          <div id="cmp-error-box" hidden class="cmp-error-box"></div>
+
+          <!-- Advertencias -->
+          <div id="cmp-advertencias" hidden class="cmp-advertencias"></div>
+
+          <!-- Tabla de diferencias -->
+          <div id="cmp-diffs-section" hidden>
+            <h3 style="margin-bottom:10px">Diferencias detectadas</h3>
+            <div class="table-wrap">
+              <table id="cmp-diffs-table">
+                <thead><tr>
+                  <th>Clave</th><th>Campo</th><th>Tipo</th>
+                  <th>Valor origen</th><th>Valor destino</th>
+                </tr></thead>
+                <tbody id="cmp-diffs-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Run ID / trazabilidad -->
+          <div id="cmp-trace" class="cmp-trace"></div>
+
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -189,26 +1545,48 @@
 <div id="page-resultados" class="page">
   <div class="container">
     <div class="section-header">
-      <h1>Resultados y evidencia</h1>
-      <p>Ejecuciones registradas con identidad propia — run_id, motores, familia y estado</p>
+      <h1>Resultados por componente</h1>
+      <p>Reglas (R) · Isolation Forest (M) · MAD baseline (B) · Híbrido H = R OR M</p>
     </div>
-    <div class="table-wrap">
-      <table>
+
+    <!-- Disponibilidad de componentes -->
+    <div class="comp-status-grid" id="comp-status-grid"></div>
+
+    <!-- Resumen de ejecuciones -->
+    <div class="resultados-stats" id="resultados-stats"></div>
+
+    <!-- Tabla de ejecuciones -->
+    <div class="table-wrap" style="margin-bottom:0">
+      <table id="tabla-resultados">
         <thead>
           <tr>
             <th>Run ID</th>
             <th>Pareja</th>
             <th>Familia</th>
-            <th>Resultado</th>
             <th class="num">Filas</th>
-            <th class="num">Diferencias</th>
-            <th class="num">Tiempo (s)</th>
+            <th style="text-align:center">R</th>
+            <th style="text-align:center">M</th>
+            <th style="text-align:center">B</th>
+            <th style="text-align:center">H</th>
             <th>Fecha</th>
           </tr>
         </thead>
         <tbody id="tbody-resultados"></tbody>
       </table>
     </div>
+
+    <!-- Panel de detalle por run -->
+    <div id="run-detail" hidden class="run-detail-panel">
+      <div class="run-detail-header">
+        <div>
+          <h2 id="run-detail-id" style="margin-bottom:4px"></h2>
+          <p id="run-detail-meta" style="font-size:13px;color:var(--fg-3)"></p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="cerrarDetalle()">✕ Cerrar</button>
+      </div>
+      <div class="run-comp-grid" id="run-comp-grid"></div>
+    </div>
+
   </div>
 </div>
 
@@ -217,43 +1595,76 @@
   <div class="container">
     <div class="section-header">
       <h1>Datos y documentación</h1>
-      <p>Catálogo de descargas, diccionario de campos y metodología</p>
+      <p>Corpus SERCOP–OCDS 2025 · Diccionario de campos · Protocolo experimental</p>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
-      <div style="border:1px solid var(--border);border-radius:10px;padding:20px">
-        <h2>Corpus SERCOP–OCDS 2025</h2>
-        <p style="font-size:13px;margin-bottom:12px">183 891 adjudicaciones · snapshot 20261012-v1 · formato Parquet</p>
-        <div style="font-size:12px;color:var(--fg-3);margin-bottom:12px">
-          <div>Fuente: SERCOP Ecuador</div>
-          <div>Estándar: OCDS 1.1</div>
-          <div>Cobertura: enero–diciembre 2025</div>
-          <div>Tamaño: ~45 MB (Parquet)</div>
+    <div class="datos-grid">
+
+      <!-- Corpus -->
+      <div class="datos-card">
+        <div class="datos-card-icon blue">🗄️</div>
+        <div>
+          <h2>Corpus SERCOP–OCDS 2025</h2>
+          <p>183 891 adjudicaciones · snapshot 20261012-v1 · formato Parquet</p>
         </div>
-        <span class="badge badge-warn">Pendiente — Jhair ETL</span>
+        <div class="datos-meta">
+          <span>Fuente: SERCOP Ecuador</span>
+          <span>Estándar: OCDS 1.1</span>
+          <span>Cobertura: enero–diciembre 2025</span>
+          <span>Tamaño: ~45 MB (Parquet)</span>
+        </div>
+        <div class="dw-status pending">En espera de carga en VM — Jhair ETL</div>
       </div>
-      <div style="border:1px solid var(--border);border-radius:10px;padding:20px">
-        <h2>Diccionario de campos</h2>
-        <p style="font-size:13px;margin-bottom:12px">Definición de cada campo del DW según el estándar OCDS y el modelo dimensional</p>
-        <table style="font-size:12px;width:100%">
-          <tr><td style="padding:3px 0;color:var(--fg-3)">snapshot_id</td><td style="padding:3px 0">Identificador de versión del conjunto</td></tr>
-          <tr><td style="padding:3px 0;color:var(--fg-3)">ocid</td><td style="padding:3px 0">Open Contracting ID del proceso</td></tr>
-          <tr><td style="padding:3px 0;color:var(--fg-3)">award_id</td><td style="padding:3px 0">Identificador de la adjudicación</td></tr>
-          <tr><td style="padding:3px 0;color:var(--fg-3)">monto</td><td style="padding:3px 0">Importe exacto — una vez por adjudicación</td></tr>
-          <tr><td style="padding:3px 0;color:var(--fg-3)">moneda</td><td style="padding:3px 0">Código ISO 4217 (USD)</td></tr>
+
+      <!-- Diccionario -->
+      <div class="datos-card">
+        <div class="datos-card-icon green">📖</div>
+        <div>
+          <h2>Diccionario de campos</h2>
+          <p>Definición según el estándar OCDS y el modelo dimensional star-schema</p>
+        </div>
+        <table class="dict-table">
+          <tr><td>snapshot_id</td><td>Identificador de versión del conjunto</td></tr>
+          <tr><td>ocid</td><td>Open Contracting ID del proceso</td></tr>
+          <tr><td>award_id</td><td>Identificador de la adjudicación</td></tr>
+          <tr><td>entidad_id</td><td>Clave de la entidad compradora</td></tr>
+          <tr><td>monto</td><td>Importe exacto — una vez por adjudicación</td></tr>
+          <tr><td>moneda</td><td>Código ISO 4217 (USD)</td></tr>
+          <tr><td>fecha_adjudicacion</td><td>Fecha de la adjudicación (OCDS)</td></tr>
+          <tr><td>modalidad</td><td>Tipo de procedimiento SERCOP</td></tr>
         </table>
       </div>
-      <div style="border:1px solid var(--border);border-radius:10px;padding:20px">
-        <h2>Metodología</h2>
-        <p style="font-size:13px;margin-bottom:12px">Protocolo experimental: contratos, comparación, perfiles, evaluación</p>
-        <ul style="font-size:12px;color:var(--fg-2);padding-left:16px;line-height:1.8">
-          <li>Contratos de transformación por familia</li>
-          <li>EquiFrame Verify (O): resultado esperado independiente</li>
-          <li>Reglas R + Isolation Forest M + MAD B</li>
-          <li>H = R OR M — detección híbrida</li>
-          <li>Soportes pareados por pareja y familia</li>
-          <li>Métricas: precisión, sensibilidad, F1, cobertura, costo</li>
-        </ul>
+
+      <!-- Metodología -->
+      <div class="datos-card">
+        <div class="datos-card-icon purple">🔬</div>
+        <div>
+          <h2>Protocolo experimental</h2>
+          <p>Contratos, comparación, perfiles de ejecución y evaluación híbrida</p>
+        </div>
+        <div class="metodologia-list">
+          <div class="metodologia-item">
+            <span class="step">1</span>
+            <p>Contratos de transformación por familia (ausencias/tipos, uniones, agregaciones)</p>
+          </div>
+          <div class="metodologia-item">
+            <span class="step">2</span>
+            <p>EquiFrame Verify (O): resultado esperado independiente por evaluadores separados</p>
+          </div>
+          <div class="metodologia-item">
+            <span class="step">3</span>
+            <p>Reglas deterministas R + Isolation Forest M + referencia MAD B</p>
+          </div>
+          <div class="metodologia-item">
+            <span class="step">4</span>
+            <p>H = R OR M — detección híbrida sobre 9 estratos pareja × familia</p>
+          </div>
+          <div class="metodologia-item">
+            <span class="step">5</span>
+            <p>Métricas: precisión, sensibilidad, F1, cobertura, tiempo y memoria</p>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
 </div>
@@ -262,39 +1673,1105 @@
 <div id="page-proyecto" class="page">
   <div class="container">
     <div class="section-header">
-      <h1>Proyecto EquiFrame</h1>
-      <p>Biblioteca de validación de equivalencia semántica en migraciones ETL</p>
+      <h1>Proyecto de Tesis — EquiFrame</h1>
+      <p>Evaluación híbrida de divergencias semánticas en migraciones ETL · Maestría en Ciencia de Datos y Máquinas de Aprendizaje · UIDE 2026</p>
     </div>
-    <div style="max-width:720px">
-      <h2>Propósito</h2>
-      <p style="margin-bottom:16px">EquiFrame evalúa si una migración ETL entre motores conserva el contenido y las relaciones exigidos. Detecta divergencias que los controles de suma o conteo no capturan: valores intercambiados, pérdida de precisión, duplicados por join, cambio de zona horaria.</p>
-      <h2>Autores</h2>
-      <p style="margin-bottom:16px">Hernán Troya · Jhair Alarcón · José Gaona<br><span style="font-size:13px;color:var(--fg-3)">Maestría en Ciencia de Datos y Máquinas de Aprendizaje — UIDE, Ecuador 2026</span></p>
-      <h2>Componentes</h2>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:14px">
-          <h3>SnapshotClient</h3>
-          <p style="font-size:12px">Descarga artefactos con verificación SHA-256. Garantiza reproducibilidad por versión.</p>
+
+    <!-- Hipótesis -->
+    <h2 class="proj-sect">Hipótesis de investigación</h2>
+    <div class="hyp-grid">
+      <div class="hyp-card">
+        <div class="hyp-tag hyp-h1">H1</div>
+        <p>La combinación de reglas deterministas y Isolation Forest detecta significativamente más divergencias semánticas que los controles de suma y conteo en migraciones ETL de datos OCDS.</p>
+      </div>
+      <div class="hyp-card">
+        <div class="hyp-tag hyp-h2">H2</div>
+        <p>El detector híbrido H = R OR M mantiene una tasa de falsos positivos ≤ 5 % mientras supera el F1 de los métodos R y M aplicados de forma independiente.</p>
+      </div>
+      <div class="hyp-card">
+        <div class="hyp-tag hyp-h3">H3</div>
+        <p>Las parejas que involucran DuckDB generan más divergencias semánticas que Pandas→Polars, debido a diferencias en el manejo de tipos numéricos y zonas horarias.</p>
+      </div>
+    </div>
+
+    <!-- Diseño experimental -->
+    <h2 class="proj-sect" style="margin-top:32px">Diseño experimental — 9 estratos</h2>
+    <p class="proj-sect-sub">3 parejas de motores × 3 familias de operación · corpus 183 891 adjudicaciones SERCOP–OCDS 2025</p>
+    <div class="strata-wrap">
+      <table class="strata-table">
+        <thead>
+          <tr>
+            <th style="text-align:left">Pareja / Familia</th>
+            <th>Ausencias y tipos</th>
+            <th>Uniones (JOIN)</th>
+            <th>Agregaciones</th>
+          </tr>
+        </thead>
+        <tbody id="strata-tbody"></tbody>
+      </table>
+    </div>
+    <div class="strata-bar-wrap">
+      <span>Progreso: 5 / 9 estratos</span>
+      <div class="strata-bar"><div class="strata-bar-fill" style="width:55.6%"></div></div>
+      <span style="color:var(--fg-3);font-size:13px">56 %</span>
+    </div>
+
+    <!-- Arquitectura -->
+    <h2 class="proj-sect" style="margin-top:32px">Arquitectura del sistema</h2>
+    <div class="arch-diagram">
+      <svg viewBox="0 0 660 296" xmlns="http://www.w3.org/2000/svg" class="arch-svg">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0 0,8 3,0 6" class="arch-arrow-head"/>
+          </marker>
+        </defs>
+        <!-- df_origen -->
+        <rect x="10" y="18" width="138" height="48" rx="6" class="arch-input-box" stroke-width="1.5"/>
+        <text x="79" y="38" text-anchor="middle" font-size="12" font-weight="600" class="arch-label">df_origen</text>
+        <text x="79" y="56" text-anchor="middle" font-size="11" class="arch-sub">Pandas</text>
+        <!-- EquiFrame.compare() -->
+        <rect x="188" y="18" width="284" height="48" rx="6" class="arch-compare-box" stroke-width="1.5"/>
+        <text x="330" y="38" text-anchor="middle" font-size="12" font-weight="700" class="arch-label">EquiFrame.compare()</text>
+        <text x="330" y="56" text-anchor="middle" font-size="11" class="arch-sub">contract · snapshot · familia</text>
+        <!-- df_destino -->
+        <rect x="512" y="18" width="138" height="48" rx="6" class="arch-input-box" stroke-width="1.5"/>
+        <text x="581" y="38" text-anchor="middle" font-size="12" font-weight="600" class="arch-label">df_destino</text>
+        <text x="581" y="56" text-anchor="middle" font-size="11" class="arch-sub">Polars · DuckDB</text>
+        <!-- Arrows: inputs → compare -->
+        <line x1="148" y1="42" x2="188" y2="42" class="arch-line" marker-end="url(#arr)"/>
+        <line x1="512" y1="42" x2="472" y2="42" class="arch-line" marker-end="url(#arr)"/>
+        <!-- Down + fan-out -->
+        <line x1="330" y1="66" x2="330" y2="98" class="arch-line"/>
+        <line x1="97"  y1="98" x2="563" y2="98" class="arch-line"/>
+        <line x1="97"  y1="98" x2="97"  y2="112" class="arch-line" marker-end="url(#arr)"/>
+        <line x1="330" y1="98" x2="330" y2="112" class="arch-line" marker-end="url(#arr)"/>
+        <line x1="563" y1="98" x2="563" y2="112" class="arch-line" marker-end="url(#arr)"/>
+        <!-- R box -->
+        <rect x="10"  y="112" width="175" height="66" rx="6" class="arch-r-box" stroke-width="1.5"/>
+        <text x="97" y="137" text-anchor="middle" font-size="15" font-weight="800" fill="#2563eb">R</text>
+        <text x="97" y="155" text-anchor="middle" font-size="12" font-weight="600" class="arch-label">Reglas deterministas</text>
+        <text x="97" y="170" text-anchor="middle" font-size="10" class="arch-sub">ausencias · tipos · claves · cardinalidad</text>
+        <!-- M box -->
+        <rect x="243" y="112" width="175" height="66" rx="6" class="arch-m-box" stroke-width="1.5"/>
+        <text x="330" y="137" text-anchor="middle" font-size="15" font-weight="800" fill="#7c3aed">M</text>
+        <text x="330" y="155" text-anchor="middle" font-size="12" font-weight="600" class="arch-label">Isolation Forest</text>
+        <text x="330" y="170" text-anchor="middle" font-size="10" class="arch-sub">23 726 perfiles canónicos · umbral 0.5</text>
+        <!-- B box -->
+        <rect x="476" y="112" width="175" height="66" rx="6" class="arch-b-box" stroke-width="1.5"/>
+        <text x="563" y="137" text-anchor="middle" font-size="15" font-weight="800" fill="#059669">B</text>
+        <text x="563" y="155" text-anchor="middle" font-size="12" font-weight="600" class="arch-label">MAD baseline</text>
+        <text x="563" y="170" text-anchor="middle" font-size="10" class="arch-sub">referencia estadística independiente</text>
+        <!-- R → H (diagonal) -->
+        <line x1="97"  y1="178" x2="210" y2="232" class="arch-line" marker-end="url(#arr)"/>
+        <!-- M → H (straight) -->
+        <line x1="330" y1="178" x2="330" y2="232" class="arch-line" marker-end="url(#arr)"/>
+        <!-- B → reference (dashed) -->
+        <line x1="563" y1="178" x2="563" y2="218" class="arch-line-dash"/>
+        <text x="563" y="232" text-anchor="middle" font-size="10" class="arch-sub">referencia</text>
+        <text x="563" y="245" text-anchor="middle" font-size="10" class="arch-sub">independiente</text>
+        <!-- H box -->
+        <rect x="160" y="232" width="340" height="52" rx="6" class="arch-h-box" stroke-width="1.5"/>
+        <text x="330" y="254" text-anchor="middle" font-size="13" font-weight="800" fill="#d97706">H = R OR M</text>
+        <text x="330" y="272" text-anchor="middle" font-size="11" class="arch-sub">resultado final · si M=N/A → H = R</text>
+      </svg>
+    </div>
+    <p class="arch-note"><strong>Flujo:</strong> EquiFrame.compare() recibe dos DataFrames y un contrato de transformación. R aplica reglas deterministas. M aplica Isolation Forest sobre 23 726 perfiles canónicos. B aplica MAD como referencia estadística independiente. El resultado H = R OR M es la señal de alerta final; si M no está disponible para esa familia, H = R.</p>
+
+    <!-- Estado del proyecto -->
+    <h2 class="proj-sect" style="margin-top:32px">Estado del proyecto</h2>
+    <div class="progress-grid">
+      <div class="progress-card">
+        <div class="progress-header">
+          <span class="ptag ptag-green">✓ Publicado</span>
+          <h3>Biblioteca EquiFrame</h3>
         </div>
-        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:14px">
-          <h3>JobManager</h3>
-          <p style="font-size:12px">Gestiona trabajos ETL con escritor único. Estados: PENDING → RUNNING → DONE.</p>
+        <div class="progress-items">
+          <div class="progress-item"><span class="pi">✓</span><span>equiframe 0.12.4 publicado en PyPI</span></div>
+          <div class="progress-item"><span class="pi">✓</span><span>Código fuente disponible en GitHub (htroya/equiframe)</span></div>
+          <div class="progress-item"><span class="pi">✓</span><span>Contratos de transformación para 3 familias de operación</span></div>
+          <div class="progress-item"><span class="pi">✓</span><span>JobManager con ciclo PENDING → RUNNING → DONE</span></div>
+          <div class="progress-item"><span class="pi">✓</span><span>SnapshotClient con verificación SHA-256 para reproducibilidad</span></div>
+          <div class="progress-item"><span class="pi">✓</span><span>DWReader / DWWriter con lock PID para DuckDB</span></div>
+          <div class="progress-item"><span class="pi">✓</span><span>EquiFrame Verify (O): evaluación independiente con arbitraje humano</span></div>
         </div>
-        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:14px">
-          <h3>DWReader / DWWriter</h3>
-          <p style="font-size:12px">Acceso controlado a DuckDB. Múltiples lectores simultáneos, escritura serializada con lock PID.</p>
-        </div>
-        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:14px">
-          <h3>EquiFrame Verify (O)</h3>
-          <p style="font-size:12px">Procedimiento de validación independiente: resultado esperado + comparación + revisión humana.</p>
+        <div class="progress-footer">
+          <a href="https://pypi.org/project/equiframe/0.12.4/" target="_blank" rel="noopener">PyPI 0.12.4 ↗</a>
+          <a href="https://github.com/htroya/equiframe" target="_blank" rel="noopener">GitHub ↗</a>
         </div>
       </div>
-      <h2>Repositorio</h2>
-      <p style="font-size:13px;color:var(--fg-3)">github.com/htroya/equiframe · rama main</p>
+      <div class="progress-card">
+        <div class="progress-header">
+          <span class="ptag ptag-yellow">⏳ En curso</span>
+          <h3>Experimentos científicos</h3>
+        </div>
+        <div class="progress-items">
+          <div class="progress-item"><span class="pi">✓</span><span>5 / 9 estratos ejecutados (snapshot 20261012-v1)</span></div>
+          <div class="progress-item"><span class="pi">✓</span><span>Isolation Forest entrenado con 23 726 perfiles canónicos</span></div>
+          <div class="progress-item"><span class="pi">✓</span><span>M disponible para ausencias_tipos y uniones (2 de 3 familias)</span></div>
+          <div class="progress-item"><span class="pi">⏳</span><span>M pendiente para agregaciones — requiere ≥ 10 000 perfiles canónicos adicionales</span></div>
+          <div class="progress-item"><span class="pi">⏳</span><span>4 estratos pendientes: Pandas→Polars y Pandas→DuckDB (uniones) · Polars→DuckDB (ausencias y agregaciones)</span></div>
+          <div class="progress-item"><span class="pi">⏳</span><span>Métricas finales F1, precisión y sensibilidad — al completar los 9 estratos</span></div>
+          <div class="progress-item"><span class="pi">⏳</span><span>Data Warehouse en VM — equiframe.duckdb pendiente de carga</span></div>
+        </div>
+        <div class="progress-footer">
+          <button class="lnk" onclick="showPage('resultados')">Ver resultados actuales →</button>
+        </div>
+      </div>
     </div>
+
+    <!-- Autores -->
+    <div class="proj-authors">
+      <p><strong>Autores:</strong> Hernán Troya · Jhair Alarcón · José Gaona</p>
+      <p style="font-size:13px;color:var(--fg-3)">Maestría en Ciencia de Datos y Máquinas de Aprendizaje · UIDE, Ecuador · 2026</p>
+      <div class="compat-grid" style="margin-top:12px">
+        <div class="compat-badge green">Pandas ≥ 2.0</div>
+        <div class="compat-badge blue">Polars ≥ 0.19</div>
+        <div class="compat-badge purple">DuckDB ≥ 0.9</div>
+        <div class="compat-badge orange">Python 3.10+</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
 </main>
 
-<script src="assets/js/app.js"></script>
+<script>
+/* EquiFrame Portal — SPA logic */
+'use strict';
+
+function copyInstall(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '¡Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    btn.textContent = 'Error';
+    setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
+  });
+}
+
+const DS = {
+  async indicadores(filtros = {}) {
+    if (!EQ_CONFIG.useRealApi) return EQ.indicadores;
+    const q = new URLSearchParams({ snapshot: EQ_CONFIG.snapshotId, ...filtros });
+    return _get(`/indicadores?${q}`);
+  },
+  async serieTemporal(filtros = {}) {
+    if (!EQ_CONFIG.useRealApi) return EQ.serie_temporal;
+    const q = new URLSearchParams({ snapshot: EQ_CONFIG.snapshotId, ...filtros });
+    return _get(`/serie-temporal?${q}`);
+  },
+  async topEntidades(limit = 10) {
+    if (!EQ_CONFIG.useRealApi) return EQ.top_entidades;
+    return _get(`/entidades/top?snapshot=${EQ_CONFIG.snapshotId}&limit=${limit}`);
+  },
+  async adjudicaciones(filtros = {}, page = 0, size = 50) {
+    if (!EQ_CONFIG.useRealApi) {
+      let data = [...EQ.adjudicaciones];
+      if (filtros.estado)      data = data.filter(a => a.estado    === filtros.estado);
+      if (filtros.entidad)     data = data.filter(a => a.entidad   === filtros.entidad);
+      if (filtros.modalidad)   data = data.filter(a => a.modalidad === filtros.modalidad);
+      if (filtros.fecha_desde) data = data.filter(a => a.fecha >= filtros.fecha_desde);
+      if (filtros.fecha_hasta) data = data.filter(a => a.fecha <= filtros.fecha_hasta);
+      return { total: data.length, page, size, items: data.slice(page*size, page*size+size) };
+    }
+    const q = new URLSearchParams({ snapshot: EQ_CONFIG.snapshotId, page, size, ...filtros });
+    return _get(`/adjudicaciones?${q}`);
+  },
+  async procedimientos(filtros = {}, page = 0, size = 50) {
+    if (!EQ_CONFIG.useRealApi) {
+      let data = [...EQ.procedimientos];
+      if (filtros.estado)      data = data.filter(p => p.estado    === filtros.estado);
+      if (filtros.entidad)     data = data.filter(p => p.entidad   === filtros.entidad);
+      if (filtros.modalidad)   data = data.filter(p => p.modalidad === filtros.modalidad);
+      if (filtros.fecha_desde) data = data.filter(p => p.fecha_publicacion >= filtros.fecha_desde);
+      if (filtros.fecha_hasta) data = data.filter(p => p.fecha_publicacion <= filtros.fecha_hasta);
+      return { total: data.length, page, size, items: data.slice(page*size, page*size+size) };
+    }
+    const q = new URLSearchParams({ snapshot: EQ_CONFIG.snapshotId, page, size, ...filtros });
+    return _get(`/procedimientos?${q}`);
+  },
+  async montosPorMoneda(filtros = {}) {
+    if (!EQ_CONFIG.useRealApi) return EQ.montos_por_moneda;
+    const q = new URLSearchParams({ snapshot: EQ_CONFIG.snapshotId, ...filtros });
+    return _get(`/montos-por-moneda?${q}`);
+  },
+  async ejecutarComparacion(params) {
+    if (!EQ_CONFIG.useRealApi) {
+      await new Promise(r => setTimeout(r, 1800 + Math.random() * 1200));
+      return _simularComparacion(params);
+    }
+    return _post('/comparaciones', params);
+  },
+  async estadoComparacion(runId) {
+    if (!EQ_CONFIG.useRealApi) return null;
+    return _get(`/comparaciones/${runId}`);
+  },
+};
+
+async function _get(path) {
+  const res = await fetch(EQ_CONFIG.apiUrl + path);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail?.mensaje || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+async function _post(path, body) {
+  const res = await fetch(EQ_CONFIG.apiUrl + path, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail?.mensaje || `HTTP ${res.status}: ${err.detail || res.statusText}`);
+  }
+  return res.json();
+}
+
+function _simularComparacion({ pareja, familia, muestra, snapshot }) {
+  const ts = Date.now();
+  const runId = `run-${snapshot}-${String(ts).slice(-6)}`;
+  const filas = parseInt(muestra) || 183891;
+  const seed = pareja.charCodeAt(0) + familia.charCodeAt(0);
+
+  const escenarios = {
+    'pandas_polars:ausencias_tipos': { resultado: 'OK',            diferencias: 0, advertencias: [] },
+    'pandas_polars:uniones':         { resultado: 'OK_CON_ADVERTENCIA', diferencias: 0,
+      advertencias: ['Polars no garantiza orden de filas sin ORDER BY. Usar contrato con orden_explícito: true para validar.'] },
+    'pandas_polars:agregaciones':    { resultado: 'OK',            diferencias: 0, advertencias: [] },
+    'pandas_duckdb:ausencias_tipos': { resultado: 'DIVERGENCIA',   diferencias: 3,
+      diffs: [
+        { clave: 'ocds-lcuori-001012', campo: 'ocid',              tipo: 'tipo_dato',    origen: '"001012" (str)', destino: '1012 (int)' },
+        { clave: 'ocds-lcuori-001012', campo: 'fecha_adjudicacion',tipo: 'zona_horaria', origen: '2025-03-15T00:00:00-05:00', destino: '2025-03-15T05:00:00Z' },
+        { clave: 'ocds-lcuori-001035', campo: 'monto',             tipo: 'precision',    origen: '1234567.89', destino: '1234567.9' },
+      ] },
+    'pandas_duckdb:uniones':         { resultado: 'DIVERGENCIA',   diferencias: 1,
+      diffs: [
+        { clave: 'N/A', campo: 'conteo_filas', tipo: 'cardinalidad', origen: '183 891 (LEFT JOIN)', destino: '183 888 (INNER JOIN — 3 proveedores sin match)' },
+      ] },
+    'pandas_duckdb:agregaciones':    { resultado: 'DIVERGENCIA',   diferencias: 1,
+      diffs: [
+        { clave: 'IESS', campo: 'monto_sum', tipo: 'precision', origen: '612300000.00', destino: '612300000.01' },
+      ] },
+    'polars_duckdb:ausencias_tipos': { resultado: 'OK',            diferencias: 0, advertencias: [] },
+    'polars_duckdb:uniones':         { resultado: 'OK',            diferencias: 0, advertencias: [] },
+    'polars_duckdb:agregaciones':    { resultado: 'DIVERGENCIA',   diferencias: 1,
+      diffs: [
+        { clave: 'IESS', campo: 'monto_sum', tipo: 'precision', origen: '612300000.01', destino: '612300000.01' },
+      ] },
+  };
+
+  const key = `${pareja}:${familia}`;
+  const esc = escenarios[key] || { resultado: 'OK', diferencias: 0, advertencias: [] };
+  const tiempo_s = +(2.1 + seed % 8 + Math.random() * 2).toFixed(2);
+
+  return {
+    run_id:      runId,
+    snapshot:    snapshot,
+    pareja:      pareja.replace('_', '→').replace('pandas', 'Pandas').replace('polars', 'Polars').replace('duckdb', 'DuckDB'),
+    familia:     familia,
+    muestra:     filas,
+    filas:       filas,
+    resultado:   esc.resultado,
+    diferencias: esc.diferencias,
+    advertencias: esc.advertencias || [],
+    diffs:       esc.diffs || [],
+    tiempo_s,
+    memoria_mb:  +(seed % 120 + 40 + Math.random() * 30).toFixed(1),
+    fecha:       new Date().toISOString().slice(0, 10),
+  };
+}
+
+function _mostrarError(msg) {
+  const banner = document.getElementById('api-error');
+  if (!banner) return;
+  banner.textContent = '⚠ ' + msg;
+  banner.hidden = false;
+  setTimeout(() => { banner.hidden = true; }, 8000);
+}
+
+let currentPage = 'inicio';
+let chartsInited = false;
+let chartSerie, chartEntidades;
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const page = document.getElementById('page-' + name);
+  if (page) page.classList.add('active');
+  const link = document.querySelector(`[data-page="${name}"]`);
+  if (link) link.classList.add('active');
+  currentPage = name;
+  window.location.hash = name;
+  if (name === 'explorar' && !chartsInited) initExplorar();
+  if (name === 'demos')      initDemos();
+  if (name === 'resultados') initResultados();
+  if (name === 'proyecto')   initProyecto();
+}
+
+document.querySelectorAll('.nav-link').forEach(btn => {
+  btn.addEventListener('click', () => showPage(btn.dataset.page));
+});
+
+window.addEventListener('hashchange', () => {
+  const h = window.location.hash.replace('#', '') || 'inicio';
+  showPage(h);
+});
+
+function fmt(n) {
+  if (n >= 1e9) return (n / 1e9).toFixed(2) + ' B';
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + ' M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + ' K';
+  return n.toLocaleString('es-EC');
+}
+function fmtUSD(n) {
+  return new Intl.NumberFormat('es-EC', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
+}
+function fmtNum(n) {
+  return new Intl.NumberFormat('es-EC').format(n);
+}
+function estadoBadge(e) {
+  const map = { active:'badge-blue', complete:'badge-ok', cancelled:'badge-err', pending:'badge-warn' };
+  const lbl = { active:'Activo', complete:'Completado', cancelled:'Cancelado', pending:'Pendiente' };
+  return `<span class="badge ${map[e] || ''}">${lbl[e] || e}</span>`;
+}
+function resultadoBadge(r) {
+  const map = { OK:'badge-ok', DIVERGENCIA:'badge-err', OK_CON_ADVERTENCIA:'badge-warn', DIVERGENCIA_PARCIAL:'badge-warn' };
+  return `<span class="badge ${map[r] || 'badge-purple'}">${r.replace(/_/g,' ')}</span>`;
+}
+
+let paginaActual    = 0;
+let paginaProc      = 0;
+const POR_PAGINA    = 10;
+let adjFiltradas    = [];
+let procFiltradas   = [];
+let _totalFiltrado  = 0;
+let _totalProc      = 0;
+let vistaActual     = 'adj';
+
+async function initExplorar() {
+  chartsInited = true;
+  try {
+    const entidades = await DS.topEntidades(50);
+    const sel = document.getElementById('f-entidad');
+    entidades.forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = e.entidad; opt.textContent = e.entidad;
+      sel.appendChild(opt);
+    });
+  } catch (e) { _mostrarError(e.message); }
+
+  ['f-snapshot','f-entidad','f-estado','f-modalidad','f-fecha-desde','f-fecha-hasta'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', aplicarFiltros);
+  });
+
+  try {
+    const ind = await DS.indicadores();
+    renderKPIs(ind);
+  } catch (e) { _mostrarError(e.message); }
+
+  await renderCharts();
+  await aplicarFiltros();
+}
+
+function _getFiltros() {
+  const filtros = {};
+  const estado    = document.getElementById('f-estado')?.value;
+  const entidad   = document.getElementById('f-entidad')?.value;
+  const modalidad = document.getElementById('f-modalidad')?.value;
+  const desde     = document.getElementById('f-fecha-desde')?.value;
+  const hasta     = document.getElementById('f-fecha-hasta')?.value;
+  if (estado)    filtros.estado      = estado;
+  if (entidad)   filtros.entidad     = entidad;
+  if (modalidad) filtros.modalidad   = modalidad;
+  if (desde)     filtros.fecha_desde = desde;
+  if (hasta)     filtros.fecha_hasta = hasta;
+  return filtros;
+}
+
+function limpiarFiltros() {
+  ['f-entidad','f-estado','f-modalidad'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const desde = document.getElementById('f-fecha-desde');
+  const hasta  = document.getElementById('f-fecha-hasta');
+  if (desde) desde.value = '2025-01-01';
+  if (hasta)  hasta.value  = '2025-12-31';
+  aplicarFiltros();
+}
+
+async function aplicarFiltros() {
+  const filtros = _getFiltros();
+  try {
+    if (vistaActual === 'adj' || vistaActual !== 'monedas') {
+      const resp = await DS.adjudicaciones(filtros, 0, POR_PAGINA);
+      adjFiltradas   = resp.items;
+      _totalFiltrado = resp.total;
+      paginaActual   = 0;
+      renderTabla();
+    }
+    if (vistaActual === 'proc') {
+      const resp = await DS.procedimientos(filtros, 0, POR_PAGINA);
+      procFiltradas = resp.items;
+      _totalProc    = resp.total;
+      paginaProc    = 0;
+      renderTablaProc();
+    }
+    if (vistaActual === 'monedas') {
+      const data = await DS.montosPorMoneda(filtros);
+      renderMonedas(data);
+    }
+  } catch (e) { _mostrarError(e.message); }
+}
+
+function switchView(v) {
+  vistaActual = v;
+  document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('vtab-' + v)?.classList.add('active');
+  document.getElementById('view-' + v)?.classList.add('active');
+  aplicarFiltros();
+}
+
+function renderKPIs(ind) {
+  const grid = document.getElementById('kpi-grid');
+  grid.innerHTML = `
+    <div class="kpi kpi-blue">
+      <span class="kpi-icon">📋</span>
+      <div class="kpi-label">Total adjudicaciones</div>
+      <div class="kpi-value">${fmtNum(ind.total_adjudicaciones)}</div>
+      <div class="kpi-sub">Corpus SERCOP 2025</div>
+    </div>
+    <div class="kpi kpi-green">
+      <span class="kpi-icon">💰</span>
+      <div class="kpi-label">Monto total</div>
+      <div class="kpi-value">${fmt(ind.monto_total_usd)}</div>
+      <div class="kpi-sub">Dólares USD</div>
+    </div>
+    <div class="kpi kpi-purple">
+      <span class="kpi-icon">🏛️</span>
+      <div class="kpi-label">Entidades únicas</div>
+      <div class="kpi-value">${fmtNum(ind.entidades_unicas)}</div>
+      <div class="kpi-sub">Compradores públicos</div>
+    </div>
+    <div class="kpi kpi-orange">
+      <span class="kpi-icon">🏢</span>
+      <div class="kpi-label">Proveedores únicos</div>
+      <div class="kpi-value">${fmtNum(ind.proveedores_unicos)}</div>
+      <div class="kpi-sub">Adjudicatarios</div>
+    </div>`;
+}
+
+async function renderCharts() {
+  const accent = '#2563eb';
+  const accentL = '#93c5fd';
+  const gris = '#94a3b8';
+
+  let serie, topEnt;
+  try {
+    [serie, topEnt] = await Promise.all([DS.serieTemporal(), DS.topEntidades(5)]);
+  } catch (e) { _mostrarError(e.message); return; }
+
+  if (chartSerie)    { chartSerie.destroy();    chartSerie    = null; }
+  if (chartEntidades){ chartEntidades.destroy(); chartEntidades = null; }
+
+  const ctxSerie = document.getElementById('chart-serie').getContext('2d');
+  chartSerie = new Chart(ctxSerie, {
+    type: 'line',
+    data: {
+      labels: serie.map(d => d.mes),
+      datasets: [{
+        label: 'Monto USD',
+        data: serie.map(d => d.monto),
+        borderColor: accent,
+        backgroundColor: 'rgba(37,99,168,.08)',
+        tension: .3, fill: true,
+        pointRadius: 3, pointBackgroundColor: accent,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: gris, maxRotation: 45 } },
+        y: { grid: { color: 'rgba(0,0,0,.04)' }, ticks: { font: { size: 10 }, color: gris,
+          callback: v => fmt(v) } }
+      }
+    }
+  });
+
+  const ctxEnt = document.getElementById('chart-entidades').getContext('2d');
+  const top5 = topEnt.slice(0, 5);
+  chartEntidades = new Chart(ctxEnt, {
+    type: 'bar',
+    data: {
+      labels: top5.map(e => e.entidad.split(' ').slice(0,3).join(' ')),
+      datasets: [{
+        label: 'Monto USD',
+        data: top5.map(e => e.monto),
+        backgroundColor: [accent, accentL, '#1e40af','#3b82f6','#60a5fa'],
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(0,0,0,.04)' }, ticks: { font: { size: 10 }, color: gris,
+          callback: v => fmt(v) } },
+        y: { grid: { display: false }, ticks: { font: { size: 10 }, color: gris } }
+      }
+    }
+  });
+}
+
+function renderTabla() {
+  const tbody = document.getElementById('tbody-adj');
+  if (!tbody) return;
+  const fmtMonto = n => new Intl.NumberFormat('es-EC',{minimumFractionDigits:2}).format(n);
+  tbody.innerHTML = adjFiltradas.map(a => `
+    <tr>
+      <td class="mono">${a.ocid}</td>
+      <td>${a.entidad}</td>
+      <td>${a.proveedor}</td>
+      <td class="num">${fmtMonto(a.monto)}</td>
+      <td>${a.moneda}</td>
+      <td>${a.fecha}</td>
+      <td>${estadoBadge(a.estado)}</td>
+      <td>${a.modalidad}</td>
+    </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--fg-3);padding:20px">Sin resultados</td></tr>';
+  const countEl = document.getElementById('adj-count');
+  if (countEl) countEl.textContent = `${fmtNum(_totalFiltrado)} adjudicaciones · snapshot ${EQ_CONFIG.snapshotId}`;
+  renderPaginacion();
+}
+
+function renderPaginacion() {
+  const total = Math.ceil(_totalFiltrado / POR_PAGINA);
+  const pg = document.getElementById('paginacion');
+  if (!pg) return;
+  pg.innerHTML = `
+    <button onclick="irPagina(${paginaActual-1})" ${paginaActual===0?'disabled':''}>‹ Ant.</button>
+    <span>Pág. ${paginaActual+1} / ${total||1}</span>
+    <button onclick="irPagina(${paginaActual+1})" ${paginaActual>=total-1?'disabled':''}>Sig. ›</button>`;
+}
+
+async function irPagina(n) {
+  const total = Math.ceil(_totalFiltrado / POR_PAGINA);
+  if (n < 0 || n >= total) return;
+  paginaActual = n;
+  try {
+    const resp = await DS.adjudicaciones(_getFiltros(), n, POR_PAGINA);
+    adjFiltradas = resp.items;
+    renderTabla();
+  } catch (e) { _mostrarError(e.message); }
+}
+
+function renderTablaProc() {
+  const tbody = document.getElementById('tbody-proc');
+  if (!tbody) return;
+  const fmtMonto = n => new Intl.NumberFormat('es-EC',{minimumFractionDigits:2}).format(n);
+  tbody.innerHTML = procFiltradas.map(p => `
+    <tr>
+      <td class="mono">${p.ocid}</td>
+      <td>${p.entidad}</td>
+      <td>${p.objeto}</td>
+      <td>${p.modalidad}</td>
+      <td class="num">${fmtMonto(p.monto_referencial)}</td>
+      <td>${p.fecha_publicacion}</td>
+      <td>${p.fecha_adjudicacion || '—'}</td>
+      <td>${estadoBadge(p.estado)}</td>
+    </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--fg-3);padding:20px">Sin resultados</td></tr>';
+  const countEl = document.getElementById('proc-count');
+  if (countEl) countEl.textContent = `${fmtNum(_totalProc)} procedimientos · snapshot ${EQ_CONFIG.snapshotId}`;
+  renderPaginacionProc();
+}
+
+function renderPaginacionProc() {
+  const total = Math.ceil(_totalProc / POR_PAGINA);
+  const pg = document.getElementById('paginacion-proc');
+  if (!pg) return;
+  pg.innerHTML = `
+    <button onclick="irPaginaProc(${paginaProc-1})" ${paginaProc===0?'disabled':''}>‹ Ant.</button>
+    <span>Pág. ${paginaProc+1} / ${total||1}</span>
+    <button onclick="irPaginaProc(${paginaProc+1})" ${paginaProc>=total-1?'disabled':''}>Sig. ›</button>`;
+}
+
+async function irPaginaProc(n) {
+  const total = Math.ceil(_totalProc / POR_PAGINA);
+  if (n < 0 || n >= total) return;
+  paginaProc = n;
+  try {
+    const resp = await DS.procedimientos(_getFiltros(), n, POR_PAGINA);
+    procFiltradas = resp.items;
+    renderTablaProc();
+  } catch (e) { _mostrarError(e.message); }
+}
+
+function renderMonedas(data) {
+  const grid = document.getElementById('monedas-grid');
+  if (!grid) return;
+  const fmtMonto = n => new Intl.NumberFormat('es-EC',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
+  grid.innerHTML = `
+    <p class="monedas-snap">Snapshot: ${EQ_CONFIG.snapshotId}</p>
+    ${data.map(m => `
+    <div class="moneda-card">
+      <div class="moneda-codigo">${m.codigo}</div>
+      <div class="moneda-desc">${m.descripcion}</div>
+      <div class="moneda-monto">${fmtMonto(m.monto_total)}</div>
+      <div class="moneda-meta">
+        <span>${fmtNum(m.total_adjudicaciones)} adjudicaciones</span>
+        <span class="moneda-pct">${m.porcentaje.toFixed(2)} %</span>
+      </div>
+      <div class="moneda-bar"><div class="moneda-bar-fill" style="width:${m.porcentaje}%"></div></div>
+    </div>`).join('')}`;
+}
+
+async function exportCSV() {
+  const cols = ['ocid','entidad','proveedor','monto','moneda','fecha','estado','modalidad'];
+  let allRows;
+  if (!EQ_CONFIG.useRealApi) {
+    allRows = EQ.adjudicaciones;
+  } else {
+    try {
+      const PAGE_SIZE = 500;
+      allRows = [];
+      let page = 0;
+      while (true) {
+        const resp = await DS.adjudicaciones(_getFiltros(), page, PAGE_SIZE);
+        allRows = allRows.concat(resp.items);
+        if (allRows.length >= resp.total) break;
+        page++;
+      }
+    } catch (e) { _mostrarError(e.message); return; }
+  }
+  const header = cols.join(',');
+  const rows = allRows.map(a => cols.map(c => `"${a[c] ?? ''}"`).join(','));
+  const blob = new Blob([header + '\n' + rows.join('\n')], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'adjudicaciones_sercop_2025.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+async function exportProcCSV() {
+  const cols = ['ocid','entidad','objeto','modalidad','monto_referencial','fecha_publicacion','fecha_adjudicacion','estado'];
+  const allRows = EQ_CONFIG.useRealApi ? [] : EQ.procedimientos;
+  const header = cols.join(',');
+  const rows = allRows.map(p => cols.map(c => `"${p[c] ?? ''}"`).join(','));
+  const blob = new Blob([header + '\n' + rows.join('\n')], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'procedimientos_sercop_2025.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+document.querySelectorAll('.cmp-radio input[type="radio"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    radio.closest('.cmp-radio-group')
+         .querySelectorAll('.cmp-radio')
+         .forEach(l => l.classList.toggle('active', l.querySelector('input') === radio));
+  });
+});
+
+async function ejecutarComparacion() {
+  const pareja   = document.querySelector('input[name="pareja"]:checked')?.value;
+  const familia  = document.querySelector('input[name="familia"]:checked')?.value;
+  const muestra  = document.getElementById('cmp-muestra')?.value;
+  const snapshot = document.getElementById('cmp-snapshot')?.value || EQ_CONFIG.snapshotId;
+
+  if (!pareja || !familia) { _mostrarError('Selecciona pareja y familia.'); return; }
+
+  _setCmpEstado('spinner', 'Enviando solicitud…');
+  const btn = document.getElementById('cmp-ejecutar');
+  if (btn) btn.disabled = true;
+
+  try {
+    if (EQ_CONFIG.useRealApi) _setCmpEstado('spinner', 'Ejecutando en el backend…');
+    const res = await DS.ejecutarComparacion({ pareja, familia, muestra, snapshot });
+    renderResultadoComparacion(res);
+  } catch (e) {
+    renderResultadoComparacion({ resultado: 'ERROR', error: e.message, run_id: null });
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+function _setCmpEstado(estado, msg) {
+  const inicial  = document.getElementById('cmp-estado-inicial');
+  const spinner  = document.getElementById('cmp-spinner');
+  const resultado = document.getElementById('cmp-resultado');
+  const spinMsg  = document.getElementById('cmp-spinner-msg');
+
+  inicial.hidden   = true;
+  spinner.hidden   = true;
+  resultado.hidden = true;
+
+  if (estado === 'spinner') { spinner.hidden = false; if (spinMsg) spinMsg.textContent = msg || 'Ejecutando…'; }
+  if (estado === 'resultado') resultado.hidden = false;
+  if (estado === 'inicial')  inicial.hidden   = false;
+}
+
+function renderResultadoComparacion(r) {
+  _setCmpEstado('resultado');
+
+  const cfgBanner = {
+    OK:                 { cls: 'ok',      icono: '✓', titulo: 'Equivalencia confirmada',       sub: 'Las dos implementaciones producen resultados semánticamente equivalentes.' },
+    OK_CON_ADVERTENCIA: { cls: 'warn',    icono: '⚠', titulo: 'Equivalente con advertencias', sub: 'Los resultados son equivalentes pero hay comportamientos a revisar.' },
+    DIVERGENCIA:        { cls: 'err',     icono: '✗', titulo: 'Divergencia detectada',        sub: 'Se encontraron diferencias semánticas entre las dos implementaciones.' },
+    INCOMPLETO:         { cls: 'partial', icono: '◑', titulo: 'Evaluación incompleta',        sub: 'No fue posible completar la comparación. Ver motivo abajo.' },
+    ERROR:              { cls: 'err',     icono: '!', titulo: 'Error durante la ejecución',   sub: 'EquiFrame no pudo completar la comparación. Revisa el mensaje de error.' },
+  };
+  const cfg = cfgBanner[r.resultado] || cfgBanner.ERROR;
+
+  const banner = document.getElementById('cmp-banner');
+  banner.className = `cmp-banner cmp-banner-${cfg.cls}`;
+  document.getElementById('cmp-banner-icono').textContent  = cfg.icono;
+  document.getElementById('cmp-banner-titulo').textContent = cfg.titulo;
+  document.getElementById('cmp-banner-sub').textContent    = cfg.sub;
+
+  const metricas = document.getElementById('cmp-metricas');
+  if (r.run_id) {
+    metricas.innerHTML = [
+      { label: 'Filas', val: r.filas ? fmtNum(r.filas) : '—' },
+      { label: 'Diferencias', val: r.diferencias !== undefined ? fmtNum(r.diferencias) : '—' },
+      { label: 'Tiempo', val: r.tiempo_s ? `${r.tiempo_s} s` : '—' },
+      { label: 'Memoria', val: r.memoria_mb ? `${r.memoria_mb} MB` : '—' },
+    ].map(m => `<div class="cmp-metrica"><div class="cmp-metrica-val">${m.val}</div><div class="cmp-metrica-lbl">${m.label}</div></div>`).join('');
+  } else {
+    metricas.innerHTML = '';
+  }
+
+  const errBox = document.getElementById('cmp-error-box');
+  if (r.error) {
+    const msgs = {
+      'Connection refused':      'No se pudo conectar con el backend. ¿Está la VM encendida y la API activa?',
+      'HTTP 503':                'El servicio no está disponible en este momento. Intenta de nuevo en unos segundos.',
+      'HTTP 422':                'Los parámetros enviados no son válidos. Revisa pareja y familia seleccionadas.',
+      'snapshot no encontrado':  'El snapshot solicitado no existe en el DW. Verifica que Jhair haya cargado los datos.',
+      'timeout':                 'La comparación tardó demasiado. Prueba con una muestra más pequeña.',
+    };
+    const key = Object.keys(msgs).find(k => r.error.includes(k));
+    errBox.hidden = false;
+    errBox.innerHTML = `<strong>Qué ocurrió:</strong> ${msgs[key] || r.error}<br><small style="color:var(--fg-3);margin-top:6px;display:block">Técnico: ${r.error}</small>`;
+  } else {
+    errBox.hidden = true;
+  }
+
+  const advBox = document.getElementById('cmp-advertencias');
+  if (r.advertencias && r.advertencias.length) {
+    advBox.hidden = false;
+    advBox.innerHTML = '<strong>Advertencias:</strong><ul style="margin-top:6px;padding-left:18px">' +
+      r.advertencias.map(a => `<li style="font-size:13px;margin-bottom:4px">${a}</li>`).join('') + '</ul>';
+  } else {
+    advBox.hidden = true;
+  }
+
+  const diffsSection = document.getElementById('cmp-diffs-section');
+  const diffsTbody   = document.getElementById('cmp-diffs-tbody');
+  if (r.diffs && r.diffs.length) {
+    diffsSection.hidden = false;
+    diffsTbody.innerHTML = r.diffs.map(d => `
+      <tr>
+        <td class="mono">${d.clave}</td>
+        <td class="mono">${d.campo}</td>
+        <td><span class="badge ${d.tipo === 'cardinalidad' ? 'badge-err' : d.tipo === 'precision' ? 'badge-warn' : 'badge-purple'}">${d.tipo}</span></td>
+        <td style="color:var(--ok)">${d.origen}</td>
+        <td style="color:var(--err)">${d.destino}</td>
+      </tr>`).join('');
+  } else {
+    diffsSection.hidden = true;
+  }
+
+  const trace = document.getElementById('cmp-trace');
+  if (r.run_id) {
+    trace.innerHTML = `
+      <span>run_id: <code>${r.run_id}</code></span>
+      <span>snapshot: <code>${r.snapshot || EQ_CONFIG.snapshotId}</code></span>
+      ${r.pareja  ? `<span>pareja: <code>${r.pareja}</code></span>` : ''}
+      ${r.familia ? `<span>familia: <code>${r.familia}</code></span>` : ''}
+      ${r.fecha   ? `<span>fecha: <code>${r.fecha}</code></span>` : ''}`;
+  } else {
+    trace.innerHTML = '';
+  }
+}
+
+function initDemos() {
+  const grid = document.getElementById('demo-grid');
+  if (grid.dataset.inited) return;
+  grid.dataset.inited = '1';
+
+  const casos = Object.entries(EQ.demos);
+  grid.innerHTML = casos.map(([key, d]) => `
+    <div class="demo-card" data-key="${key}" onclick="selectDemo('${key}')">
+      <h3>${d.titulo}</h3>
+      <p>${d.descripcion.slice(0, 90)}…</p>
+      <div style="margin-top:8px;display:flex;gap:6px">
+        ${resultadoBadge(d.resultado)}
+        <span class="badge badge-purple">${d.tipo_datos}</span>
+      </div>
+    </div>`).join('');
+}
+
+function selectDemo(key) {
+  document.querySelectorAll('.demo-card').forEach(c => c.classList.remove('selected'));
+  const card = document.querySelector(`[data-key="${key}"]`);
+  if (card) card.classList.add('selected');
+
+  const d = EQ.demos[key];
+  const det = document.getElementById('demo-detail');
+  det.style.display = 'block';
+  det.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  document.getElementById('demo-titulo').textContent = d.titulo;
+  document.getElementById('demo-tipo-badge').innerHTML =
+    `<span class="badge badge-purple">${d.tipo_datos}</span>`;
+  document.getElementById('demo-resultado-badge').innerHTML = resultadoBadge(d.resultado);
+  document.getElementById('demo-desc').textContent = d.descripcion;
+
+  const tabNames = ['Resumen','Datos','Contrato','Diferencias','Detalle técnico'];
+  const tabs  = document.getElementById('demo-tabs');
+  const panels = document.getElementById('demo-panels');
+  tabs.innerHTML   = tabNames.map((t,i) =>
+    `<button class="tab ${i===0?'active':''}" onclick="switchTab(this,${i})">${t}</button>`).join('');
+  panels.innerHTML = tabNames.map((t,i) =>
+    `<div class="tab-panel ${i===0?'active':''}" id="dp-${i}"></div>`).join('');
+
+  document.getElementById('dp-0').innerHTML = `
+    <p><b>Motor origen:</b> ${d.motor_origen} &nbsp;→&nbsp; <b>Destino:</b> ${d.motor_destino || (d.parejas ? d.parejas.join(', ') : '—')}</p>
+    <p style="margin-top:8px"><b>Resultado:</b> ${resultadoBadge(d.resultado)}</p>
+    ${d.resumen ? `<div style="margin-top:12px">${renderResumenParejas(d.resumen)}</div>` : ''}`;
+
+  const entrada = d.entrada || [];
+  if (entrada.length) {
+    const cols = Object.keys(entrada[0]);
+    document.getElementById('dp-1').innerHTML = `
+      <p style="margin-bottom:8px;font-size:12px;color:var(--fg-3)">Datos de entrada (${entrada.length} filas)</p>
+      <div class="table-wrap">${buildTable(cols, entrada)}</div>
+      ${d.salida_pandas ? buildSalidaCompar(d) : ''}`;
+  } else {
+    document.getElementById('dp-1').innerHTML = '<p>Ver tabla de resumen en la pestaña Resumen.</p>';
+  }
+
+  document.getElementById('dp-2').innerHTML = `
+    <p style="margin-bottom:8px;font-size:12px;color:var(--fg-3)">Requisitos del contrato de transformación</p>
+    <pre style="background:var(--bg-2);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:12px;overflow-x:auto">${JSON.stringify(d.contrato, null, 2)}</pre>`;
+
+  const diffs = d.diferencias || [];
+  if (diffs.length) {
+    const cols = Object.keys(diffs[0]);
+    document.getElementById('dp-3').innerHTML = `
+      <p style="margin-bottom:8px;font-size:12px;color:var(--fg-3)">${diffs.length} diferencia(s) detectada(s)</p>
+      <div class="table-wrap">${buildTable(cols, diffs, true)}</div>`;
+  } else {
+    document.getElementById('dp-3').innerHTML = '<p style="color:var(--ok)">✓ Sin diferencias detectadas.</p>';
+  }
+
+  document.getElementById('dp-4').innerHTML = `
+    <pre style="background:var(--bg-2);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;overflow-x:auto">${JSON.stringify(d, null, 2)}</pre>`;
+}
+
+function renderResumenParejas(resumen) {
+  const cols = Object.keys(resumen[0]);
+  return buildTable(cols, resumen);
+}
+
+function buildTable(cols, rows, highlight) {
+  const thead = `<thead><tr>${cols.map(c =>
+    `<th${typeof rows[0]?.[c]==='number'?' class="num"':''}>${c}</th>`).join('')}</tr></thead>`;
+  const tbody = `<tbody>${rows.map(r => {
+    const cls = highlight && (r.tipo?.includes('incorrecto') || r.tipo?.includes('valor')) ? ' class="diff-row-err"' : '';
+    return `<tr${cls}>${cols.map(c => {
+      const v = r[c] ?? '—';
+      const isNum = typeof v === 'number';
+      return `<td${isNum?' class="num"':''}>${isNum ? new Intl.NumberFormat('es-EC',{minimumFractionDigits:typeof v==='number'&&String(v).includes('.')?2:0}).format(v) : v}</td>`;
+    }).join('')}</tr>`;
+  }).join('')}</tbody>`;
+  return `<table>${thead}${tbody}</table>`;
+}
+
+function buildSalidaCompar(d) {
+  return `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+      <div>
+        <p style="font-size:12px;color:var(--fg-3);margin-bottom:6px">Salida ${d.motor_origen}</p>
+        <div class="table-wrap">${buildTable(Object.keys(d.salida_pandas[0]), d.salida_pandas)}</div>
+      </div>
+      <div>
+        <p style="font-size:12px;color:var(--fg-3);margin-bottom:6px">Salida ${d.motor_destino || 'destino'}</p>
+        <div class="table-wrap">${buildTable(
+          Object.keys((d.salida_polars||d.salida_duckdb||[])[0]||{}),
+          d.salida_polars||d.salida_duckdb||[])}</div>
+      </div>
+    </div>`;
+}
+
+function switchTab(btn, idx) {
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('dp-' + idx).classList.add('active');
+}
+
+const _COMP_META = {
+  R: { label: 'R', nombre: 'Reglas',            color: 'blue'   },
+  M: { label: 'M', nombre: 'Isolation Forest',  color: 'purple' },
+  B: { label: 'B', nombre: 'MAD baseline',      color: 'green'  },
+  H: { label: 'H', nombre: 'Híbrido R OR M',    color: 'orange' },
+};
+
+function _compBadge(resultado, disponible) {
+  if (!disponible) return `<span class="comp-badge comp-badge-na" title="No disponible">—</span>`;
+  const cls = resultado === 'OK' ? 'ok' : resultado?.startsWith('DIVERGENCIA') ? 'err' : 'warn';
+  const ico = resultado === 'OK' ? '✓' : resultado?.startsWith('DIVERGENCIA') ? '✗' : '⚠';
+  return `<span class="comp-badge comp-badge-${cls}" title="${resultado || ''}">${ico}</span>`;
+}
+
+function initResultados() {
+  const tbody = document.getElementById('tbody-resultados');
+  if (!tbody || tbody.dataset.inited) return;
+  tbody.dataset.inited = '1';
+
+  const runs = EQ.resultados;
+  const comps = EQ.componentes_estado;
+
+  const compGrid = document.getElementById('comp-status-grid');
+  if (compGrid && comps) {
+    compGrid.innerHTML = Object.values(comps).map(c => {
+      const pct = Math.round((c.runs_completados / c.runs_total) * 100);
+      const extra = c.modelo_fecha
+        ? `<div class="comp-extra">Modelo: ${c.modelo_fecha} · ${fmtNum(c.n_perfiles)} perfiles</div>
+           ${c.familias_pendientes?.length ? `<div class="comp-pending">Pendiente: ${c.familias_pendientes.join(', ')}</div>` : ''}`
+        : `<div class="comp-extra">${c.runs_completados} / ${c.runs_total} estratos completados</div>`;
+      return `
+        <div class="comp-status-card comp-${c.clave.toLowerCase()}">
+          <div class="comp-status-top">
+            <span class="comp-status-letra">${c.clave}</span>
+            <span class="comp-status-nombre">${c.nombre}</span>
+            <span class="comp-status-dot ${c.disponible ? 'dot-ok' : 'dot-na'}"></span>
+          </div>
+          <p class="comp-status-desc">${c.descripcion}</p>
+          ${extra}
+          <div class="comp-progress"><div class="comp-progress-fill" style="width:${pct}%"></div></div>
+        </div>`;
+    }).join('');
+  }
+
+  const ok  = runs.filter(r => r.resultado === 'OK').length;
+  const div = runs.filter(r => r.resultado?.startsWith('DIVERGENCIA')).length;
+  const statsEl = document.getElementById('resultados-stats');
+  if (statsEl) {
+    statsEl.innerHTML = `
+      <div class="res-stat"><span class="badge badge-ok">✓ OK</span> ${ok} runs</div>
+      <div class="res-stat"><span class="badge badge-err">✗ Divergencia</span> ${div} runs</div>
+      <div class="res-stat" style="margin-left:auto;font-size:12px;color:var(--fg-3)">
+        ${runs.length} ejecuciones · snapshot ${EQ_CONFIG.snapshotId}
+      </div>`;
+  }
+
+  tbody.innerHTML = runs.map((r, i) => `
+    <tr class="run-row" onclick="selectRun(${i})" data-idx="${i}" style="cursor:pointer">
+      <td class="mono" style="font-size:11px">${r.run_id}</td>
+      <td>${r.pareja}</td>
+      <td>${r.familia.replace(/_/g,' ')}</td>
+      <td class="num">${fmtNum(r.filas)}</td>
+      <td style="text-align:center">${_compBadge(r.resultado_R, true)}</td>
+      <td style="text-align:center">${_compBadge(r.resultado_M, r.m_disponible)}</td>
+      <td style="text-align:center">${_compBadge(r.resultado_B, true)}</td>
+      <td style="text-align:center">${_compBadge(r.resultado,   true)}</td>
+      <td style="font-size:12px;color:var(--fg-3)">${r.fecha}</td>
+    </tr>`).join('');
+}
+
+function selectRun(idx) {
+  const r = EQ.resultados[idx];
+  if (!r) return;
+
+  document.querySelectorAll('.run-row').forEach(row =>
+    row.classList.toggle('run-row-selected', parseInt(row.dataset.idx) === idx));
+
+  const panel = document.getElementById('run-detail');
+  panel.hidden = false;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  document.getElementById('run-detail-id').textContent = r.run_id;
+  document.getElementById('run-detail-meta').textContent =
+    `${r.pareja} · ${r.familia.replace(/_/g,' ')} · ${fmtNum(r.filas)} filas · ${r.tiempo_s} s · ${r.memoria_mb} MB · ${r.fecha}`;
+
+  const grid = document.getElementById('run-comp-grid');
+
+  const componentes = [
+    { key: 'R', resultado: r.resultado_R, diffs: r.diferencias_R, notas: r.notas_R, disponible: true },
+    { key: 'M', resultado: r.resultado_M, diffs: r.diferencias_M, notas: r.notas_M, disponible: r.m_disponible,
+      extra: r.puntuacion_anomalia != null ? `Puntuación anomalía: <strong>${r.puntuacion_anomalia}</strong> (umbral 0.5)` : null },
+    { key: 'B', resultado: r.resultado_B, diffs: r.diferencias_B, notas: r.notas_B, disponible: true },
+    { key: 'H', resultado: r.resultado,   diffs: r.diferencias,   notas: 'Resultado final: H = R OR M. Si M no está disponible, H = R.', disponible: true },
+  ];
+
+  grid.innerHTML = componentes.map(c => {
+    const meta = _COMP_META[c.key];
+    if (!c.disponible) {
+      return `
+        <div class="run-comp-card run-comp-na">
+          <div class="run-comp-top">
+            <span class="run-comp-letra">${c.key}</span>
+            <span class="run-comp-nombre">${meta.nombre}</span>
+          </div>
+          <div class="run-comp-unavail">
+            <span>⚠ No disponible</span>
+            <p>El modelo Isolation Forest no ha sido entrenado para la familia <strong>${r.familia.replace(/_/g,' ')}</strong>.<br>
+            Se requieren ≥ 10 000 perfiles canónicos. El resultado H se calcula solo con R.</p>
+          </div>
+        </div>`;
+    }
+    const cls = c.resultado === 'OK' ? 'ok' : c.resultado?.startsWith('DIVERGENCIA') ? 'err' : 'warn';
+    const ico = c.resultado === 'OK' ? '✓' : c.resultado?.startsWith('DIVERGENCIA') ? '✗' : '⚠';
+    return `
+      <div class="run-comp-card run-comp-${cls}">
+        <div class="run-comp-top">
+          <span class="run-comp-letra">${c.key}</span>
+          <span class="run-comp-nombre">${meta.nombre}</span>
+          <span class="run-comp-badge run-comp-badge-${cls}">${ico} ${c.resultado?.replace(/_/g,' ') || ''}</span>
+        </div>
+        <div class="run-comp-diffs">${c.diffs !== null ? `${c.diffs} diferencia(s)` : '—'}</div>
+        ${c.extra ? `<div class="run-comp-extra">${c.extra}</div>` : ''}
+        <p class="run-comp-notas">${c.notas || ''}</p>
+      </div>`;
+  }).join('');
+}
+
+function cerrarDetalle() {
+  document.getElementById('run-detail').hidden = true;
+  document.querySelectorAll('.run-row').forEach(r => r.classList.remove('run-row-selected'));
+}
+
+function initProyecto() {
+  const tbody = document.getElementById('strata-tbody');
+  if (!tbody || tbody.dataset.inited) return;
+  tbody.dataset.inited = '1';
+
+  const PAIRS    = ['Pandas→Polars', 'Pandas→DuckDB', 'Polars→DuckDB'];
+  const FAMILIES = ['ausencias_tipos', 'uniones', 'agregaciones'];
+
+  const lookup = {};
+  (EQ.resultados || []).forEach(r => { lookup[`${r.pareja}:${r.familia}`] = r; });
+
+  tbody.innerHTML = PAIRS.map(pareja => {
+    const cells = FAMILIES.map(familia => {
+      const r = lookup[`${pareja}:${familia}`];
+      if (!r) return `<td class="strata-cell strata-pend">⏳ Pendiente</td>`;
+      if (r.resultado === 'OK') return `<td class="strata-cell strata-ok">✓ OK</td>`;
+      return `<td class="strata-cell strata-div">✗ Divergencia</td>`;
+    }).join('');
+    return `<tr><td class="strata-row-header">${pareja}</td>${cells}</tr>`;
+  }).join('');
+}
+
+(function init() {
+  const hash = window.location.hash.replace('#', '') || 'inicio';
+  showPage(hash);
+})();
+</script>
