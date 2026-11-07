@@ -1,0 +1,55 @@
+{
+  "family": "aggregations",
+  "feature_version": "1.0",
+  "features": [
+    {
+      "columns": [],
+      "denominator_table": null,
+      "metric": "log_filas",
+      "name": "rows",
+      "null_matches": null,
+      "right_columns": [],
+      "right_table": null,
+      "table": "result",
+      "target": null
+    },
+    {
+      "columns": [],
+      "denominator_table": "source",
+      "metric": "razon_salida_entrada",
+      "name": "row_ratio",
+      "null_matches": null,
+      "right_columns": [],
+      "right_table": null,
+      "table": "result",
+      "target": null
+    },
+    {
+      "columns": [
+        "currency"
+      ],
+      "denominator_table": null,
+      "metric": "cardinalidad_rel",
+      "name": "currency_cardinality",
+      "null_matches": null,
+      "right_columns": [],
+      "right_table": null,
+      "table": "result",
+      "target": null
+    },
+    {
+      "columns": [
+        "total"
+      ],
+      "denominator_table": null,
+      "metric": "tasa_nulos",
+      "name": "total_nulls",
+      "null_matches": null,
+      "right_columns": [],
+      "right_table": null,
+      "table": "result",
+      "target": null
+    }
+  ],
+  "schema_version": "1.0"
+}

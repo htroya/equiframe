@@ -1,0 +1,389 @@
+{
+  "active_plan": "docs/ALPHA_MAXIMIZATION_PLAN_20261012.md",
+  "additional_engineering_evidence": {
+    "automatic_rubric_points": 0,
+    "sha256": "31aa05d69753df435948f971c742cde89dc627d430e15ff8a0ca19654fdd8bba",
+    "source": "docs/SERCOP_ANNUAL_VM_RESULT_20261011.json"
+  },
+  "assessed_checkout_base_commit": "ac2434841d562599f4bcdd8e30d15ff3000ee7d4",
+  "assessment_date_local": "2026-10-12",
+  "beta_activated": false,
+  "current_package_versions": {
+    "equiframe": "0.12.0a13",
+    "equiframe-benchmark": "0.12.0a13"
+  },
+  "excluded_areas": [
+    "security"
+  ],
+  "exclusion_reason": "Explicit owner instruction2026-10-11",
+  "github_actions_executed": false,
+  "global_target_percent": 75,
+  "measured_areas": 8,
+  "metrics": [
+    {
+      "aspect": "Usabilidad para arquitecto/científico de datos",
+      "assessed_candidate": "0.12.0a13",
+      "comparable_gain_from_screenshot": null,
+      "denominator": 12,
+      "key": "usability",
+      "new_area_assessment_executed": true,
+      "numerator": 11,
+      "percent": 91.66666666666667,
+      "recalculated_now": true,
+      "recalculation_scope": "Arithmetic and source/hash binding; existing area evaluation retains its candidate and scope.",
+      "record_targets_current_a13": true,
+      "remaining": [
+        "U12"
+      ],
+      "rounded_percent": 91.67,
+      "rubric": "USABILITY-U01-U12-20261007-preserved",
+      "scope": "Technical preserved U01-U12 criterion closure on A13; U12 human adoption remains pending",
+      "screenshot_percent_unverified": 80,
+      "source": "docs/USABILITY_A13_REASSESSMENT_RESULT_20261012.json",
+      "source_sha256": "6adad17fc7b39caeb250d86c63d9786af82733e581861e61b0a0ca359db127b0",
+      "status": "CURRENT_INTERNAL_MEASUREMENT",
+      "human_review": false
+    },
+    {
+      "additional_required": 4,
+      "aspect": "Madurez",
+      "assessed_candidate": "0.12.0a13",
+      "denominator": 16,
+      "desired_maximum_percent": 100,
+      "historical_strict_plan_closure": {
+        "assessment_date": "2026-10-08",
+        "candidate": "0.12.0a8",
+        "candidate_commit": "c4f6a903f580f5e98d63db6e225e0a042221f4ec",
+        "criterion_counts": {
+          "BLOQUEADO": 6,
+          "CUMPLIDO": 1,
+          "PARCIAL": 9
+        },
+        "denominator": 16,
+        "numerator": 1,
+        "percent": 6.25,
+        "scope": "Strict closure of that historical plan; not A13 maturity or library functionality"
+      },
+      "human_review": false,
+      "key": "maturity",
+      "new_area_assessment_executed": true,
+      "new_current_evidence": "Original scope reread and actual new PEP517 sdists, full3.11/3.13 suites, producer regression; closes M05/M07/M11/M12/M14 and substantiates M06; historical assessments preserved",
+      "numerator": 11,
+      "percent": 68.75,
+      "previous_record_source": "docs/MATURITY_HANDOFF_RESULT_20261012.json",
+      "recalculated_now": true,
+      "recalculation_scope": "Arithmetic and source/hash binding; existing area evaluation retains its candidate and scope.",
+      "record_targets_current_a13": true,
+      "rounded_percent": 68.75,
+      "rubric": "M01-M16-original-scope-preserved",
+      "scope": "Strict original sixteen-definition closure on A13; M04 cells not silently extended to unrelated evidence/consumer/recovery criteria; human/canceled gates remain open",
+      "source": "docs/MATURITY_SCOPE_REASSESSMENT_RESULT_20261012.json",
+      "source_sha256": "fedec2fff2f4f74a3575c85a2e81fa7b8b25794177e1a8fbc9c27e5865a66356",
+      "status": "CURRENT_INTERNAL_MEASUREMENT_TARGET_NOT_MET",
+      "target_met": false,
+      "target_percent": 90,
+      "target_verified": 15
+    },
+    {
+      "artifact_sha256": {
+        "equiframe-0.12.0a11-py3-none-any.whl": "11cbae825f3b2ac4f6e9a6378d589bbb6f74be37587a3c40a591b64a7496a15e",
+        "equiframe-0.12.0a11.tar.gz": "512ab8eb3e100f279aca4dfa2b6f65340817cf1c8ef620ccb9aa8b5a78c85831",
+        "equiframe_benchmark-0.12.0a11-py3-none-any.whl": "f77d06012e92ea3bc72a1ada4d02938827880622d7560501ba0a251e132fc2b3",
+        "equiframe_benchmark-0.12.0a11.tar.gz": "b775f5909c3122bb5313800ff49a22ab822b8bb922e55496289ae279ff903241"
+      },
+      "aspect": "Universalidad",
+      "assessed_candidate": "0.12.0a11",
+      "comparable_gain_from_screenshot": null,
+      "comparable_historical_progress_same_a11": {
+        "current_passed": 48,
+        "current_percent": 80,
+        "denominator": 60,
+        "initial_passed": 41,
+        "initial_percent": 68.33333333333333,
+        "percentage_point_gain": 11.666666666666666
+      },
+      "denominator": 60,
+      "followup": "docs/TARGET_FOLLOWUP_RESULT_20261011.md",
+      "key": "universality",
+      "new_area_assessment_executed": false,
+      "new_current_evidence": "Thirteen isolated A13 Windows3.12 profiles plus exact32 native POSIX omissions and bounded catalog in ARM64 3.10/3.12; no complete60-criterion A13 score inferred. Full source suites ARM64 CPython3.12: core8077 PASS; benchmark625 applicable PASS and2 Windows-only skips. No all-platform60-criterion score inferred.",
+      "numerator": 48,
+      "percent": 80.0,
+      "recalculated_now": true,
+      "recalculation_scope": "Arithmetic and source/hash binding; existing area evaluation retains its candidate and scope.",
+      "record_targets_current_a13": false,
+      "remaining": [
+        "03.1",
+        "03.4",
+        "03.5",
+        "04.5",
+        "05.5",
+        "06.5",
+        "08.5",
+        "09.5",
+        "10.5",
+        "11.4",
+        "11.5",
+        "12.5"
+      ],
+      "rounded_percent": 80.0,
+      "rubric": "UV-TECH-A11-60-v1",
+      "scope": "Engineering progress on frozen A11 artifacts; not a thesis scientific metric or an A13 re-evaluation",
+      "screenshot_percent_unverified": 55,
+      "source": "docs/UNIVERSALITY_80_RESULT_20261010.json",
+      "source_sha256": "c8456a492b8832ba350d81d01fffbeeb06bc1ad99cdababfe63d5f16485b0fad",
+      "status": "LATEST_RECORDED_MEASUREMENT",
+      "target_met": false,
+      "target_percent": 90
+    },
+    {
+      "artifact_inventory": [
+        {
+          "bytes": 461570,
+          "file": "equiframe-0.12.0a13-py3-none-any.whl",
+          "sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23"
+        },
+        {
+          "bytes": 1524480,
+          "file": "equiframe-0.12.0a13.tar.gz",
+          "sha256": "164b70270344343094dc0a688bf8dbfe20a27112f7227e2f7fe318f085b71935"
+        },
+        {
+          "bytes": 127142,
+          "file": "equiframe_benchmark-0.12.0a13-py3-none-any.whl",
+          "sha256": "fb843318d044a36a7ba4efab7d7d997d45798e12d16df7a9aa1b472b2c6359d8"
+        },
+        {
+          "bytes": 434163,
+          "file": "equiframe_benchmark-0.12.0a13.tar.gz",
+          "sha256": "4f8c47a00a8724b234e87c0a7147e193092122c77772e9169bd954744dd6e9c7"
+        }
+      ],
+      "aspect": "Preparación para publicar en PyPI",
+      "assessed_candidate": "0.12.0a13",
+      "comparable_gain_from_screenshot": null,
+      "denominator": 20,
+      "followup": "docs/VM_TARGET_FOLLOWUP_20261011.md",
+      "key": "pypi_preparation",
+      "new_area_assessment_executed": false,
+      "numerator": 16,
+      "percent": 80.0,
+      "recalculated_now": true,
+      "recalculation_scope": "Arithmetic and source/hash binding; existing area evaluation retains its candidate and scope.",
+      "record_targets_current_a13": true,
+      "remaining": [
+        "P17",
+        "P18",
+        "P19",
+        "P20"
+      ],
+      "rounded_percent": 80.0,
+      "rubric": "PYPI-PREP-20-v1",
+      "scope": "Private artifact-pair preparation; public publication remains disabled",
+      "screenshot_percent_unverified": 60,
+      "source": "docs/PYPI_PREPARATION_RESULT_20261010.json",
+      "source_sha256": "7da65e6f90904c42ff7a3ed4f6b078838cac566353a11a43c3423e6f0bc46159",
+      "status": "LATEST_RECORDED_MEASUREMENT",
+      "target_met": false,
+      "target_percent": 90
+    },
+    {
+      "additional_required": 11,
+      "aspect": "Cumplimiento de la tesis",
+      "assessed_candidate": "0.12.0a13",
+      "denominator": 22,
+      "desired_maximum_percent": 100,
+      "human_review": false,
+      "key": "thesis",
+      "new_area_assessment_executed": false,
+      "numerator": 9,
+      "percent": 40.90909090909091,
+      "previous_record_source": "docs/PROJECT_STATUS_MATRIX_20261011.json",
+      "recalculated_now": true,
+      "recalculation_scope": "Arithmetic and source/hash binding; existing area evaluation retains its candidate and scope.",
+      "record_targets_current_a13": true,
+      "rounded_percent": 40.91,
+      "rubric": "T01-T22-original-requirements-preserved-binary-v1",
+      "scope": "Strict closure of mixed engineering/scientific T01-T22 obligations; not editorial Word quality,tutor approval or scientific hypothesis confirmation. Word untouched.",
+      "source": "docs/THESIS_CURRENT_RESULT_20261011.json",
+      "source_sha256": "37f695ac042057e0ade9ac2c4e002dd8d662d82892c40c419faafe9bd6d11be7",
+      "status": "CURRENT_INTERNAL_MEASUREMENT_TARGET_NOT_MET",
+      "target_met": false,
+      "target_percent": 90,
+      "target_verified": 20
+    },
+    {
+      "aspect": "Documentación profesional",
+      "assessed_candidate": "0.12.0a13",
+      "comparable_gain_from_screenshot": null,
+      "denominator": 20,
+      "historical_example_binding": {
+        "archive_crc_members_verified": 322,
+        "archive_sha256": "bc2a914e22d3c140e68cc36662d3c8d8f63cdc7342cf3539d8524acfb79e73e8",
+        "examples": [
+          {
+            "code_sha256": "6ac2087fb7336ea2758ab33c2e52573a91a6fc7350620657d31a93ab8aa1fdcf",
+            "current_code_matches": true,
+            "document": "README.md",
+            "historical_attempts_verified": 2,
+            "id": "root-comparison"
+          },
+          {
+            "code_sha256": "79febc903940cca52c76bcb0876388fc84e5160d3bd36d552bbef3f052b6fa52",
+            "current_code_matches": true,
+            "document": "packages/equiframe/docs/quickstart.md",
+            "historical_attempts_verified": 2,
+            "id": "quickstart"
+          },
+          {
+            "code_sha256": "a29992f7abab0dc31ee5fffd735109116dcfcf25eed1eed4c0fc5da7cbc87304",
+            "current_code_matches": true,
+            "document": "docs/DOCUMENTATION_WORKFLOW.md",
+            "historical_attempts_verified": 2,
+            "id": "pipeline-three-states"
+          },
+          {
+            "code_sha256": "a9deed567052cae3359aa2298d3813d4304118b5c1a18d5065bc8fd77b533a06",
+            "current_code_matches": true,
+            "document": "packages/equiframe/docs/index.md",
+            "historical_attempts_verified": 2,
+            "id": "installed-handbook"
+          }
+        ],
+        "historical_pass_attempts_bound": 8,
+        "new_example_executions": 0,
+        "private_execution_receipt_sha256": "e7c46f771c8c93be7574a5cc94962f2c43e034c4c02ce9c7f903cf6efc554434",
+        "retained_wheel_verified": true,
+        "scope": "Current fence/registry/wheel byte identity against preserved installed execution receipts; not a fresh installation or execution replay.",
+        "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23"
+      },
+      "key": "documentation",
+      "new_area_assessment_executed": false,
+      "numerator": 18,
+      "percent": 90.0,
+      "recalculated_now": true,
+      "recalculation_scope": "Arithmetic and source/hash binding; existing area evaluation retains its candidate and scope.",
+      "record_targets_current_a13": true,
+      "remaining": [
+        "D19",
+        "D20"
+      ],
+      "rounded_percent": 90.0,
+      "rubric": "DOC-PRO-20-v1",
+      "scope": "Repository documentation over A13; human independent reader and approved public documentation pending",
+      "screenshot_percent_unverified": 85,
+      "source": "docs/DOCUMENTATION_RECHECK_20261010.json",
+      "source_sha256": "24e6c43c5b6f3af78a29113f6d21a8ef9f432cf43aa4477d308ff1ff7a7f09e8",
+      "status": "LATEST_RECORDED_MEASUREMENT"
+    },
+    {
+      "additional_required": 1238,
+      "aspect": "Pruebas con trazabilidad por opción",
+      "assessed_candidate": "0.12.0a13",
+      "denominator": 8385,
+      "desired_maximum_percent": 100,
+      "human_review": false,
+      "key": "option_traceability",
+      "native_followup": "docs/VM_TARGET_FOLLOWUP_20261011.json",
+      "native_followup_scope": "Four ARM64 repeats in3.10/3.12 normal/-O;1054 identical cases per run; no coverage added.",
+      "new_area_assessment_executed": true,
+      "new_current_evidence": "43 unique local exception contract IDs;30 cases each mode with full literal state/messages,MRO,binding and same-object catch;C initializer body unobservable;no actual IO/engine failure inference.",
+      "numerator": 6309,
+      "percent": 75.24150268336315,
+      "previous_record_source": "docs/OPTION_BOUNDARY_RESULT_20261011.json",
+      "recalculated_now": true,
+      "recalculation_scope": "Arithmetic and source/hash binding; existing area evaluation retains its candidate and scope.",
+      "record_targets_current_a13": true,
+      "remaining": [
+        "2076 NOT_RUN",
+        "1238 additional unique verified IDs required for >=90%"
+      ],
+      "rounded_percent": 75.24,
+      "rubric": "Frozen A13 core option obligation inventory",
+      "scope": "Complete local exception instance, literal message/args/code/MRO, actual Python initializer binding or controlled C invocation, same-object raise/catch; synthetic decision fixtures, not real IO/engine/comparison failures",
+      "source": "docs/OPTION_EXCEPTIONS_RESULT_20261012.json",
+      "source_sha256": "36421d54f37de4ee9116af2c729092bb6a3f3906494f14113311387533698569",
+      "status": "CURRENT_INTERNAL_MEASUREMENT_TARGET_NOT_MET",
+      "target_met": false,
+      "target_percent": 90,
+      "target_verified": 7547
+    },
+    {
+      "artifact_inventory": [
+        {
+          "bytes": 461570,
+          "file": "equiframe-0.12.0a13-py3-none-any.whl",
+          "sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23"
+        },
+        {
+          "bytes": 1524480,
+          "file": "equiframe-0.12.0a13.tar.gz",
+          "sha256": "164b70270344343094dc0a688bf8dbfe20a27112f7227e2f7fe318f085b71935"
+        },
+        {
+          "bytes": 127142,
+          "file": "equiframe_benchmark-0.12.0a13-py3-none-any.whl",
+          "sha256": "fb843318d044a36a7ba4efab7d7d997d45798e12d16df7a9aa1b472b2c6359d8"
+        },
+        {
+          "bytes": 434163,
+          "file": "equiframe_benchmark-0.12.0a13.tar.gz",
+          "sha256": "4f8c47a00a8724b234e87c0a7147e193092122c77772e9169bd954744dd6e9c7"
+        },
+        {
+          "bytes": 28249,
+          "file": "equiframe_consumer_lab-0.1.15-py3-none-any.whl",
+          "sha256": "be82d4f7422dc98bbfbd978746eca5051280b1935b1191cb6fb566c61337838e"
+        },
+        {
+          "bytes": 28302,
+          "file": "equiframe_consumer_lab-0.1.15.tar.gz",
+          "sha256": "ebecd34b85d9922bc015421842f64ff980329660f33b41af1a93e7408f087393"
+        }
+      ],
+      "aspect": "Calidad del paquete, rúbrica propia",
+      "assessed_candidate": "0.12.0a13",
+      "comparable_gain_from_screenshot": null,
+      "denominator": 20,
+      "followup": "docs/VM_TARGET_FOLLOWUP_20261011.md",
+      "key": "package_quality",
+      "new_area_assessment_executed": false,
+      "numerator": 16,
+      "official_real_python_score": false,
+      "percent": 80.0,
+      "recalculated_now": true,
+      "recalculation_scope": "Arithmetic and source/hash binding; existing area evaluation retains its candidate and scope.",
+      "record_targets_current_a13": true,
+      "remaining": [
+        "Q08",
+        "Q11",
+        "Q12",
+        "Q20"
+      ],
+      "rounded_percent": 80.0,
+      "rubric": "PACKAGE-QUALITY-RP-20-v1",
+      "scope": "Own rubric inspired by Real Python; not an official Real Python score or a security audit",
+      "screenshot_percent_unverified": 45,
+      "source": "docs/PACKAGE_QUALITY_RESULT_20261010.json",
+      "source_sha256": "a4a69cb8ea6956df9972b297f601529528079aeaff66e66b2646c02529737044",
+      "source_url": "https://realpython.com/python-package-quality/",
+      "status": "LATEST_RECORDED_MEASUREMENT",
+      "target_met": false,
+      "target_percent": 85
+    }
+  ],
+  "new_paid_resources": false,
+  "overall_rubric_id": "GLOBAL-EIGHT-EQUAL-v1",
+  "previous_matrix": {
+    "preserved": true,
+    "sha256": "4e1bdc7729da4e17b8529a02c32b112fc0089ff042b4502ec41ac6e215cef8da",
+    "source": "docs/PROJECT_STATUS_MATRIX_20261011_GLOBAL75.json"
+  },
+  "public_publication_performed": false,
+  "recorded_at_utc": "2026-10-13T01:59:22.423042+00:00",
+  "schema": "equiframe.project-status.v1",
+  "scope": "Owner-selected eight-area board; original per-area denominators and candidate identities retained.",
+  "scope_change_is_technical_progress": false,
+  "timezone": "America/Guayaquil",
+  "word_modified_in_this_followup": false
+}

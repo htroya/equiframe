@@ -1,0 +1,44 @@
+{
+  "additionalProperties": false,
+  "description": "Accounting budgets; no compression/archive extraction or hidden downloads.",
+  "properties": {
+    "max_file_bytes": {
+      "default": 2147483648,
+      "exclusiveMinimum": 0,
+      "title": "Max File Bytes",
+      "type": "integer"
+    },
+    "max_files": {
+      "default": 10000,
+      "exclusiveMinimum": 0,
+      "title": "Max Files",
+      "type": "integer"
+    },
+    "max_manifest_bytes": {
+      "default": 8388608,
+      "exclusiveMinimum": 0,
+      "title": "Max Manifest Bytes",
+      "type": "integer"
+    },
+    "max_record_bytes": {
+      "default": 67108864,
+      "exclusiveMinimum": 0,
+      "title": "Max Record Bytes",
+      "type": "integer"
+    },
+    "max_total_bytes": {
+      "default": 10737418240,
+      "exclusiveMinimum": 0,
+      "title": "Max Total Bytes",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "title": "BundleLimits",
+  "type": "object"
+}

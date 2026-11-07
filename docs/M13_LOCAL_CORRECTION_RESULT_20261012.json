@@ -1,0 +1,107 @@
+{
+  "archive": "m13-kit-r2.zip",
+  "archive_members": 54,
+  "archive_sha256": "354c704a5d760b8295031a1a966c135c3e41d111327cce97ad10180799d87e63",
+  "archive_size_bytes": 6478917,
+  "artifact_hashes": {
+    "benchmark_sdist": "4f8c47a00a8724b234e87c0a7147e193092122c77772e9169bd954744dd6e9c7",
+    "benchmark_wheel": "fb843318d044a36a7ba4efab7d7d997d45798e12d16df7a9aa1b472b2c6359d8",
+    "consumer_sdist": "ebecd34b85d9922bc015421842f64ff980329660f33b41af1a93e7408f087393",
+    "consumer_wheel": "be82d4f7422dc98bbfbd978746eca5051280b1935b1191cb6fb566c61337838e",
+    "core_sdist": "164b70270344343094dc0a688bf8dbfe20a27112f7227e2f7fe318f085b71935",
+    "core_wheel": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23"
+  },
+  "candidate_manifest_sha256": "55eb4ce44c5453a884e3424c8d490c645338696cc0e9ca5c235f94366612f9fa",
+  "consumer_wheel_rebuild_policy": "consumer-wheel-central-creator-system-zero-v1",
+  "criteria_automatically_closed": [],
+  "declared_files": 52,
+  "execution_started": false,
+  "local_tool_checks": {
+    "human_independent_review": false,
+    "maturity_points_added": 0,
+    "normal": {
+      "passed": 71,
+      "skipped_windows_posix_case": 1,
+      "tests": 72
+    },
+    "optimized": {
+      "passed": 71,
+      "skipped_windows_posix_case": 1,
+      "tests": 72
+    },
+    "ruff_changed_scripts": "PASS",
+    "static_ai_review": "mi_dot"
+  },
+  "original_transfer": {
+    "authorized": true,
+    "execution_started_at_utc": "2026-10-12T12:07:21.345092Z",
+    "full_final_receipts_collected": false,
+    "launch_receipt_sha256": "0b2c48091e1280795247fdf476d55340b5082fa6c0db2c23179512e88bcf722d",
+    "passing_m13_execution": false,
+    "reason": "Original consumer raw wheel rebuild differs; first failure is preserved. Current VM SSH connections time out; no terminal state inferred.",
+    "transport_receipt_sha256": "cd299d7f4554aa25be7abcbfaa2c594c95eea70a36f1aae031c677a6d5e960de",
+    "verified": true
+  },
+  "previous_attempt_preserved": true,
+  "previous_kit_sha256": "c33e581011bae4077aafccb478a7e678af9ea2cf8ff381d5f3a3bec4d6adab03",
+  "private_preparation_receipt_sha256": "bcd406c035c11d3e97774f9f44daf789969eee5ebaacdc48061d69cc3c184aaa",
+  "public_publication_performed": false,
+  "recorded_at_utc": "2026-10-12T15:05:58.176481+00:00",
+  "schema": "equiframe.m13-corrected-kit-preparation.v1",
+  "scope_id": "M13-ARM-ORIGINAL-v1",
+  "sdk_or_original_artifact_modified": false,
+  "source": {
+    "consumer": {
+      "branch": "main",
+      "commit": "3f17c8c5398b02ec2c97c09b2ac4eac1c36e3143",
+      "history": "observed committed source; integration status is recorded separately",
+      "tree": "2fed18cd7614d916be292e4283e51aa976d3feca",
+      "worktree_clean": true
+    },
+    "consumer_data": {
+      "branch": "main",
+      "commit": "e8e17976dfa2c36a5cbcf4c2ec183469a73adbc7",
+      "history": "observed committed frozen-data source; no remote publication implied",
+      "tree": "02b41f05f5fc14e779cdb85219a020bef7f060a6",
+      "worktree_clean": true
+    },
+    "equiframe": {
+      "branch": "main",
+      "commit": "ab508e443eeb5576348fa62c5cbf9efab9de2a19",
+      "history": "observed committed source; integration status is recorded separately",
+      "tree": "08a61d13a5b35c6aa930149ba1de1a1cdcacdd23",
+      "worktree_clean": true
+    },
+    "verified_remote_baseline": {
+      "commit": "10c00a765af411f7d0e56825dafdc063f125585c",
+      "note": "Caller-observed remote main; source is a verified descendant, not a claim of final integration",
+      "repository": "htroya/equiframe",
+      "tree": "9751ad74db091db6a6941b8f144244ce533b2802"
+    }
+  },
+  "status": "LOCAL_PREPARED_NOT_TRANSFERRED_NOT_EXECUTED",
+  "test_manifests": {
+    "benchmark": {
+      "path": "test-manifests/benchmark.json",
+      "sha256": "a9add614694e13d586f9ec279d61df9a79fc0542a32afb83f301bdd7164aa049",
+      "size_bytes": 97180
+    },
+    "consumer": {
+      "path": "test-manifests/consumer.json",
+      "sha256": "5e6846208e489598424825228276233fcefcb2af2e6246d1691e6b0ebed0e081",
+      "size_bytes": 4074
+    },
+    "core": {
+      "path": "test-manifests/core.json",
+      "sha256": "a4ac1f96dbc60da827d4ccfd09211f25fc2f2e47d8175aa05426af7a3453b4eb",
+      "size_bytes": 1305645
+    }
+  },
+  "tooling_source": {
+    "commit": "ab508e443eeb5576348fa62c5cbf9efab9de2a19",
+    "tree": "08a61d13a5b35c6aa930149ba1de1a1cdcacdd23",
+    "worktree_clean": true
+  },
+  "word_or_credentials_included": false,
+  "word_sha256_verified": "883b187f08221b9b4abab775430d9a2c87b6d92f503494317f3e1fec214d0f3c"
+}

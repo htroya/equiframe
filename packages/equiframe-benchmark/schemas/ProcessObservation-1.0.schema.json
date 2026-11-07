@@ -1,0 +1,407 @@
+{
+  "$defs": {
+    "ResourceMetricCoverage": {
+      "additionalProperties": false,
+      "description": "One metric's actual observation or its exact platform capability boundary.",
+      "properties": {
+        "metric": {
+          "enum": [
+            "sampled_rss_peak_bytes",
+            "cpu_user_seconds",
+            "cpu_system_seconds",
+            "io_read_bytes",
+            "io_write_bytes",
+            "io_read_chars",
+            "io_write_chars",
+            "disk_apparent_peak_bytes",
+            "disk_allocated_peak_bytes"
+          ],
+          "title": "Metric",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "enum": [
+                "psutil_process_memory_info_rss",
+                "psutil_process_cpu_times_user",
+                "psutil_process_cpu_times_system",
+                "psutil_process_io_counters",
+                "linux_proc_pid_io",
+                "filesystem_tree_stat_size",
+                "filesystem_tree_stat_blocks_512"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source"
+        },
+        "state": {
+          "enum": [
+            "observed",
+            "unavailable_on_platform",
+            "measurement_failed"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "metric",
+        "state",
+        "source",
+        "reason"
+      ],
+      "title": "ResourceMetricCoverage",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Process facts, deliberately without a workload-success or complete flag.\n\nSample counts/gaps cover monitoring rounds, including the preflight and\nfinal disk-only rounds. ``cleanup_reaped`` refers only to the direct child;\nit is also true when launch never happened. Descendants cannot generally be\nreaped by this process and their absence is not a containment guarantee.",
+  "properties": {
+    "budget_method": {
+      "const": "reactive_sampled_thresholds_not_hard_quotas",
+      "default": "reactive_sampled_thresholds_not_hard_quotas",
+      "title": "Budget Method",
+      "type": "string"
+    },
+    "cleanup_reaped": {
+      "title": "Cleanup Reaped",
+      "type": "boolean"
+    },
+    "counter_method": {
+      "const": "sampled_cumulative_last_available",
+      "default": "sampled_cumulative_last_available",
+      "title": "Counter Method",
+      "type": "string"
+    },
+    "cpu_system_seconds": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Cpu System Seconds"
+    },
+    "cpu_user_seconds": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Cpu User Seconds"
+    },
+    "disk_allocated_peak_bytes": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Disk Allocated Peak Bytes"
+    },
+    "disk_apparent_peak_bytes": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Disk Apparent Peak Bytes"
+    },
+    "disk_method": {
+      "const": "sampled_tree_inodes_no_symlink_following",
+      "default": "sampled_tree_inodes_no_symlink_following",
+      "title": "Disk Method",
+      "type": "string"
+    },
+    "exit_code": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Exit Code"
+    },
+    "io_counter_fallback_reason": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Io Counter Fallback Reason"
+    },
+    "io_counter_source": {
+      "default": "legacy_unspecified",
+      "enum": [
+        "psutil",
+        "linux_proc_pid_io",
+        "unavailable",
+        "legacy_unspecified"
+      ],
+      "title": "Io Counter Source",
+      "type": "string"
+    },
+    "io_read_bytes": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Io Read Bytes"
+    },
+    "io_read_chars": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Io Read Chars"
+    },
+    "io_write_bytes": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Io Write Bytes"
+    },
+    "io_write_chars": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Io Write Chars"
+    },
+    "max_sample_gap_seconds": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Max Sample Gap Seconds"
+    },
+    "measurement_contract": {
+      "default": "legacy_unspecified",
+      "enum": [
+        "equiframe_process_resources_v1",
+        "legacy_unspecified"
+      ],
+      "title": "Measurement Contract",
+      "type": "string"
+    },
+    "measurement_platform": {
+      "default": "legacy_unspecified",
+      "enum": [
+        "linux",
+        "windows",
+        "macos",
+        "legacy_unspecified"
+      ],
+      "title": "Measurement Platform",
+      "type": "string"
+    },
+    "metric_coverage": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ResourceMetricCoverage"
+      },
+      "title": "Metric Coverage",
+      "type": "array"
+    },
+    "monitoring_errors": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Monitoring Errors",
+      "type": "array"
+    },
+    "observed_descendant_pids": {
+      "default": [],
+      "items": {
+        "exclusiveMinimum": 0,
+        "type": "integer"
+      },
+      "title": "Observed Descendant Pids",
+      "type": "array"
+    },
+    "pid": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Pid"
+    },
+    "resource_scope": {
+      "const": "direct_child_excluding_descendants",
+      "default": "direct_child_excluding_descendants",
+      "title": "Resource Scope",
+      "type": "string"
+    },
+    "rss_method": {
+      "const": "sampled_absolute_lower_bound",
+      "default": "sampled_absolute_lower_bound",
+      "title": "Rss Method",
+      "type": "string"
+    },
+    "sample_count": {
+      "minimum": 0,
+      "title": "Sample Count",
+      "type": "integer"
+    },
+    "sample_interval_seconds": {
+      "exclusiveMinimum": 0,
+      "title": "Sample Interval Seconds",
+      "type": "number"
+    },
+    "sampled_rss_peak_bytes": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Sampled Rss Peak Bytes"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "stderr_path": {
+      "const": "stderr.log",
+      "default": "stderr.log",
+      "title": "Stderr Path",
+      "type": "string"
+    },
+    "stdout_path": {
+      "const": "stdout.log",
+      "default": "stdout.log",
+      "title": "Stdout Path",
+      "type": "string"
+    },
+    "termination_reason": {
+      "enum": [
+        "exited",
+        "timeout",
+        "rss_budget_exceeded",
+        "disk_budget_exceeded",
+        "monitoring_failed",
+        "launch_failed",
+        "unsupported_descendant"
+      ],
+      "title": "Termination Reason",
+      "type": "string"
+    },
+    "termination_scope": {
+      "enum": [
+        "posix_process_group",
+        "direct_child"
+      ],
+      "title": "Termination Scope",
+      "type": "string"
+    },
+    "wall_seconds": {
+      "minimum": 0,
+      "title": "Wall Seconds",
+      "type": "number"
+    }
+  },
+  "required": [
+    "pid",
+    "exit_code",
+    "termination_reason",
+    "wall_seconds",
+    "sampled_rss_peak_bytes",
+    "cpu_user_seconds",
+    "cpu_system_seconds",
+    "io_read_bytes",
+    "io_write_bytes",
+    "io_read_chars",
+    "io_write_chars",
+    "disk_apparent_peak_bytes",
+    "disk_allocated_peak_bytes",
+    "sample_interval_seconds",
+    "max_sample_gap_seconds",
+    "sample_count",
+    "monitoring_errors",
+    "cleanup_reaped",
+    "termination_scope"
+  ],
+  "title": "ProcessObservation",
+  "type": "object"
+}

@@ -1,0 +1,20 @@
+{
+  "status": "TEMPLATE_NOT_EXECUTED",
+  "actual_executor_name_or_task": null,
+  "authorized_codex_environment": null,
+  "executed_at_utc": null,
+  "kit_sha256_verified_before_extraction": null,
+  "connection_or_transport_receipt_file": null,
+  "connection_or_transport_receipt_sha256": null,
+  "host_key_fingerprint_verified": null,
+  "observed_hostname": null,
+  "observed_user_and_uid": null,
+  "j01_to_j07_observed_preparation": null,
+  "coexistence_constraints_confirmed_with_owner": null,
+  "lab_path_created_by_runner": null,
+  "returned_evidence_archive_sha256": null,
+  "remaining_failures_or_blockers": null,
+  "reviewed_by": null,
+  "review_decision": null,
+  "warning": "Populate only from actual observations. Do not attach a private key or authentication token. Execution identity and evidence hashes do not establish independent human acceptance."
+}

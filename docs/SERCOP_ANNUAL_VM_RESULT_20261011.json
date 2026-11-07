@@ -1,0 +1,209 @@
+{
+  "actions_executed": false,
+  "all_capture_and_difference_references_verified": true,
+  "all_results_complete": true,
+  "assessment_date_local": "2026-10-11",
+  "attempt1_limit": {
+    "check": 61,
+    "diagnostic": "max_work",
+    "family": "joins",
+    "max_work": 50000000,
+    "not_a_timeout": true,
+    "state": "not_evaluable"
+  },
+  "attempts": [
+    {
+      "archive_sha256": "0c8e5ec45a0c918a2f243fda5e101fa5eb856eb40f00b2a252165a2abd530568",
+      "archive_size_bytes": 89197032,
+      "attempt": "attempt1",
+      "checks": 61,
+      "full_checks": 7,
+      "last_check": {
+        "award_rows": 183891,
+        "check": "pandas-literal",
+        "comparison_id": "comparison-82fa3bffe5ca4e25a9fbeb58971a8635",
+        "comparison_seconds": 180.47157675295603,
+        "complete": false,
+        "difference_records": 0,
+        "expected_state": "equivalent",
+        "family": "joins",
+        "readback_seconds": 0.004566386924125254,
+        "size": "full",
+        "state": "not_evaluable",
+        "status": "FAIL",
+        "verified_difference_records": 0
+      },
+      "manifest_sha256": "e9c7009d914b12a7a6eb4482fc35080eb08926c738179994b2cc0ab792d3355a",
+      "pass_checks": 60,
+      "private_verification_receipt_sha256": "3a0238b191aabbe5e0f7066eb1c7c47acaf6298f3dd5b2510e697b47297f7f6f",
+      "protocol_sha256": "49afe6e00be440234fc222fb19fe0910bad418a472342d1bdb8ea698e45436d8",
+      "status": "FAIL",
+      "verified_files": 391
+    },
+    {
+      "archive_sha256": "c45a15148a7789948f520d49854881f38f91ad6bfd0650bb76381dee58cf8212",
+      "archive_size_bytes": 212899017,
+      "attempt": "attempt2",
+      "checks": 81,
+      "full_checks": 27,
+      "last_check": {
+        "award_rows": 183891,
+        "check": "duckdb-deliberate-difference",
+        "comparison_id": "comparison-af8e67dd39e74293a309f4120e83668a",
+        "comparison_seconds": 0.03050113609060645,
+        "complete": true,
+        "difference_records": 2,
+        "expected_state": "different",
+        "family": "aggregations",
+        "readback_seconds": 0.003909223014488816,
+        "size": "full",
+        "state": "different",
+        "status": "PASS",
+        "verified_difference_records": 2
+      },
+      "manifest_sha256": "6a8b4f7f8345d9975e885fdd80e3efb426103f8f8657f93292611daad0da8636",
+      "pass_checks": 81,
+      "private_verification_receipt_sha256": "400aabac5b280debb84ea64aa90bea5ad72f62900b1afbf3d8367f20baa18a1e",
+      "protocol_sha256": "da8887a0fb6b332356bd35f379312fdc336959077b8f2d789e6ceb6ec0d4743a",
+      "status": "PASS",
+      "verified_files": 512
+    }
+  ],
+  "award_count": 183891,
+  "candidate": "0.12.0a13",
+  "checks": 81,
+  "core_wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+  "effective_fit_records": null,
+  "environment": {
+    "machine": "aarch64",
+    "platform": "Linux-6.8.0-1060-oracle-aarch64-with-glibc2.35",
+    "python": "3.12.15 (main, Oct  1 2026, 15:41:07) [GCC 11.4.0]",
+    "versions": {
+      "duckdb": "1.5.6",
+      "equiframe": "0.12.0a13",
+      "pandas": "3.0.6",
+      "polars": "1.44.2",
+      "psutil": "7.2.2",
+      "pyarrow": "25.0.1",
+      "pydantic": "2.13.5"
+    }
+  },
+  "finished_utc": "2026-10-12T04:36:22.154952+00:00",
+  "full_checks": 27,
+  "full_deliberately_altered_output_checks": 9,
+  "full_expected_and_engine_pair_equivalence_checks": 18,
+  "human_oracle_labels": false,
+  "limits": [
+    "Engineering comparison on one observed ARM64 CPython3.12 environment.",
+    "2025 portal selection contains releases published in2025 and2026; it is not an approved scientific cohort.",
+    "Raw awards are not normal learning executions; no N_fit, blind O or scientific approval inferred.",
+    "Sampled supervision is not a hard operating-system quota or a confidence interval.",
+    "Repeats and Counter checks do not enlarge the unique obligation denominator or numerator."
+  ],
+  "observed_resources": {
+    "final_output_bytes": 1058178840,
+    "resource_sample_count": 3230,
+    "resource_scope": "One observed Linux ARM64 run; no confidence interval, scaling law or hard OS quota",
+    "sampled_peak_output_bytes": 1988928634,
+    "sampled_peak_process_tree_rss_bytes": 951996416,
+    "wall_seconds": 3244.468070795061
+  },
+  "official_public_archive_sha256": "9ee4e5f94f44e42c89ade804d00ed69cd24604d246ad6450a4a43b2bd42e3632",
+  "original_tooling_commit": "7c9b3e9d8ed5d2156fb3cc5a941bc8ba873ce2b9",
+  "original_windows_limit_preserved": {
+    "full_state": "not_evaluable",
+    "max_disk_bytes": 268435456,
+    "not_reclassified_as_pass": true,
+    "source": "docs/SERCOP_ANNUAL_ENGINEERING_RESULT_20261011.json"
+  },
+  "paid_resources_created": false,
+  "physical_disk_cleanup": {
+    "backup_sha256": "c2d8b5af4372d66209d887b6e2f144aed77d013fdd6072cc0095e19a1c4cebd0",
+    "logical_bytes_removed": 247955526,
+    "observed_free_disk_increase_bytes": 471478272,
+    "owned_test_directories_removed": 10,
+    "removed_beyond_owned_test_temporaries": false
+  },
+  "prefix_checks": 54,
+  "pypi_or_testpypi_published": false,
+  "release_count": 190619,
+  "reviewed_protocol": {
+    "absence": "Explicit missing/null/present flags; malformed value objects are not converted to null",
+    "archive_sha256": "9ee4e5f94f44e42c89ade804d00ed69cd24604d246ad6450a4a43b2bd42e3632",
+    "award_columns": [
+      "ocid",
+      "award_id",
+      "currency",
+      "amount",
+      "value_state",
+      "currency_state",
+      "amount_state"
+    ],
+    "candidate": "0.12.0a13",
+    "comparison_options": {
+      "max_disk_bytes": 1073741824,
+      "max_evidence_bytes": 134217728,
+      "max_rows": 500000,
+      "max_work": 100000000,
+      "partitions": 16,
+      "timeout_seconds": 300.0
+    },
+    "comparisons_each_size": "3 families x (3 independent expected comparisons +3 engine pairs) =18; source data are shared",
+    "corrupt_controls_full": {
+      "acceptance": "different AND complete with nonzero verified differences; these are expected differences, not input rejection",
+      "aggregations": "Add exactly1 to award_count for that award's currency",
+      "count": 9,
+      "joins": "Replace release_date for that exact award key with literal0001-01-01",
+      "nulls_types": "Add exactly1 to amount for first source award with a present amount",
+      "site": "Deliberately altered native transformation output, not corruption of the raw export"
+    },
+    "dates": "Release publication text and presence flag; no award/cohort date inferred",
+    "dw_or_gateway_implemented": false,
+    "engines": [
+      "pandas",
+      "polars",
+      "duckdb"
+    ],
+    "expected": "Python raw projection, exact left join lookup and currency counts built before native execution; engine outputs never generate expected values",
+    "expected_award_occurrences": 183891,
+    "expected_packages": 190619,
+    "families": [
+      "nulls_types",
+      "joins",
+      "aggregations"
+    ],
+    "grain": "Exactly one release per package, unique ocid and (ocid,award.id); ambiguous or unsupported inputs fail without repair",
+    "host_budgets": {
+      "kind": "Owned-run supervision and cooperative SDK checks; no production OS/container quota claim",
+      "minimum_free_disk_bytes": 5368709120,
+      "minimum_free_ram_bytes": 3221225472,
+      "one_process_at_a_time": true,
+      "output_bytes": 3221225472,
+      "rss_bytes": 3221225472,
+      "threads_each_engine": 1,
+      "wall_seconds": 4800
+    },
+    "human_labels": 0,
+    "json_member": "releases_2025.json",
+    "model_fitting": false,
+    "money": "Exact JSON int/float tokens decoded as Decimal, including signed zero; Decimal128(38,observed scale) only if exact coefficient fits38 digits; negative zero rejected",
+    "native": "Independent pandas,Polars,DuckDB projection/left join/currency count implementations; no engine output converted to simulate another engine",
+    "schema": "equiframe.sercop-engineering-workload.v1",
+    "scientific_acceptance": false,
+    "size_definition": "Deterministic prefixes of the same observed unique award grain; shared observations, not independent cohorts/groups",
+    "sizes": [
+      100,
+      1000,
+      10000,
+      "full"
+    ],
+    "source": "Frozen official SERCOP year2025 month0 methodall export; selector is not an award/release cohort",
+    "word_modified": false
+  },
+  "rubric_points_automatically_added": 0,
+  "schema": "equiframe.sercop-annual-vm-result.v1",
+  "scientific_acceptance": false,
+  "status": "PASS",
+  "traceability_obligation_ids_automatically_added": 0,
+  "word_modified": false
+}

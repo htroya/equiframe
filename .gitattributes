@@ -1,0 +1,33 @@
+* text=auto
+.gitattributes text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sql text eol=lf
+*.sh text eol=lf
+*.ps1 text eol=crlf
+*.lock text eol=lf
+.github/controller-requirements.txt text eol=lf
+packages/equiframe/tools/cyclonedx/LICENSE text eol=lf
+
+# Historical compatibility fixtures are immutable byte corpora. Their recorded
+# sizes and SHA-256 values must survive checkout even when core.autocrlf is true.
+packages/equiframe/tests/fixtures/versioned/** -text
+
+# This historical schema has an exact published byte hash. Keep its committed
+# LF bytes on Windows too; platform newline conversion is not a format revision.
+packages/equiframe-benchmark/schemas/SnapshotManifest-1.0.schema.json -text
+
+# Frozen option cases and manifest are identified by their exact archived bytes.
+packages/equiframe/tests/fixtures/option_trace/catalog-a12.json -text
+packages/equiframe/tests/fixtures/option_trace/manifest.json -text
+
+# These dated receipts are identified by exact hashes in their private custody
+# and other assessments. Preserve their original bytes across checkout.
+docs/*_RESULT_20261012.json -text whitespace=cr-at-eol
+
+# This reader addendum binds the exact original consumer testcase inventory.
+tools/maturity_lab/scripts/consumer-subtests-manifest.json -text whitespace=cr-at-eol

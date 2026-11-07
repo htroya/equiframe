@@ -1,0 +1,204 @@
+{
+  "$defs": {
+    "ComponentDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "complete": {
+          "title": "Complete",
+          "type": "boolean"
+        },
+        "decision": {
+          "enum": [
+            "alert",
+            "no_alert",
+            "not_evaluable"
+          ],
+          "title": "Decision",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "decision",
+        "complete"
+      ],
+      "title": "ComponentDecision",
+      "type": "object"
+    },
+    "DetectorDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/ComponentDecision"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "const": "+infinity",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Score"
+        },
+        "threshold": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Threshold"
+        }
+      },
+      "required": [
+        "result",
+        "score",
+        "threshold"
+      ],
+      "title": "DetectorDecision",
+      "type": "object"
+    },
+    "DetectorScores": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "state": {
+          "enum": [
+            "scored",
+            "not_estimable"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "values": {
+          "default": [],
+          "items": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "const": "+infinity",
+                "type": "string"
+              }
+            ]
+          },
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "state"
+      ],
+      "title": "DetectorScores",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Frozen inference for one method; the other detector is not scored.",
+  "properties": {
+    "bundle_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Bundle Sha256",
+      "type": "string"
+    },
+    "decisions": {
+      "items": {
+        "$ref": "#/$defs/DetectorDecision"
+      },
+      "title": "Decisions",
+      "type": "array"
+    },
+    "fit_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Fit Sha256",
+      "type": "string"
+    },
+    "matrix_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Matrix Sha256"
+    },
+    "method": {
+      "enum": [
+        "isolation_forest",
+        "mad"
+      ],
+      "title": "Method",
+      "type": "string"
+    },
+    "profiles_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Profiles Sha256",
+      "type": "string"
+    },
+    "rows": {
+      "minimum": 0,
+      "title": "Rows",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scores": {
+      "$ref": "#/$defs/DetectorScores"
+    }
+  },
+  "required": [
+    "method",
+    "bundle_sha256",
+    "fit_sha256",
+    "profiles_sha256",
+    "matrix_sha256",
+    "rows",
+    "scores",
+    "decisions"
+  ],
+  "title": "ComponentDetectionResult",
+  "type": "object"
+}

@@ -1,0 +1,62 @@
+{
+  "schema": "equiframe.security-managed-scan-reference.v1",
+  "scope": "Reference metadata only; canonical findings, coverage and report remain in Codex Security managed storage",
+  "scan_id": "c90b443b-0f84-4716-9ba1-febea05c8dbb",
+  "completed_at_utc": "2026-10-11T19:24:57.816290Z",
+  "status": "completed",
+  "report_available": true,
+  "managed_scan_directory": "C:\\Users\\Usuario\\.codex\\state\\plugins\\codex-security\\scans\\equiframe-source-snapshot-20261011\\unversioned_20261011T184015Z_2xofrd39",
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "xhigh",
+  "snapshot": {
+    "origin_head": "40a8d8dd82229fe1dbe1f21d22939522502a61b6",
+    "non_git_copy": true,
+    "new_files_present_at_copy": 3,
+    "files": 698,
+    "bytes": 11166948,
+    "digest": "d17f61673ca2b11e57392e26b37112bc94420bc48a2a223e3062883daefa240a",
+    "historical_fixtures_excluded": 122,
+    "rehash_unchanged": true,
+    "later_driver_workflow_documentation_checkout_attribute_changes_covered": false
+  },
+  "coverage_reference": {
+    "assessment": "partial",
+    "reviewed_files": 319,
+    "unreviewed_files": 379,
+    "unreviewed_tests": 144,
+    "unreviewed_examples": 67,
+    "unreviewed_documentation_metadata": 168,
+    "production_core_benchmark_tools_cli_ci_reviewed_within_snapshot": true,
+    "structural_data_audits_are_not_execution": true,
+    "generic_task_closed_with_explicit_exclusions": true,
+    "whole_product_preparation_percentage": null
+  },
+  "finding_reference": {
+    "id": "csf_d92dc83dfa946f8126a9de46",
+    "occurrence_id": "occ_190ebc9495be875ded15a4d1",
+    "rule_id": "path-confinement.windows-report-junction",
+    "cwe": "CWE-22",
+    "severity": "low",
+    "confidence": "medium",
+    "validation": "static",
+    "triage": "open",
+    "dynamic_poc_executed": false,
+    "sdk_fix_applied": false
+  },
+  "canonical_artifact_digests": {
+    "findings.json": "30dc68121274e30b2f183f544204e44822978d768f00d8f65144721ce1d5a230",
+    "coverage.json": "28ba8675af1e4ea713e05693c1aec3e0f07a6ff0327c9c10d069b1d1b66ad21c",
+    "artifacts/snapshot-origin-20261011.json": "1d5765c7e628eefdc956c303eb94f65992bd5041d24f0f7a34c9b756c84003de",
+    "artifacts/architecture-review-20261011.json": "60093e86c8c4c673714c8d7b2928c27c6bdb02face60a0a2db5bd1b9b9a9a57d",
+    "artifacts/runtime-review-20261011.json": "c1107387f1481bcc69f8cfbe8fda981ffaa4f3e075cd725b7e8a66ba31667f99",
+    "artifacts/review-inventory-20261011.json": "db462fce9cf4716003a4b4d8ede6c49746359b5d2e3def8bac006acd7b1b3fdf",
+    "hardening/security-readiness-rubric-proposal-20261011.md": "3842e8a63e6e58134a99a73468a2508a49bb653d58e680d6c82b415058ed7c6e"
+  },
+  "host_digest_unavailable": ["report.md", "scan-manifest.json"],
+  "host_usage": {"token_count": null, "warning": "scan_thread_unavailable"},
+  "completion_called_once": true,
+  "canonical_report_hand_authored": false,
+  "human_review_completed": false,
+  "github_actions_executed": false,
+  "new_paid_resources": false
+}

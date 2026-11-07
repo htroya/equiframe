@@ -1,0 +1,17 @@
+{
+  "archive": "trace85_llamadas_semanticas_20261012.zip",
+  "archive_crc_members_verified": 43,
+  "credential_word_corpus_wheels_or_venvs_included": false,
+  "denominator": 8385,
+  "failed_attempts_extra_credit": 0,
+  "files_verified": 42,
+  "limits": [
+    "The v5 failed attempt retains its receipt/tool hash/log; its complete tool source was not separately snapshotted."
+  ],
+  "new_unique_ids": 71,
+  "replay_extra_credit": 0,
+  "schema": "equiframe.semantic-calls-custody-receipt.v1",
+  "sha256": "da457ee1a5fc7ac278969a1d93779f15196b66d76b95cd54261426bedbd8d3f0",
+  "size_bytes": 1757383,
+  "verified_union": 6045
+}

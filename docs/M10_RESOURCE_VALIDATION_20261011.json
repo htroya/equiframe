@@ -1,0 +1,130 @@
+{
+  "schema": "equiframe.maturity-resource-validation.v1",
+  "recorded_at_utc": "2026-10-12T00:11:19.058981+00:00",
+  "candidate": "0.12.0a13",
+  "scope": "Original local M10 protocol; no platform-matrix, human, scientific, security quota or SLO closure",
+  "executor": "Windows AMD64 CPython3.12.4 in the owned installed A13 lab",
+  "core": {
+    "version": "0.12.0a13",
+    "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+    "payload_files": 127
+  },
+  "benchmark": {
+    "version": "0.12.0a13",
+    "wheel_sha256": "fb843318d044a36a7ba4efab7d7d997d45798e12d16df7a9aa1b472b2c6359d8",
+    "payload_files": 35
+  },
+  "protocol": {
+    "rows": [
+      100,
+      1000
+    ],
+    "width": 2,
+    "repetitions_each": 3,
+    "rss_budget_bytes": 536870912,
+    "disk_budget_bytes": 67108864,
+    "timeout_seconds": 120,
+    "engine_threads": 1,
+    "storage": "disk",
+    "filesystem_observed": "NTFS",
+    "filesystem_method": "windows_get_volume_information_and_drive_type",
+    "os_cache": "uncontrolled",
+    "shared_host_load": "not controlled",
+    "slo_accepted": false
+  },
+  "result": "PASS",
+  "correct_complete_repetitions": 6,
+  "bounded_limit": {
+    "max_rows": 1,
+    "state": "not_evaluable",
+    "complete": false,
+    "reason": "ResourceLimitError"
+  },
+  "measurement_contract": "equiframe_process_resources_v1",
+  "measurement_platform": "windows",
+  "metrics_observed_each": 6,
+  "fixed_platform_exceptions_each": 3,
+  "fixed_exceptions": {
+    "io_read_chars": "windows_psutil_process_io_read_chars_not_exposed",
+    "io_write_chars": "windows_psutil_process_io_write_chars_not_exposed",
+    "disk_allocated_peak_bytes": "windows_python_stat_result_st_blocks_not_exposed"
+  },
+  "runs": [
+    {
+      "rows": 100,
+      "run_id": "scale-644804c978054f2fa7aff1a4a9d71eec",
+      "repetitions": 3,
+      "metrics_observed": 6,
+      "fixed_platform_exceptions": 3,
+      "process": {
+        "wall_seconds": 8.60899999999674,
+        "sampled_rss_peak_bytes": 159383552,
+        "cpu_user_seconds": 4.09375,
+        "cpu_system_seconds": 1.78125,
+        "io_read_bytes": 20841099,
+        "io_write_bytes": 3429506,
+        "disk_apparent_peak_bytes": 285307
+      }
+    },
+    {
+      "rows": 1000,
+      "run_id": "scale-c4bd84257e14434ba1ab966a9f6b605f",
+      "repetitions": 3,
+      "metrics_observed": 6,
+      "fixed_platform_exceptions": 3,
+      "process": {
+        "wall_seconds": 12.53200000000652,
+        "sampled_rss_peak_bytes": 159653888,
+        "cpu_user_seconds": 7.390625,
+        "cpu_system_seconds": 3.515625,
+        "io_read_bytes": 22350512,
+        "io_write_bytes": 5760028,
+        "disk_apparent_peak_bytes": 1423316
+      }
+    }
+  ],
+  "verified_evidence_members": 109,
+  "source_tool": "tools/maturity_lab/scripts/measure_maturity.py",
+  "source_tool_sha256": "a9898bced3c7a56d1ff5edcb46858d6821fc6a3fbfb0cfc1e951d3e6b4c3cee7",
+  "receipts": [
+    {
+      "private_path": "avance_global_75_20261011/m10-execution.json",
+      "sha256": "1b6eedaefaf5191c0895ee634144e1d9648eea8a385bd3bbf9eb8ccd5db4ced6"
+    },
+    {
+      "private_path": "avance_global_75_20261011/m10-preflight.json",
+      "sha256": "2fa206a0da038884cde2d197805f2b793d58b4045150cbade59012a935e2eb2d"
+    },
+    {
+      "private_path": "avance_global_75_20261011/m10-verification.json",
+      "sha256": "78f529b9a4fadab35899d5ffcc640d58bd7a5bc55bce660610c67715e493ad19"
+    },
+    {
+      "private_path": "avance_global_75_20261011/m10-windows-a13/protocol.json",
+      "sha256": "ed0ca2a5738ac084f18cebc668f8c80b4b9285a619e51d39f5e1ddc9f7c733e0"
+    },
+    {
+      "private_path": "avance_global_75_20261011/m10-windows-a13/summary.json",
+      "sha256": "446345a48d2658126b9904fde33137a18caaeb4ee76db152cf2ce236f5a720a1"
+    },
+    {
+      "private_path": "avance_global_75_20261011/m10-windows-a13/bounded-limit.json",
+      "sha256": "a26e5662654c26b71a39dd0092040d8dd05938b5bf13e8c0ed76b37133b38e4b"
+    },
+    {
+      "private_path": "avance_global_75_20261011/ai-m10-global-review.json",
+      "sha256": "7e88a20cf0ee493649464aa0e2fc085ec605fa14c9ee6e65c65f03342a3fe4ac"
+    }
+  ],
+  "review": {
+    "reviewer": "mi_dot",
+    "type": "AI_AGENT_READ_ONLY",
+    "human_review": false
+  },
+  "limitations": [
+    "Observed counters and sampled peaks are not physical maxima or hard host quotas.",
+    "Three unavailable Windows metrics retain pre-existing exact reasons; no failed observation was relabeled unavailable.",
+    "No complete M04/M05/M07/M11/M13, S09, production SLO or scientific cost evaluation is inferred.",
+    "Other original obligations retain their scope and denominator; all Word/SDK/benchmark artifact bytes are unchanged."
+  ]
+}

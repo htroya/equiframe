@@ -1,0 +1,46 @@
+{
+  "additionalProperties": false,
+  "description": "Full declared logical payloads, immutable JSON with tagged exact quantities.\n\nTables must contain complete logical rows or verified full-content identities,\nincluding currency amounts where applicable. Counts alone cannot establish table\nequivalence; this generic record does not certify tables omitted by a caller.",
+  "properties": {
+    "configuration": {
+      "minLength": 1,
+      "title": "Configuration",
+      "type": "string"
+    },
+    "decisions": {
+      "minLength": 1,
+      "title": "Decisions",
+      "type": "string"
+    },
+    "labels": {
+      "minLength": 1,
+      "title": "Labels",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "splits": {
+      "minLength": 1,
+      "title": "Splits",
+      "type": "string"
+    },
+    "tables": {
+      "minLength": 1,
+      "title": "Tables",
+      "type": "string"
+    }
+  },
+  "required": [
+    "configuration",
+    "splits",
+    "labels",
+    "decisions",
+    "tables"
+  ],
+  "title": "ReproductionRecord",
+  "type": "object"
+}

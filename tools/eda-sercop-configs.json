@@ -1,0 +1,389 @@
+{
+  "default": {
+    "schema_version": "1.0",
+    "rules_id": "sercop-export-observations",
+    "rules_revision": 1,
+    "charts": true,
+    "resources": {
+      "memory_mb": 512,
+      "threads": 1,
+      "temp_disk_mb": 256,
+      "timeout_seconds": 300.0,
+      "examples": 5,
+      "chart_rows": 100,
+      "top_categories": 8
+    }
+  },
+  "metadata_2025": {
+    "schema_version": "1.0",
+    "rules_id": "sercop-export-observations",
+    "rules_revision": 1,
+    "charts": true,
+    "resources": {
+      "memory_mb": 512,
+      "threads": 1,
+      "temp_disk_mb": 256,
+      "timeout_seconds": 300.0,
+      "examples": 5,
+      "chart_rows": 100,
+      "top_categories": 8
+    },
+    "conversions": [
+      {
+        "column": "PublishedDate",
+        "target": "derived_PublishedDate",
+        "kind": "timestamp",
+        "empty": "missing"
+      }
+    ],
+    "numeric": []
+  },
+  "releases_2025": {
+    "schema_version": "1.0",
+    "rules_id": "sercop-export-observations",
+    "rules_revision": 1,
+    "charts": true,
+    "resources": {
+      "memory_mb": 512,
+      "threads": 1,
+      "temp_disk_mb": 256,
+      "timeout_seconds": 300.0,
+      "examples": 5,
+      "chart_rows": 100,
+      "top_categories": 8
+    },
+    "conversions": [
+      {
+        "column": "date",
+        "target": "derived_date",
+        "kind": "timestamp",
+        "empty": "missing"
+      }
+    ],
+    "numeric": [],
+    "identifiers": [
+      "ocid",
+      "id"
+    ],
+    "keys": [
+      {
+        "columns": [
+          "ocid",
+          "id"
+        ],
+        "incomplete": "exclude",
+        "empty_is_missing": true,
+        "require_unique": false
+      }
+    ]
+  },
+  "planning_2025": {
+    "schema_version": "1.0",
+    "rules_id": "sercop-export-observations",
+    "rules_revision": 1,
+    "charts": true,
+    "resources": {
+      "memory_mb": 512,
+      "threads": 1,
+      "temp_disk_mb": 256,
+      "timeout_seconds": 300.0,
+      "examples": 5,
+      "chart_rows": 100,
+      "top_categories": 8
+    },
+    "conversions": [
+      {
+        "column": "budget_amount",
+        "target": "derived_budget_amount",
+        "kind": "decimal",
+        "precision": 38,
+        "scale": 12,
+        "empty": "missing"
+      }
+    ],
+    "numeric": [
+      {
+        "column": "derived_budget_amount",
+        "groups": [
+          "budget_currency"
+        ],
+        "monetary": true,
+        "currency_column": "budget_currency",
+        "outliers": "iqr",
+        "multiplier": 1.5,
+        "min_support": 20
+      }
+    ],
+    "identifiers": [
+      "ocid",
+      "id"
+    ],
+    "keys": [
+      {
+        "columns": [
+          "ocid",
+          "id"
+        ],
+        "incomplete": "exclude",
+        "empty_is_missing": true,
+        "require_unique": false
+      }
+    ]
+  },
+  "tender_2025": {
+    "schema_version": "1.0",
+    "rules_id": "sercop-export-observations",
+    "rules_revision": 1,
+    "charts": true,
+    "resources": {
+      "memory_mb": 512,
+      "threads": 1,
+      "temp_disk_mb": 256,
+      "timeout_seconds": 300.0,
+      "examples": 5,
+      "chart_rows": 100,
+      "top_categories": 8
+    },
+    "conversions": [
+      {
+        "column": "value_amount",
+        "target": "derived_value_amount",
+        "kind": "decimal",
+        "precision": 38,
+        "scale": 12,
+        "empty": "missing"
+      },
+      {
+        "column": "tenderPeriod_startDate",
+        "target": "derived_tenderPeriod_startDate",
+        "kind": "timestamp",
+        "empty": "missing"
+      },
+      {
+        "column": "tenderPeriod_endDate",
+        "target": "derived_tenderPeriod_endDate",
+        "kind": "timestamp",
+        "empty": "missing"
+      }
+    ],
+    "numeric": [
+      {
+        "column": "derived_value_amount",
+        "groups": [
+          "value_currency"
+        ],
+        "monetary": true,
+        "currency_column": "value_currency",
+        "outliers": "iqr",
+        "multiplier": 1.5,
+        "min_support": 20
+      }
+    ],
+    "identifiers": [
+      "ocid",
+      "id"
+    ],
+    "keys": [
+      {
+        "columns": [
+          "ocid",
+          "release_id",
+          "id"
+        ],
+        "incomplete": "exclude",
+        "empty_is_missing": true,
+        "require_unique": false
+      }
+    ]
+  },
+  "awards_2025": {
+    "schema_version": "1.0",
+    "rules_id": "sercop-export-observations",
+    "rules_revision": 1,
+    "charts": true,
+    "resources": {
+      "memory_mb": 512,
+      "threads": 1,
+      "temp_disk_mb": 256,
+      "timeout_seconds": 300.0,
+      "examples": 5,
+      "chart_rows": 100,
+      "top_categories": 8
+    },
+    "conversions": [
+      {
+        "column": "amount",
+        "target": "derived_amount",
+        "kind": "decimal",
+        "precision": 38,
+        "scale": 12,
+        "empty": "missing"
+      },
+      {
+        "column": "correctedValue_amount",
+        "target": "derived_correctedValue_amount",
+        "kind": "decimal",
+        "precision": 38,
+        "scale": 12,
+        "empty": "missing"
+      },
+      {
+        "column": "enteredValue_amount",
+        "target": "derived_enteredValue_amount",
+        "kind": "decimal",
+        "precision": 38,
+        "scale": 12,
+        "empty": "missing"
+      },
+      {
+        "column": "date",
+        "target": "derived_date",
+        "kind": "timestamp",
+        "empty": "missing"
+      }
+    ],
+    "numeric": [
+      {
+        "column": "derived_amount",
+        "groups": [
+          "currency"
+        ],
+        "monetary": true,
+        "currency_column": "currency",
+        "outliers": "iqr",
+        "multiplier": 1.5,
+        "min_support": 20
+      },
+      {
+        "column": "derived_correctedValue_amount",
+        "groups": [
+          "correctedValue_currency"
+        ],
+        "monetary": true,
+        "currency_column": "correctedValue_currency",
+        "outliers": "iqr",
+        "multiplier": 1.5,
+        "min_support": 20
+      },
+      {
+        "column": "derived_enteredValue_amount",
+        "groups": [
+          "enteredValue_currency"
+        ],
+        "monetary": true,
+        "currency_column": "enteredValue_currency",
+        "outliers": "iqr",
+        "multiplier": 1.5,
+        "min_support": 20
+      }
+    ],
+    "identifiers": [
+      "ocid",
+      "id"
+    ],
+    "keys": [
+      {
+        "columns": [
+          "ocid",
+          "release_id",
+          "id"
+        ],
+        "incomplete": "exclude",
+        "empty_is_missing": true,
+        "require_unique": false
+      }
+    ]
+  },
+  "contracts_2025": {
+    "schema_version": "1.0",
+    "rules_id": "sercop-export-observations",
+    "rules_revision": 1,
+    "charts": true,
+    "resources": {
+      "memory_mb": 512,
+      "threads": 1,
+      "temp_disk_mb": 256,
+      "timeout_seconds": 300.0,
+      "examples": 5,
+      "chart_rows": 100,
+      "top_categories": 8
+    },
+    "conversions": [
+      {
+        "column": "amount",
+        "target": "derived_amount",
+        "kind": "decimal",
+        "precision": 38,
+        "scale": 12,
+        "empty": "missing"
+      },
+      {
+        "column": "dateSigned",
+        "target": "derived_dateSigned",
+        "kind": "timestamp",
+        "empty": "missing"
+      }
+    ],
+    "numeric": [
+      {
+        "column": "derived_amount",
+        "groups": [
+          "currency"
+        ],
+        "monetary": true,
+        "currency_column": "currency",
+        "outliers": "iqr",
+        "multiplier": 1.5,
+        "min_support": 20
+      }
+    ],
+    "identifiers": [
+      "ocid",
+      "id"
+    ],
+    "keys": [
+      {
+        "columns": [
+          "ocid",
+          "release_id",
+          "id"
+        ],
+        "incomplete": "exclude",
+        "empty_is_missing": true,
+        "require_unique": false
+      }
+    ]
+  },
+  "suppliers_2025": {
+    "schema_version": "1.0",
+    "rules_id": "sercop-export-observations",
+    "rules_revision": 1,
+    "charts": true,
+    "resources": {
+      "memory_mb": 512,
+      "threads": 1,
+      "temp_disk_mb": 256,
+      "timeout_seconds": 300.0,
+      "examples": 5,
+      "chart_rows": 100,
+      "top_categories": 8
+    },
+    "identifiers": [
+      "ocid",
+      "release_id",
+      "award_id",
+      "id"
+    ],
+    "keys": [
+      {
+        "columns": [
+          "ocid",
+          "release_id",
+          "award_id",
+          "id"
+        ],
+        "require_unique": false
+      }
+    ]
+  }
+}

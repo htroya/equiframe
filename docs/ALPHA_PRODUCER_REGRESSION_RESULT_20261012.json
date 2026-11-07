@@ -1,0 +1,57 @@
+{
+  "schema": "equiframe.producer-regression-public-assessment.v1",
+  "candidate": "0.12.0a13",
+  "previous_candidate": "0.12.0a12",
+  "status": "PASS",
+  "private_result_sha256": "68a71da57c16d9e8310abacc863055a78d8b689cae6c1384bafc1f68e1458b15",
+  "probe_sha256": "7a60198d315361445e935f17f4a3b40ef1182c1c826243f7148db2d4d1ce75a8",
+  "cases": [
+    {
+      "installed_version": "0.12.0a12",
+      "code_version": "0.12.0a12",
+      "new_evidence_producer": "0.12.0a11",
+      "expected_producer": "0.12.0a12",
+      "status": "FAIL",
+      "wheel_sha256": "1d769926f3003686a0b728cebc6163c939e5b33f7278b86182877b816b8a3c88",
+      "origin": "C:\\HT\\maestria datos\\tesis\\alpha_platforms_20261012\\producer-regression-v1\\runtime\\Lib\\site-packages\\equiframe\\__init__.py",
+      "optimized": false,
+      "explicit_history_preserved": true
+    },
+    {
+      "installed_version": "0.12.0a12",
+      "code_version": "0.12.0a12",
+      "new_evidence_producer": "0.12.0a11",
+      "expected_producer": "0.12.0a12",
+      "status": "FAIL",
+      "wheel_sha256": "1d769926f3003686a0b728cebc6163c939e5b33f7278b86182877b816b8a3c88",
+      "origin": "C:\\HT\\maestria datos\\tesis\\alpha_platforms_20261012\\producer-regression-v1\\runtime\\Lib\\site-packages\\equiframe\\__init__.py",
+      "optimized": true,
+      "explicit_history_preserved": true
+    },
+    {
+      "installed_version": "0.12.0a13",
+      "code_version": "0.12.0a13",
+      "new_evidence_producer": "0.12.0a13",
+      "expected_producer": "0.12.0a13",
+      "status": "PASS",
+      "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+      "origin": "C:\\HT\\maestria datos\\tesis\\alpha_platforms_20261012\\producer-regression-v1\\runtime\\Lib\\site-packages\\equiframe\\__init__.py",
+      "optimized": false,
+      "explicit_history_preserved": true
+    },
+    {
+      "installed_version": "0.12.0a13",
+      "code_version": "0.12.0a13",
+      "new_evidence_producer": "0.12.0a13",
+      "expected_producer": "0.12.0a13",
+      "status": "PASS",
+      "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+      "origin": "C:\\HT\\maestria datos\\tesis\\alpha_platforms_20261012\\producer-regression-v1\\runtime\\Lib\\site-packages\\equiframe\\__init__.py",
+      "optimized": true,
+      "explicit_history_preserved": true
+    }
+  ],
+  "new_traceability_ids": 0,
+  "human_review": false,
+  "scope": "Installed A12 emits A11 by default, despite expected producer from its actual A12 metadata; installed A13 correctly emits A13. Genuine fail-before/pass-after normal/-O; explicit historical A11 retained; no model fit."
+}

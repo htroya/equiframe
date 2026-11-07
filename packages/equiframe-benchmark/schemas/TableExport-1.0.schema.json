@@ -1,0 +1,75 @@
+{
+  "$defs": {
+    "EvaluationTable": {
+      "additionalProperties": false,
+      "properties": {
+        "filename": {
+          "minLength": 1,
+          "title": "Filename",
+          "type": "string"
+        },
+        "rows": {
+          "minimum": 0,
+          "title": "Rows",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "filename",
+        "sha256",
+        "size_bytes",
+        "rows"
+      ],
+      "title": "EvaluationTable",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "evaluation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Evaluation Sha256",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scientific": {
+      "title": "Scientific",
+      "type": "boolean"
+    },
+    "tables": {
+      "items": {
+        "$ref": "#/$defs/EvaluationTable"
+      },
+      "title": "Tables",
+      "type": "array"
+    }
+  },
+  "required": [
+    "evaluation_sha256",
+    "scientific",
+    "tables"
+  ],
+  "title": "TableExport",
+  "type": "object"
+}
