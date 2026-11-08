@@ -1,0 +1,365 @@
+{
+  "schema": "equiframe.vm-target-followup-summary.v1",
+  "recorded_at_utc": "2026-10-11T22:22:57.508572+00:00",
+  "candidate": "0.12.0a13",
+  "artifact_source_commit": "96769ad15d0807a501e6141725c8d4198d7715b0",
+  "tested_tool_commit": "47941c90d16810798db84303e1d45600caa73db9",
+  "authority": {
+    "user_explicitly_authorized_payload_destination_and_tests": true,
+    "automatic_transfer_rejection_resolved_by_explicit_user_reply": true,
+    "transfer_executed": true,
+    "transport": "SSH/SCP with strict pinned known-host verification and existing key; no key contents exported",
+    "destination": "hernan@157.137.227.1:/home/hernan/equiframe-targets-20261011-dFXg80"
+  },
+  "inputs": {
+    "sha256": "0c798b543169e3c9129302dc200c06e58119f78c6c4a0bc7e47071875449e839",
+    "size_bytes": 3329570,
+    "members": {
+      "run_vm.py": "473b6b121f0fe3118d3828aab3de0c15371716b738e14ab0da088f433f683fcb",
+      "source/tools/option_boundary_followup.py": "56822972540c405a1a5c05315575d4b87b21e5919ee0910747c9680564ed1bff",
+      "source/tools/option_operations.py": "56663cd649fd0be9234f274ffa828d7714c2e546b870fa678c9bdd919e448e60",
+      "input/catalog.json": "d83a7389205852de4c10eb699885f83e6cfd892bef7116fb2a70ac750499b0fd",
+      "input/inventory.json": "556a3534dcc204c16742fe30ca32843438cb46782e91bb566054a2a0d32014d3",
+      "input/seed-catalog.json": "9eaa56aa71b803d901b07b56da0a89eb3cb610a44dc67a78513b553288ab59e1",
+      "input/baseline.json": "2b8691cb9c3d0633d309a95fa471ca7df0414af2a3c31f203c60a12cdbe419b2",
+      "input/previous.json": "4c7702cd398d4c0196ec163820b51a115734f59f3c73e21bb140de793bae1b0c",
+      "input/lock-requirements.txt": "ed392d95045042f22408eee9c5e8dbbaf518b0493976c1461de56f65b9b154d2",
+      "artifacts/equiframe-0.12.0a13-py3-none-any.whl": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+      "artifacts/equiframe-0.12.0a13.tar.gz": "164b70270344343094dc0a688bf8dbfe20a27112f7227e2f7fe318f085b71935",
+      "artifacts/equiframe_benchmark-0.12.0a13-py3-none-any.whl": "fb843318d044a36a7ba4efab7d7d997d45798e12d16df7a9aa1b472b2c6359d8",
+      "artifacts/equiframe_benchmark-0.12.0a13.tar.gz": "4f8c47a00a8724b234e87c0a7147e193092122c77772e9169bd954744dd6e9c7",
+      "input/posix-nodes.json": "4b3f1c3233084ac881375107f5d7d0e9c113ee15833fb66b91f3ea91a07e180d"
+    },
+    "owned_vm_path": "/home/hernan/equiframe-targets-20261011-dFXg80",
+    "final_tool_bytes": true,
+    "original_prepared_payload_preserved": true
+  },
+  "evidence_archive": {
+    "private_path": "metas_90_80_85_50_20261011/vm-transfer-final/evidence.tar.gz",
+    "sha256": "7859c5793742f89d6566fcb5f4c8830f4d0718abeffebe07630495b9c2a15ff0",
+    "size_bytes": 2129283,
+    "regular_execution_receipts_verified": 24
+  },
+  "commands": {
+    "count": 14,
+    "all_exit_zero": true,
+    "stages": [
+      {
+        "stage": "create-3.12",
+        "exit_code": 0
+      },
+      {
+        "stage": "install-3.12",
+        "exit_code": 0
+      },
+      {
+        "stage": "pip-check-3.12",
+        "exit_code": 0
+      },
+      {
+        "stage": "environment-3.12",
+        "exit_code": 0
+      },
+      {
+        "stage": "boundaries-3.12-normal",
+        "exit_code": 0
+      },
+      {
+        "stage": "boundaries-3.12-optimized",
+        "exit_code": 0
+      },
+      {
+        "stage": "posix-core",
+        "exit_code": 0
+      },
+      {
+        "stage": "posix-benchmark",
+        "exit_code": 0
+      },
+      {
+        "stage": "create-3.10",
+        "exit_code": 0
+      },
+      {
+        "stage": "install-3.10",
+        "exit_code": 0
+      },
+      {
+        "stage": "pip-check-3.10",
+        "exit_code": 0
+      },
+      {
+        "stage": "environment-3.10",
+        "exit_code": 0
+      },
+      {
+        "stage": "boundaries-3.10-normal",
+        "exit_code": 0
+      },
+      {
+        "stage": "boundaries-3.10-optimized",
+        "exit_code": 0
+      }
+    ]
+  },
+  "platform": {
+    "python": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]",
+    "platform": "Linux-6.8.0-1060-oracle-aarch64-with-glibc2.35",
+    "machine": "aarch64",
+    "executor_uid": 1003,
+    "purpose": "Native POSIX omissions and bounded metadata/binding follow-up; not complete VM handoff or platform matrix"
+  },
+  "trace_repetitions": [
+    {
+      "python": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]",
+      "platform": "Linux-6.8.0-1060-oracle-aarch64-with-glibc2.35",
+      "optimized": false,
+      "sha256": "c7cae009b558544e00b5558141f4d76f1579c284891065371dfa8d110e258d1d",
+      "private_path": "metas_90_80_85_50_20261011/vm-transfer-final/verified-evidence/evidence/boundaries-3.10-normal/result.json",
+      "cases": 1054,
+      "obligations": 1072,
+      "counts": {
+        "EXPECTED_REJECTION": 721,
+        "PASS": 333
+      },
+      "verified_union": 5516,
+      "tool_sha256": "56822972540c405a1a5c05315575d4b87b21e5919ee0910747c9680564ed1bff"
+    },
+    {
+      "python": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]",
+      "platform": "Linux-6.8.0-1060-oracle-aarch64-with-glibc2.35",
+      "optimized": true,
+      "sha256": "397e9a3241624aa51021e7384b1629c9a75062125ca827c0cb7965cfe838c668",
+      "private_path": "metas_90_80_85_50_20261011/vm-transfer-final/verified-evidence/evidence/boundaries-3.10-optimized/result.json",
+      "cases": 1054,
+      "obligations": 1072,
+      "counts": {
+        "EXPECTED_REJECTION": 721,
+        "PASS": 333
+      },
+      "verified_union": 5516,
+      "tool_sha256": "56822972540c405a1a5c05315575d4b87b21e5919ee0910747c9680564ed1bff"
+    },
+    {
+      "python": "3.12.15 (main, Oct  1 2026, 15:41:07) [GCC 11.4.0]",
+      "platform": "Linux-6.8.0-1060-oracle-aarch64-with-glibc2.35",
+      "optimized": false,
+      "sha256": "2baefcccb541ab32f1c659258aaecb6858974e8c23b121521fd271354773bfdf",
+      "private_path": "metas_90_80_85_50_20261011/vm-transfer-final/verified-evidence/evidence/boundaries-3.12-normal/result.json",
+      "cases": 1054,
+      "obligations": 1072,
+      "counts": {
+        "EXPECTED_REJECTION": 721,
+        "PASS": 333
+      },
+      "verified_union": 5516,
+      "tool_sha256": "56822972540c405a1a5c05315575d4b87b21e5919ee0910747c9680564ed1bff"
+    },
+    {
+      "python": "3.12.15 (main, Oct  1 2026, 15:41:07) [GCC 11.4.0]",
+      "platform": "Linux-6.8.0-1060-oracle-aarch64-with-glibc2.35",
+      "optimized": true,
+      "sha256": "263b4b8af02b8a6e3356aed467404cf9656e81bf5862321010c103949c55645f",
+      "private_path": "metas_90_80_85_50_20261011/vm-transfer-final/verified-evidence/evidence/boundaries-3.12-optimized/result.json",
+      "cases": 1054,
+      "obligations": 1072,
+      "counts": {
+        "EXPECTED_REJECTION": 721,
+        "PASS": 333
+      },
+      "verified_union": 5516,
+      "tool_sha256": "56822972540c405a1a5c05315575d4b87b21e5919ee0910747c9680564ed1bff"
+    }
+  ],
+  "posix_results": [
+    {
+      "package": "core",
+      "cases": 25,
+      "passed": 25,
+      "failed": 0,
+      "skipped": 0,
+      "sha256": "c6c25999e145ddd6f96d214570df3db584bbe5c14fcb9ce0f33178fbabe31387",
+      "private_path": "metas_90_80_85_50_20261011/vm-transfer-final/verified-evidence/evidence/core-posix.xml",
+      "exact_previously_skipped_ids_verified": true
+    },
+    {
+      "package": "benchmark",
+      "cases": 7,
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "sha256": "54ef4754d8ad8ca482887af57d0520f8eea478ee813a70429ea0dd2b44f1e3d5",
+      "private_path": "metas_90_80_85_50_20261011/vm-transfer-final/verified-evidence/evidence/benchmark-posix.xml",
+      "exact_previously_skipped_ids_verified": true
+    }
+  ],
+  "regular_receipt_inventory": [
+    {
+      "path": "evidence/benchmark-posix.xml",
+      "size_bytes": 1105,
+      "sha256": "54ef4754d8ad8ca482887af57d0520f8eea478ee813a70429ea0dd2b44f1e3d5"
+    },
+    {
+      "path": "evidence/boundaries-3.10-normal/result.json",
+      "size_bytes": 5399525,
+      "sha256": "c7cae009b558544e00b5558141f4d76f1579c284891065371dfa8d110e258d1d"
+    },
+    {
+      "path": "evidence/boundaries-3.10-normal.log",
+      "size_bytes": 321,
+      "sha256": "fe5522fecfa83375e2bce5f1ab942c0d31ebf2289a6917556dbc9404deb2660b"
+    },
+    {
+      "path": "evidence/boundaries-3.10-optimized/result.json",
+      "size_bytes": 5399524,
+      "sha256": "397e9a3241624aa51021e7384b1629c9a75062125ca827c0cb7965cfe838c668"
+    },
+    {
+      "path": "evidence/boundaries-3.10-optimized.log",
+      "size_bytes": 321,
+      "sha256": "fe5522fecfa83375e2bce5f1ab942c0d31ebf2289a6917556dbc9404deb2660b"
+    },
+    {
+      "path": "evidence/boundaries-3.12-normal/result.json",
+      "size_bytes": 5399525,
+      "sha256": "2baefcccb541ab32f1c659258aaecb6858974e8c23b121521fd271354773bfdf"
+    },
+    {
+      "path": "evidence/boundaries-3.12-normal.log",
+      "size_bytes": 321,
+      "sha256": "fe5522fecfa83375e2bce5f1ab942c0d31ebf2289a6917556dbc9404deb2660b"
+    },
+    {
+      "path": "evidence/boundaries-3.12-optimized/result.json",
+      "size_bytes": 5399524,
+      "sha256": "263b4b8af02b8a6e3356aed467404cf9656e81bf5862321010c103949c55645f"
+    },
+    {
+      "path": "evidence/boundaries-3.12-optimized.log",
+      "size_bytes": 321,
+      "sha256": "fe5522fecfa83375e2bce5f1ab942c0d31ebf2289a6917556dbc9404deb2660b"
+    },
+    {
+      "path": "evidence/commands.json",
+      "size_bytes": 11967,
+      "sha256": "20ea7489f16924e85a7fb90fef76c1b4d685bb2889dd9e112fbac0b2457ca949"
+    },
+    {
+      "path": "evidence/core-posix.xml",
+      "size_bytes": 3264,
+      "sha256": "c6c25999e145ddd6f96d214570df3db584bbe5c14fcb9ce0f33178fbabe31387"
+    },
+    {
+      "path": "evidence/create-3.10.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/create-3.12.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/environment-3.10.log",
+      "size_bytes": 391,
+      "sha256": "f9f34bee212bc32fc949377e65f51f0a676c7deb3297b6bd81b65898243298a9"
+    },
+    {
+      "path": "evidence/environment-3.10.txt",
+      "size_bytes": 391,
+      "sha256": "f9f34bee212bc32fc949377e65f51f0a676c7deb3297b6bd81b65898243298a9"
+    },
+    {
+      "path": "evidence/environment-3.12.log",
+      "size_bytes": 1131,
+      "sha256": "98115adb8a04a1f3783d47281ea7c4960c10c08f9154860638c626de092fb8b7"
+    },
+    {
+      "path": "evidence/environment-3.12.txt",
+      "size_bytes": 1131,
+      "sha256": "98115adb8a04a1f3783d47281ea7c4960c10c08f9154860638c626de092fb8b7"
+    },
+    {
+      "path": "evidence/install-3.10.log",
+      "size_bytes": 3009,
+      "sha256": "ff9411322596b2d9a8f6472edb001b111b4fd3e0640b526ef5ce3eef83e5b2a7"
+    },
+    {
+      "path": "evidence/install-3.12.log",
+      "size_bytes": 11282,
+      "sha256": "78a747fc66f72947e75566211688721f7790394691b3497c6523f73a7407d03a"
+    },
+    {
+      "path": "evidence/pip-check-3.10.log",
+      "size_bytes": 30,
+      "sha256": "9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09"
+    },
+    {
+      "path": "evidence/pip-check-3.12.log",
+      "size_bytes": 30,
+      "sha256": "9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09"
+    },
+    {
+      "path": "evidence/platform.json",
+      "size_bytes": 303,
+      "sha256": "c000145f110f569f724fb5bc987634a67ffbe5eefca291cd31ff703802f854b1"
+    },
+    {
+      "path": "evidence/posix-benchmark.log",
+      "size_bytes": 98,
+      "sha256": "0b7f75076fa63e3857704f9f24fb557ed2c703058cb66e3dee568ba127823281"
+    },
+    {
+      "path": "evidence/posix-core.log",
+      "size_bytes": 99,
+      "sha256": "e3d474ffdead3509699c6410e1d867aee702ddf67f98c1c26bc43932741b9a84"
+    }
+  ],
+  "verification_reference": {
+    "private_path": "metas_90_80_85_50_20261011/vm-transfer-final/evidence-verification.json",
+    "sha256": "552be36e1a79d2708c49685c8f6149ce7df6cd95406446e88b96867d2a9fdb84"
+  },
+  "private_custody_archive": {
+    "archive": "metas_90_80_85_50_20261011_VM_evidencia.zip",
+    "size_bytes": 6568731,
+    "sha256": "c21d0ae2773c3760660ca4fc30a22e8f0f9b0ec10e9953bebf848961afbe06f4",
+    "members_verified": 32,
+    "word_included": false,
+    "credentials_included": false,
+    "scope": "Authorized VM input, complete raw response archive, extracted regular receipts, verification and bootstrap scripts. Negative pytest links/FIFO remain embedded in the raw tar as data and were not extracted locally."
+  },
+  "fixture_handling": "Intentionally created symlink/FIFO negative-test fixtures remain only as archive metadata; only regular execution receipts are extracted. Initial conservative extractor refused a fixture link and its partial output is not used.",
+  "new_trace_obligations": 0,
+  "new_trace_percent": 65.78413834227787,
+  "human_review": false,
+  "automated_independent_review": {
+    "reviewer": "mi_dot",
+    "role": "AI reviewer, not a person",
+    "recommendation": "M02 PASS; M01/M02/M03/M06 = 4/16 =25%; M04/M07/M13 remain partial",
+    "checks": "24 receipt sizes/hashes; transferred input members;14 command exits; exact32 IDs compared to original Windows JUnit; four full trace receipt lists equal to Windows"
+  },
+  "scope_limits": [
+    "Initial selection ran exact32 omitted Windows cases. Subsequent full source suites from A13 sdists ran core8077 PASS and benchmark622 PASS/5 SKIP; exact3 source-inventory skips were later passed with original paired sources;2 Windows-only cases remain inapplicable to Linux.",
+    "Only the bounded metadata/binding catalog ran in both native Python3.10/3.12 modes.",
+    "Not all13 isolated profiles on ARM64, all dependency endpoints or all native platforms.",
+    "Not a full VM handoff, human reproduction, scientific approval or remediation of the Windows junction finding."
+  ],
+  "word": {
+    "filename": "tesis_corregda_v1.docx",
+    "sha256": "883b187f08221b9b4abab775430d9a2c87b6d92f503494317f3e1fec214d0f3c",
+    "modified": false
+  },
+  "github_actions_executed": false,
+  "new_paid_resources": false,
+  "pypi_or_testpypi_publication": false,
+  "sdk_payload_modified": false,
+  "owned_vm_runtimes_retained": true,
+  "full_validation": {
+    "source": "docs/VM_FULL_VALIDATION_20261011.json",
+    "sha256": "fb756d3230dc1f69ae77d849f68045ba3dd5ebff5990537b1b6b4c40f264791e",
+    "core_passed": 8077,
+    "benchmark_applicable_union_passed": 625,
+    "benchmark_windows_only_skips": 2,
+    "new_option_credit": 0
+  }
+}

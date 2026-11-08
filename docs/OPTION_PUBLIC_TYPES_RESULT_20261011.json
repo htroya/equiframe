@@ -1,0 +1,85 @@
+{
+  "additional_required": 1268,
+  "candidate": "0.12.0a13",
+  "case_uniqueness_definition": "Distinct catalog assertion case IDs, not distinct raw inputs or independent scientific samples. The method follow-up reused 95 previously reviewed model fixtures with new explicit method-call/return assertions.",
+  "catalog_sha256": "f8f46b571775bb6f97f31415f2887aa775794358b3db79f3ea58c862dbc24822",
+  "counts": {
+    "EXPECTED_REJECTION": 3414,
+    "NOT_RUN": 2525,
+    "PASS": 2446
+  },
+  "denominator": 8385,
+  "dependencies": {
+    "boundary_tool_sha256": "56822972540c405a1a5c05315575d4b87b21e5919ee0910747c9680564ed1bff",
+    "operations_tool_sha256": "56663cd649fd0be9234f274ffa828d7714c2e546b870fa678c9bdd919e448e60"
+  },
+  "guardrail_cases_without_obligations": 13,
+  "harness_checks": [
+    {
+      "passed": 22,
+      "private_path": "trace85_20261011/types-harness-normal.xml",
+      "sha256": "84839aaa4020e5cc6a1bc33301bc29601518dc672f9fb9c973ae694429c45ca3"
+    },
+    {
+      "passed": 22,
+      "private_path": "trace85_20261011/types-harness-optimized.xml",
+      "sha256": "14375955e9cf46c265e6a17845be01de8343fa75cb537cfca507ba5c463dc1c8"
+    }
+  ],
+  "human_review": false,
+  "limitations": [
+    "Windows CPython3.12 only; no native motor behavior or scientific acceptance inferred.",
+    "The 13 rejection guardrails add no obligations; no nonexistent invalid-type ID was invented.",
+    "Original denominators, prior receipts, candidates and human gates are retained."
+  ],
+  "new_case_counts": {
+    "EXPECTED_REJECTION": 13,
+    "PASS": 61
+  },
+  "new_cases": 74,
+  "new_coverage_from_replays": 0,
+  "new_obligations": 74,
+  "percent": 69.88670244484197,
+  "positive_cases": 61,
+  "prior_assessment": {
+    "preserved": true,
+    "sha256": "badbf7fa5815368c4494064e4b736be4e5da05d1444f05ac6229caa8f300d53a",
+    "source": "docs/OPTION_LITERAL_FIELD_RESULT_20261011.json"
+  },
+  "prior_verified": 5786,
+  "receipts": [
+    {
+      "optimized": false,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "private_path": "trace85_20261011/public-types-normal/result.json",
+      "python": "3.12.4 | packaged by Anaconda, Inc. | (main, Jun 18 2024, 15:03:56) [MSC v.1929 64 bit (AMD64)]",
+      "sha256": "bcbe5ef7c0ebcf8e0b78fb08157e75ca5d988db5423affec524e6b92b2873a5c",
+      "verified": 5860
+    },
+    {
+      "optimized": true,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "private_path": "trace85_20261011/public-types-optimized/result.json",
+      "python": "3.12.4 | packaged by Anaconda, Inc. | (main, Jun 18 2024, 15:03:56) [MSC v.1929 64 bit (AMD64)]",
+      "sha256": "832176ba41c04241696a81712cd75d01d760899f61ffdaad03d31a6a7852a63d",
+      "verified": 5860
+    }
+  ],
+  "recorded_at_utc": "2026-10-12T03:53:03.087405+00:00",
+  "review": {
+    "human_review": false,
+    "reviewer": "mi_dot",
+    "scope": "Source-backed review of 13 Literal aliases, 58 alternatives, three constants, IDs and prior union before execution; false rejection guard corrected before execution.",
+    "type": "AI_AGENT_READ_ONLY"
+  },
+  "schema": "equiframe.option-public-types-assessment.v1",
+  "scope": "Public finite type admission and constants; metadata only, no detector or engine outcome inferred",
+  "target_met": false,
+  "target_percent": 85,
+  "target_verified": 7128,
+  "tool": "tools/option_public_types_followup.py",
+  "tool_sha256": "020141dfc629c9286741e3909f24c99c862fd570b9505aec8f409955170045d7",
+  "unique_catalog_union_cases": 4980,
+  "verified": 5860,
+  "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23"
+}

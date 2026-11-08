@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "publication_enabled": false,
+  "pending_decisions": [
+    "Owner must choose the distribution channel and approve public disclosure.",
+    "Owner must approve the project license and redistribution terms; no license is assigned.",
+    "Owner must assign release and vulnerability-response responsibility and a verified private reporting channel.",
+    "Complete STEP10 and the separately requested global review before any public release.",
+    "Confirm names, public documentation access, account ownership and publication protections in a separately authorized task.",
+    "Review exact artifact-bound dependency licenses, current vulnerability evidence and source-security findings; unresolved or unavailable checks are blockers.",
+    "Authorize publication of the exact version and artifact hashes after all gates pass."
+  ]
+}

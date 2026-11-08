@@ -1,0 +1,190 @@
+{
+  "rubric_id": "OPT-CORE-A12-8383-v1",
+  "date": "2026-10-10",
+  "candidate": "0.12.0a12",
+  "sdk_source_commit": "8df0173b98398e2a4f3ef3c5e8216f079a541922",
+  "audit_source_commit": "cc8ca6b3243b9aa7ae4d20f3a86e98cc48c76bb9",
+  "historical_table_percent": 5.16,
+  "historical_table_reproducible": false,
+  "historical_note": "No identified numerator, denominator or per-option receipt matrix was found for the screenshot. No comparable 5.16-to-51.25 improvement is asserted.",
+  "verified_obligations": 4296,
+  "total_obligations": 8383,
+  "percent": 51.24657044017655,
+  "counts": {
+    "EXPECTED_REJECTION": 2555,
+    "NOT_RUN": 4087,
+    "PASS": 1741
+  },
+  "unique_cases": 3443,
+  "case_counts": {
+    "EXPECTED_REJECTION": 1777,
+    "PASS": 1666
+  },
+  "surface_counts": {
+    "api": {
+      "NOT_RUN": 226,
+      "PASS": 191
+    },
+    "cli": {
+      "NOT_RUN": 30
+    },
+    "cli-option": {
+      "NOT_RUN": 238
+    },
+    "dependency": {
+      "NOT_RUN": 14
+    },
+    "field": {
+      "EXPECTED_REJECTION": 2555,
+      "NOT_RUN": 1551,
+      "PASS": 1550
+    },
+    "method": {
+      "NOT_RUN": 152
+    },
+    "parameter": {
+      "NOT_RUN": 1754
+    },
+    "property": {
+      "NOT_RUN": 102
+    },
+    "requirement": {
+      "NOT_RUN": 20
+    }
+  },
+  "obligation_ids_sha256": "fcd8fc749a8c911de684a746cbb5405823dec0f9351abf515781226f7818c68e",
+  "catalog_sha256": "0f580cf50b0b9e1fd29e0d419f874b1330b1b0b585d8c8fee2f83e12d3ef404b",
+  "wheel_sha256": "1d769926f3003686a0b728cebc6163c939e5b33f7278b86182877b816b8a3c88",
+  "tool_sha256": {
+    "option_inventory.py": "a22555d42ec26e572aa0ec240a82f70c2b2e5127b45da6a5e4f20e7b62512575",
+    "option_trace.py": "54f6269987a1dc99174ee88e7aa1a7c370631c37c2efc42236bae8e924dbd89a"
+  },
+  "validation": {
+    "pytest_passed": 3485,
+    "inventory_regression_tests": 20,
+    "executor_regression_tests": 21,
+    "frozen_catalog_tests": 3444,
+    "asset_checks": 67,
+    "mypy_source_files": 78,
+    "lint_and_format": "PASS",
+    "windows": {
+      "python": "3.12.4 | packaged by Anaconda, Inc. | (main, Jun 18 2024, 15:03:56) [MSC v.1929 64 bit (AMD64)]",
+      "machine": "AMD64",
+      "modes": [
+        "normal",
+        "optimized"
+      ],
+      "dependencies": {
+        "Pygments": "2.21.0",
+        "annotated-doc": "0.0.5",
+        "annotated-types": "0.8.0",
+        "cloudpickle": "3.1.2",
+        "colorama": "0.4.6",
+        "duckdb": "1.5.6",
+        "equiframe": "0.12.0a12",
+        "iniconfig": "2.3.1",
+        "joblib": "1.6.0",
+        "markdown-it-py": "4.2.0",
+        "mdurl": "0.1.2",
+        "narwhals": "2.27.1",
+        "numpy": "2.5.4",
+        "packaging": "26.3",
+        "pandas": "3.0.6",
+        "pip": "24.0",
+        "pluggy": "1.6.0",
+        "polars": "1.44.2",
+        "polars-runtime-32": "1.44.2",
+        "pyarrow": "25.0.1",
+        "pydantic": "2.14.0",
+        "pydantic_core": "2.50.0",
+        "pytest": "9.1.1",
+        "python-dateutil": "2.9.0.post0",
+        "rich": "15.0.0",
+        "scikit-learn": "1.9.1",
+        "scipy": "1.18.1",
+        "shellingham": "1.5.4",
+        "six": "1.17.0",
+        "threadpoolctl": "3.7.0",
+        "typer": "0.27.3",
+        "typing-inspection": "0.4.4",
+        "typing_extensions": "4.16.0",
+        "tzdata": "2026.5"
+      }
+    },
+    "vm": {
+      "python": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]",
+      "machine": "aarch64",
+      "modes": [
+        "normal",
+        "optimized"
+      ],
+      "dependencies": {
+        "Pygments": "2.21.0",
+        "annotated-doc": "0.0.5",
+        "annotated-types": "0.8.0",
+        "equiframe": "0.12.0a12",
+        "markdown-it-py": "4.2.0",
+        "mdurl": "0.1.2",
+        "pip": "22.0.2",
+        "pydantic": "2.14.0",
+        "pydantic_core": "2.50.0",
+        "rich": "15.0.0",
+        "setuptools": "59.6.0",
+        "shellingham": "1.5.4",
+        "typer": "0.27.3",
+        "typing-inspection": "0.4.4",
+        "typing_extensions": "4.16.0",
+        "tzdata": "2026.5"
+      }
+    },
+    "optimized_fault_controls": [
+      {
+        "name": "fault-wrong-literal",
+        "exit_code": 1,
+        "expected_exit_code": 1
+      },
+      {
+        "name": "fault-wrong-candidate",
+        "exit_code": 1,
+        "expected_exit_code": 1
+      },
+      {
+        "name": "existing_output_preserved",
+        "exit_code": 2,
+        "expected_exit_code": 2
+      }
+    ],
+    "build": {
+      "build_exit_code": 0,
+      "rebuild_exit_code": 0,
+      "wheel_sha256": "1d769926f3003686a0b728cebc6163c939e5b33f7278b86182877b816b8a3c88",
+      "sdist_sha256": "c0552f424ea6852b7255d2554759a70b0a1606d98df78ebea798dd8d84da6d35",
+      "sdist_exact_checked": [
+        "tools/option_trace.py",
+        "tools/option_inventory.py",
+        "tests/fixtures/option_trace/catalog-a12.json",
+        "tests/fixtures/option_trace/manifest.json",
+        "tests/test_option_trace_catalog.py"
+      ],
+      "reconstructed_wheel_byte_identical": true
+    }
+  },
+  "deployment": {
+    "host": "157.137.227.1",
+    "directory": "/home/hernan/equiframe-trazabilidad-a12-20261010",
+    "runtime": "runtime/bin/python",
+    "kit": "kit",
+    "installation": "Private identified SDK wheel and manual audit kit in isolated base environment",
+    "actions_executed": false,
+    "paid_resources_created": false,
+    "services_created": false
+  },
+  "limits": [
+    "Construction, serialization and rejection of metadata only; no automatic downstream native-engine effect claim.",
+    "All 4,087 unlinked obligations remain NOT_RUN; the denominator was not reduced.",
+    "Overlapping obligations can share one case; repetitions on other platforms do not add to the numerator.",
+    "Core only. Benchmark option traceability has not been measured by this rubric.",
+    "No blanket claim for all values, boundaries, interactions, Python versions or operating systems.",
+    "This does not change Universalidad, Usabilidad, licensing, public release or scientific thesis acceptance."
+  ]
+}

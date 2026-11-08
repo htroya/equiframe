@@ -1,0 +1,127 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "acceptance": {
+      "enum": [
+        "satisfied",
+        "not_satisfied"
+      ],
+      "title": "Acceptance",
+      "type": "string"
+    },
+    "access": {
+      "const": "caller_managed_local_storage_no_encryption",
+      "default": "caller_managed_local_storage_no_encryption",
+      "title": "Access",
+      "type": "string"
+    },
+    "available_records": {
+      "minimum": 0,
+      "title": "Available Records",
+      "type": "integer"
+    },
+    "counts_final": {
+      "title": "Counts Final",
+      "type": "boolean"
+    },
+    "display_complete": {
+      "title": "Display Complete",
+      "type": "boolean"
+    },
+    "evaluation_complete": {
+      "title": "Evaluation Complete",
+      "type": "boolean"
+    },
+    "included_examples": {
+      "minimum": 0,
+      "title": "Included Examples",
+      "type": "integer"
+    },
+    "inspection": {
+      "enum": [
+        "result_only",
+        "verified_differences"
+      ],
+      "title": "Inspection",
+      "type": "string"
+    },
+    "metadata_withheld": {
+      "title": "Metadata Withheld",
+      "type": "boolean"
+    },
+    "mode": {
+      "enum": [
+        "diagnostic",
+        "detail",
+        "reproduction"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "raw_retention": {
+      "const": "unchanged_in_original_comparison",
+      "default": "unchanged_in_original_comparison",
+      "title": "Raw Retention",
+      "type": "string"
+    },
+    "report_retention": {
+      "const": "until_caller_deletes",
+      "default": "until_caller_deletes",
+      "title": "Report Retention",
+      "type": "string"
+    },
+    "reproduction": {
+      "enum": [
+        "not_requested",
+        "requires_verified_export",
+        "exported_materialized_inputs"
+      ],
+      "title": "Reproduction",
+      "type": "string"
+    },
+    "reproduction_scope": {
+      "const": "materialized_comparison_only_no_transform_reexecution",
+      "default": "materialized_comparison_only_no_transform_reexecution",
+      "title": "Reproduction Scope",
+      "type": "string"
+    },
+    "required_exhaustive": {
+      "title": "Required Exhaustive",
+      "type": "boolean"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "unmet_requirements": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Unmet Requirements",
+      "type": "array"
+    },
+    "values_withheld": {
+      "title": "Values Withheld",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "mode",
+    "inspection",
+    "evaluation_complete",
+    "counts_final",
+    "available_records",
+    "included_examples",
+    "display_complete",
+    "values_withheld",
+    "metadata_withheld",
+    "required_exhaustive",
+    "acceptance",
+    "unmet_requirements",
+    "reproduction"
+  ],
+  "title": "ReportEvidenceManifest",
+  "type": "object"
+}

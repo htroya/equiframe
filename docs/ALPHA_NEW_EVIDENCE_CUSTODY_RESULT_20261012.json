@@ -1,0 +1,12 @@
+{
+  "schema": "equiframe.alpha-new-evidence-custody.v1",
+  "candidate": "0.12.0a13",
+  "status": "PASS",
+  "private_archive": "alpha_platforms_20261012\\alpha-new-evidence-v2.zip",
+  "archive_sha256": "03519a6673acb35e99598be73aad2c551b0b81267130d2ad1497de080d2274ec",
+  "archive_bytes": 1339615,
+  "files": 415,
+  "payload_bytes": 16978722,
+  "member_sha256_and_crc_readback": true,
+  "scope": "Helpers, locks, receipts, logs and JUnit; includes failed attempts. Original distributions retained separately. Environments, caches and temporary test data excluded; does not claim every filesystem byte."
+}

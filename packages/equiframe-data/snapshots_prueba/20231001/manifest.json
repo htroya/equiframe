@@ -1,0 +1,15 @@
+﻿{
+    "source":  "SERCOP-OCDS",
+    "timestamp":  "2023-10-01T12:00:00",
+    "snapshot_id":  "20231001",
+    "version":  "1.0",
+    "artifacts":  [
+                      {
+                          "table_name":  "fact_adjudicacion",
+                          "size_bytes":  87,
+                          "sha256":  "17a22902162e96b9a5d34938893d850266b8c43a709912ad52d676cb3d9c153b",
+                          "row_count":  1,
+                          "file_path":  "fact_adjudicacion.csv"
+                      }
+                  ]
+}

@@ -1,0 +1,41 @@
+# Deliberately NOT under workflows/. This cannot publish, even if copied there.
+# STEP9 does not grant a license, upload authority, credentials or OIDC access.
+# A later owner-approved release needs a separately reviewed publishing workflow,
+# verified build-run provenance, protected environment and exact artifact approval.
+name: Check publication readiness (closed candidate)
+on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: 'Successful release-candidate run to inspect; no upload occurs'
+        required: true
+      source_commit:
+        description: 'Exact 40-character candidate commit'
+        required: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.build_run_id }}
+          name: equiframe-candidate-${{ inputs.source_commit }}
+          path: approved
+      - name: Verify identified bytes and enforce the closed release policy
+        env:
+          EXPECTED_COMMIT: ${{ inputs.source_commit }}
+        run: |
+          python packages/equiframe/tools/verify_publication.py \
+            --candidate-root approved --commit "$EXPECTED_COMMIT" \
+            --output readiness.json
+      # The gate returns 3 with an explicit decision packet when bytes are valid.
+      # It has no enable/override switch. There is intentionally no upload step,
+      # id-token permission, publishing secret or automatic retry here.

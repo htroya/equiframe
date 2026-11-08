@@ -1,0 +1,68 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'"><meta name="viewport" content="width=device-width, initial-scale=1"><title>EquiFrame evidence</title><style>body{max-width:1000px;margin:3rem auto;padding:0 1rem;font:16px system-ui;color:#172b3a;background:#f6f8fa}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:white;padding:1.5rem;border:1px solid #ccd5df;border-radius:8px}h1{color:#174b57}table{width:100%;border-collapse:collapse;background:white;margin:1rem 0 2rem}th,td{padding:.7rem;border-bottom:1px solid #ccd5df;text-align:left}caption{text-align:left;font-weight:bold;padding:.5rem 0}@media print{body{margin:0;background:white}details{display:block}}</style><h1>EquiFrame · Operational evidence</h1><p>Completion, alerts and equivalence are separate results. An unavailable component never means absence of alert.</p><table><caption>Independent decisions</caption><thead><tr><th>Method</th><th>Decision</th><th>Complete</th></tr></thead><tbody><tr><th scope='row'>R</th><td>no_alert</td><td>True</td></tr><tr><th scope='row'>M</th><td>not_evaluable</td><td>False</td></tr><tr><th scope='row'>B</th><td>not requested / unavailable</td><td>False</td></tr><tr><th scope='row'>H</th><td>not_evaluable</td><td>False</td></tr></tbody></table><table><caption>Stage trace</caption><thead><tr><th>Stage</th><th>State</th><th>Code</th><th>Seconds</th></tr></thead><tbody><tr><td>execution</td><td>completed</td><td>stage_completed</td><td>0.013184968000132358</td></tr><tr><td>rules</td><td>completed</td><td>stage_completed</td><td>0.003819776000455022</td></tr><tr><td>profile</td><td>skipped</td><td>not_requested</td><td>0.0</td></tr><tr><td>detection</td><td>skipped</td><td>not_requested</td><td>0.0</td></tr><tr><td>comparison</td><td>skipped</td><td>not_requested</td><td>0.0</td></tr><tr><td>hybrid</td><td>not_evaluable</td><td>component_unavailable</td><td>0.00023519599926657975</td></tr></tbody></table><details open><summary>Full operational summary</summary><pre>{
+  &quot;schema_version&quot;: &quot;1.0&quot;,
+  &quot;pipeline_id&quot;: &quot;pipeline_e250a954f5974d37ae1dffecdc632f65&quot;,
+  &quot;contract_sha256&quot;: &quot;30341fa694fe189c18b37bd1ba852a3780d047f9d87a9d2c4077000bc1ee2794&quot;,
+  &quot;spec_sha256&quot;: &quot;d188101eb1d1e8d7a84487bec56b6a788f4376b1d8cf05b57c984df742bb1a9d&quot;,
+  &quot;engine&quot;: &quot;pandas&quot;,
+  &quot;family&quot;: &quot;nulls_types&quot;,
+  &quot;complete&quot;: true,
+  &quot;cancelled&quot;: false,
+  &quot;exit_code&quot;: 0,
+  &quot;elapsed_seconds&quot;: 0.02572669200162636,
+  &quot;execution_state&quot;: &quot;completed&quot;,
+  &quot;stages&quot;: [
+    {
+      &quot;stage&quot;: &quot;execution&quot;,
+      &quot;state&quot;: &quot;completed&quot;,
+      &quot;elapsed_seconds&quot;: 0.013184968000132358,
+      &quot;code&quot;: &quot;stage_completed&quot;
+    },
+    {
+      &quot;stage&quot;: &quot;rules&quot;,
+      &quot;state&quot;: &quot;completed&quot;,
+      &quot;elapsed_seconds&quot;: 0.003819776000455022,
+      &quot;code&quot;: &quot;stage_completed&quot;
+    },
+    {
+      &quot;stage&quot;: &quot;profile&quot;,
+      &quot;state&quot;: &quot;skipped&quot;,
+      &quot;elapsed_seconds&quot;: 0.0,
+      &quot;code&quot;: &quot;not_requested&quot;
+    },
+    {
+      &quot;stage&quot;: &quot;detection&quot;,
+      &quot;state&quot;: &quot;skipped&quot;,
+      &quot;elapsed_seconds&quot;: 0.0,
+      &quot;code&quot;: &quot;not_requested&quot;
+    },
+    {
+      &quot;stage&quot;: &quot;comparison&quot;,
+      &quot;state&quot;: &quot;skipped&quot;,
+      &quot;elapsed_seconds&quot;: 0.0,
+      &quot;code&quot;: &quot;not_requested&quot;
+    },
+    {
+      &quot;stage&quot;: &quot;hybrid&quot;,
+      &quot;state&quot;: &quot;not_evaluable&quot;,
+      &quot;elapsed_seconds&quot;: 0.00023519599926657975,
+      &quot;code&quot;: &quot;component_unavailable&quot;
+    }
+  ],
+  &quot;R&quot;: {
+    &quot;decision&quot;: &quot;no_alert&quot;,
+    &quot;complete&quot;: true
+  },
+  &quot;M&quot;: {
+    &quot;decision&quot;: &quot;not_evaluable&quot;,
+    &quot;complete&quot;: false
+  },
+  &quot;B&quot;: null,
+  &quot;H&quot;: {
+    &quot;decision&quot;: &quot;not_evaluable&quot;,
+    &quot;complete&quot;: false
+  },
+  &quot;comparison&quot;: null,
+  &quot;detector_bundle_sha256&quot;: null,
+  &quot;scientific_equivalence_confirmed&quot;: false,
+  &quot;scope&quot;: &quot;Operational evidence only; no oracle review or scientific label.&quot;
+}</pre></details></html>

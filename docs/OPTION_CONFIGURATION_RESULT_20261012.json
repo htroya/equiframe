@@ -1,0 +1,93 @@
+{
+  "additional_required": 1186,
+  "assessment_date_local": "2026-10-12",
+  "candidate": "0.12.0a13",
+  "case_counts": {
+    "EXPECTED_REJECTION": 20,
+    "PASS": 20
+  },
+  "case_uniqueness_definition": "Distinct assertion catalog identities, not independent records or learning samples.",
+  "catalog_sha256": "38e89bc9bdb9e712b32e69701c11854721be022f331a7bc99e8cc9ecb0893e2f",
+  "counts": {
+    "EXPECTED_REJECTION": 3434,
+    "NOT_RUN": 2443,
+    "PASS": 2508
+  },
+  "denominator": 8385,
+  "failed_protocol_preserved": {
+    "additional_credit_from_that_attempt": 0,
+    "failed_cases": 6,
+    "private_path": "trace85_20261011/configuration-normal/result.json",
+    "reason": "Harness expected direct ComparisonPolicy error path and full ReportOptions output; A13 uses ComparisonSpec.policy and the ReportViewPolicy projection.",
+    "sha256": "06250b1e11f8430e7e72d861c7b0665f8d4bf3d14ec5ec45572a5a81fe01b42d",
+    "status": "FAIL",
+    "valid_obligations_observed": 34
+  },
+  "guardrail_cases_without_ids": 10,
+  "helper_source_sha256": {
+    "option_boundary_followup.py": "56822972540c405a1a5c05315575d4b87b21e5919ee0910747c9680564ed1bff",
+    "option_operations.py": "56663cd649fd0be9234f274ffa828d7714c2e546b870fa678c9bdd919e448e60",
+    "option_public_types_followup.py": "020141dfc629c9286741e3909f24c99c862fd570b9505aec8f409955170045d7",
+    "option_seed_bounds_followup.py": "5fe2679ea141cdfd832c5d5904d8d1a1744c9c93af39268ea82c70a0889ab46f"
+  },
+  "limits": [
+    "Explicit None is not an omitted default; no default IDs credited.",
+    "ReportViewPolicy output is a full8field projection, not full ReportOptions normalization.",
+    "Synthetic captured executions do not demonstrate native transformation execution or scientific acceptance.",
+    "The only native SQL fixture is the one-row capture readback; no API-wide closure credited."
+  ],
+  "new_assertion_cases": 40,
+  "new_obligations": 40,
+  "percent": 70.86463923673226,
+  "prior_assessment": {
+    "preserved": true,
+    "sha256": "50651b738ecdd754d39a8642e85ff6d155bb7aefe83e3f257376d2fe2704b50d",
+    "source": "docs/OPTION_SEED_BOUNDS_RESULT_20261012.json"
+  },
+  "prior_verified": 5902,
+  "receipts": [
+    {
+      "environment": {
+        "machine": "AMD64",
+        "optimization": 0,
+        "python": "3.12.4",
+        "system": "Windows"
+      },
+      "private_path": "trace85_20261011/configuration-v2-normal/result.json",
+      "sha256": "d22dfc865013ed0cfe50093353e965e3f3967cea82ca2a6ea7f50fbf7570546c"
+    },
+    {
+      "environment": {
+        "machine": "AMD64",
+        "optimization": 1,
+        "python": "3.12.4",
+        "system": "Windows"
+      },
+      "private_path": "trace85_20261011/configuration-v2-optimized/result.json",
+      "sha256": "e4869bc51b597013a0e48b4719e871a09e09fb6eda1eff78b279dd8a5cb4ed22"
+    }
+  ],
+  "recorded_at_utc": "2026-10-12T06:15:28.877746+00:00",
+  "replays_additional_coverage": 0,
+  "review": {
+    "final_oracles_reviewed_from_frozen_a13_source_before_execution": true,
+    "human_review": false,
+    "reviewer": "mi_dot",
+    "type": "AI_AGENT_READ_ONLY"
+  },
+  "reviewed_sdk_source_sha256": {
+    "comparison.py": "b391d657ecd4cfe70ef39472d9f946becef41ad8dc025f69f542f4b1dbc227b0",
+    "comparison_report.py": "6c24dbe39a85e2212efb5302e22875623fb1f35cd20ac72618ac278524fdf7c9",
+    "report_types.py": "5b2c1dea1d3c7aa6ce84bc58d8b2b42c34e566d03d4feac9f41cb731cde48c54"
+  },
+  "schema": "equiframe.option-configuration-assessment.v1",
+  "scope": "Explicit model/None admission and invalid argument rejection before work; no omitted default or API-wide semantics credited",
+  "target_met": false,
+  "target_percent": 85,
+  "target_verified": 7128,
+  "tool": "tools/option_configuration_followup.py",
+  "tool_sha256": "6f1209899f8b2e73e79ac30a799a5b70780bc14995889658e6857f1ce410efba",
+  "unique_catalog_union_cases": 5042,
+  "verified": 5942,
+  "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23"
+}
