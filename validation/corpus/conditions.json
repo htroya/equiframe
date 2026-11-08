@@ -1,0 +1,37 @@
+{
+  "reviewed_at_utc": "2026-10-07T05:25:55.248444+00:00",
+  "credentials_or_accounts_created": false,
+  "new_agreements_accepted": false,
+  "treasury": {
+    "status": "PRIMARY_INDEXED_POLICY_VERIFIED_FULL_API_TERMS_UNAVAILABLE",
+    "source_urls": [
+      "https://fiscaldata.treasury.gov/data/about-us/901-1%20Open%20Data%20Policy.pdf",
+      "https://fiscaldata.treasury.gov/api-documentation/",
+      "https://fiscaldata.treasury.gov/about-us/"
+    ],
+    "verified_evidence": "Official indexed FS Policy 901-1 defines Open Data as public data and Open Source Data as free to use and download in publicly readable formats. July 2021 issue/review; next review July 2025. API response was acquired without credentials and contains complete metadata for 17 rows.",
+    "limitations": "Direct official API documentation/about/policy fetches returned 403 in web on 2026-10-07. Full current license-and-authorization wording and later policy revisions were not independently retrieved; no substitute third-party licensing assertion is adopted. No attempt was made to bypass denial.",
+    "prior_terms_do_not_apply_automatically": "TreasuryDirect web-api terms previously disclosed belong to a separate service; this source is FiscalData.",
+    "attribution": "U.S. Department of the Treasury, Bureau of the Fiscal Service; Fiscal Data, Average Interest Rates on U.S. Treasury Securities"
+  },
+  "usgs": {
+    "status": "PRIMARY_SOURCE_VERIFIED",
+    "source_url": "https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits",
+    "verified_via": "Official page content retrieved by web tool; direct HTTP document fetch returned empty 202 and is preserved as failed document evidence.",
+    "conditions": "USGS-authored or produced data/information are in the U.S. public domain; proper credit is requested. Third-party material may have separate rights; this capture contains numerical catalog data, not photographs, trademarks or media.",
+    "attribution": "U.S. Geological Survey, Earthquake Hazards Program, ComCat catalog",
+    "no_guarantee": "Catalog events may be revised; exact captured bytes, not a future live re-query, define this offline input."
+  },
+  "census": {
+    "status": "PRIMARY_SOURCE_VERIFIED",
+    "source_urls": [
+      "https://www.census.gov/topics/research/research-transparency-public-access/open-data.html",
+      "https://www2.census.gov/foia/ds_policies/ds027.pdf",
+      "https://www.census.gov/data/datasets/time-series/demo/popest/2020s-state-total.html"
+    ],
+    "verified_via": "Official source page and policies retrieved via web tool; official CSV and layout PDF retrieved by anonymous bounded HTTP GET.",
+    "conditions": "Census publishes public datasets as open data and supports reuse and reproducibility. DS027 page 9 states Census employee works generally lack U.S. copyright protection, with foreign and nonemployee-work qualifications. Cite the source. Aggregate state-level population estimates do not identify respondents. No rights are claimed over agency marks.",
+    "attribution": "U.S. Census Bureau, Population Division; Vintage 2025 NST-EST2025-ALLDATA, released January 2026",
+    "api_failure_handling": "The Census API returned Missing Key HTML. It is excluded as a dataset. The successful file is separately offered as a public CSV on an official download page, not a bypass of the API key requirement."
+  }
+}

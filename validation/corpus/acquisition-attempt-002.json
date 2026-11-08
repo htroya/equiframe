@@ -1,0 +1,33 @@
+{
+  "file": "raw/population.csv",
+  "source_url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv",
+  "final_url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv",
+  "status": 200,
+  "headers": {
+    "Date": "Wed, 07 Oct 2026 05:21:54 GMT",
+    "Content-Type": "text/csv",
+    "Content-Length": "53555",
+    "Connection": "close",
+    "Content-Security-Policy": "default-src 'self' 'unsafe-inline' 'unsafe-eval' census.gov *.census.gov http://www.census.gov assets.adobedtm.com www.googletagmanager.com https://dpm.demdex.net https://cm.everesttech.net https://uscensusbureau.demdex.net dap.digitalgov.gov www.google-analytics.com https://static.cloudflareinsights.com; frame-ancestors 'self';",
+    "X-Frame-Options": "SAMEORIGIN",
+    "X-Content-Type-Options": "nosniff",
+    "Cache-Control": "public, max-age=14400",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Last-Modified": "Tue, 27 Jan 2026 13:45:29 GMT",
+    "Accept-Ranges": "bytes",
+    "Vary": "Accept-Encoding",
+    "X-XSS-Protection": "1; mode=block",
+    "Strict-Transport-Security": "max-age=31536000",
+    "Age": "407090",
+    "expires": "Wed, 07 Oct 2026 09:21:54 GMT",
+    "cf-cache-status": "HIT",
+    "Server": "cloudflare",
+    "CF-RAY": "a46a770d090ef0b4-DFW"
+  },
+  "bytes": 53555,
+  "sha256": "92188e29cb0a67dcf95afa7d6c47359409782f086478b70ea4128eb70e223ca9",
+  "retrieved_at_utc": "2026-10-07T05:21:54.787443+00:00",
+  "parent_official_download_page": "https://www.census.gov/data/datasets/time-series/demo/popest/2020s-state-total.html",
+  "download_link_label": "NST-EST2025-ALLDATA",
+  "download_requires_key": false
+}

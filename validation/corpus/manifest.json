@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0",
+  "status": "FROZEN",
+  "capture_status": "NEW_CAPTURE_PARTIAL",
+  "created_at_utc": "2026-10-28T20:35:05.602638+00:00",
+  "consumer_effective_rows": 219,
+  "successful_raw_records": 233,
+  "data_status": "CURATED_OFFLINE_CAPTURE_WITH_REPRODUCED_POPULATION_CSV",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "size_bytes": 96,
+      "sha256": "14d6c586c49d9c88cb1fa0a8647e410f8236e4432d7a3ea4db1067d45299b030"
+    },
+    {
+      "path": "NOTAS_DATOS_ES.md",
+      "size_bytes": 3352,
+      "sha256": "76e28d42b746fc77fca9a66167b7b3f5ebcaa79de4e04c55bde0da238d0c48fe"
+    },
+    {
+      "path": "README.md",
+      "size_bytes": 7188,
+      "sha256": "be8960e65963cf62b1448443dc8c0623cde82b040d59f2d101d28ba922010828"
+    },
+    {
+      "path": "acquisition-attempt-001.json",
+      "size_bytes": 3854,
+      "sha256": "6813448b771a0f21ffe3799592051c9afe5d38338e7aea3c81629713acf16072"
+    },
+    {
+      "path": "acquisition-attempt-002.json",
+      "size_bytes": 1732,
+      "sha256": "8b22e47319cacd5c1fabc863a56ce1cb034666e5ae449faafe08eb921b87b49d"
+    },
+    {
+      "path": "conditions.json",
+      "size_bytes": 3396,
+      "sha256": "a0fc59d3813549a35c38f8ff3272d03fdae2e96350095fe27b1dadb30a6e8a87"
+    },
+    {
+      "path": "derive_population.py",
+      "size_bytes": 736,
+      "sha256": "0a5dd427773863075d174ff7713db99db053341d3528ca7ec3b842f86dbae154"
+    },
+    {
+      "path": "documentation-acquisition.json",
+      "size_bytes": 1884,
+      "sha256": "21742ba200789f39282f5ee8f42b99e374b66162d6a5c0f14cb37ea57f47eb06"
+    },
+    {
+      "path": "integration-provenance.json",
+      "size_bytes": 2466,
+      "sha256": "ed72274ffc77b34d7ca8c71d42d05ebdd38af1e7e6079915658c01d4842a4005"
+    },
+    {
+      "path": "population.csv",
+      "size_bytes": 1708,
+      "sha256": "4eccee3763c96b014aeebb6c87cac36973dbd4f3f2cb4498722390ecc84b2425"
+    },
+    {
+      "path": "provenance.json",
+      "size_bytes": 18657,
+      "sha256": "ae448a6a00a71e17c7d066651d0413ba50cd58abc3f99195234baf3fbe900510"
+    },
+    {
+      "path": "raw/earthquakes.csv",
+      "size_bytes": 28355,
+      "sha256": "004a78795e611117b78384530a365f914192f98104a1d1ece17eff1be244590a"
+    },
+    {
+      "path": "raw/population.csv",
+      "size_bytes": 53555,
+      "sha256": "92188e29cb0a67dcf95afa7d6c47359409782f086478b70ea4128eb70e223ca9"
+    },
+    {
+      "path": "raw/treasury.json",
+      "size_bytes": 7065,
+      "sha256": "cdb4db03aa33f5c83339bc43409ba81cb7ad8a42b734b09a8a47e3c2b2e972d1"
+    },
+    {
+      "path": "source-manifest.json",
+      "size_bytes": 2814,
+      "sha256": "fcb1b50757376b0795b7e602c0c73b6e6cd15ea6e50dbada111d90affa88cec2"
+    }
+  ]
+}

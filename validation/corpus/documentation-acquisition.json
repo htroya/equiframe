@@ -1,0 +1,42 @@
+[
+  {
+    "url": "https://www.census.gov/data/datasets/time-series/demo/popest/2020s-state-total.html",
+    "status": "DOCUMENT_FETCH_FAILED",
+    "error": "HTTP Error 403: Forbidden",
+    "attempted_at_utc": "2026-10-07T05:23:07.357688+00:00"
+  },
+  {
+    "path": "source-docs/census-layout.pdf",
+    "url": "https://www2.census.gov/programs-surveys/popest/technical-documentation/file-layouts/2020-2025/NST-EST2025-ALLDATA.pdf",
+    "final_url": "https://www2.census.gov/programs-surveys/popest/technical-documentation/file-layouts/2020-2025/NST-EST2025-ALLDATA.pdf",
+    "http_status": 200,
+    "retrieved_at_utc": "2026-10-07T05:23:11.227730+00:00",
+    "bytes": 104772,
+    "sha256": "20b35f224039faf1f0a09a281b53ece071a31d3a963943046917d6ee5a81c7f2"
+  },
+  {
+    "url": "https://www.census.gov/topics/research/research-transparency-public-access/open-data.html",
+    "status": "DOCUMENT_FETCH_FAILED",
+    "error": "HTTP Error 403: Forbidden",
+    "attempted_at_utc": "2026-10-07T05:23:15.554255+00:00"
+  },
+  {
+    "path": "failed-attempts/usgs-copyright-empty-http202.html",
+    "url": "https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits",
+    "final_url": "https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits",
+    "http_status": 202,
+    "retrieved_at_utc": "2026-10-07T05:23:20.395838+00:00",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "status": "EMPTY_RESPONSE_NOT_DOCUMENT"
+  },
+  {
+    "path": "source-docs/usgs-api-documentation.html",
+    "url": "https://earthquake.usgs.gov/fdsnws/event/1/",
+    "final_url": "https://earthquake.usgs.gov/fdsnws/event/1/",
+    "http_status": 200,
+    "retrieved_at_utc": "2026-10-07T05:23:26.235824+00:00",
+    "bytes": 34875,
+    "sha256": "a34793edb1f2f8542b3c8cfb20cb7a65e342036d4ae496388d141d581009ea9f"
+  }
+]
