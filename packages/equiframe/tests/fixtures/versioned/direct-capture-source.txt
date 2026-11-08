@@ -1,0 +1,27 @@
+"""Supplementary one-time capture from the archived STEP3 source, including STEP2 diff."""
+import json
+import shutil
+import sys
+from pathlib import Path
+
+import pyarrow as pa
+
+import equiframe as ef
+
+source, destination = Path(sys.argv[1]), Path(sys.argv[2])
+assert Path(ef.__file__).resolve().is_relative_to(source.resolve())
+raw = destination.parent / 'direct-capture'
+raw.mkdir(exist_ok=False)
+result = ef.diff(
+    pa.table({'id': [1, 2], 'value': [11, 20]}),
+    pa.table({'id': [1, 2], 'value': [10, 20]}),
+    keys=['id'],
+    work_dir=raw,
+)
+assert result.state == 'different' and result.complete
+declaration = ef.read_diff_contract(result)
+destination.mkdir(parents=True, exist_ok=False)
+for name in ('comparison.json', 'differences.jsonl', 'diff-contract.json'):
+    shutil.copyfile(raw / result.comparison_id / name, destination / name)
+(destination / 'declaration.json').write_text(declaration.model_dump_json(indent=2) + '\n')
+shutil.rmtree(raw)

@@ -1,0 +1,71 @@
+"""One-time archival capture; never imported or run by compatibility tests."""
+import importlib.metadata
+import json
+import platform
+import shutil
+import sys
+from pathlib import Path
+
+import pyarrow as pa
+
+import equiframe as ef
+from test_comparison import column, contract, key, run
+
+source, destination, mode = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
+assert Path(ef.__file__).resolve().is_relative_to(source.resolve())
+destination.mkdir(parents=True, exist_ok=False)
+raw = destination.parent / (mode + '-capture')
+raw.mkdir(exist_ok=False)
+if mode == 'baseline':
+    for family in ('nulls_types', 'joins', 'aggregations', 'duplicates_order', 'dates'):
+        original = source / 'packages/equiframe/examples' / (family + '.json')
+        out = destination / 'contracts'
+        out.mkdir(exist_ok=True)
+        shutil.copyfile(original, out / original.name)
+        (out / (family + '.canonical.json')).write_bytes(
+            ef.canonical_contract_bytes(ef.read_contract(original))
+        )
+    declaration = contract((column('id'), column('value')), keys=(key(),))
+    expected = pa.table({'id': [1, 2], 'value': [10, 20]})
+    cases = (
+        ('equivalent', expected, {}),
+        ('different', pa.table({'id': [1, 2], 'value': [11, 20]}), {}),
+        ('not_evaluable', expected, {'options': ef.ComparisonOptions(max_rows=1)}),
+        ('invalid_expected', pa.table({'id': [1, 1], 'value': [10, 20]}), {}),
+    )
+    for name, candidate, options in cases:
+        result = run(raw / name, expected if name == 'invalid_expected' else candidate,
+                     candidate if name == 'invalid_expected' else expected,
+                     declaration, reference='expected', **options)
+        operation = raw / name / result.comparison_id
+        out = destination / 'comparisons' / name
+        out.mkdir(parents=True)
+        for filename in ('comparison.json', 'differences.jsonl'):
+            shutil.copyfile(operation / filename, out / filename)
+    from test_migration import run as migrate, table
+    migrated = migrate(raw / 'migration', expected=ef.ArrowInput(table()))
+    assert migrated.complete and migrated.state == 'equivalent'
+    ef.export_bundle(raw / 'migration' / migrated.migration_id, destination / 'migration-bundle')
+else:
+    expected = pa.table({'id': [1, 2], 'value': [10, 20]})
+    candidate = pa.table({'id': [1, 2], 'value': [11, 20]})
+    declaration = contract((column('id'), column('value')), keys=(key(),))
+    for name, options in (
+        ('diagnostic', ef.ReportOptions()),
+        ('detail', ef.ReportOptions(mode='detail', include_values=True, include_metadata=True)),
+        ('reproduction', ef.ReportOptions(mode='reproduction', include_values=True,
+                                         include_metadata=True)),
+    ):
+        result = run(raw / name, candidate, expected, declaration, reference='expected')
+        ef.write_comparison_report(result, destination / name, options=options, evidence_root=raw)
+    for name, options in (
+        ('equivalent', {}),
+        ('not_evaluable', {'options': ef.ComparisonOptions(max_rows=1)}),
+    ):
+        result = run(raw / name, expected, expected, declaration, reference='expected', **options)
+        ef.write_comparison_report(result, destination / name)
+info = {'python': platform.python_version(), 'package_version': ef.__version__,
+        'packages': {name: importlib.metadata.version(name)
+                     for name in ('pydantic','pyarrow','pandas','polars','duckdb','tzdata')}}
+(destination / 'producer-environment.json').write_text(json.dumps(info, indent=2) + '\n')
+shutil.rmtree(raw)

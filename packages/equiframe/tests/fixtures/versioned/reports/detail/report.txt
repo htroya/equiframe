@@ -1,0 +1,94 @@
+EquiFrame comparison
+
+Verdict and coverage
+Verdict: different
+Evaluation complete: true
+Scope: output_schema
+Reference role: expected
+Interpretation: Comparison against the declared expected output; its independence is not established
+Strategy: key
+Coverage: complete
+
+Policies
+column_order: significant
+physical_types: exact
+index: reject
+multiplicity: preserve
+row_order: ignored
+alignment: key
+key_validation: globally validated
+declared_key_1: {"columns": ["id"], "scope_columns": [], "unique": true, "incomplete": "reject", "selected": true}
+id: {"allowed_values_count": 0, "logical_type": {"bits": 64, "kind": "integer", "signed": true}, "null_policy": {"representations": ["null"]}, "nullable": true, "numeric_policy": {"comparison": "exact", "rounding": null, "tolerance": null, "unit": "count"}}
+value: {"allowed_values_count": 0, "logical_type": {"bits": 64, "kind": "integer", "signed": true}, "null_policy": {"representations": ["null"]}, "nullable": true, "numeric_policy": {"comparison": "exact", "rounding": null, "tolerance": null, "unit": "count"}}
+
+Reasons
+cell_value: Aligned values differ under the declared policy
+
+Next action
+Review the witnesses and declared policies, then correct the candidate or explicitly revise the contract
+
+Counts
+Measure | Value | Precision | Unit
+Candidate (left) rows | 2 | exact | rows
+Expected (right) rows | 2 | exact | rows
+Matched rows | 1 | exact | rows
+Difference records | 1 | exact | records
+Contract violation records | 0 | exact | records
+Added rows (left relative to right) | 0 | exact | rows
+Removed rows (left relative to right) | 0 | exact | rows
+Modified aligned rows | 1 | exact | rows
+Candidate (left) excess occurrences | unknown | unknown | occurrences
+Expected (right) excess occurrences | unknown | unknown | occurrences
+
+Displayed examples
+Included examples: 1
+Available difference records: 1
+Display complete: true
+Counting scope: Difference records need not be distinct rows
+
+Example 1: location and reason
+Category: content
+Code: cell_value
+Reason: Aligned values differ under the declared policy
+Candidate (left) position (zero-based): 0
+Expected (right) position (zero-based): 0
+Column: value
+Candidate (left) occurrences: 1
+Expected (right) occurrences: 1
+
+Example 1: values and types
+Side | Column | Value | Disclosure | Kind | Native type | Physical type
+Key | id | integer(1) | visible | integer | unavailable | int64
+Candidate (left) | value | integer(11) | visible | integer | unavailable | int64
+Expected (right) | value | integer(10) | visible | integer | unavailable | int64
+
+Evidence and limitations
+Evidence schema version: 1.0
+Evidence mode: detail
+Inspection: verified_differences
+Evaluation complete: true
+Counts final: true
+Values withheld: false
+Metadata withheld: false
+Original evidence retention: unchanged_in_original_comparison
+Report retention: until_caller_deletes
+Access: caller_managed_local_storage_no_encryption
+Exhaustive evidence required: false
+Evidence requirements: satisfied
+Reproduction: not_requested
+Reproduction scope: materialized_comparison_only_no_transform_reexecution
+
+Report disclosure and limits
+Mode: detail
+Include values: true
+Include metadata: true
+Redacted columns: 0
+Maximum examples: 20
+Maximum value characters: 4096
+Maximum report bytes: 2097152
+Require exhaustive evidence: false
+
+Identity
+Report schema version: 1.0
+Contract SHA-256: 6d76c05db723588c0314ca17b8c8953c8032798110e72eafb7e8f001c13faaca
+Comparison specification SHA-256: d93d5635fd99ae3531c6e7497d1f9827411d05bcf816a32a8ff56c0448aa3076

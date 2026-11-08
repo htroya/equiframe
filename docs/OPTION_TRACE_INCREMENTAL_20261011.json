@@ -1,0 +1,6015 @@
+{
+  "schema": "equiframe.option-trace-incremental.v1",
+  "candidate": "0.12.0a13",
+  "baseline_verified": 4298,
+  "baseline_unique_cases": 3445,
+  "current_option_traceability": {
+    "normal": {
+      "total": 8385,
+      "verified": 4444,
+      "percent": 52.999403697078115,
+      "counts": {
+        "EXPECTED_REJECTION": 2670,
+        "NOT_RUN": 3941,
+        "PASS": 1774
+      },
+      "new_verified_obligations": 146,
+      "unique_new_cases": 139,
+      "regression_cases": 2,
+      "linked_obligations": {
+        "parameter:equiframe.diff:options:value:null": "PASS",
+        "parameter:equiframe.diff:options:invalid": "EXPECTED_REJECTION",
+        "parameter:equiframe.diff:options:class:1": "EXPECTED_REJECTION",
+        "parameter:equiframe.diff:capture_options:value:null": "PASS",
+        "parameter:equiframe.diff:capture_options:invalid": "EXPECTED_REJECTION",
+        "parameter:equiframe.diff:capture_options:class:1": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:partitions:class:2": "PASS",
+        "field:equiframe.ComparisonOptions:partitions:class:4": "PASS",
+        "field:equiframe.ComparisonOptions:partitions:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:partitions:class:5": "EXPECTED_REJECTION",
+        "api:equiframe.diff": "PASS",
+        "parameter:equiframe.diff:candidate:class:0": "PASS",
+        "parameter:equiframe.diff:expected:class:0": "PASS",
+        "parameter:equiframe.diff:options:default": "PASS",
+        "parameter:equiframe.diff:capture_options:default": "PASS",
+        "parameter:equiframe.diff:work_dir:class:0": "PASS",
+        "parameter:equiframe.diff:candidate:required_omission": "EXPECTED_REJECTION",
+        "parameter:equiframe.diff:expected:required_omission": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:batch_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:batch_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_batch_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_batch_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_row_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_row_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:sqlite_cache_kib:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:sqlite_cache_kib:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_work:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_work:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_disk_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_disk_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_evidence_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_evidence_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_matching_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_matching_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_matching_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_matching_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_pair_checks:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_pair_checks:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_numeric_digits:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_numeric_digits:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:timeout_seconds:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:timeout_seconds:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_examples:class:2": "PASS",
+        "field:equiframe.ComparisonOptions:max_examples:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.DiffCaptureOptions:max_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.DiffCaptureOptions:max_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.DiffCaptureOptions:max_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.DiffCaptureOptions:max_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:timeout_seconds:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:timeout_seconds:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:max_transport_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:max_transport_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:duckdb_memory_mb:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:duckdb_memory_mb:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:duckdb_threads:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:duckdb_threads:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:max_input_rows:class:2": "PASS",
+        "field:equiframe.ExecutionOptions:max_input_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:max_output_rows:class:2": "PASS",
+        "field:equiframe.ExecutionOptions:max_output_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:batch_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:batch_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:max_batch_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:max_batch_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:max_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:max_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:timeout_seconds:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:timeout_seconds:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:max_rows:class:2": "PASS",
+        "field:equiframe.DuckDBCaptureOptions:max_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.MigrationOptions:timeout_seconds:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.MigrationOptions:timeout_seconds:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.MigrationOptions:max_capture_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.MigrationOptions:max_capture_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.MigrationOptions:max_capture_rows:class:2": "PASS",
+        "field:equiframe.MigrationOptions:max_capture_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:max_evaluations:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:max_evaluations:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:timeout_seconds:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:timeout_seconds:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:max_input_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:max_input_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_artifact_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_artifact_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_evidence_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_evidence_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_work:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_work:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:timeout_seconds:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:timeout_seconds:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_examples:class:2": "PASS",
+        "field:equiframe.RuleOptions:max_examples:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_artifact_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_artifact_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_work:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_work:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_distinct:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_distinct:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:timeout_seconds:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:timeout_seconds:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_report_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_report_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_evidence_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_evidence_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_records:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_records:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_records:class:4": "PASS",
+        "field:equiframe.ReportOptions:max_records:class:5": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_examples:class:2": "PASS",
+        "field:equiframe.ReportOptions:max_examples:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_examples:class:4": "PASS",
+        "field:equiframe.ReportOptions:max_examples:class:5": "EXPECTED_REJECTION",
+        "field:equiframe.ReportViewPolicy:max_value_chars:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReportViewPolicy:max_value_chars:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportViewPolicy:max_report_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReportViewPolicy:max_report_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportViewPolicy:redacted_column_count:class:2": "PASS",
+        "field:equiframe.ReportViewPolicy:redacted_column_count:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportViewPolicy:max_examples:class:2": "PASS",
+        "field:equiframe.ReportViewPolicy:max_examples:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.IsolationForestConfig:random_state:class:2": "PASS",
+        "field:equiframe.IsolationForestConfig:random_state:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.IsolationForestConfig:random_state:class:4": "PASS",
+        "field:equiframe.IsolationForestConfig:random_state:class:5": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:confirmations:class:2": "PASS",
+        "field:equiframe.ReductionOptions:confirmations:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:confirmations:class:4": "PASS",
+        "field:equiframe.ReductionOptions:confirmations:class:5": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_value_chars:class:2": "PASS",
+        "field:equiframe.ReportOptions:max_value_chars:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_value_chars:class:4": "PASS",
+        "field:equiframe.ReportOptions:max_value_chars:class:5": "EXPECTED_REJECTION",
+        "field:equiframe.IsolationForestConfig:n_estimators:class:2": "PASS",
+        "field:equiframe.IsolationForestConfig:n_estimators:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.IsolationForestConfig:n_estimators:class:4": "PASS",
+        "field:equiframe.IsolationForestConfig:n_estimators:class:5": "EXPECTED_REJECTION",
+        "field:equiframe.IsolationForestConfig:max_samples:class:2": "PASS",
+        "field:equiframe.IsolationForestConfig:max_samples:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.IsolationForestConfig:max_samples:class:4": "PASS",
+        "field:equiframe.IsolationForestConfig:max_samples:class:5": "EXPECTED_REJECTION"
+      }
+    },
+    "optimized": {
+      "total": 8385,
+      "verified": 4444,
+      "percent": 52.999403697078115,
+      "counts": {
+        "EXPECTED_REJECTION": 2670,
+        "NOT_RUN": 3941,
+        "PASS": 1774
+      },
+      "new_verified_obligations": 146,
+      "unique_new_cases": 139,
+      "regression_cases": 2,
+      "linked_obligations": {
+        "parameter:equiframe.diff:options:value:null": "PASS",
+        "parameter:equiframe.diff:options:invalid": "EXPECTED_REJECTION",
+        "parameter:equiframe.diff:options:class:1": "EXPECTED_REJECTION",
+        "parameter:equiframe.diff:capture_options:value:null": "PASS",
+        "parameter:equiframe.diff:capture_options:invalid": "EXPECTED_REJECTION",
+        "parameter:equiframe.diff:capture_options:class:1": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:partitions:class:2": "PASS",
+        "field:equiframe.ComparisonOptions:partitions:class:4": "PASS",
+        "field:equiframe.ComparisonOptions:partitions:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:partitions:class:5": "EXPECTED_REJECTION",
+        "api:equiframe.diff": "PASS",
+        "parameter:equiframe.diff:candidate:class:0": "PASS",
+        "parameter:equiframe.diff:expected:class:0": "PASS",
+        "parameter:equiframe.diff:options:default": "PASS",
+        "parameter:equiframe.diff:capture_options:default": "PASS",
+        "parameter:equiframe.diff:work_dir:class:0": "PASS",
+        "parameter:equiframe.diff:candidate:required_omission": "EXPECTED_REJECTION",
+        "parameter:equiframe.diff:expected:required_omission": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:batch_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:batch_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_batch_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_batch_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_row_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_row_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:sqlite_cache_kib:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:sqlite_cache_kib:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_work:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_work:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_disk_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_disk_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_evidence_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_evidence_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_matching_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_matching_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_matching_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_matching_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_pair_checks:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_pair_checks:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_numeric_digits:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_numeric_digits:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:timeout_seconds:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:timeout_seconds:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ComparisonOptions:max_examples:class:2": "PASS",
+        "field:equiframe.ComparisonOptions:max_examples:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.DiffCaptureOptions:max_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.DiffCaptureOptions:max_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.DiffCaptureOptions:max_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.DiffCaptureOptions:max_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:timeout_seconds:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:timeout_seconds:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:max_transport_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:max_transport_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:duckdb_memory_mb:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:duckdb_memory_mb:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:duckdb_threads:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:duckdb_threads:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:max_input_rows:class:2": "PASS",
+        "field:equiframe.ExecutionOptions:max_input_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ExecutionOptions:max_output_rows:class:2": "PASS",
+        "field:equiframe.ExecutionOptions:max_output_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:batch_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:batch_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:max_batch_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:max_batch_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:max_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:max_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:timeout_seconds:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:timeout_seconds:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.DuckDBCaptureOptions:max_rows:class:2": "PASS",
+        "field:equiframe.DuckDBCaptureOptions:max_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.MigrationOptions:timeout_seconds:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.MigrationOptions:timeout_seconds:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.MigrationOptions:max_capture_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.MigrationOptions:max_capture_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.MigrationOptions:max_capture_rows:class:2": "PASS",
+        "field:equiframe.MigrationOptions:max_capture_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:max_evaluations:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:max_evaluations:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:timeout_seconds:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:timeout_seconds:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:max_input_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:max_input_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_artifact_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_artifact_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_evidence_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_evidence_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_work:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_work:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:timeout_seconds:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:timeout_seconds:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.RuleOptions:max_examples:class:2": "PASS",
+        "field:equiframe.RuleOptions:max_examples:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_rows:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_rows:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_artifact_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_artifact_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_work:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_work:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_distinct:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:max_distinct:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:timeout_seconds:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ProfileOptions:timeout_seconds:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_report_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_report_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_evidence_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_evidence_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_records:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_records:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_records:class:4": "PASS",
+        "field:equiframe.ReportOptions:max_records:class:5": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_examples:class:2": "PASS",
+        "field:equiframe.ReportOptions:max_examples:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_examples:class:4": "PASS",
+        "field:equiframe.ReportOptions:max_examples:class:5": "EXPECTED_REJECTION",
+        "field:equiframe.ReportViewPolicy:max_value_chars:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReportViewPolicy:max_value_chars:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportViewPolicy:max_report_bytes:class:2": "EXPECTED_REJECTION",
+        "field:equiframe.ReportViewPolicy:max_report_bytes:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportViewPolicy:redacted_column_count:class:2": "PASS",
+        "field:equiframe.ReportViewPolicy:redacted_column_count:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportViewPolicy:max_examples:class:2": "PASS",
+        "field:equiframe.ReportViewPolicy:max_examples:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.IsolationForestConfig:random_state:class:2": "PASS",
+        "field:equiframe.IsolationForestConfig:random_state:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.IsolationForestConfig:random_state:class:4": "PASS",
+        "field:equiframe.IsolationForestConfig:random_state:class:5": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:confirmations:class:2": "PASS",
+        "field:equiframe.ReductionOptions:confirmations:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReductionOptions:confirmations:class:4": "PASS",
+        "field:equiframe.ReductionOptions:confirmations:class:5": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_value_chars:class:2": "PASS",
+        "field:equiframe.ReportOptions:max_value_chars:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.ReportOptions:max_value_chars:class:4": "PASS",
+        "field:equiframe.ReportOptions:max_value_chars:class:5": "EXPECTED_REJECTION",
+        "field:equiframe.IsolationForestConfig:n_estimators:class:2": "PASS",
+        "field:equiframe.IsolationForestConfig:n_estimators:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.IsolationForestConfig:n_estimators:class:4": "PASS",
+        "field:equiframe.IsolationForestConfig:n_estimators:class:5": "EXPECTED_REJECTION",
+        "field:equiframe.IsolationForestConfig:max_samples:class:2": "PASS",
+        "field:equiframe.IsolationForestConfig:max_samples:class:3": "EXPECTED_REJECTION",
+        "field:equiframe.IsolationForestConfig:max_samples:class:4": "PASS",
+        "field:equiframe.IsolationForestConfig:max_samples:class:5": "EXPECTED_REJECTION"
+      }
+    }
+  },
+  "unique_case_union": 3584,
+  "executed_driver_sha256": "56663cd649fd0be9234f274ffa828d7714c2e546b870fa678c9bdd919e448e60",
+  "wheel": {
+    "version": "0.12.0a13",
+    "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23",
+    "payload_files": 127
+  },
+  "baseline_sha256": "2b8691cb9c3d0633d309a95fa471ca7df0414af2a3c31f203c60a12cdbe419b2",
+  "source_commit": "96769ad15d0807a501e6141725c8d4198d7715b0",
+  "catalog_sha256": "9eaa56aa71b803d901b07b56da0a89eb3cb610a44dc67a78513b553288ab59e1",
+  "obligation_ids_sha256": "22308238f613b50aefc0d5bb876e743443b3585c69f5f92d2ce9c22a5c2c3de1",
+  "windows_results_sha256": {
+    "normal": "4c7702cd398d4c0196ec163820b51a115734f59f3c73e21bb140de793bae1b0c",
+    "optimized": "d4e3851dba748222a013b4f883ae5efb414f21f3e0e7129b4e6d019bf120ebb3"
+  },
+  "vm_archives_sha256": [
+    "7a9f7b4807dcb6d265b746769fd2168e53071e07c2feea5f851131308623065b",
+    "599c85f487d87c645a9f7f99735d73169bd2091c7e79bc6fe78919d858b34bec"
+  ],
+  "executions": [
+    {
+      "python": "3.12.4",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "architecture": "AMD64",
+      "optimized": false
+    },
+    {
+      "python": "3.12.4",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "architecture": "AMD64",
+      "optimized": true
+    }
+  ],
+  "linux_arm64_executions": [
+    {
+      "python": "3.10.12",
+      "architecture": "aarch64",
+      "optimized": true
+    },
+    {
+      "python": "3.12.15",
+      "architecture": "aarch64",
+      "optimized": false
+    },
+    {
+      "python": "3.12.15",
+      "architecture": "aarch64",
+      "optimized": true
+    },
+    {
+      "python": "3.10.12",
+      "architecture": "aarch64",
+      "optimized": false
+    },
+    {
+      "python": "3.10.12",
+      "architecture": "aarch64",
+      "optimized": false
+    },
+    {
+      "python": "3.10.12",
+      "architecture": "aarch64",
+      "optimized": true
+    }
+  ],
+  "review": {
+    "automated": true,
+    "human_independent_acceptance": false
+  },
+  "receipts": [
+    {
+      "case_id": "diff-null-options",
+      "driver": "diff_null",
+      "argument": "options",
+      "input": null,
+      "expected": {
+        "state": "equivalent",
+        "all_default_options": true
+      },
+      "obligations": [
+        "parameter:equiframe.diff:options:value:null"
+      ],
+      "basis": "test_diff.py:test_none_and_valid_empty_option_mappings_preserve_defaults",
+      "observed": {
+        "state": "equivalent",
+        "partitions": 16,
+        "capture_defaults_verified": true,
+        "receipt_persisted": true
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "diff-reject-options",
+      "driver": "diff_invalid",
+      "argument": "options",
+      "input": false,
+      "expected": {
+        "exception": "ValidationError",
+        "workspace_empty": true
+      },
+      "obligations": [
+        "parameter:equiframe.diff:options:invalid",
+        "parameter:equiframe.diff:options:class:1"
+      ],
+      "basis": "test_diff.py:test_falsey_invalid_options_are_rejected_before_capture",
+      "observed": {
+        "exception": "ValidationError",
+        "workspace_empty": true
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "diff-null-capture_options",
+      "driver": "diff_null",
+      "argument": "capture_options",
+      "input": null,
+      "expected": {
+        "state": "equivalent",
+        "all_default_options": true
+      },
+      "obligations": [
+        "parameter:equiframe.diff:capture_options:value:null"
+      ],
+      "basis": "test_diff.py:test_none_and_valid_empty_option_mappings_preserve_defaults",
+      "observed": {
+        "state": "equivalent",
+        "partitions": 16,
+        "capture_defaults_verified": true,
+        "receipt_persisted": true
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "diff-reject-capture_options",
+      "driver": "diff_invalid",
+      "argument": "capture_options",
+      "input": false,
+      "expected": {
+        "exception": "ValidationError",
+        "workspace_empty": true
+      },
+      "obligations": [
+        "parameter:equiframe.diff:capture_options:invalid",
+        "parameter:equiframe.diff:capture_options:class:1"
+      ],
+      "basis": "test_diff.py:test_falsey_invalid_options_are_rejected_before_capture",
+      "observed": {
+        "exception": "ValidationError",
+        "workspace_empty": true
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "partitions-int-16",
+      "driver": "partitions",
+      "input": 16,
+      "expected": {
+        "admitted": true
+      },
+      "obligations": [],
+      "basis": "ComparisonOptions declares strict integer ge=1/le=4096; native admitted cases preserve complete literal equality",
+      "observed": {
+        "admitted": true,
+        "partitions": 16,
+        "state": "equivalent"
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "partitions-int-1",
+      "driver": "partitions",
+      "input": 1,
+      "expected": {
+        "admitted": true
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:partitions:class:2"
+      ],
+      "basis": "ComparisonOptions declares strict integer ge=1/le=4096; native admitted cases preserve complete literal equality",
+      "observed": {
+        "admitted": true,
+        "partitions": 1,
+        "state": "equivalent"
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "partitions-int-4096",
+      "driver": "partitions",
+      "input": 4096,
+      "expected": {
+        "admitted": true
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:partitions:class:4"
+      ],
+      "basis": "ComparisonOptions declares strict integer ge=1/le=4096; native admitted cases preserve complete literal equality",
+      "observed": {
+        "admitted": true,
+        "partitions": 4096,
+        "state": "equivalent"
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "partitions-int-0",
+      "driver": "partitions",
+      "input": 0,
+      "expected": {
+        "admitted": false
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:partitions:class:3"
+      ],
+      "basis": "ComparisonOptions declares strict integer ge=1/le=4096; native admitted cases preserve complete literal equality",
+      "observed": {
+        "admitted": false,
+        "exception": "ValidationError",
+        "field": "partitions"
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "partitions-int-4097",
+      "driver": "partitions",
+      "input": 4097,
+      "expected": {
+        "admitted": false
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:partitions:class:5"
+      ],
+      "basis": "ComparisonOptions declares strict integer ge=1/le=4096; native admitted cases preserve complete literal equality",
+      "observed": {
+        "admitted": false,
+        "exception": "ValidationError",
+        "field": "partitions"
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "partitions-str-1",
+      "driver": "partitions",
+      "input": "1",
+      "expected": {
+        "admitted": false
+      },
+      "obligations": [],
+      "basis": "ComparisonOptions declares strict integer ge=1/le=4096; native admitted cases preserve complete literal equality",
+      "observed": {
+        "admitted": false,
+        "exception": "ValidationError",
+        "field": "partitions"
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "diff-omitted-options",
+      "driver": "diff_defaults",
+      "input": {
+        "candidate": [
+          1,
+          2
+        ],
+        "expected": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "state": "equivalent",
+        "default_partitions": 16
+      },
+      "obligations": [
+        "api:equiframe.diff",
+        "parameter:equiframe.diff:candidate:class:0",
+        "parameter:equiframe.diff:expected:class:0",
+        "parameter:equiframe.diff:options:default",
+        "parameter:equiframe.diff:capture_options:default",
+        "parameter:equiframe.diff:work_dir:class:0"
+      ],
+      "basis": "Literal Arrow tables, omitted options/capture_options and a new persisted workspace",
+      "observed": {
+        "state": "equivalent",
+        "partitions": 16,
+        "capture_defaults_verified": true,
+        "receipt_persisted": true
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "diff-missing-candidate",
+      "driver": "diff_missing",
+      "argument": "candidate",
+      "input": "omitted",
+      "expected": {
+        "exception": "TypeError",
+        "missing_argument": "candidate",
+        "workspace_empty": true
+      },
+      "obligations": [
+        "parameter:equiframe.diff:candidate:required_omission"
+      ],
+      "basis": "Python's required signature; supplying only the other table must reject before capture",
+      "observed": {
+        "exception": "TypeError",
+        "missing_argument": "candidate",
+        "workspace_empty": true
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "diff-missing-expected",
+      "driver": "diff_missing",
+      "argument": "expected",
+      "input": "omitted",
+      "expected": {
+        "exception": "TypeError",
+        "missing_argument": "expected",
+        "workspace_empty": true
+      },
+      "obligations": [
+        "parameter:equiframe.diff:expected:required_omission"
+      ],
+      "basis": "Python's required signature; supplying only the other table must reject before capture",
+      "observed": {
+        "exception": "TypeError",
+        "missing_argument": "expected",
+        "workspace_empty": true
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-batch_rows-2",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "batch_rows",
+      "input": {
+        "batch_rows": 0,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:batch_rows:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "batch_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-batch_rows-3",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "batch_rows",
+      "input": {
+        "batch_rows": -1,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:batch_rows:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "batch_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_batch_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_batch_bytes",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 0,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_batch_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_batch_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_batch_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_batch_bytes",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": -1,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_batch_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_batch_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_row_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_row_bytes",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 0,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_row_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_row_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_row_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_row_bytes",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": -1,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_row_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_row_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-sqlite_cache_kib-2",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "sqlite_cache_kib",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 0,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:sqlite_cache_kib:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "sqlite_cache_kib"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-sqlite_cache_kib-3",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "sqlite_cache_kib",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": -1,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:sqlite_cache_kib:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "sqlite_cache_kib"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_rows-2",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_rows",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 0,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_rows:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_rows-3",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_rows",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": -1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_rows:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_work-2",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_work",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 0,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_work:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_work"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_work-3",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_work",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": -1,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_work:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_work"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_disk_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_disk_bytes",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 0,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_disk_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_disk_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_disk_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_disk_bytes",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": -1,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_disk_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_disk_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_evidence_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_evidence_bytes",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 0,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_evidence_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_evidence_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_evidence_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_evidence_bytes",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": -1,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_evidence_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_evidence_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_matching_rows-2",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_matching_rows",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 0,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_matching_rows:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_matching_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_matching_rows-3",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_matching_rows",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": -1,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_matching_rows:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_matching_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_matching_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_matching_bytes",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 0,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_matching_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_matching_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_matching_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_matching_bytes",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": -1,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_matching_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_matching_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_pair_checks-2",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_pair_checks",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 0,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_pair_checks:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_pair_checks"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_pair_checks-3",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_pair_checks",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": -1,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_pair_checks:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_pair_checks"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_numeric_digits-2",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_numeric_digits",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 0,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_numeric_digits:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_numeric_digits"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_numeric_digits-3",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_numeric_digits",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": -1,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_numeric_digits:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_numeric_digits"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-timeout_seconds-2",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "timeout_seconds",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": 0
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:timeout_seconds:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "timeout_seconds"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-timeout_seconds-3",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "timeout_seconds",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 20,
+        "timeout_seconds": -1
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:timeout_seconds:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "timeout_seconds"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_examples-2",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_examples",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": 0,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": true,
+        "value": 0,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_examples:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-ComparisonOptions-max_examples-3",
+      "driver": "metadata_boundary",
+      "model": "ComparisonOptions",
+      "field": "max_examples",
+      "input": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_row_bytes": 1048576,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "max_rows": 1,
+        "max_work": 100000000,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_matching_rows": 2000,
+        "max_matching_bytes": 33554432,
+        "max_pair_checks": 2000000,
+        "max_numeric_digits": 4096,
+        "max_examples": -1,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.ComparisonOptions:max_examples:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_examples"
+            ],
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-DiffCaptureOptions-max_rows-2",
+      "driver": "metadata_boundary",
+      "model": "DiffCaptureOptions",
+      "field": "max_rows",
+      "input": {
+        "max_rows": 0,
+        "max_bytes": 268435456
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.DiffCaptureOptions:max_rows:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-DiffCaptureOptions-max_rows-3",
+      "driver": "metadata_boundary",
+      "model": "DiffCaptureOptions",
+      "field": "max_rows",
+      "input": {
+        "max_rows": -1,
+        "max_bytes": 268435456
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.DiffCaptureOptions:max_rows:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-DiffCaptureOptions-max_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "DiffCaptureOptions",
+      "field": "max_bytes",
+      "input": {
+        "max_rows": 1000000,
+        "max_bytes": 0
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.DiffCaptureOptions:max_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-DiffCaptureOptions-max_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "DiffCaptureOptions",
+      "field": "max_bytes",
+      "input": {
+        "max_rows": 1000000,
+        "max_bytes": -1
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.DiffCaptureOptions:max_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ExecutionOptions-timeout_seconds-2",
+      "driver": "metadata_boundary",
+      "model": "ExecutionOptions",
+      "field": "timeout_seconds",
+      "input": {
+        "timeout_seconds": 0,
+        "max_input_rows": null,
+        "max_output_rows": null,
+        "max_transport_bytes": null,
+        "duckdb_memory_mb": 512,
+        "duckdb_threads": 1,
+        "duckdb_timezone": "UTC"
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ExecutionOptions:timeout_seconds:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "timeout_seconds"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ExecutionOptions-timeout_seconds-3",
+      "driver": "metadata_boundary",
+      "model": "ExecutionOptions",
+      "field": "timeout_seconds",
+      "input": {
+        "timeout_seconds": -1,
+        "max_input_rows": null,
+        "max_output_rows": null,
+        "max_transport_bytes": null,
+        "duckdb_memory_mb": 512,
+        "duckdb_threads": 1,
+        "duckdb_timezone": "UTC"
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ExecutionOptions:timeout_seconds:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "timeout_seconds"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ExecutionOptions-max_transport_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "ExecutionOptions",
+      "field": "max_transport_bytes",
+      "input": {
+        "timeout_seconds": null,
+        "max_input_rows": null,
+        "max_output_rows": null,
+        "max_transport_bytes": 0,
+        "duckdb_memory_mb": 512,
+        "duckdb_threads": 1,
+        "duckdb_timezone": "UTC"
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ExecutionOptions:max_transport_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_transport_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ExecutionOptions-max_transport_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "ExecutionOptions",
+      "field": "max_transport_bytes",
+      "input": {
+        "timeout_seconds": null,
+        "max_input_rows": null,
+        "max_output_rows": null,
+        "max_transport_bytes": -1,
+        "duckdb_memory_mb": 512,
+        "duckdb_threads": 1,
+        "duckdb_timezone": "UTC"
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ExecutionOptions:max_transport_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_transport_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ExecutionOptions-duckdb_memory_mb-2",
+      "driver": "metadata_boundary",
+      "model": "ExecutionOptions",
+      "field": "duckdb_memory_mb",
+      "input": {
+        "timeout_seconds": null,
+        "max_input_rows": null,
+        "max_output_rows": null,
+        "max_transport_bytes": null,
+        "duckdb_memory_mb": 0,
+        "duckdb_threads": 1,
+        "duckdb_timezone": "UTC"
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ExecutionOptions:duckdb_memory_mb:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "duckdb_memory_mb"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ExecutionOptions-duckdb_memory_mb-3",
+      "driver": "metadata_boundary",
+      "model": "ExecutionOptions",
+      "field": "duckdb_memory_mb",
+      "input": {
+        "timeout_seconds": null,
+        "max_input_rows": null,
+        "max_output_rows": null,
+        "max_transport_bytes": null,
+        "duckdb_memory_mb": -1,
+        "duckdb_threads": 1,
+        "duckdb_timezone": "UTC"
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ExecutionOptions:duckdb_memory_mb:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "duckdb_memory_mb"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ExecutionOptions-duckdb_threads-2",
+      "driver": "metadata_boundary",
+      "model": "ExecutionOptions",
+      "field": "duckdb_threads",
+      "input": {
+        "timeout_seconds": null,
+        "max_input_rows": null,
+        "max_output_rows": null,
+        "max_transport_bytes": null,
+        "duckdb_memory_mb": 512,
+        "duckdb_threads": 0,
+        "duckdb_timezone": "UTC"
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ExecutionOptions:duckdb_threads:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "duckdb_threads"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ExecutionOptions-duckdb_threads-3",
+      "driver": "metadata_boundary",
+      "model": "ExecutionOptions",
+      "field": "duckdb_threads",
+      "input": {
+        "timeout_seconds": null,
+        "max_input_rows": null,
+        "max_output_rows": null,
+        "max_transport_bytes": null,
+        "duckdb_memory_mb": 512,
+        "duckdb_threads": -1,
+        "duckdb_timezone": "UTC"
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ExecutionOptions:duckdb_threads:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "duckdb_threads"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ExecutionOptions-max_input_rows-2",
+      "driver": "metadata_boundary",
+      "model": "ExecutionOptions",
+      "field": "max_input_rows",
+      "input": {
+        "timeout_seconds": null,
+        "max_input_rows": 0,
+        "max_output_rows": null,
+        "max_transport_bytes": null,
+        "duckdb_memory_mb": 512,
+        "duckdb_threads": 1,
+        "duckdb_timezone": "UTC"
+      },
+      "expected": {
+        "admitted": true,
+        "value": 0,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.ExecutionOptions:max_input_rows:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-ExecutionOptions-max_input_rows-3",
+      "driver": "metadata_boundary",
+      "model": "ExecutionOptions",
+      "field": "max_input_rows",
+      "input": {
+        "timeout_seconds": null,
+        "max_input_rows": -1,
+        "max_output_rows": null,
+        "max_transport_bytes": null,
+        "duckdb_memory_mb": 512,
+        "duckdb_threads": 1,
+        "duckdb_timezone": "UTC"
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.ExecutionOptions:max_input_rows:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_input_rows"
+            ],
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ExecutionOptions-max_output_rows-2",
+      "driver": "metadata_boundary",
+      "model": "ExecutionOptions",
+      "field": "max_output_rows",
+      "input": {
+        "timeout_seconds": null,
+        "max_input_rows": null,
+        "max_output_rows": 0,
+        "max_transport_bytes": null,
+        "duckdb_memory_mb": 512,
+        "duckdb_threads": 1,
+        "duckdb_timezone": "UTC"
+      },
+      "expected": {
+        "admitted": true,
+        "value": 0,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.ExecutionOptions:max_output_rows:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-ExecutionOptions-max_output_rows-3",
+      "driver": "metadata_boundary",
+      "model": "ExecutionOptions",
+      "field": "max_output_rows",
+      "input": {
+        "timeout_seconds": null,
+        "max_input_rows": null,
+        "max_output_rows": -1,
+        "max_transport_bytes": null,
+        "duckdb_memory_mb": 512,
+        "duckdb_threads": 1,
+        "duckdb_timezone": "UTC"
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.ExecutionOptions:max_output_rows:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_output_rows"
+            ],
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-DuckDBCaptureOptions-batch_rows-2",
+      "driver": "metadata_boundary",
+      "model": "DuckDBCaptureOptions",
+      "field": "batch_rows",
+      "input": {
+        "batch_rows": 0,
+        "max_rows": 0,
+        "max_batch_bytes": 67108864,
+        "max_bytes": 268435456,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.DuckDBCaptureOptions:batch_rows:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "batch_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-DuckDBCaptureOptions-batch_rows-3",
+      "driver": "metadata_boundary",
+      "model": "DuckDBCaptureOptions",
+      "field": "batch_rows",
+      "input": {
+        "batch_rows": -1,
+        "max_rows": 0,
+        "max_batch_bytes": 67108864,
+        "max_bytes": 268435456,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.DuckDBCaptureOptions:batch_rows:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "batch_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-DuckDBCaptureOptions-max_batch_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "DuckDBCaptureOptions",
+      "field": "max_batch_bytes",
+      "input": {
+        "batch_rows": 4096,
+        "max_rows": 0,
+        "max_batch_bytes": 0,
+        "max_bytes": 268435456,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.DuckDBCaptureOptions:max_batch_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_batch_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-DuckDBCaptureOptions-max_batch_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "DuckDBCaptureOptions",
+      "field": "max_batch_bytes",
+      "input": {
+        "batch_rows": 4096,
+        "max_rows": 0,
+        "max_batch_bytes": -1,
+        "max_bytes": 268435456,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.DuckDBCaptureOptions:max_batch_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_batch_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-DuckDBCaptureOptions-max_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "DuckDBCaptureOptions",
+      "field": "max_bytes",
+      "input": {
+        "batch_rows": 4096,
+        "max_rows": 0,
+        "max_batch_bytes": 67108864,
+        "max_bytes": 0,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.DuckDBCaptureOptions:max_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-DuckDBCaptureOptions-max_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "DuckDBCaptureOptions",
+      "field": "max_bytes",
+      "input": {
+        "batch_rows": 4096,
+        "max_rows": 0,
+        "max_batch_bytes": 67108864,
+        "max_bytes": -1,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.DuckDBCaptureOptions:max_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-DuckDBCaptureOptions-timeout_seconds-2",
+      "driver": "metadata_boundary",
+      "model": "DuckDBCaptureOptions",
+      "field": "timeout_seconds",
+      "input": {
+        "batch_rows": 4096,
+        "max_rows": 0,
+        "max_batch_bytes": 67108864,
+        "max_bytes": 268435456,
+        "timeout_seconds": 0
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.DuckDBCaptureOptions:timeout_seconds:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "timeout_seconds"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-DuckDBCaptureOptions-timeout_seconds-3",
+      "driver": "metadata_boundary",
+      "model": "DuckDBCaptureOptions",
+      "field": "timeout_seconds",
+      "input": {
+        "batch_rows": 4096,
+        "max_rows": 0,
+        "max_batch_bytes": 67108864,
+        "max_bytes": 268435456,
+        "timeout_seconds": -1
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.DuckDBCaptureOptions:timeout_seconds:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "timeout_seconds"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-DuckDBCaptureOptions-max_rows-2",
+      "driver": "metadata_boundary",
+      "model": "DuckDBCaptureOptions",
+      "field": "max_rows",
+      "input": {
+        "batch_rows": 4096,
+        "max_rows": 0,
+        "max_batch_bytes": 67108864,
+        "max_bytes": 268435456,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": true,
+        "value": 0,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.DuckDBCaptureOptions:max_rows:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-DuckDBCaptureOptions-max_rows-3",
+      "driver": "metadata_boundary",
+      "model": "DuckDBCaptureOptions",
+      "field": "max_rows",
+      "input": {
+        "batch_rows": 4096,
+        "max_rows": -1,
+        "max_batch_bytes": 67108864,
+        "max_bytes": 268435456,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.DuckDBCaptureOptions:max_rows:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_rows"
+            ],
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-MigrationOptions-timeout_seconds-2",
+      "driver": "metadata_boundary",
+      "model": "MigrationOptions",
+      "field": "timeout_seconds",
+      "input": {
+        "timeout_seconds": 0,
+        "max_capture_rows": 10000000,
+        "max_capture_bytes": 536870912
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.MigrationOptions:timeout_seconds:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "timeout_seconds"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-MigrationOptions-timeout_seconds-3",
+      "driver": "metadata_boundary",
+      "model": "MigrationOptions",
+      "field": "timeout_seconds",
+      "input": {
+        "timeout_seconds": -1,
+        "max_capture_rows": 10000000,
+        "max_capture_bytes": 536870912
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.MigrationOptions:timeout_seconds:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "timeout_seconds"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-MigrationOptions-max_capture_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "MigrationOptions",
+      "field": "max_capture_bytes",
+      "input": {
+        "timeout_seconds": null,
+        "max_capture_rows": 10000000,
+        "max_capture_bytes": 0
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.MigrationOptions:max_capture_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_capture_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-MigrationOptions-max_capture_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "MigrationOptions",
+      "field": "max_capture_bytes",
+      "input": {
+        "timeout_seconds": null,
+        "max_capture_rows": 10000000,
+        "max_capture_bytes": -1
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.MigrationOptions:max_capture_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_capture_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-MigrationOptions-max_capture_rows-2",
+      "driver": "metadata_boundary",
+      "model": "MigrationOptions",
+      "field": "max_capture_rows",
+      "input": {
+        "timeout_seconds": null,
+        "max_capture_rows": 0,
+        "max_capture_bytes": 536870912
+      },
+      "expected": {
+        "admitted": true,
+        "value": 0,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.MigrationOptions:max_capture_rows:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-MigrationOptions-max_capture_rows-3",
+      "driver": "metadata_boundary",
+      "model": "MigrationOptions",
+      "field": "max_capture_rows",
+      "input": {
+        "timeout_seconds": null,
+        "max_capture_rows": -1,
+        "max_capture_bytes": 536870912
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.MigrationOptions:max_capture_rows:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_capture_rows"
+            ],
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReductionOptions-max_evaluations-2",
+      "driver": "metadata_boundary",
+      "model": "ReductionOptions",
+      "field": "max_evaluations",
+      "input": {
+        "max_evaluations": 0,
+        "timeout_seconds": 60.0,
+        "confirmations": 2,
+        "max_input_rows": 100000
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReductionOptions:max_evaluations:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_evaluations"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReductionOptions-max_evaluations-3",
+      "driver": "metadata_boundary",
+      "model": "ReductionOptions",
+      "field": "max_evaluations",
+      "input": {
+        "max_evaluations": -1,
+        "timeout_seconds": 60.0,
+        "confirmations": 2,
+        "max_input_rows": 100000
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReductionOptions:max_evaluations:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_evaluations"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReductionOptions-timeout_seconds-2",
+      "driver": "metadata_boundary",
+      "model": "ReductionOptions",
+      "field": "timeout_seconds",
+      "input": {
+        "max_evaluations": 100,
+        "timeout_seconds": 0,
+        "confirmations": 2,
+        "max_input_rows": 100000
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReductionOptions:timeout_seconds:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "timeout_seconds"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReductionOptions-timeout_seconds-3",
+      "driver": "metadata_boundary",
+      "model": "ReductionOptions",
+      "field": "timeout_seconds",
+      "input": {
+        "max_evaluations": 100,
+        "timeout_seconds": -1,
+        "confirmations": 2,
+        "max_input_rows": 100000
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReductionOptions:timeout_seconds:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "timeout_seconds"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReductionOptions-max_input_rows-2",
+      "driver": "metadata_boundary",
+      "model": "ReductionOptions",
+      "field": "max_input_rows",
+      "input": {
+        "max_evaluations": 100,
+        "timeout_seconds": 60.0,
+        "confirmations": 2,
+        "max_input_rows": 0
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReductionOptions:max_input_rows:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_input_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReductionOptions-max_input_rows-3",
+      "driver": "metadata_boundary",
+      "model": "ReductionOptions",
+      "field": "max_input_rows",
+      "input": {
+        "max_evaluations": 100,
+        "timeout_seconds": 60.0,
+        "confirmations": 2,
+        "max_input_rows": -1
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReductionOptions:max_input_rows:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_input_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-RuleOptions-max_rows-2",
+      "driver": "metadata_boundary",
+      "model": "RuleOptions",
+      "field": "max_rows",
+      "input": {
+        "max_rows": 0,
+        "max_artifact_bytes": 134217728,
+        "max_evidence_bytes": 67108864,
+        "max_work": 10000000,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.RuleOptions:max_rows:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-RuleOptions-max_rows-3",
+      "driver": "metadata_boundary",
+      "model": "RuleOptions",
+      "field": "max_rows",
+      "input": {
+        "max_rows": -1,
+        "max_artifact_bytes": 134217728,
+        "max_evidence_bytes": 67108864,
+        "max_work": 10000000,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.RuleOptions:max_rows:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-RuleOptions-max_artifact_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "RuleOptions",
+      "field": "max_artifact_bytes",
+      "input": {
+        "max_rows": 1000000,
+        "max_artifact_bytes": 0,
+        "max_evidence_bytes": 67108864,
+        "max_work": 10000000,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.RuleOptions:max_artifact_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_artifact_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-RuleOptions-max_artifact_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "RuleOptions",
+      "field": "max_artifact_bytes",
+      "input": {
+        "max_rows": 1000000,
+        "max_artifact_bytes": -1,
+        "max_evidence_bytes": 67108864,
+        "max_work": 10000000,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.RuleOptions:max_artifact_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_artifact_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-RuleOptions-max_evidence_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "RuleOptions",
+      "field": "max_evidence_bytes",
+      "input": {
+        "max_rows": 1000000,
+        "max_artifact_bytes": 134217728,
+        "max_evidence_bytes": 0,
+        "max_work": 10000000,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.RuleOptions:max_evidence_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_evidence_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-RuleOptions-max_evidence_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "RuleOptions",
+      "field": "max_evidence_bytes",
+      "input": {
+        "max_rows": 1000000,
+        "max_artifact_bytes": 134217728,
+        "max_evidence_bytes": -1,
+        "max_work": 10000000,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.RuleOptions:max_evidence_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_evidence_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-RuleOptions-max_work-2",
+      "driver": "metadata_boundary",
+      "model": "RuleOptions",
+      "field": "max_work",
+      "input": {
+        "max_rows": 1000000,
+        "max_artifact_bytes": 134217728,
+        "max_evidence_bytes": 67108864,
+        "max_work": 0,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.RuleOptions:max_work:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_work"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-RuleOptions-max_work-3",
+      "driver": "metadata_boundary",
+      "model": "RuleOptions",
+      "field": "max_work",
+      "input": {
+        "max_rows": 1000000,
+        "max_artifact_bytes": 134217728,
+        "max_evidence_bytes": 67108864,
+        "max_work": -1,
+        "max_examples": 20,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.RuleOptions:max_work:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_work"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-RuleOptions-timeout_seconds-2",
+      "driver": "metadata_boundary",
+      "model": "RuleOptions",
+      "field": "timeout_seconds",
+      "input": {
+        "max_rows": 1000000,
+        "max_artifact_bytes": 134217728,
+        "max_evidence_bytes": 67108864,
+        "max_work": 10000000,
+        "max_examples": 20,
+        "timeout_seconds": 0
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.RuleOptions:timeout_seconds:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "timeout_seconds"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-RuleOptions-timeout_seconds-3",
+      "driver": "metadata_boundary",
+      "model": "RuleOptions",
+      "field": "timeout_seconds",
+      "input": {
+        "max_rows": 1000000,
+        "max_artifact_bytes": 134217728,
+        "max_evidence_bytes": 67108864,
+        "max_work": 10000000,
+        "max_examples": 20,
+        "timeout_seconds": -1
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.RuleOptions:timeout_seconds:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "timeout_seconds"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-RuleOptions-max_examples-2",
+      "driver": "metadata_boundary",
+      "model": "RuleOptions",
+      "field": "max_examples",
+      "input": {
+        "max_rows": 1000000,
+        "max_artifact_bytes": 134217728,
+        "max_evidence_bytes": 67108864,
+        "max_work": 10000000,
+        "max_examples": 0,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": true,
+        "value": 0,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.RuleOptions:max_examples:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-RuleOptions-max_examples-3",
+      "driver": "metadata_boundary",
+      "model": "RuleOptions",
+      "field": "max_examples",
+      "input": {
+        "max_rows": 1000000,
+        "max_artifact_bytes": 134217728,
+        "max_evidence_bytes": 67108864,
+        "max_work": 10000000,
+        "max_examples": -1,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.RuleOptions:max_examples:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_examples"
+            ],
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ProfileOptions-max_rows-2",
+      "driver": "metadata_boundary",
+      "model": "ProfileOptions",
+      "field": "max_rows",
+      "input": {
+        "max_rows": 0,
+        "max_artifact_bytes": 134217728,
+        "max_work": 10000000,
+        "max_distinct": 1000000,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ProfileOptions:max_rows:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ProfileOptions-max_rows-3",
+      "driver": "metadata_boundary",
+      "model": "ProfileOptions",
+      "field": "max_rows",
+      "input": {
+        "max_rows": -1,
+        "max_artifact_bytes": 134217728,
+        "max_work": 10000000,
+        "max_distinct": 1000000,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ProfileOptions:max_rows:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_rows"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ProfileOptions-max_artifact_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "ProfileOptions",
+      "field": "max_artifact_bytes",
+      "input": {
+        "max_rows": 1,
+        "max_artifact_bytes": 0,
+        "max_work": 10000000,
+        "max_distinct": 1000000,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ProfileOptions:max_artifact_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_artifact_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ProfileOptions-max_artifact_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "ProfileOptions",
+      "field": "max_artifact_bytes",
+      "input": {
+        "max_rows": 1,
+        "max_artifact_bytes": -1,
+        "max_work": 10000000,
+        "max_distinct": 1000000,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ProfileOptions:max_artifact_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_artifact_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ProfileOptions-max_work-2",
+      "driver": "metadata_boundary",
+      "model": "ProfileOptions",
+      "field": "max_work",
+      "input": {
+        "max_rows": 1,
+        "max_artifact_bytes": 134217728,
+        "max_work": 0,
+        "max_distinct": 1000000,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ProfileOptions:max_work:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_work"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ProfileOptions-max_work-3",
+      "driver": "metadata_boundary",
+      "model": "ProfileOptions",
+      "field": "max_work",
+      "input": {
+        "max_rows": 1,
+        "max_artifact_bytes": 134217728,
+        "max_work": -1,
+        "max_distinct": 1000000,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ProfileOptions:max_work:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_work"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ProfileOptions-max_distinct-2",
+      "driver": "metadata_boundary",
+      "model": "ProfileOptions",
+      "field": "max_distinct",
+      "input": {
+        "max_rows": 1,
+        "max_artifact_bytes": 134217728,
+        "max_work": 10000000,
+        "max_distinct": 0,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ProfileOptions:max_distinct:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_distinct"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ProfileOptions-max_distinct-3",
+      "driver": "metadata_boundary",
+      "model": "ProfileOptions",
+      "field": "max_distinct",
+      "input": {
+        "max_rows": 1,
+        "max_artifact_bytes": 134217728,
+        "max_work": 10000000,
+        "max_distinct": -1,
+        "timeout_seconds": null
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ProfileOptions:max_distinct:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_distinct"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ProfileOptions-timeout_seconds-2",
+      "driver": "metadata_boundary",
+      "model": "ProfileOptions",
+      "field": "timeout_seconds",
+      "input": {
+        "max_rows": 1,
+        "max_artifact_bytes": 134217728,
+        "max_work": 10000000,
+        "max_distinct": 1000000,
+        "timeout_seconds": 0
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ProfileOptions:timeout_seconds:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "timeout_seconds"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ProfileOptions-timeout_seconds-3",
+      "driver": "metadata_boundary",
+      "model": "ProfileOptions",
+      "field": "timeout_seconds",
+      "input": {
+        "max_rows": 1,
+        "max_artifact_bytes": 134217728,
+        "max_work": 10000000,
+        "max_distinct": 1000000,
+        "timeout_seconds": -1
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ProfileOptions:timeout_seconds:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "timeout_seconds"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_report_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_report_bytes",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 20,
+        "max_value_chars": 4096,
+        "max_report_bytes": 0,
+        "max_evidence_bytes": 67108864,
+        "max_records": 100000,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_report_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_report_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_report_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_report_bytes",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 20,
+        "max_value_chars": 4096,
+        "max_report_bytes": -1,
+        "max_evidence_bytes": 67108864,
+        "max_records": 100000,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_report_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_report_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_evidence_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_evidence_bytes",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 20,
+        "max_value_chars": 4096,
+        "max_report_bytes": 2097152,
+        "max_evidence_bytes": 0,
+        "max_records": 100000,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_evidence_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_evidence_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_evidence_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_evidence_bytes",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 20,
+        "max_value_chars": 4096,
+        "max_report_bytes": 2097152,
+        "max_evidence_bytes": -1,
+        "max_records": 100000,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_evidence_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_evidence_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_records-2",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_records",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 20,
+        "max_value_chars": 4096,
+        "max_report_bytes": 2097152,
+        "max_evidence_bytes": 67108864,
+        "max_records": 0,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_records:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": "le",
+        "upper": 1000000,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_records"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_records-3",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_records",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 20,
+        "max_value_chars": 4096,
+        "max_report_bytes": 2097152,
+        "max_evidence_bytes": 67108864,
+        "max_records": -1,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_records:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": "le",
+        "upper": 1000000,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_records"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_records-4",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_records",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 20,
+        "max_value_chars": 4096,
+        "max_report_bytes": 2097152,
+        "max_evidence_bytes": 67108864,
+        "max_records": 1000000,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": true,
+        "value": 1000000,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_records:class:4"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": "le",
+        "upper": 1000000,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 1000000
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_records-5",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_records",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 20,
+        "max_value_chars": 4096,
+        "max_report_bytes": 2097152,
+        "max_evidence_bytes": 67108864,
+        "max_records": 1000001,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": 1000001,
+        "error_code": "less_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_records:class:5"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": "le",
+        "upper": 1000000,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_records"
+            ],
+            "type": "less_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_examples-2",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_examples",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 0,
+        "max_value_chars": 4096,
+        "max_report_bytes": 2097152,
+        "max_evidence_bytes": 67108864,
+        "max_records": 100000,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": true,
+        "value": 0,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_examples:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": "le",
+        "upper": 10000,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_examples-3",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_examples",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": -1,
+        "max_value_chars": 4096,
+        "max_report_bytes": 2097152,
+        "max_evidence_bytes": 67108864,
+        "max_records": 100000,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_examples:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": "le",
+        "upper": 10000,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_examples"
+            ],
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_examples-4",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_examples",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 10000,
+        "max_value_chars": 4096,
+        "max_report_bytes": 2097152,
+        "max_evidence_bytes": 67108864,
+        "max_records": 100000,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": true,
+        "value": 10000,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_examples:class:4"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": "le",
+        "upper": 10000,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 10000
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_examples-5",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_examples",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 10001,
+        "max_value_chars": 4096,
+        "max_report_bytes": 2097152,
+        "max_evidence_bytes": 67108864,
+        "max_records": 100000,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": 10001,
+        "error_code": "less_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_examples:class:5"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": "le",
+        "upper": 10000,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_examples"
+            ],
+            "type": "less_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportViewPolicy-max_value_chars-2",
+      "driver": "metadata_boundary",
+      "model": "ReportViewPolicy",
+      "field": "max_value_chars",
+      "input": {
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redacted_column_count": 0,
+        "max_examples": 20,
+        "max_value_chars": 0,
+        "max_report_bytes": 2097152,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReportViewPolicy:max_value_chars:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_value_chars"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportViewPolicy-max_value_chars-3",
+      "driver": "metadata_boundary",
+      "model": "ReportViewPolicy",
+      "field": "max_value_chars",
+      "input": {
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redacted_column_count": 0,
+        "max_examples": 20,
+        "max_value_chars": -1,
+        "max_report_bytes": 2097152,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReportViewPolicy:max_value_chars:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_value_chars"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportViewPolicy-max_report_bytes-2",
+      "driver": "metadata_boundary",
+      "model": "ReportViewPolicy",
+      "field": "max_report_bytes",
+      "input": {
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redacted_column_count": 0,
+        "max_examples": 20,
+        "max_value_chars": 4096,
+        "max_report_bytes": 0,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReportViewPolicy:max_report_bytes:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_report_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportViewPolicy-max_report_bytes-3",
+      "driver": "metadata_boundary",
+      "model": "ReportViewPolicy",
+      "field": "max_report_bytes",
+      "input": {
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redacted_column_count": 0,
+        "max_examples": 20,
+        "max_value_chars": 4096,
+        "max_report_bytes": -1,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than"
+      },
+      "obligations": [
+        "field:equiframe.ReportViewPolicy:max_report_bytes:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "gt",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_report_bytes"
+            ],
+            "type": "greater_than"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportViewPolicy-redacted_column_count-2",
+      "driver": "metadata_boundary",
+      "model": "ReportViewPolicy",
+      "field": "redacted_column_count",
+      "input": {
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redacted_column_count": 0,
+        "max_examples": 20,
+        "max_value_chars": 4096,
+        "max_report_bytes": 2097152,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": true,
+        "value": 0,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.ReportViewPolicy:redacted_column_count:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-ReportViewPolicy-redacted_column_count-3",
+      "driver": "metadata_boundary",
+      "model": "ReportViewPolicy",
+      "field": "redacted_column_count",
+      "input": {
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redacted_column_count": -1,
+        "max_examples": 20,
+        "max_value_chars": 4096,
+        "max_report_bytes": 2097152,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.ReportViewPolicy:redacted_column_count:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "redacted_column_count"
+            ],
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportViewPolicy-max_examples-2",
+      "driver": "metadata_boundary",
+      "model": "ReportViewPolicy",
+      "field": "max_examples",
+      "input": {
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redacted_column_count": 0,
+        "max_examples": 0,
+        "max_value_chars": 4096,
+        "max_report_bytes": 2097152,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": true,
+        "value": 0,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.ReportViewPolicy:max_examples:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-ReportViewPolicy-max_examples-3",
+      "driver": "metadata_boundary",
+      "model": "ReportViewPolicy",
+      "field": "max_examples",
+      "input": {
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redacted_column_count": 0,
+        "max_examples": -1,
+        "max_value_chars": 4096,
+        "max_report_bytes": 2097152,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.ReportViewPolicy:max_examples:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": null,
+        "upper": null,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_examples"
+            ],
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-IsolationForestConfig-random_state-2",
+      "driver": "metadata_boundary",
+      "model": "IsolationForestConfig",
+      "field": "random_state",
+      "input": {
+        "random_state": 0,
+        "n_estimators": 17,
+        "max_samples": 16
+      },
+      "expected": {
+        "admitted": true,
+        "value": 0,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.IsolationForestConfig:random_state:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": "le",
+        "upper": 4294967295,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-IsolationForestConfig-random_state-3",
+      "driver": "metadata_boundary",
+      "model": "IsolationForestConfig",
+      "field": "random_state",
+      "input": {
+        "random_state": -1,
+        "n_estimators": 17,
+        "max_samples": 16
+      },
+      "expected": {
+        "admitted": false,
+        "value": -1,
+        "error_code": "greater_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.IsolationForestConfig:random_state:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": "le",
+        "upper": 4294967295,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "random_state"
+            ],
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-IsolationForestConfig-random_state-4",
+      "driver": "metadata_boundary",
+      "model": "IsolationForestConfig",
+      "field": "random_state",
+      "input": {
+        "random_state": 4294967295,
+        "n_estimators": 17,
+        "max_samples": 16
+      },
+      "expected": {
+        "admitted": true,
+        "value": 4294967295,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.IsolationForestConfig:random_state:class:4"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": "le",
+        "upper": 4294967295,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 4294967295
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-IsolationForestConfig-random_state-5",
+      "driver": "metadata_boundary",
+      "model": "IsolationForestConfig",
+      "field": "random_state",
+      "input": {
+        "random_state": 4294967296,
+        "n_estimators": 17,
+        "max_samples": 16
+      },
+      "expected": {
+        "admitted": false,
+        "value": 4294967296,
+        "error_code": "less_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.IsolationForestConfig:random_state:class:5"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 0,
+        "upper_constraint": "le",
+        "upper": 4294967295,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "random_state"
+            ],
+            "type": "less_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReductionOptions-confirmations-2",
+      "driver": "metadata_boundary",
+      "model": "ReductionOptions",
+      "field": "confirmations",
+      "input": {
+        "max_evaluations": 100,
+        "timeout_seconds": 60.0,
+        "confirmations": 1,
+        "max_input_rows": 100000
+      },
+      "expected": {
+        "admitted": true,
+        "value": 1,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.ReductionOptions:confirmations:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 1,
+        "upper_constraint": "le",
+        "upper": 5,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 1
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-ReductionOptions-confirmations-3",
+      "driver": "metadata_boundary",
+      "model": "ReductionOptions",
+      "field": "confirmations",
+      "input": {
+        "max_evaluations": 100,
+        "timeout_seconds": 60.0,
+        "confirmations": 0,
+        "max_input_rows": 100000
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.ReductionOptions:confirmations:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 1,
+        "upper_constraint": "le",
+        "upper": 5,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "confirmations"
+            ],
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReductionOptions-confirmations-4",
+      "driver": "metadata_boundary",
+      "model": "ReductionOptions",
+      "field": "confirmations",
+      "input": {
+        "max_evaluations": 100,
+        "timeout_seconds": 60.0,
+        "confirmations": 5,
+        "max_input_rows": 100000
+      },
+      "expected": {
+        "admitted": true,
+        "value": 5,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.ReductionOptions:confirmations:class:4"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 1,
+        "upper_constraint": "le",
+        "upper": 5,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 5
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-ReductionOptions-confirmations-5",
+      "driver": "metadata_boundary",
+      "model": "ReductionOptions",
+      "field": "confirmations",
+      "input": {
+        "max_evaluations": 100,
+        "timeout_seconds": 60.0,
+        "confirmations": 6,
+        "max_input_rows": 100000
+      },
+      "expected": {
+        "admitted": false,
+        "value": 6,
+        "error_code": "less_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.ReductionOptions:confirmations:class:5"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 1,
+        "upper_constraint": "le",
+        "upper": 5,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "confirmations"
+            ],
+            "type": "less_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_value_chars-2",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_value_chars",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 20,
+        "max_value_chars": 16,
+        "max_report_bytes": 2097152,
+        "max_evidence_bytes": 67108864,
+        "max_records": 100000,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": true,
+        "value": 16,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_value_chars:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 16,
+        "upper_constraint": "le",
+        "upper": 1048576,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 16
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_value_chars-3",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_value_chars",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 20,
+        "max_value_chars": 15,
+        "max_report_bytes": 2097152,
+        "max_evidence_bytes": 67108864,
+        "max_records": 100000,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": 15,
+        "error_code": "greater_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_value_chars:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 16,
+        "upper_constraint": "le",
+        "upper": 1048576,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_value_chars"
+            ],
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_value_chars-4",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_value_chars",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 20,
+        "max_value_chars": 1048576,
+        "max_report_bytes": 2097152,
+        "max_evidence_bytes": 67108864,
+        "max_records": 100000,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": true,
+        "value": 1048576,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_value_chars:class:4"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 16,
+        "upper_constraint": "le",
+        "upper": 1048576,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 1048576
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-ReportOptions-max_value_chars-5",
+      "driver": "metadata_boundary",
+      "model": "ReportOptions",
+      "field": "max_value_chars",
+      "input": {
+        "schema_version": "1.0",
+        "mode": "diagnostic",
+        "include_values": false,
+        "include_metadata": false,
+        "redact_columns": [],
+        "max_examples": 20,
+        "max_value_chars": 1048577,
+        "max_report_bytes": 2097152,
+        "max_evidence_bytes": 67108864,
+        "max_records": 100000,
+        "require_exhaustive": false
+      },
+      "expected": {
+        "admitted": false,
+        "value": 1048577,
+        "error_code": "less_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.ReportOptions:max_value_chars:class:5"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 16,
+        "upper_constraint": "le",
+        "upper": 1048576,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_value_chars"
+            ],
+            "type": "less_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-IsolationForestConfig-n_estimators-2",
+      "driver": "metadata_boundary",
+      "model": "IsolationForestConfig",
+      "field": "n_estimators",
+      "input": {
+        "random_state": 7,
+        "n_estimators": 1,
+        "max_samples": 16
+      },
+      "expected": {
+        "admitted": true,
+        "value": 1,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.IsolationForestConfig:n_estimators:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 1,
+        "upper_constraint": "le",
+        "upper": 2048,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 1
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-IsolationForestConfig-n_estimators-3",
+      "driver": "metadata_boundary",
+      "model": "IsolationForestConfig",
+      "field": "n_estimators",
+      "input": {
+        "random_state": 7,
+        "n_estimators": 0,
+        "max_samples": 16
+      },
+      "expected": {
+        "admitted": false,
+        "value": 0,
+        "error_code": "greater_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.IsolationForestConfig:n_estimators:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 1,
+        "upper_constraint": "le",
+        "upper": 2048,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "n_estimators"
+            ],
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-IsolationForestConfig-n_estimators-4",
+      "driver": "metadata_boundary",
+      "model": "IsolationForestConfig",
+      "field": "n_estimators",
+      "input": {
+        "random_state": 7,
+        "n_estimators": 2048,
+        "max_samples": 16
+      },
+      "expected": {
+        "admitted": true,
+        "value": 2048,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.IsolationForestConfig:n_estimators:class:4"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 1,
+        "upper_constraint": "le",
+        "upper": 2048,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 2048
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-IsolationForestConfig-n_estimators-5",
+      "driver": "metadata_boundary",
+      "model": "IsolationForestConfig",
+      "field": "n_estimators",
+      "input": {
+        "random_state": 7,
+        "n_estimators": 2049,
+        "max_samples": 16
+      },
+      "expected": {
+        "admitted": false,
+        "value": 2049,
+        "error_code": "less_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.IsolationForestConfig:n_estimators:class:5"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 1,
+        "upper_constraint": "le",
+        "upper": 2048,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "n_estimators"
+            ],
+            "type": "less_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-IsolationForestConfig-max_samples-2",
+      "driver": "metadata_boundary",
+      "model": "IsolationForestConfig",
+      "field": "max_samples",
+      "input": {
+        "random_state": 7,
+        "n_estimators": 17,
+        "max_samples": 2
+      },
+      "expected": {
+        "admitted": true,
+        "value": 2,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.IsolationForestConfig:max_samples:class:2"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 2,
+        "upper_constraint": "le",
+        "upper": 4096,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 2
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-IsolationForestConfig-max_samples-3",
+      "driver": "metadata_boundary",
+      "model": "IsolationForestConfig",
+      "field": "max_samples",
+      "input": {
+        "random_state": 7,
+        "n_estimators": 17,
+        "max_samples": 1
+      },
+      "expected": {
+        "admitted": false,
+        "value": 1,
+        "error_code": "greater_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.IsolationForestConfig:max_samples:class:3"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 2,
+        "upper_constraint": "le",
+        "upper": 4096,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_samples"
+            ],
+            "type": "greater_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    },
+    {
+      "case_id": "boundary-IsolationForestConfig-max_samples-4",
+      "driver": "metadata_boundary",
+      "model": "IsolationForestConfig",
+      "field": "max_samples",
+      "input": {
+        "random_state": 7,
+        "n_estimators": 17,
+        "max_samples": 4096
+      },
+      "expected": {
+        "admitted": true,
+        "value": 4096,
+        "error_code": null
+      },
+      "obligations": [
+        "field:equiframe.IsolationForestConfig:max_samples:class:4"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 2,
+        "upper_constraint": "le",
+        "upper": 4096,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": true,
+        "value": 4096
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": "boundary-IsolationForestConfig-max_samples-5",
+      "driver": "metadata_boundary",
+      "model": "IsolationForestConfig",
+      "field": "max_samples",
+      "input": {
+        "random_state": 7,
+        "n_estimators": 17,
+        "max_samples": 4097
+      },
+      "expected": {
+        "admitted": false,
+        "value": 4097,
+        "error_code": "less_than_equal"
+      },
+      "obligations": [
+        "field:equiframe.IsolationForestConfig:max_samples:class:5"
+      ],
+      "basis": {
+        "lower_constraint": "ge",
+        "lower": 2,
+        "upper_constraint": "le",
+        "upper": 4096,
+        "scope": "Declared numeric metadata only; no engine effects inferred"
+      },
+      "observed": {
+        "admitted": false,
+        "errors": [
+          {
+            "loc": [
+              "max_samples"
+            ],
+            "type": "less_than_equal"
+          }
+        ]
+      },
+      "status": "EXPECTED_REJECTION"
+    }
+  ],
+  "limits": "146 previously NOT_RUN obligations added once: 128 numeric metadata boundaries plus 18 native/API obligations; 139 new unique cases and two regressions. Repetitions across modes, interpreters/platforms and after build-tool updates add no coverage. Not exhaustive option interactions or line coverage."
+}

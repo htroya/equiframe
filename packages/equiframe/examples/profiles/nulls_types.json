@@ -1,0 +1,57 @@
+{
+  "family": "nulls_types",
+  "feature_version": "1.0",
+  "features": [
+    {
+      "columns": [],
+      "denominator_table": null,
+      "metric": "log_filas",
+      "name": "rows",
+      "null_matches": null,
+      "right_columns": [],
+      "right_table": null,
+      "table": "result",
+      "target": null
+    },
+    {
+      "columns": [
+        "text"
+      ],
+      "denominator_table": null,
+      "metric": "tasa_nulos",
+      "name": "text_nulls",
+      "null_matches": null,
+      "right_columns": [],
+      "right_table": null,
+      "table": "result",
+      "target": null
+    },
+    {
+      "columns": [
+        "signal"
+      ],
+      "denominator_table": null,
+      "metric": "tasa_nulos",
+      "name": "signal_nulls",
+      "null_matches": null,
+      "right_columns": [],
+      "right_table": null,
+      "table": "result",
+      "target": null
+    },
+    {
+      "columns": [
+        "signal"
+      ],
+      "denominator_table": null,
+      "metric": "tasa_nan",
+      "name": "signal_nan",
+      "null_matches": null,
+      "right_columns": [],
+      "right_table": null,
+      "table": "result",
+      "target": null
+    }
+  ],
+  "schema_version": "1.0"
+}

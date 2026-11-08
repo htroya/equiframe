@@ -1,0 +1,57 @@
+{
+  "ocid": "ocds-123abc-2023-001",
+  "id": "award-001",
+  "title": "Adquisición de Medicamentos para Hospitales",
+  "description": "Contrato para la compra de medicamentos esenciales para diversos hospitales del país",
+  "status": "adjudicado",
+  "date": "2023-10-01T00:00:00Z",
+  "value": {
+    "amount": 15000.75,
+    "currency": "USD"
+  },
+  "suppliers": [
+    {
+      "id": "PROV-001",
+      "name": "Company S.A.",
+      "identifier": {
+        "scheme": "EC-RUC",
+        "id": "1234567890001"
+      },
+      "address": {
+        "street_address": "Av. Principal 123",
+        "locality": "Guayaquil",
+        "region": "Guayas",
+        "country_name": "Ecuador"
+      }
+    }
+  ],
+  "items": [
+    {
+      "id": "ITEM-001",
+      "description": "Medicamentos",
+      "quantity": 1000,
+      "unit": {
+        "name": "Und"
+      },
+      "value": {
+        "amount": 15.00,
+        "currency": "USD"
+      }
+    }
+  ],
+  "procuringEntity": {
+    "id": "ENT-001",
+    "name": "Ministerio de Salud",
+    "identifier": {
+      "scheme": "EC-RUC",
+      "id": "0987654321001"
+    },
+    "address": {
+      "street_address": "Av. Amazonas y 9 de Octubre",
+      "locality": "Quito",
+      "region": "Pichincha",
+      "country_name": "Ecuador"
+    },
+    "entityType": "Gobierno"
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "additionalProperties": false,
+  "description": "Safe integration summary preserving the original comparison verdict.\n\nInspect accepted explicitly. Comparison state failures take precedence over\nguarantee mismatches and evidence failures, which remain separately visible.\nThis document is not accepted as input to assert_equivalent.",
+  "properties": {
+    "accepted": {
+      "title": "Accepted",
+      "type": "boolean"
+    },
+    "code": {
+      "enum": [
+        "equivalent",
+        "different",
+        "not_evaluable",
+        "guarantee_mismatch",
+        "evidence_missing",
+        "evidence_corrupt",
+        "evidence_path_rejected",
+        "evidence_budget_exceeded",
+        "evidence_unreadable"
+      ],
+      "title": "Code",
+      "type": "string"
+    },
+    "complete": {
+      "title": "Complete",
+      "type": "boolean"
+    },
+    "contract_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Contract Sha256",
+      "type": "string"
+    },
+    "counts_final": {
+      "title": "Counts Final",
+      "type": "boolean"
+    },
+    "evidence_code": {
+      "anyOf": [
+        {
+          "enum": [
+            "evidence_missing",
+            "evidence_corrupt",
+            "evidence_path_rejected",
+            "evidence_budget_exceeded",
+            "evidence_unreadable"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Evidence Code"
+    },
+    "evidence_status": {
+      "enum": [
+        "not_requested",
+        "verified",
+        "missing",
+        "corrupt",
+        "path_rejected",
+        "budget_exceeded",
+        "unreadable"
+      ],
+      "title": "Evidence Status",
+      "type": "string"
+    },
+    "guarantee": {
+      "const": "observed_contract",
+      "default": "observed_contract",
+      "title": "Guarantee",
+      "type": "string"
+    },
+    "guarantee_conforms": {
+      "title": "Guarantee Conforms",
+      "type": "boolean"
+    },
+    "guarantee_failures": {
+      "items": {
+        "enum": [
+          "required_contract_sha256",
+          "required_spec_sha256",
+          "required_reference"
+        ],
+        "type": "string"
+      },
+      "title": "Guarantee Failures",
+      "type": "array"
+    },
+    "reference": {
+      "enum": [
+        "peer",
+        "expected"
+      ],
+      "title": "Reference",
+      "type": "string"
+    },
+    "safe_reason_code": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Safe Reason Code"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "const": "output_schema",
+      "default": "output_schema",
+      "title": "Scope",
+      "type": "string"
+    },
+    "spec_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Spec Sha256",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "equivalent",
+        "different",
+        "not_evaluable"
+      ],
+      "title": "State",
+      "type": "string"
+    }
+  },
+  "required": [
+    "accepted",
+    "code",
+    "state",
+    "complete",
+    "counts_final",
+    "reference",
+    "contract_sha256",
+    "spec_sha256",
+    "guarantee_conforms",
+    "guarantee_failures",
+    "evidence_status",
+    "evidence_code"
+  ],
+  "title": "EquivalenceDecision",
+  "type": "object"
+}

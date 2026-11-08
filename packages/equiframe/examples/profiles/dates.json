@@ -1,0 +1,120 @@
+{
+  "family": "dates",
+  "feature_version": "1.0",
+  "features": [
+    {
+      "columns": [],
+      "denominator_table": null,
+      "metric": "log_filas",
+      "name": "rows",
+      "null_matches": null,
+      "right_columns": [],
+      "right_table": null,
+      "table": "result",
+      "target": null
+    },
+    {
+      "columns": [
+        "day"
+      ],
+      "denominator_table": null,
+      "metric": "fechas_invalidas",
+      "name": "day_invalid",
+      "null_matches": null,
+      "right_columns": [],
+      "right_table": null,
+      "table": "result",
+      "target": {
+        "allowed_values": [
+          {
+            "kind": "date",
+            "value": "2000-02-29"
+          }
+        ],
+        "logical_type": {
+          "kind": "date"
+        },
+        "name": "day",
+        "nan_policy": null,
+        "null_policy": {
+          "justification": null,
+          "representations": [
+            "null"
+          ]
+        },
+        "nullable": false,
+        "numeric_policy": null,
+        "temporal_policy": {
+          "closed": "left",
+          "granularity": "day",
+          "kind": "date",
+          "lower": {
+            "kind": "date",
+            "value": "2000-02-01"
+          },
+          "upper": {
+            "kind": "date",
+            "value": "2000-03-01"
+          }
+        }
+      }
+    },
+    {
+      "columns": [
+        "instant"
+      ],
+      "denominator_table": null,
+      "metric": "fechas_invalidas",
+      "name": "instant_invalid",
+      "null_matches": null,
+      "right_columns": [],
+      "right_table": null,
+      "table": "result",
+      "target": {
+        "allowed_values": [
+          {
+            "kind": "timestamp",
+            "value": "2000-02-29T12:00:00.123456789-05:00",
+            "zone": "America/Guayaquil"
+          }
+        ],
+        "logical_type": {
+          "kind": "timestamp",
+          "timezone": "America/Guayaquil",
+          "unit": "ns"
+        },
+        "name": "instant",
+        "nan_policy": null,
+        "null_policy": {
+          "justification": null,
+          "representations": [
+            "null"
+          ]
+        },
+        "nullable": false,
+        "numeric_policy": null,
+        "temporal_policy": {
+          "ambiguous": "reject",
+          "closed": "both",
+          "comparison": "instant",
+          "granularity": "ns",
+          "kind": "timestamp",
+          "lower": {
+            "kind": "timestamp",
+            "value": "2000-02-29T00:00:00.000000001-05:00",
+            "zone": "America/Guayaquil"
+          },
+          "naive": "reject",
+          "nonexistent": "reject",
+          "timezone": "America/Guayaquil",
+          "upper": {
+            "kind": "timestamp",
+            "value": "2000-02-29T23:59:59.999999999-05:00",
+            "zone": "America/Guayaquil"
+          }
+        }
+      }
+    }
+  ],
+  "schema_version": "1.0"
+}

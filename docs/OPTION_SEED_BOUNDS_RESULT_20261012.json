@@ -1,0 +1,96 @@
+{
+  "additional_required": 1226,
+  "assessment_date_local": "2026-10-12",
+  "candidate": "0.12.0a13",
+  "case_uniqueness_definition": "Distinct assertion catalog identities; reused constructor fixtures remain explicit and are not new independent data.",
+  "catalog_sha256": "bea5179a99e703ef579de13373d669551e8aedffcb82f9d50d99934737d5dc52",
+  "counts": {
+    "EXPECTED_REJECTION": 3414,
+    "NOT_RUN": 2483,
+    "PASS": 2488
+  },
+  "denominator": 8385,
+  "helper_source_sha256": {
+    "option_boundary_followup.py": "56822972540c405a1a5c05315575d4b87b21e5919ee0910747c9680564ed1bff",
+    "option_operations.py": "56663cd649fd0be9234f274ffa828d7714c2e546b870fa678c9bdd919e448e60",
+    "option_public_types_followup.py": "020141dfc629c9286741e3909f24c99c862fd570b9505aec8f409955170045d7"
+  },
+  "human_review": false,
+  "new_assertion_cases": 22,
+  "new_coverage_from_replays": 0,
+  "new_independent_input_fixtures": 0,
+  "new_obligations": 42,
+  "original_fixture_case_ids": [
+    "CheckResult.construction",
+    "ColumnKeyScope.construction",
+    "Contract.construction",
+    "Deduplicate.construction",
+    "DetectorModel.construction",
+    "EngineCapabilities.construction",
+    "FeatureObservation.construction",
+    "FeatureSupport.construction",
+    "FieldMapping.construction",
+    "IngestionResult.construction",
+    "JoinCheck.construction",
+    "KeySpec.construction",
+    "NullPolicy.construction",
+    "OrderCheck.construction",
+    "ProfileFeature.construction",
+    "ProfileSpec.construction",
+    "ReducedTable.construction",
+    "ReportEvidenceManifest.construction",
+    "SignificantOrder.construction",
+    "SnapshotManifest.construction",
+    "SnapshotTable.construction",
+    "WindowMeasure.construction"
+  ],
+  "percent": 70.3875968992248,
+  "preparation_failure_preserved": "Initial plan cardinality guard expected23; reviewed list actually contains22fixtures. Failed plan log retained; no SDK credit assigned.",
+  "prior_assessment": {
+    "preserved": true,
+    "sha256": "bfa4a16a05d8382e17c313d79da3c07fbf2a3ebac6be7eeca1a1005274fec218",
+    "source": "docs/OPTION_PUBLIC_TYPES_RESULT_20261011.json"
+  },
+  "prior_verified": 5860,
+  "receipts": [
+    {
+      "environment": {
+        "machine": "AMD64",
+        "optimization": 0,
+        "python": "3.12.4",
+        "system": "Windows"
+      },
+      "private_path": "trace85_20261011/seed-bounds-normal/result.json",
+      "sha256": "54cf08ad5f0630465aade2056c7cda1b4cd4d3f1df73204e6a52b1662a2b5772"
+    },
+    {
+      "environment": {
+        "machine": "AMD64",
+        "optimization": 1,
+        "python": "3.12.4",
+        "system": "Windows"
+      },
+      "private_path": "trace85_20261011/seed-bounds-optimized/result.json",
+      "sha256": "50167f6a52b75c59f9bee159617eb38c6b2a3dcb1a7dc102c51d8256a5fa8e9b"
+    }
+  ],
+  "recorded_at_utc": "2026-10-12T05:06:46.026638+00:00",
+  "reused_original_fixtures": 22,
+  "review": {
+    "exact_boundary_guard_corrected_before_execution": true,
+    "human_review": false,
+    "reviewer": "mi_dot",
+    "selection_and_oracles_verified_before_execution": true,
+    "type": "AI_AGENT_READ_ONLY"
+  },
+  "schema": "equiframe.option-seed-boundaries-assessment.v1",
+  "scope": "Complete original literal constructor JSON:33 exact lower boundaries and9 typed members; no native operation, scientific result or additional independent input inferred.",
+  "target_met": false,
+  "target_percent": 85,
+  "target_verified": 7128,
+  "tool": "tools/option_seed_bounds_followup.py",
+  "tool_sha256": "5fe2679ea141cdfd832c5d5904d8d1a1744c9c93af39268ea82c70a0889ab46f",
+  "unique_catalog_union_cases": 5002,
+  "verified": 5902,
+  "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23"
+}

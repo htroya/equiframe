@@ -1,0 +1,185 @@
+{
+  "additional_required": 1293,
+  "candidate": "0.12.0a13",
+  "cases_each_mode": 22,
+  "catalog_sha256": "56c4cb44a57e6d36cb01c28f4e1fc0b57032194ae8a3c70cea2e8211de8517fa",
+  "counts": {
+    "EXPECTED_REJECTION": 3496,
+    "NOT_RUN": 2131,
+    "PASS": 2758
+  },
+  "custody": {
+    "bytes": 1697657,
+    "files": 20,
+    "full_readback_verified": true,
+    "private_path": "trace85_contextos_20261012.zip",
+    "sha256": "36714b617dd6bede4a59de66b9573bb5efd42c0ec6685a9ec66fe693d7dc65ed"
+  },
+  "denominator": 8385,
+  "desired_maximum_percent": 100,
+  "harness": {
+    "normal": {
+      "context_tests": 4,
+      "extra_ids": 0,
+      "private_path": "trace85_20261011/context-sercop-guards-normal-v2.xml",
+      "sercop_tests": 4,
+      "sha256": "9614770d44f2cdd88b01ded0dd4dbeb20d81d7603f337236f079c355838f1198",
+      "status": "PASS"
+    },
+    "optimized": {
+      "context_tests": 4,
+      "extra_ids": 0,
+      "private_path": "trace85_20261011/context-sercop-guards-optimized-v2.xml",
+      "sercop_tests": 4,
+      "sha256": "6b85e97663b29746307c6847cb5d8842ce3c00ba5a386417f36e916c4e0e4dc5",
+      "status": "PASS"
+    }
+  },
+  "harness_sha256": "5d3b2c18c1d90b1578b8ad223bba55c5cb00dc99af157f7d3852a145484b8e05",
+  "human_review": false,
+  "limits": [
+    "Plain class constructor parameter IDs only; no Pydantic constructor IDs are invented.",
+    "Complete model JSON fixtures must match frozen literal expectations with recursive exact types.",
+    "Constructor entry, full stored attributes, omitted binding defaults, copied mappings and actual fresh empty list factories are observed.",
+    "Native callbacks and binary/record-batch fixture factories are independently checked; target constructors do not execute ETL, rules or transports.",
+    "Explicit null earns only its finite value; SQLite tuple member None earns only its declared member ID.",
+    "Repeated ID links, optimized replays and harness tests earn no extra coverage.",
+    "Original unqualified v1 instrument and passing raw results stay preserved with zero new credit.",
+    "AI review is not human independent acceptance or scientific approval."
+  ],
+  "new_ids_by_kind": {
+    "admitted_class": 46,
+    "collection_member": 1,
+    "default": 10,
+    "explicit_finite": 9
+  },
+  "new_obligations": 66,
+  "new_verified_ids": [
+    "parameter:equiframe.CompiledPlan:check:class:0",
+    "parameter:equiframe.CompiledPlan:contract_sha256:class:0",
+    "parameter:equiframe.CompiledPlan:engine:class:0",
+    "parameter:equiframe.CompiledPlan:ir_sha256:class:0",
+    "parameter:equiframe.CompiledPlan:transformation:class:0",
+    "parameter:equiframe.CompositeDataSource:bindings:class:0",
+    "parameter:equiframe.FileInput:batch_rows:class:0",
+    "parameter:equiframe.FileInput:batch_rows:default",
+    "parameter:equiframe.FileInput:path:class:0",
+    "parameter:equiframe.FileInput:spec:class:0",
+    "parameter:equiframe.LocalDataSource:inputs:class:0",
+    "parameter:equiframe.RecordBatchInput:open_batches:class:0",
+    "parameter:equiframe.RecordBatchInput:schema:class:0",
+    "parameter:equiframe.RuleContext:cancellation:class:0",
+    "parameter:equiframe.RuleContext:contract:class:0",
+    "parameter:equiframe.RuleContext:options:class:0",
+    "parameter:equiframe.RuleContext:started:class:0",
+    "parameter:equiframe.RuleContext:tables:class:0",
+    "parameter:equiframe.RuleImplementation:evaluate:class:0",
+    "parameter:equiframe.RuleImplementation:identity:class:0",
+    "parameter:equiframe.RuleImplementation:kind:value:\"aggregate\"",
+    "parameter:equiframe.RuleImplementation:kind:value:\"cardinality\"",
+    "parameter:equiframe.RuleImplementation:kind:value:\"join\"",
+    "parameter:equiframe.RuleImplementation:kind:value:\"key\"",
+    "parameter:equiframe.RuleImplementation:kind:value:\"order\"",
+    "parameter:equiframe.RuleImplementation:kind:value:\"schema\"",
+    "parameter:equiframe.RuleImplementation:revision:class:0",
+    "parameter:equiframe.RunContext:cancellation:class:0",
+    "parameter:equiframe.RunContext:captured_inputs:class:0",
+    "parameter:equiframe.RunContext:captured_inputs:default",
+    "parameter:equiframe.RunContext:captured_output:class:0",
+    "parameter:equiframe.RunContext:captured_output:default",
+    "parameter:equiframe.RunContext:captured_output:value:null",
+    "parameter:equiframe.RunContext:deadline:class:0",
+    "parameter:equiframe.RunContext:deadline:value:null",
+    "parameter:equiframe.RunContext:directory:class:0",
+    "parameter:equiframe.RunContext:effective_configuration:class:0",
+    "parameter:equiframe.RunContext:effective_configuration:default",
+    "parameter:equiframe.RunContext:execution_id:class:0",
+    "parameter:equiframe.RunContext:plan:class:0",
+    "parameter:equiframe.RunContext:run_id:class:0",
+    "parameter:equiframe.RunContext:stage:class:0",
+    "parameter:equiframe.RunContext:stage:default",
+    "parameter:equiframe.RunContext:store:class:0",
+    "parameter:equiframe.RunContext:timings:class:0",
+    "parameter:equiframe.RunContext:timings:default",
+    "parameter:equiframe.SQLiteInput:batch_rows:class:0",
+    "parameter:equiframe.SQLiteInput:batch_rows:default",
+    "parameter:equiframe.SQLiteInput:parameters:class:0",
+    "parameter:equiframe.SQLiteInput:parameters:default",
+    "parameter:equiframe.SQLiteInput:parameters:member:0:null",
+    "parameter:equiframe.SQLiteInput:path:class:0",
+    "parameter:equiframe.SQLiteInput:query:class:0",
+    "parameter:equiframe.SQLiteInput:spec:class:0",
+    "parameter:equiframe.StreamInput:batch_rows:class:0",
+    "parameter:equiframe.StreamInput:batch_rows:default",
+    "parameter:equiframe.StreamInput:expected_sha256:class:0",
+    "parameter:equiframe.StreamInput:expected_sha256:default",
+    "parameter:equiframe.StreamInput:expected_sha256:value:null",
+    "parameter:equiframe.StreamInput:open_stream:class:0",
+    "parameter:equiframe.StreamInput:spec:class:0",
+    "parameter:equiframe.ValidatedIR:contract:class:0",
+    "parameter:equiframe.ValidatedIR:node_schemas:class:0",
+    "parameter:equiframe.ValidatedIR:output_columns:class:0",
+    "parameter:equiframe.ValidatedIR:plan:class:0",
+    "parameter:equiframe.ValidatedIR:source_tables:class:0"
+  ],
+  "percent": 74.5855694692904,
+  "previous_85_threshold": {
+    "additional_required": 874,
+    "verified": 7128
+  },
+  "prior_assessment": {
+    "preserved": true,
+    "sha256": "c5d822ec57441b122ef848bcd0a1231c6b995f15d53dfabe7449cebcbb0b2084",
+    "source": "docs/OPTION_CONSTRUCTORS_RESULT_20261012.json"
+  },
+  "prior_verified": 6188,
+  "qualification": {
+    "v1": {
+      "credit": 0,
+      "normal_sha256": "1833f5e93543167e8974940568eb750805344f8db23d1b238800a3f9643f5348",
+      "optimized_sha256": "cb810a129d485d9d60aa692c352c5813bdd860e153791457b8ce58dc48961055",
+      "reason": "Instrument lacked strict recursion through literal JSON lists in model oracles; raw passing runs and sources retained without accreditation.",
+      "tool_sha256": "bec1b3485ce204612f4ac9ca8ea7f6b45286cb8450597ef683e63b1f70f508e6"
+    },
+    "v2": {
+      "credit": 66,
+      "normal_sha256": "4a81e1aefbb4c47e152025251168af312dc5f05b05ec651f6cab4b289d9246e7",
+      "optimized_sha256": "e78f5c35e36e5e80a34f03d7db0177604f6132dd602410025bc6728a030b19ad",
+      "replay_credit": 0
+    }
+  },
+  "raw_id_links_each_mode": 108,
+  "receipts": [
+    {
+      "optimized": false,
+      "private_path": "trace85_20261011/context-constructor-normal-v2/result.json",
+      "python": "3.12.4 | packaged by Anaconda, Inc. | (main, Jun 18 2024, 15:03:56) [MSC v.1929 64 bit (AMD64)]",
+      "sha256": "4a81e1aefbb4c47e152025251168af312dc5f05b05ec651f6cab4b289d9246e7"
+    },
+    {
+      "optimized": true,
+      "private_path": "trace85_20261011/context-constructor-optimized-v2/result.json",
+      "python": "3.12.4 | packaged by Anaconda, Inc. | (main, Jun 18 2024, 15:03:56) [MSC v.1929 64 bit (AMD64)]",
+      "sha256": "e78f5c35e36e5e80a34f03d7db0177604f6132dd602410025bc6728a030b19ad"
+    }
+  ],
+  "recorded_at_utc": "2026-10-12T21:45:33.038663+00:00",
+  "replays_additional_coverage": 0,
+  "review": {
+    "human_review": false,
+    "result": "Reviewed unique union, real constructor entry, complete prior model/attribute oracles, defaults, copied mappings and list factories. Missing strict recursion through literal JSON lists was corrected and guarded; v2 receipts retain identical semantic proofs. No remaining blocking discrepancy. Eight guard tests contain four context tests and four SERCOP tests; zero extra coverage IDs.",
+    "reviewer": "mi_dot",
+    "status": "PASS",
+    "type": "AI_AGENT_READ_ONLY"
+  },
+  "schema": "equiframe.context-constructor-assessment.v1",
+  "scope": "Complete stored context attributes and real Python binding; actual copied mappings and independent list factories; explicit constructor admission/default/value/member only; no API/transport/ETL/rule or rejection inference",
+  "target_met": false,
+  "target_percent": 90,
+  "target_verified": 7547,
+  "tool": "tools/option_context_constructor_followup.py",
+  "tool_sha256": "aae9b3408565bff3f5cf8aa133742d5d9c3c341eb2e9e18d79b344d9920f7ce7",
+  "unique_new_ids": 66,
+  "verified": 6254,
+  "wheel_sha256": "c4fe192d3032ac0dcd9adf40dde46b6023e9956cd6a85bf4a74972a78ee32f23"
+}
