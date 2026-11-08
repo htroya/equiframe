@@ -1,0 +1,145 @@
+{
+  "$defs": {
+    "ComponentComparison": {
+      "additionalProperties": false,
+      "properties": {
+        "component": {
+          "enum": [
+            "configuration",
+            "splits",
+            "labels",
+            "decisions",
+            "tables"
+          ],
+          "title": "Component",
+          "type": "string"
+        },
+        "identical": {
+          "title": "Identical",
+          "type": "boolean"
+        },
+        "recorded_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Recorded Sha256",
+          "type": "string"
+        },
+        "repeated_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Repeated Sha256",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "component",
+        "recorded_sha256",
+        "repeated_sha256",
+        "identical"
+      ],
+      "title": "ComponentComparison",
+      "type": "object"
+    },
+    "ReproductionRecord": {
+      "additionalProperties": false,
+      "description": "Full declared logical payloads, immutable JSON with tagged exact quantities.\n\nTables must contain complete logical rows or verified full-content identities,\nincluding currency amounts where applicable. Counts alone cannot establish table\nequivalence; this generic record does not certify tables omitted by a caller.",
+      "properties": {
+        "configuration": {
+          "minLength": 1,
+          "title": "Configuration",
+          "type": "string"
+        },
+        "decisions": {
+          "minLength": 1,
+          "title": "Decisions",
+          "type": "string"
+        },
+        "labels": {
+          "minLength": 1,
+          "title": "Labels",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "splits": {
+          "minLength": 1,
+          "title": "Splits",
+          "type": "string"
+        },
+        "tables": {
+          "minLength": 1,
+          "title": "Tables",
+          "type": "string"
+        }
+      },
+      "required": [
+        "configuration",
+        "splits",
+        "labels",
+        "decisions",
+        "tables"
+      ],
+      "title": "ReproductionRecord",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Technical equality of all supplied content; no human attestation field.",
+  "properties": {
+    "components": {
+      "items": {
+        "$ref": "#/$defs/ComponentComparison"
+      },
+      "title": "Components",
+      "type": "array"
+    },
+    "recorded": {
+      "$ref": "#/$defs/ReproductionRecord"
+    },
+    "recorded_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Recorded Sha256",
+      "type": "string"
+    },
+    "repeated": {
+      "$ref": "#/$defs/ReproductionRecord"
+    },
+    "repeated_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Repeated Sha256",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "reproduced",
+        "different"
+      ],
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "recorded",
+    "repeated",
+    "recorded_sha256",
+    "repeated_sha256",
+    "components",
+    "status"
+  ],
+  "title": "ComparisonReceipt",
+  "type": "object"
+}

@@ -1,0 +1,37 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "left": {
+      "enum": [
+        "R",
+        "M",
+        "B",
+        "H"
+      ],
+      "title": "Left",
+      "type": "string"
+    },
+    "right": {
+      "enum": [
+        "R",
+        "M",
+        "B",
+        "H"
+      ],
+      "title": "Right",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "left",
+    "right"
+  ],
+  "title": "ContrastSpecV2",
+  "type": "object"
+}

@@ -1,0 +1,284 @@
+{
+  "$defs": {
+    "ComparisonOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "batch_rows": {
+          "default": 4096,
+          "exclusiveMinimum": 0,
+          "title": "Batch Rows",
+          "type": "integer"
+        },
+        "max_batch_bytes": {
+          "default": 67108864,
+          "exclusiveMinimum": 0,
+          "title": "Max Batch Bytes",
+          "type": "integer"
+        },
+        "max_disk_bytes": {
+          "default": 4294967296,
+          "exclusiveMinimum": 0,
+          "title": "Max Disk Bytes",
+          "type": "integer"
+        },
+        "max_evidence_bytes": {
+          "default": 536870912,
+          "exclusiveMinimum": 0,
+          "title": "Max Evidence Bytes",
+          "type": "integer"
+        },
+        "max_examples": {
+          "default": 20,
+          "minimum": 0,
+          "title": "Max Examples",
+          "type": "integer"
+        },
+        "max_matching_bytes": {
+          "default": 33554432,
+          "exclusiveMinimum": 0,
+          "title": "Max Matching Bytes",
+          "type": "integer"
+        },
+        "max_matching_rows": {
+          "default": 2000,
+          "exclusiveMinimum": 0,
+          "title": "Max Matching Rows",
+          "type": "integer"
+        },
+        "max_numeric_digits": {
+          "default": 4096,
+          "exclusiveMinimum": 0,
+          "title": "Max Numeric Digits",
+          "type": "integer"
+        },
+        "max_pair_checks": {
+          "default": 2000000,
+          "exclusiveMinimum": 0,
+          "title": "Max Pair Checks",
+          "type": "integer"
+        },
+        "max_row_bytes": {
+          "default": 1048576,
+          "exclusiveMinimum": 0,
+          "title": "Max Row Bytes",
+          "type": "integer"
+        },
+        "max_rows": {
+          "default": 10000000,
+          "exclusiveMinimum": 0,
+          "title": "Max Rows",
+          "type": "integer"
+        },
+        "max_work": {
+          "default": 100000000,
+          "exclusiveMinimum": 0,
+          "title": "Max Work",
+          "type": "integer"
+        },
+        "partitions": {
+          "default": 16,
+          "maximum": 4096,
+          "minimum": 1,
+          "title": "Partitions",
+          "type": "integer"
+        },
+        "sqlite_cache_kib": {
+          "default": 4096,
+          "exclusiveMinimum": 0,
+          "title": "Sqlite Cache Kib",
+          "type": "integer"
+        },
+        "timeout_seconds": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timeout Seconds"
+        }
+      },
+      "title": "ComparisonOptions",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Deterministic bounded synthetic integers/text/NULL, without detector labels.",
+  "properties": {
+    "alignment": {
+      "default": "multiset",
+      "enum": [
+        "keyed",
+        "multiset"
+      ],
+      "title": "Alignment",
+      "type": "string"
+    },
+    "batch_rows": {
+      "default": 4096,
+      "maximum": 65536,
+      "minimum": 1,
+      "title": "Batch Rows",
+      "type": "integer"
+    },
+    "cardinality": {
+      "default": 1000,
+      "maximum": 1000000,
+      "minimum": 1,
+      "title": "Cardinality",
+      "type": "integer"
+    },
+    "case_id": {
+      "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "comparison_options": {
+      "$ref": "#/$defs/ComparisonOptions",
+      "default": {
+        "batch_rows": 4096,
+        "max_batch_bytes": 67108864,
+        "max_disk_bytes": 4294967296,
+        "max_evidence_bytes": 536870912,
+        "max_examples": 20,
+        "max_matching_bytes": 33554432,
+        "max_matching_rows": 2000,
+        "max_numeric_digits": 4096,
+        "max_pair_checks": 2000000,
+        "max_row_bytes": 1048576,
+        "max_rows": 10000000,
+        "max_work": 100000000,
+        "partitions": 16,
+        "sqlite_cache_kib": 4096,
+        "timeout_seconds": null
+      }
+    },
+    "concurrent_loads": {
+      "default": "not controlled; record other known workloads separately",
+      "minLength": 1,
+      "title": "Concurrent Loads",
+      "type": "string"
+    },
+    "difference_every": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Difference Every"
+    },
+    "difference_last": {
+      "default": false,
+      "title": "Difference Last",
+      "type": "boolean"
+    },
+    "disk_budget_bytes": {
+      "default": 2147483648,
+      "maximum": 8589934592,
+      "minimum": 1048576,
+      "title": "Disk Budget Bytes",
+      "type": "integer"
+    },
+    "distinct_rows": {
+      "anyOf": [
+        {
+          "maximum": 1000000,
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Distinct Rows"
+    },
+    "null_every": {
+      "anyOf": [
+        {
+          "minimum": 2,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Null Every"
+    },
+    "repetitions": {
+      "default": 3,
+      "maximum": 10,
+      "minimum": 2,
+      "title": "Repetitions",
+      "type": "integer"
+    },
+    "rows": {
+      "default": 1000,
+      "maximum": 1000000,
+      "minimum": 1,
+      "title": "Rows",
+      "type": "integer"
+    },
+    "rss_budget_bytes": {
+      "default": 1073741824,
+      "maximum": 8589934592,
+      "minimum": 16777216,
+      "title": "Rss Budget Bytes",
+      "type": "integer"
+    },
+    "run_baselines": {
+      "default": true,
+      "title": "Run Baselines",
+      "type": "boolean"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "skew_percent": {
+      "default": 0,
+      "maximum": 100,
+      "minimum": 0,
+      "title": "Skew Percent",
+      "type": "integer"
+    },
+    "text_max_length": {
+      "default": 32,
+      "maximum": 1024,
+      "minimum": 1,
+      "title": "Text Max Length",
+      "type": "integer"
+    },
+    "timeout_seconds": {
+      "default": 300.0,
+      "exclusiveMinimum": 0,
+      "maximum": 3600,
+      "title": "Timeout Seconds",
+      "type": "number"
+    },
+    "width": {
+      "default": 2,
+      "maximum": 32,
+      "minimum": 2,
+      "title": "Width",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "case_id"
+  ],
+  "title": "ScaleSpec",
+  "type": "object"
+}

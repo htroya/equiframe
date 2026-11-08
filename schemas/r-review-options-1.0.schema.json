@@ -1,0 +1,38 @@
+{
+  "additionalProperties": false,
+  "description": "Explicit local executable and cooperative capture/process budgets.\n\nR must already be installed. This API never installs R or any R package.\nByte limits cover captures and the generated transport, not hard process RSS.",
+  "properties": {
+    "max_bytes": {
+      "default": 67108864,
+      "exclusiveMinimum": 0,
+      "title": "Max Bytes",
+      "type": "integer"
+    },
+    "max_columns": {
+      "default": 256,
+      "exclusiveMinimum": 0,
+      "title": "Max Columns",
+      "type": "integer"
+    },
+    "max_rows": {
+      "default": 100000,
+      "exclusiveMinimum": 0,
+      "title": "Max Rows",
+      "type": "integer"
+    },
+    "rscript": {
+      "default": "Rscript",
+      "minLength": 1,
+      "title": "Rscript",
+      "type": "string"
+    },
+    "timeout_seconds": {
+      "default": 30.0,
+      "exclusiveMinimum": 0,
+      "title": "Timeout Seconds",
+      "type": "number"
+    }
+  },
+  "title": "RReviewOptions",
+  "type": "object"
+}

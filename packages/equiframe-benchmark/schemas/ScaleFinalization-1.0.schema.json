@@ -1,0 +1,59 @@
+{
+  "$defs": {
+    "EvidenceFile": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "size_bytes"
+      ],
+      "title": "EvidenceFile",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "complete": {
+      "title": "Complete",
+      "type": "boolean"
+    },
+    "protocol": {
+      "const": "atomic_manifest_after_child_exit_and_verified_inventory",
+      "default": "atomic_manifest_after_child_exit_and_verified_inventory",
+      "title": "Protocol",
+      "type": "string"
+    },
+    "result": {
+      "$ref": "#/$defs/EvidenceFile"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result",
+    "complete"
+  ],
+  "title": "ScaleFinalization",
+  "type": "object"
+}

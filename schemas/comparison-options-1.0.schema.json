@@ -1,0 +1,105 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "batch_rows": {
+      "default": 4096,
+      "exclusiveMinimum": 0,
+      "title": "Batch Rows",
+      "type": "integer"
+    },
+    "max_batch_bytes": {
+      "default": 67108864,
+      "exclusiveMinimum": 0,
+      "title": "Max Batch Bytes",
+      "type": "integer"
+    },
+    "max_disk_bytes": {
+      "default": 4294967296,
+      "exclusiveMinimum": 0,
+      "title": "Max Disk Bytes",
+      "type": "integer"
+    },
+    "max_evidence_bytes": {
+      "default": 536870912,
+      "exclusiveMinimum": 0,
+      "title": "Max Evidence Bytes",
+      "type": "integer"
+    },
+    "max_examples": {
+      "default": 20,
+      "minimum": 0,
+      "title": "Max Examples",
+      "type": "integer"
+    },
+    "max_matching_bytes": {
+      "default": 33554432,
+      "exclusiveMinimum": 0,
+      "title": "Max Matching Bytes",
+      "type": "integer"
+    },
+    "max_matching_rows": {
+      "default": 2000,
+      "exclusiveMinimum": 0,
+      "title": "Max Matching Rows",
+      "type": "integer"
+    },
+    "max_numeric_digits": {
+      "default": 4096,
+      "exclusiveMinimum": 0,
+      "title": "Max Numeric Digits",
+      "type": "integer"
+    },
+    "max_pair_checks": {
+      "default": 2000000,
+      "exclusiveMinimum": 0,
+      "title": "Max Pair Checks",
+      "type": "integer"
+    },
+    "max_row_bytes": {
+      "default": 1048576,
+      "exclusiveMinimum": 0,
+      "title": "Max Row Bytes",
+      "type": "integer"
+    },
+    "max_rows": {
+      "default": 10000000,
+      "exclusiveMinimum": 0,
+      "title": "Max Rows",
+      "type": "integer"
+    },
+    "max_work": {
+      "default": 100000000,
+      "exclusiveMinimum": 0,
+      "title": "Max Work",
+      "type": "integer"
+    },
+    "partitions": {
+      "default": 16,
+      "maximum": 4096,
+      "minimum": 1,
+      "title": "Partitions",
+      "type": "integer"
+    },
+    "sqlite_cache_kib": {
+      "default": 4096,
+      "exclusiveMinimum": 0,
+      "title": "Sqlite Cache Kib",
+      "type": "integer"
+    },
+    "timeout_seconds": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Timeout Seconds"
+    }
+  },
+  "title": "ComparisonOptions",
+  "type": "object"
+}
