@@ -314,6 +314,9 @@ tbody td.mono { font-family: ui-monospace, monospace; font-size: 12px; }
 .badge-err    { background: var(--err-bg);    color: var(--err);    }
 .badge-purple { background: var(--purple-bg); color: var(--purple); }
 .badge-blue   { background: var(--accent-bg); color: var(--accent-l); }
+.badge-green  { background: #d1fae5; color: #065f46; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .badge-green { background: #064e3b; color: #6ee7b7; } }
+:root[data-theme="dark"] .badge-green { background: #064e3b; color: #6ee7b7; }
 
 .charts-row {
   display: grid;
@@ -1174,7 +1177,7 @@ EQ.componentes_estado = {
 };
 </script>
 <script>
-const API_URL = '';
+const API_URL = 'http://157.137.227.1:8000/api/v1';
 const EQ_CONFIG = {
   apiUrl:     API_URL,
   useRealApi: API_URL !== '',
@@ -1248,7 +1251,7 @@ const EQ_CONFIG = {
   <div class="container">
     <div class="section-header">
       <h1>Explorar datos SERCOP</h1>
-      <p>Corpus SERCOP–OCDS 2025 · snapshot <span id="snap-label">20261012-v1</span> · <span class="badge badge-blue">Datos sintéticos</span></p>
+      <p>Corpus SERCOP–OCDS 2025 · snapshot <span id="snap-label">20261012-v1</span> · <span id="api-mode-badge" class="badge badge-blue">Datos sintéticos</span></p>
     </div>
 
     <!-- Filtros -->
@@ -1911,12 +1914,31 @@ const DS = {
 };
 
 async function _get(path) {
-  const res = await fetch(EQ_CONFIG.apiUrl + path);
+  let res;
+  try {
+    res = await fetch(EQ_CONFIG.apiUrl + path);
+  } catch (e) {
+    const isMixed = location.protocol === 'https:' && EQ_CONFIG.apiUrl.startsWith('http:');
+    if (isMixed) throw new Error('⚠️ Mixed content: el portal usa HTTPS pero la VM usa HTTP. Accede al portal por HTTP o habilita HTTPS en la VM.');
+    throw new Error(`No se pudo conectar a la API: ${e.message}`);
+  }
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.detail?.mensaje || `HTTP ${res.status}`);
   }
   return res.json();
+}
+
+function _actualizarBadgeApi(exito) {
+  const b = document.getElementById('api-mode-badge');
+  if (!b) return;
+  if (exito) {
+    b.textContent = 'Datos reales';
+    b.className = 'badge badge-green';
+  } else {
+    b.textContent = 'Datos sintéticos';
+    b.className = 'badge badge-blue';
+  }
 }
 
 async function _post(path, body) {
@@ -2069,10 +2091,15 @@ async function initExplorar() {
     if (el) el.addEventListener('change', aplicarFiltros);
   });
 
+  let apiOk = !EQ_CONFIG.useRealApi;
   try {
     const ind = await DS.indicadores();
     renderKPIs(ind);
-  } catch (e) { _mostrarError(e.message); }
+    if (EQ_CONFIG.useRealApi) apiOk = true;
+  } catch (e) {
+    _mostrarError(e.message);
+  }
+  _actualizarBadgeApi(apiOk);
 
   await renderCharts();
   await aplicarFiltros();

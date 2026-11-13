@@ -16,7 +16,7 @@ from dw_config import DW_FILE, DW_JOBS_DIR  # noqa: E402
 # ── Parámetros de la API ──────────────────────────────────────────────────
 API_VERSION  = "v1"
 API_PREFIX   = f"/api/{API_VERSION}"
-SNAPSHOT_ID  = "20261012-v1"   # actualizar cuando Jhair publique nueva versión
+SNAPSHOT_ID  = "test_20231001"  # actualizar cuando Jhair publique nueva versión
 
 # ── Límites de paginación ─────────────────────────────────────────────────
 MAX_PAGE_SIZE = 500
