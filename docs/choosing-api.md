@@ -1,5 +1,21 @@
 # Choose the smallest existing API
 
+## Start with the smallest workflow
+
+| Need | Start here | Acceptance boundary |
+| --- | --- | --- |
+| Read a local file and expose another engine | `load_dataset`, `convert_dataset` | Conversion does not execute an independently written ETL |
+| Compare two already produced results | `diff`, then `assert_equivalent` | Only a complete equivalent result is accepted under its declared policies |
+| Inspect numeric sums by arbitrary groups | `compare_grouped` | Equal totals do not establish row equivalence |
+| Execute a supported native relational migration | `check_migration`, `migrate` | Only admitted declarative plans and native types are supported |
+| Build anomaly signals from one execution | `profile_execution`, fit/calibrate/detect | Rules, IF, MAD and the hybrid decision remain separate; scores are not proof of equivalence |
+
+Keep the installed version, selected contract, dependencies and input snapshot
+identities with the result. Read [stability and capability limits](compatibility.md)
+before depending on an experimental workflow. No new API is required to use this
+table; the detailed choices below retain their existing contracts.
+
+
 [Handbook](index.md) · [Inicio en español](inicio.md) · [API reference](api.md) ·
 [Eight runnable journeys](journeys.md)
 

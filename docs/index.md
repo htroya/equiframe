@@ -40,15 +40,15 @@ Consulta [fuentes](universal-sources.md), [ventanas](migration-ir.md) y
 
 ## Release status
 
-This handbook targets the **0.13.5** maintenance candidate. Version **0.13.1**
-was published to TestPyPI and PyPI on 17 November 2026 (America/Guayaquil).
-The new candidate requires its own exact-artifact checks and manual publication;
-verify current index availability before pinning it. The
-[readiness review and action plan](review-0132.md) explains the integrated-tree
-defects, archive preservation and Beta project classification. Existing stable
-API and persisted-format commitments remain unchanged. Historical Alpha reports
-retain their own identities under `archive/research-a14` in Git and are excluded
-from current distributions.
+The current maintenance target is **0.13.6**. The preceding **0.13.5**
+release is [published on PyPI](https://pypi.org/project/equiframe/0.13.5/),
+with final source, installed-package and compatibility results in its
+[release notes](https://github.com/htroya/equiframe/releases/tag/v0.13.5).
+Those results identify 0.13.5; every new artifact needs its own checks.
+See [current versus historical compatibility evidence](compatibility.md) and
+the [manual release procedure](releasing.md). Stable API and persisted-format
+commitments remain unchanged. Historical Alpha materials are preserved under
+`archive/research-a14` and excluded from current distributions.
 
 Project-owned code uses MIT. Included third-party components retain their
 licenses; the core archive expression is `MIT AND Apache-2.0` because it includes

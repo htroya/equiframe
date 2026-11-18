@@ -2,9 +2,24 @@
 
 [Handbook](index.md) · [Upgrading](upgrading.md) · [Dependencies](dependencies.md)
 
+## Current release evidence
+
+The published [0.13.5 release](https://github.com/htroya/equiframe/releases/tag/v0.13.5)
+records the identified final artifacts and their actual checks: core source and
+installed suites each passed 10,299 tests on Windows (94 skipped) and 10,355 on
+Linux aarch64 (38 skipped). Sixteen installed minimum/latest cells across Python
+3.10–3.13 passed 167 cases each. The release notes distinguish the matrix scope,
+omissions and Linux-only current real-R execution. These results belong to
+0.13.5, not to this new 0.13.6 maintenance target or a later artifact.
+
+The current candidate requires fresh artifact-bound checks. The following
+historical matrices retain their original dates and identities. Start with
+[choosing an API](choosing-api.md) for existing workflows and consult the
+[release procedure](releasing.md) for current candidate acceptance.
+
 ## Admission is not a measured support matrix
 
-The 0.13.5 release contract declares **Python `>=3.10,<3.14`**, meaning 3.10, 3.11, 3.12 and
+The 0.13.6 release contract declares **Python `>=3.10,<3.14`**, meaning 3.10, 3.11, 3.12 and
 3.13. Dependency ranges describe installable admission, not every tested
 combination. A lock captures one resolution; it does not prove every operating
 system, architecture, Python patch or cross-product of package versions works.

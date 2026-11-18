@@ -1,5 +1,11 @@
 # Readiness review and 0.13.5 action plan
 
+This historical plan was executed for the now-published
+[0.13.5 release](https://github.com/htroya/equiframe/releases/tag/v0.13.5).
+Its final notes identify the actual artifacts, completed checks and omissions.
+The plan and rejected candidates below retain their original scope; they are
+not a passing receipt for 0.13.6 or a later release.
+
 ## Assessment of published 0.13.1
 
 Publishing 0.13.1 was defensible for its documented, bounded library interfaces:

@@ -1,3 +1,10 @@
+## 0.13.6 - current release evidence and focused entry points
+
+- Correct stale documentation that still described published 0.13.5 as a candidate.
+- Link actual final 0.13.5 results without crediting them to a new artifact.
+- Foreground existing entry points; preserve algorithms, old producers and historical bytes.
+- Pair the packages at 0.13.6; new artifacts require their own checks.
+
 ## 0.13.5 - reviewed producer identity and maintenance release
 
 - Complete the maintenance corrections described below without moving earlier tags.
