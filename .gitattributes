@@ -19,3 +19,6 @@ tests/fixtures/versioned/** -text
 tests/fixtures/option_trace/catalog-a12.json -text
 tests/fixtures/option_trace/manifest.json -text
 packages/equiframe-benchmark/schemas/SnapshotManifest-1.0.schema.json -text
+
+# Archived research retains original bytes, including recorded line endings.
+/archive/research-a14/** -text

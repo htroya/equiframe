@@ -40,7 +40,7 @@ Consulta [fuentes](universal-sources.md), [ventanas](migration-ir.md) y
 
 ## Release status
 
-This handbook targets the **0.13.2** maintenance candidate. Version **0.13.1**
+This handbook targets the **0.13.3** maintenance candidate. Version **0.13.1**
 was published to TestPyPI and PyPI on 17 November 2026 (America/Guayaquil).
 The new candidate requires its own exact-artifact checks and manual publication;
 verify current index availability before pinning it. The

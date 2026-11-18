@@ -1,4 +1,14 @@
-## 0.13.2 - coherent manual-release tree and maturity metadata
+## 0.13.3 - preserved archive bytes and paired maintenance release
+
+- Complete the maintenance changes prepared in unpublished 0.13.2.
+- Reject that local candidate after Git-object checks found four archived JSON
+  files normalized on staging and one ignored historical instruction file.
+  Preserve its tag and failure record; no 0.13.2 files were uploaded.
+- Protect archived bytes with explicit Git attributes, include the ignored
+  historical member and check Git HEAD objects as well as working-copy hashes.
+- Pair both distributions at 0.13.3 and retain earlier producer readers.
+
+## 0.13.2 - unpublished candidate: coherent manual-release tree and maturity metadata
 
 - Keep one active root core. Preserve the reintroduced historical Alpha core,
   research tools, reports and tests under `archive/research-a14`, byte-for-byte,

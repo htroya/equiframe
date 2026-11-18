@@ -1,4 +1,4 @@
-# Readiness review and 0.13.2 action plan
+# Readiness review and 0.13.3 action plan
 
 ## Assessment of published 0.13.1
 
@@ -45,3 +45,11 @@ warehouse or Jose's portal/client.
 
 Final release records and official inventories establish completed steps.
 This plan is not itself a passing test or publication receipt.
+
+## Candidate identity recovery
+
+The local 0.13.2 tag was rejected before any upload. Comparing archived working
+files with actual Git objects found four line-ending conversions during staging
+and one globally ignored historical instruction file. Version 0.13.3 preserves
+those bytes with a Git attribute exception and checks both the working copy and
+Git HEAD. The earlier tag and its failure evidence remain unchanged.

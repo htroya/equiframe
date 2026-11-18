@@ -1,7 +1,9 @@
 """Reject duplicate cores, active Actions workflows and modified archived bytes."""
 
 import hashlib
+import io
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -9,6 +11,26 @@ if sys.version_info >= (3, 11):
     import tomllib
 else:
     import tomli as tomllib
+
+
+def _git_archive_errors(root: Path, entries: list[dict[str, str]]) -> list[str]:
+    request = "".join("HEAD:" + item["archived"] + "\n" for item in entries).encode()
+    result = subprocess.run(
+        ["git", "cat-file", "--batch"], cwd=root, input=request, capture_output=True, check=False
+    )
+    if result.returncode:
+        return ["archive Git objects could not be verified"]
+    stream = io.BytesIO(result.stdout)
+    errors = []
+    for item in entries:
+        header = stream.readline().split()
+        if len(header) != 3 or header[1] != b"blob":
+            errors.append("archive member missing from Git HEAD: " + item["original"])
+            continue
+        data = stream.read(int(header[2]))
+        if stream.read(1) != b"\n" or hashlib.sha256(data).hexdigest() != item["sha256"]:
+            errors.append("archive Git bytes contradict inventory: " + item["original"])
+    return errors
 
 
 def layout_errors(root: Path) -> list[str]:
@@ -44,6 +66,8 @@ def layout_errors(root: Path) -> list[str]:
                 or hashlib.sha256(path.read_bytes()).hexdigest() != item["sha256"]
             ):
                 errors.append("archived file missing, substituted or modified: " + item["original"])
+        if not errors and (root / ".git").exists():
+            errors.extend(_git_archive_errors(root, entries))
     return errors
 
 
