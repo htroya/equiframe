@@ -2,8 +2,8 @@
 
 ## Current state
 
-The release target is `equiframe 0.13.4` with the exactly paired
-`equiframe-benchmark 0.13.4`, identified by commit and artifact SHA-256.
+The release target is `equiframe 0.13.5` with the exactly paired
+`equiframe-benchmark 0.13.5`, identified by commit and artifact SHA-256.
 Source preparation does not establish validation or publication: verify the
 artifact-bound receipts and official index inventory. The public 0.12.2 tag and
 its receipts retain their original identities. The local 0.12.3 candidate tag
@@ -62,13 +62,13 @@ receipts; 0.13.1 corrects and executes all four examples under its own identity.
 
 On 17 November 2026 (America/Guayaquil), both 0.13.1 packages were manually
 published and checked from TestPyPI and PyPI. The subsequent owner-requested
-readiness review prepares the compatible 0.13.4 maintenance release described
+readiness review prepares the compatible 0.13.5 maintenance release described
 in [the action plan](review-0132.md). Publication of 0.13.1 does not waive any
 checks for the new commit or artifacts.
 
 The local 0.13.2 maintenance candidate was rejected before upload because its
 archive Git objects did not preserve every original byte/member. It remains
-immutable. The replacement 0.13.4 adds archive attribute protection and raw Git
+immutable. The replacement 0.13.5 adds archive attribute protection and raw Git
 object verification, then undergoes its own complete checks.
 
 ## Tagged versions

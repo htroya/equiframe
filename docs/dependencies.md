@@ -24,7 +24,7 @@ version string.
 TLS trust is also part of the build and advisory-query environment. The
 [Python security notice for the emSign incident](https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576)
 requires corrected CA bundles and identifies minimum repaired versions including
-`certifi>=2026.10.19`, `pip>=26.2.2` and `uv>=0.13.4`. The release locks use
+`certifi>=2026.10.19`, `pip>=26.2.2` and `uv>=0.13.5`. The release locks use
 `certifi==2026.10.23`. A standalone tool can embed its own CA bundle, so inspecting
 installed Python distributions alone does not cover `uv` or other native tools.
 Do not disable certificate verification to work around a download failure.
@@ -74,15 +74,15 @@ CORE=.
 BENCH=packages/equiframe-benchmark
 
 $PY $TOOL generate --package "$CORE" \
-  --artifact "$CORE/dist/equiframe-0.13.4-py3-none-any.whl" \
-  --artifact "$CORE/dist/equiframe-0.13.4.tar.gz" \
+  --artifact "$CORE/dist/equiframe-0.13.5-py3-none-any.whl" \
+  --artifact "$CORE/dist/equiframe-0.13.5.tar.gz" \
   --output evidence/dependencies/core
 
 $PY $TOOL generate --package "$BENCH" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.13.4-py3-none-any.whl" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.13.4.tar.gz" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.13.5-py3-none-any.whl" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.13.5.tar.gz" \
   --environment-python "$BENCH/.venv/bin/python" \
-  --local-artifact "$CORE/dist/equiframe-0.13.4-py3-none-any.whl" \
+  --local-artifact "$CORE/dist/equiframe-0.13.5-py3-none-any.whl" \
   --output evidence/dependencies/benchmark
 ```
 
@@ -145,17 +145,17 @@ Reverify the final artifact bytes, lock, selected environment, BOMs and audit:
 
 ```sh
 $PY $TOOL verify --package "$CORE" \
-  --artifact "$CORE/dist/equiframe-0.13.4-py3-none-any.whl" \
-  --artifact "$CORE/dist/equiframe-0.13.4.tar.gz" \
+  --artifact "$CORE/dist/equiframe-0.13.5-py3-none-any.whl" \
+  --artifact "$CORE/dist/equiframe-0.13.5.tar.gz" \
   --inventory evidence/dependencies/core/inventory.json \
   --advisories evidence/dependencies/core-advisories/advisories.json \
   --max-age-hours 24 --require-clean
 
 $PY $TOOL verify --package "$BENCH" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.13.4-py3-none-any.whl" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.13.4.tar.gz" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.13.5-py3-none-any.whl" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.13.5.tar.gz" \
   --environment-python "$BENCH/.venv/bin/python" \
-  --local-artifact "$CORE/dist/equiframe-0.13.4-py3-none-any.whl" \
+  --local-artifact "$CORE/dist/equiframe-0.13.5-py3-none-any.whl" \
   --inventory evidence/dependencies/benchmark/inventory.json \
   --advisories evidence/dependencies/benchmark-advisories/advisories.json \
   --max-age-hours 24 --require-clean

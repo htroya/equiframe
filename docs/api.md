@@ -2,7 +2,7 @@
 
 [Handbook](index.md) · [Choose an API](choosing-api.md) · [Semantics](semantics.md) · [Compatibility](compatibility.md)
 
-Use `import equiframe as ef`. This reference describes the 0.13.4 implemented
+Use `import equiframe as ef`. This reference describes the 0.13.5 implemented
 entry points and their bounded stability contracts. Signatures below use Python notation;
 `...` in a signature means the other documented optional arguments, not an
 executable example. The exhaustive exported namespace is `ef.__all__` and its
@@ -142,7 +142,7 @@ matching, time and evidence. `DiffCaptureOptions` controls native capture
 separately. They are cooperative budgets; [defaults and costs](performance.md)
 are not hard resource quotas.
 
-### Grouped numeric comparison (0.13.4)
+### Grouped numeric comparison (0.13.5)
 
 ```text
 compare_grouped(candidate, expected, *, by, column, options=None,

@@ -2,7 +2,7 @@
 
 [Handbook](index.md) · [API](api.md) · [Semantics](semantics.md)
 
-Available in **EquiFrame 0.13.4**. Install `equiframe[arrow]==0.13.4`, or the
+Available in **EquiFrame 0.13.5**. Install `equiframe[arrow]==0.13.5`, or the
 selected `pandas`, `polars` or `duckdb` extra. Optional engines stay lazy.
 
 `compare_grouped` sums one numeric column within each declared key and compares

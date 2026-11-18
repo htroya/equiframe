@@ -1,4 +1,14 @@
-## 0.13.4 - module-safe verification and paired maintenance release
+## 0.13.5 - reviewed producer identity and maintenance release
+
+- Complete the maintenance corrections described below without moving earlier tags.
+- Update the standalone DetectorVersions model-shape fingerprint after reviewing
+  its new producer default and reader enumeration. Existing stable model and
+  schema guards remain strict; no comparison or detector algorithm changes.
+- Preserve the rejected 0.13.4 candidate and its model-guard failure evidence;
+  no files from 0.13.2, 0.13.3 or 0.13.4 were uploaded.
+- Pair both distributions at 0.13.5 and retain earlier producer readers.
+
+## 0.13.4 - unpublished candidate: module-safe verification and paired maintenance release
 
 - Complete the maintenance changes prepared in unpublished 0.13.2/0.13.3.
 - Fix the asset-check entry point when loaded with importlib, preserving its
