@@ -12,7 +12,7 @@ license = "MIT AND Apache-2.0"
 license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md", "tools/cyclonedx/LICENSE", "tools/cyclonedx/PROVENANCE.md"]
 requires-python = ">=3.10,<3.14"
 authors = [{ name = "Hernán Troya" }]
-classifiers = ["Development Status :: 5 - Production/Stable", "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11", "Programming Language :: Python :: 3.12", "Programming Language :: Python :: 3.13", "Operating System :: Microsoft :: Windows", "Operating System :: POSIX :: Linux", "Topic :: Software Development :: Libraries :: Python Modules", "Typing :: Typed"]
+classifiers = ["Development Status :: 4 - Beta", "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11", "Programming Language :: Python :: 3.12", "Programming Language :: Python :: 3.13", "Operating System :: Microsoft :: Windows", "Operating System :: POSIX :: Linux", "Topic :: Software Development :: Libraries :: Python Modules", "Typing :: Typed"]
 dependencies = ["typing-extensions>=4.14,<5", "pydantic>=2.12,<3", "typer>=0.20,<1", "tzdata>=2025.2,<2027"]
 
 [project.urls]
@@ -101,7 +101,7 @@ path = "tools/reproducible_wheel.py"
 [tool.hatch.build.targets.sdist]
 ignore-vcs = true
 include = ["/docs", "/src", "/tests", "/examples", "/schemas", "/tools", "/pyproject.toml", "/uv.lock", "/README.md", "/README.en.md", "/CHANGELOG.md", "/LICENSE", "/THIRD_PARTY_NOTICES.md"]
-exclude = ["/.private/**", "/infra/**", "/qa/**", "/services/**", "/components/**", "/componentes/**", "/data/**", "/datasets/**", "/models/**", "/reports/**", "/validation/**", "/packages/**", "/.github/**"]
+exclude = ["/archive/**", "/.private/**", "/infra/**", "/qa/**", "/services/**", "/components/**", "/componentes/**", "/data/**", "/datasets/**", "/models/**", "/reports/**", "/validation/**", "/packages/**", "/.github/**"]
 
 [tool.hatch.build.targets.sdist.hooks.custom]
 path = "tools/reproducible_wheel.py"
@@ -115,7 +115,7 @@ path = "tools/reproducible_wheel.py"
 [tool.ruff]
 target-version = "py310"
 line-length = 100
-extend-exclude = [".private", "infra", "qa", "services", "components", "componentes", "data", "datasets", "models", "reports", "validation", "packages"]
+extend-exclude = ["archive", ".private", "infra", "qa", "services", "components", "componentes", "data", "datasets", "models", "reports", "validation", "packages"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]

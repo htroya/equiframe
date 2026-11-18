@@ -4,7 +4,7 @@
 
 ## Admission is not a measured support matrix
 
-The 0.13.1 release contract declares **Python `>=3.10,<3.14`**, meaning 3.10, 3.11, 3.12 and
+The 0.13.2 release contract declares **Python `>=3.10,<3.14`**, meaning 3.10, 3.11, 3.12 and
 3.13. Dependency ranges describe installable admission, not every tested
 combination. A lock captures one resolution; it does not prove every operating
 system, architecture, Python patch or cross-product of package versions works.
@@ -19,7 +19,7 @@ that retains version `0.11.1`.
 
 The following implementation checks actually ran from installed A14 artifacts
 on 27 October 2026. They establish the listed workloads, rather than every input
-or dependency combination. The 0.13.1 artifact must pass its own
+or dependency combination. The 0.13.2 artifact must pass its own
 [release gates](releasing.md); a version change does not inherit an artifact hash.
 
 | OS / architecture | CPython actually exercised | Observed functional scope |
@@ -56,7 +56,7 @@ Platform-specific skips retain their meaning and are not successful checks.
 No macOS, PyPy, other architecture, every Python patch or full minimum-to-maximum
 dependency cross-product is established by this table. Earlier STEP6 x86_64
 results above retain their own artifact identities; none is silently relabelled
-as a 0.13.1 final-artifact result.
+as a 0.13.2 final-artifact result.
 
 The first-use builder selects an explicit Python minor and its own hash-pinned
 dependency closure. The legacy `requirements.lock` is the 3.12 closure;
@@ -118,6 +118,14 @@ Native engine/Arrow transport and timezone behavior must be rechecked, not just
 `pip check`. ML parity is against the installed scikit-learn version; fitted
 forests, thresholds and decisions are not promised identical across versions.
 See [dependency/SBOM policy](dependencies.md) before upgrading transitives.
+
+## Overall project maturity
+
+The distribution is classified Beta starting with 0.13.2. This reflects the
+project's overall maturity and experimental integration surfaces; it does not
+downgrade a stable callable or withdraw a persisted-format reader. Every stable
+signature, semantic/error contract and deprecation commitment below still applies.
+The [readiness review](review-0132.md) records the reason and validation scope.
 
 ## Public-surface classification
 

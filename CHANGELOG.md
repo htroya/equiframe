@@ -1,3 +1,18 @@
+## 0.13.2 - coherent manual-release tree and maturity metadata
+
+- Keep one active root core. Preserve the reintroduced historical Alpha core,
+  research tools, reports and tests under `archive/research-a14`, byte-for-byte,
+  with a SHA-256 inventory. Exclude that archive from current distributions.
+- Add a repository-layout guard to asset checks to reject duplicate cores,
+  active Actions workflows and altered archive members. Full current suites,
+  rather than incompatible historical-layout tests, define release validation.
+- Classify the overall distribution as Beta; all existing stable API and
+  persisted-format commitments remain protected. Scientific validation and
+  warehouse/portal acceptance remain separate from publication.
+- Correct the missing-extra recovery instruction for public PyPI consumers.
+- Pair benchmark 0.13.2 exactly and retain older detector-producer readers.
+  Comparison, migration, grouping and detector algorithms are unchanged.
+
 ## 0.13.1 - reusable comparison of grouped numeric sums
 
 - Preserve the unuploaded local 0.13.0 candidate and its failed check. Correct

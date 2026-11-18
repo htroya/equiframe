@@ -490,12 +490,12 @@ SCHEMA_INVENTORY = (
     (
         "detector-bundle-1.0.schema.json",
         "stable",
-        "9cd870ec74b22754233571ec978741995315fc87f93e3eea35425e3ece3c019f",
+        "b9edfcc74c5cd8cbf599142c7e855419275fd1775eaf5afb060d880b918b8c38",
     ),
     (
         "detector-fit-1.0.schema.json",
         "stable",
-        "849ff6629c82fac56582b4054974f975e167aff4d41cb7034105a3c70fe57a37",
+        "bab650b0a5b934e937f0588a703ee6f1c8defadf7c7a8906692a746a5d66c226",
     ),
     (
         "detector-score-result-1.0.schema.json",
@@ -1296,10 +1296,10 @@ MODEL_SHAPES = {
     "DecimalRound": "274dd2c88fdf2418a295e2504554bc0103a1adf1ebe2f99b3e43cb2dd1be945c",
     "Deduplicate": "d64ccbc7cf6847b828c6ae6ed651f07ffac86cc4984626ff47767c78a086e8a3",
     "DetectionResult": "dabd0f1de4a7437b89572330096c38375e081618f032e3d9cdde05fa45a56b87",
-    "DetectorBundle": "9cd870ec74b22754233571ec978741995315fc87f93e3eea35425e3ece3c019f",
+    "DetectorBundle": "b9edfcc74c5cd8cbf599142c7e855419275fd1775eaf5afb060d880b918b8c38",
     "DetectorCalibration": "d7fda2ce2f914d7433b4fff257366b670d7e1c0d0decd6b6a2df8085bd32a348",
     "DetectorDecision": "feb569e4caa62d6ad8c2cd03280250647e97100feb892925e817ad87f66074ee",
-    "DetectorFit": "849ff6629c82fac56582b4054974f975e167aff4d41cb7034105a3c70fe57a37",
+    "DetectorFit": "bab650b0a5b934e937f0588a703ee6f1c8defadf7c7a8906692a746a5d66c226",
     "DetectorModel": "dee1cff255a5d462627ce82f1242b7534672f6027c56cf6b3568c87ed41c2d8f",
     "DetectorScoreResult": "d2ba844388cabad55c1cf29428e86611b69b66572dc7f47d3eab2584eec83cf1",
     "DetectorScores": "d8df865c220ee33bf48c392c4fed85d696a79113cf4b14eee5d8bd12fcc6faa9",

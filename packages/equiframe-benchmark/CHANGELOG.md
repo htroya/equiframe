@@ -1,3 +1,9 @@
+## 0.13.2 - paired maintenance release
+
+- Require core 0.13.2 and admit its producer identity in generated schemas.
+- Preserve existing protocols, algorithms, historical fixtures and evidence.
+- Keep the separate benchmark's Beta classification and manual publication.
+
 ## 0.13.1 - paired grouped-comparison release
 
 - Pair exactly with core 0.13.1 and admit its detector producer in active schemas.

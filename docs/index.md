@@ -40,13 +40,15 @@ Consulta [fuentes](universal-sources.md), [ventanas](migration-ir.md) y
 
 ## Release status
 
-This handbook targets **0.13.1**, preserving the **0.12.0 stable release contract**. Preparation and
-publication are separate: the owner has authorized a manual TestPyPI rehearsal
-followed by PyPI, subject to the [release gates](releasing.md). Until registry
-ownership, uploads and clean consumer installation are actually verified, those
-steps remain pending; a source version or a passing local test is not publication.
-Use the exact wheel/sdist SHA-256 and source identity for each identified artifact.
-Historical private Alpha notes retain their original versions and results.
+This handbook targets the **0.13.2** maintenance candidate. Version **0.13.1**
+was published to TestPyPI and PyPI on 17 November 2026 (America/Guayaquil).
+The new candidate requires its own exact-artifact checks and manual publication;
+verify current index availability before pinning it. The
+[readiness review and action plan](review-0132.md) explains the integrated-tree
+defects, archive preservation and Beta project classification. Existing stable
+API and persisted-format commitments remain unchanged. Historical Alpha reports
+retain their own identities under `archive/research-a14` in Git and are excluded
+from current distributions.
 
 Project-owned code uses MIT. Included third-party components retain their
 licenses; the core archive expression is `MIT AND Apache-2.0` because it includes

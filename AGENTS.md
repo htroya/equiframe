@@ -1,19 +1,28 @@
-# Instrucciones de trabajo
+# Development instructions
 
-Lee `README.md`, `docs/ARCHITECTURE.md`, `docs/API_CONTRACTS.md`, `docs/TEAM_INTEGRATION.md` y el paso aplicable de `docs/HERNAN_ROADMAP.md` antes de implementar.
-
-- La tesis sigue en revisión. Distingue requisitos del borrador, decisiones de ingeniería y decisiones experimentales pendientes. Cambios metodológicos requieren registrar motivo, versión y consecuencias en `docs/DECISIONS.md` y `docs/THESIS_TRACEABILITY.md`.
-- No presentes interfaces planificadas, datos sintéticos, modelos no entrenados o pruebas no ejecutadas como funcionalidad o evidencia existente.
-- Mantén independientes R (reglas), M (Isolation Forest), B (MAD), H (R OR M) y O (oráculo). Detectores y perfiles no reciben etiquetas, mutaciones ni salidas de otro motor. Pandas no es el oráculo.
-- No conviertas un fallo, una entrada inválida o un componente no estimable en ausencia de alerta.
-- Conserva decimales, monedas, multiplicidad, claves, ausencias y fechas según el contrato. No normalices diferencias para hacer pasar una prueba.
-- El núcleo no depende de OCI, del cliente de José ni del esquema SERCOP. Usa interfaces e inyección de dependencias. Cada motor conserva su ejecución nativa; no ejecutes una transformación una sola vez y conviertas su resultado para simular tres implementaciones.
-- Respeta la propiedad de carpetas de `docs/TEAM_INTEGRATION.md`. No implementes infraestructura de José ni redefinas el DW de Jhair dentro de tareas de Hernán.
-- No leas ni escribas un archivo DuckDB compartido con varios procesos escritores independientes. El servicio de datos es responsable de la coordinación.
-- Prueba comportamiento y riesgos reales: casos esperados independientes, propiedades, estados no evaluables y errores. No inventes resultados o cobertura.
-- No subas credenciales, datos reales, bases, modelos serializados, entornos ni resultados privados. No uses tokens incrustados en remotes, código o comandos documentados.
-- No ejecutes callbacks, SQL, plugins o modelos obtenidos de fuentes no confiables. Esta biblioteca no es un sandbox.
-- Cada paso termina con pruebas apropiadas, documentación de uso y límites, y un commit revisable. Publicar en PyPI o desplegar servicios requiere una tarea explícita; subir cambios a este repositorio está autorizado en la tarea inicial.
-- `pip install equiframe` significa publicación pública en PyPI accesible a cualquier usuario. Solo se abordará después de completar el paso 10 y una nueva ronda de revisión indicada por Hernán. Instalar el paquete localmente o en CI no cumple ese objetivo ni es un entregable solicitado. No adelantar esa publicación ni instalaciones persistentes por este requisito.
-- No generes métodos vacíos o retornos ficticios para aparentar implementación. Los Protocol y tipos declarativos son válidos; las implementaciones públicas deben tener comportamiento comprobable.
-- Antes de subir, ejecuta los controles específicos del paquete afectado. En el paso 1 crea y verifica las comprobaciones CI reales; no anuncies comprobaciones que todavía no existen.
+- The reusable core lives in `src/`, `tests/`, `docs/` and `pyproject.toml` at the
+  root. The paired scientific package is `packages/equiframe-benchmark`.
+  `archive/research-a14` preserves history; it is not an active package.
+- Read `docs/api.md`, `docs/compatibility.md` and `docs/semantics.md` before changing
+  public behavior. Preserve native execution and lazy optional imports.
+- Preserve decimals, missing values, keys, multiplicity, dates and unavailable
+  outcomes. Rules R, Isolation Forest M, MAD B, hybrid H and independent expected
+  evidence O remain separate. Software publication is not scientific acceptance.
+- Do not modify the DW or portal in a core task. Jhair owns
+  `packages/equiframe-sercop` and `validation/sercop_dw`; Jose owns
+  `packages/equiframe-data`, `packages/equiframe-portal`, `services` and `infra`.
+- Never execute untrusted SQL, callbacks, plugins or serialized models. Never
+  use concurrent independent writers on a shared DuckDB database.
+- Test independent expectations, negative cases, exits, permissions and unavailable
+  states. Never count unexecuted or failed work as passed. Run Ruff, strict mypy,
+  assets and appropriate tests; release checks bind source and installed artifacts
+  to the actual commit, tag and hashes.
+- Git and publication are manual. Do not add or invoke GitHub Actions. TestPyPI
+  precedes PyPI; promote identical bytes after downloaded-consumer checks pass.
+  Use ephemeral credentials and revoke them afterward.
+- Preserve historical fixtures and archives byte-for-byte. Never publish data,
+  databases, models, credentials, private configurations or private Git history.
+- Reuse the Windows QA lab under `equiframe-013-lab`, at most 3 GiB, and clean
+  consumed scratch files. Preserve VM services, datasets and unrelated processes.
+- Use only Opera Neon MCP, the dedicated NeonCodexQA profile, loopback port 9222
+  and initial 75 percent zoom. Do not inspect personal tabs.

@@ -1,0 +1,53 @@
+{
+  "schema": "equiframe.alpha-windows-installed-assessment.v1",
+  "recorded_at_utc": "2026-10-12T23:52:12.225801+00:00",
+  "candidate": "0.12.0a13",
+  "status": "PASS",
+  "scope": "Four Windows minors, existing fresh v2 installations and same dependency locks, original Alpha wheels, explicit real imported origins, isolated -I normal/-O examples; repetitions yield no new obligation IDs or scientific samples",
+  "python_versions": [
+    "3.10.21",
+    "3.11.16",
+    "3.12.4",
+    "3.13.15"
+  ],
+  "platform": "Windows AMD64",
+  "dependency_profiles_per_minor": 1,
+  "original_install_commands": 68,
+  "isolated_addendum_commands": 48,
+  "packaged_examples": 24,
+  "attempted_executions": 432,
+  "complete_comparisons": 408,
+  "expected_invalid_inputs": 24,
+  "modes": [
+    "normal",
+    "optimized"
+  ],
+  "isolated_import_origins_verified_before_after": true,
+  "public_lock_hashes": {
+    "3.10": "c84f9d9156674506471ac8e4e169609f505b9007222a274157eefca1c0236de2",
+    "3.11": "d9e3608a2657e7da91354924eabad6ccdff860c0235906cefb7ac51e0d314b5c",
+    "3.12": "587529163c8e2df6ab018338f206da2714beefe98a70726770c105573651e5f7",
+    "3.13": "66521bcd419979c40b5971e35a94c5072d94b3c7250300041ab09c84620fc5fb"
+  },
+  "installation_result_sha256": "699537587ebf14563192bf6121d32117b3f985dc8e26564bcdaa1eb54f266442",
+  "isolated_addendum_result_sha256": "724abecd51f63778b72508e1a7cfb5de8be8b72f7e1fab7da69b0a4d06e2d25f",
+  "instrument_sources_unchanged": true,
+  "custody": {
+    "private_file": "alpha_windows_instalado_20261012.zip",
+    "sha256": "8555c9203b69988582e9084602b35978cae7d88b2b1d2c712cfd88a1c4953ff2",
+    "bytes": 8790440,
+    "files": 6763,
+    "full_readback_verified": true
+  },
+  "automatic_rubric_points": 0,
+  "new_traceability_ids": 0,
+  "human_independent_review": false,
+  "limits": [
+    "One latest-resolved dependency profile per minor, not all extras/endpoints or complete source suites.",
+    "Windows native results do not prove Linux x64, ARM64 or macOS support.",
+    "Synthetic four-row example, not SERCOP study samples.",
+    "The historical expected_failed_executions field denotes input integrity rejections, not SDK test failures.",
+    "v2 lacks an imported-origin guard; v3 is a separate isolated rerun and does not rewrite v2.",
+    "Usability and universality rubrics require their own complete candidate-specific reevaluation."
+  ]
+}

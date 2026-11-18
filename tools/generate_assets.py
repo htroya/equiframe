@@ -506,6 +506,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
+    if args.check:
+        from check_repository_layout import layout_errors
+
+        errors = layout_errors(ROOT)
+        if errors:
+            parser.exit(1, "Repository layout differs: " + "; ".join(errors) + "\n")
     contracts = examples()
     assets = {
         ROOT / "examples" / (name + ".json"): canonical_contract_bytes(value)

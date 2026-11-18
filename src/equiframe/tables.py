@@ -34,7 +34,8 @@ def require_dependency(name: str, extra: str) -> None:
     except ImportError as error:
         raise MissingDependencyError(
             f"optional dependency {name} is unavailable; install 'equiframe[{extra}]' "
-            "from the team's wheel/checkout (public PyPI release is pending)"
+            f"with python -m pip install 'equiframe[{extra}]', or add that extra "
+            "to your pinned EquiFrame requirement"
         ) from error
 
 

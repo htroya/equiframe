@@ -4,7 +4,7 @@
 
 <a id="english"></a>
 
-> Release target: **0.13.1**. Check the official index for availability and
+> Release target: **0.13.2**. Check the official index for availability and
 > verify the identified artifact hashes. Publication requires the
 > [release gates](docs/releasing.md).
 
@@ -25,16 +25,20 @@ checks to an existing application. Contracts describe keys, types, numeric
 precision, missing values, duplicates, order and dates. The library works with
 your own data, independently of procurement schemas, warehouses and cloud services.
 
+The distribution is classified **Beta**. Existing stable APIs and persisted
+formats retain their compatibility commitments; experimental workflows remain
+explicitly identified. See the [readiness review](https://github.com/htroya/equiframe/blob/main/docs/review-0132.md).
+
 ## Install
 
 EquiFrame supports **Python 3.10, 3.11, 3.12 and 3.13**.
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.13.1"
+python -m pip install "equiframe[files,engines,ml]==0.13.2"
 python -m pip check
 ```
 
-The base installation is `python -m pip install equiframe==0.13.1`.
+The base installation is `python -m pip install equiframe==0.13.2`.
 Optional engines and machine-learning libraries are loaded when requested.
 
 | Extra | Purpose |
@@ -254,7 +258,7 @@ and [license scope](https://github.com/htroya/equiframe/blob/main/NOTICE.md).
 
 <a id="espanol"></a>
 
-> Objetivo de versión: **0.13.1**. Consulta su disponibilidad en el índice oficial
+> Objetivo de versión: **0.13.2**. Consulta su disponibilidad en el índice oficial
 > y verifica los hashes de los archivos identificados. La publicación requiere
 > las [comprobaciones de release](docs/releasing.md).
 
@@ -318,24 +322,24 @@ estables y las capacidades experimentales.
 Instala los extras necesarios para tu trabajo:
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.13.1"
+python -m pip install "equiframe[files,engines,ml]==0.13.2"
 python -m pip check
 ```
 
-La instalación base puede hacerse con `python -m pip install equiframe==0.13.1`.
+La instalación base puede hacerse con `python -m pip install equiframe==0.13.2`.
 Selecciona los extras necesarios para tu trabajo; el núcleo no importa los
 motores opcionales al ejecutar `import equiframe`.
 
 Para instalar un wheel local:
 
 ```bash
-python -m pip install "./equiframe-0.13.1-py3-none-any.whl[files,engines,ml]"
+python -m pip install "./equiframe-0.13.2-py3-none-any.whl[files,engines,ml]"
 ```
 
 El benchmark se instala por separado, después del núcleo:
 
 ```bash
-python -m pip install equiframe-benchmark==0.13.1
+python -m pip install equiframe-benchmark==0.13.2
 ```
 
 Consulta la [guía de instalación](https://github.com/htroya/equiframe/blob/main/docs/installed-private.md) para entornos aislados,
@@ -456,6 +460,9 @@ También funciona con ventas por sucursal, inventario por almacén y gastos por
 departamento. Separa grupos ausentes, valores no evaluables y cambios desde cero;
 las proporciones conservan su denominador. Consulta la [guía completa](docs/grouped-comparison.md).
 La comparación semántica de filas y las funciones existentes conservan su significado.
+
+El paquete se clasifica como **Beta** y conserva los compromisos de sus API y
+formatos estables. Consulta la [revisión de preparación](docs/review-0132.md).
 
 ## ETL y detección de diferencias
 

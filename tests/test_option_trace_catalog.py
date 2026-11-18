@@ -44,6 +44,7 @@ def test_frozen_metadata_case(case):
         "0.12.4",
         "0.13.0",
         "0.13.1",
+        "0.13.2",
     ):
         # The immutable A12 catalog describes the A11 default in the old wheel.
         # A13 fixes producer identity; subsequent candidates emit their own identity.

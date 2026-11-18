@@ -1,6 +1,6 @@
 # EquiFrame: semantic comparison and dataframe migration
 
-> Release target: **0.13.1**. Check the official index for availability and
+> Release target: **0.13.2**. Check the official index for availability and
 > verify the identified artifact hashes. Publication requires the
 > [release gates](https://github.com/htroya/equiframe/blob/main/docs/releasing.md).
 
@@ -19,16 +19,20 @@ checks to an existing application. Contracts describe keys, types, numeric
 precision, missing values, duplicates, order and dates. The library works with
 your own data, independently of procurement schemas, warehouses and cloud services.
 
+The distribution is classified **Beta**. Existing stable APIs and persisted
+formats retain their compatibility commitments; experimental workflows remain
+explicitly identified. See the [readiness review](https://github.com/htroya/equiframe/blob/main/docs/review-0132.md).
+
 ## Install
 
-EquiFrame 0.13.1 supports **Python 3.10, 3.11, 3.12 and 3.13**.
+EquiFrame 0.13.2 supports **Python 3.10, 3.11, 3.12 and 3.13**.
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.13.1"
+python -m pip install "equiframe[files,engines,ml]==0.13.2"
 python -m pip check
 ```
 
-The base installation is `python -m pip install equiframe==0.13.1`.
+The base installation is `python -m pip install equiframe==0.13.2`.
 Optional engines and machine-learning libraries are loaded when requested.
 
 | Extra | Purpose |
