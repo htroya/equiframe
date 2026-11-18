@@ -45,6 +45,19 @@ RECIPES = (
 EXACT_RESOURCE_FILES = frozenset(
     {
         (
+            "schemas/grouped-comparison-options-1.0.schema.json",
+            "equiframe/schemas/grouped-comparison-options-1.0.schema.json",
+        ),
+        (
+            "schemas/grouped-comparison-result-1.0.schema.json",
+            "equiframe/schemas/grouped-comparison-result-1.0.schema.json",
+        ),
+        (
+            "schemas/grouped-difference-1.0.schema.json",
+            "equiframe/schemas/grouped-difference-1.0.schema.json",
+        ),
+        ("examples/grouped_compare.py", "equiframe/examples/grouped_compare.py"),
+        (
             "examples/eda_generic.py",
             "equiframe/examples/integrations/eda_generic.py",
         ),

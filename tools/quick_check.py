@@ -22,6 +22,7 @@ UTC = _timezone.utc
 
 Package = Literal["core", "benchmark"]
 CORE_TESTS = (
+    "test_grouped.py",
     "test_contracts.py",
     "test_architecture_boundaries.py",
     "test_progressive_docs.py",

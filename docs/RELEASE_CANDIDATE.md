@@ -242,7 +242,7 @@ No se amplía soporte Python/plataformas ni se activa un workflow remoto.
 
 ## Estabilidad y matriz STEP6
 
-La [política](COMPATIBILITY.md) clasifica API, CLI y formatos; el
+La [política](compatibility-legacy-0124.md) clasifica API, CLI y formatos; el
 [registro de adaptadores](ADAPTER_CAPABILITIES.md) declara condiciones, pérdidas
 y mantenimiento individual no asignado. Los formatos permanecen independientes
 del número privado 0.11.1; el corpus histórico se conserva en el sdist y no se

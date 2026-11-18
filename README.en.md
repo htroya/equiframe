@@ -1,6 +1,6 @@
 # EquiFrame: semantic comparison and dataframe migration
 
-> Release target: **0.12.4**. Check the official index for availability and
+> Release target: **0.13.1**. Check the official index for availability and
 > verify the identified artifact hashes. Publication requires the
 > [release gates](https://github.com/htroya/equiframe/blob/main/docs/releasing.md).
 
@@ -21,14 +21,14 @@ your own data, independently of procurement schemas, warehouses and cloud servic
 
 ## Install
 
-EquiFrame 0.12.4 supports **Python 3.10, 3.11, 3.12 and 3.13**.
+EquiFrame 0.13.1 supports **Python 3.10, 3.11, 3.12 and 3.13**.
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.12.4"
+python -m pip install "equiframe[files,engines,ml]==0.13.1"
 python -m pip check
 ```
 
-The base installation is `python -m pip install equiframe==0.12.4`.
+The base installation is `python -m pip install equiframe==0.13.1`.
 Optional engines and machine-learning libraries are loaded when requested.
 
 | Extra | Purpose |
@@ -127,6 +127,46 @@ for argument-validation exceptions and command-specific exits.
 All six directed combinations of Pandas, Polars and DuckDB are supported.
 A verdict concerns the supplied inputs and contract. Preserve `complete` and
 unavailable-component states when deciding whether to accept a migration.
+
+## Compare amounts by arbitrary groups
+
+New in 0.13.1, compare exact sums for any grouping columns and numeric measure:
+
+```python
+import pyarrow as pa
+import equiframe as ef
+
+expected = pa.table(
+    {
+        "branch": ["A", "A", "B", "C", "D"],
+        "currency": ["USD"] * 5,
+        "sales": [40, 60, 0, 50, 9],
+    }
+)
+candidate = pa.table(
+    {
+        "branch": ["A", "A", "B", "C", "E"],
+        "currency": ["USD"] * 5,
+        "sales": [90, 60, 25, 50, 7],
+    }
+)
+summary = ef.compare_grouped(
+    candidate,
+    expected,
+    by=("branch", "currency"),
+    column="sales",
+)
+print(summary.modified_group_proportion)
+print(summary.maximum_relative_difference)
+print(summary.changed_from_zero_groups)
+print(summary.group_coverage, summary.comparison_coverage)
+```
+
+The same API works for inventory by warehouse, expenses by department or amounts
+by entity and currency. It reports missing and invalid groups explicitly; an
+empty denominator is `None`. Metrics use exact Fractions and do not change the
+existing row-equivalence checks. See the [grouped-comparison guide](https://github.com/htroya/equiframe/blob/main/docs/grouped-comparison.md)
+for formulas, tolerances, zero references, input types and bounded examples.
 
 ## ETL, rules, anomalies and R review
 

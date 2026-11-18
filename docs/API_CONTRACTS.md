@@ -31,7 +31,7 @@ equivalencia; la notación O y los nombres existentes `oracle`, `OracleResult`,
 
 La API explícita está en `equiframe.__all__`; `__version__` es `0.12.0a14`.
 Desde STEP6 cada export, comando y esquema tiene clasificación explícita en
-[compatibilidad](COMPATIBILITY.md), consultable con `get_stability_register()`.
+[compatibilidad](compatibility-legacy-0124.md), consultable con `get_stability_register()`.
 `get_compatibility_policy()` publica los avisos/plazos; `get_adapter_capabilities()`
 separa captura, comparación, ejecución y migración. Estas descripciones no admiten
 por sí solas una ejecución ni acreditan una plataforma; los registros de la

@@ -198,6 +198,12 @@ from equiframe.execution_types import (
     TableArtifact,
     VersionInfo,
 )
+from equiframe.grouped import GroupedComparisonInput, compare_grouped
+from equiframe.grouped_types import (
+    GroupedComparisonOptions,
+    GroupedComparisonResult,
+    GroupedDifference,
+)
 from equiframe.ingestion import (
     ConversionReceipt as IngestionConversionReceipt,
 )
@@ -580,6 +586,10 @@ __all__ = [
     "FloatType",
     "FloatValue",
     "GlobalKeyScope",
+    "GroupedComparisonInput",
+    "GroupedComparisonOptions",
+    "GroupedComparisonResult",
+    "GroupedDifference",
     "HybridDecision",
     "IRColumn",
     "IgnoredOrder",
@@ -751,6 +761,7 @@ __all__ = [
     "check_migration",
     "combine_decisions",
     "compare",
+    "compare_grouped",
     "comparison_fingerprint",
     "comparison_report",
     "contract_fingerprint",

@@ -157,7 +157,7 @@ Eso no acredita todas las operaciones/tipos en las seis direcciones. El
 
 Los tests del registro cotejan runtime, compilers, dependencias, referencias y
 cada superficie de estabilidad. Son controles de correspondencia, no certifican
-por sí solos el motor. La [política de compatibilidad](COMPATIBILITY.md) define
+por sí solos el motor. La [política de compatibilidad](compatibility-legacy-0124.md) define
 avisos, ventana de retirada y excepciones fail-closed.
 
 

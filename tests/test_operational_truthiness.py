@@ -30,6 +30,7 @@ GUARDED = {
     "DetectorScoreResult",
     "DetectorScores",
     "ExecutionResult",
+    "GroupedComparisonResult",
     "HybridDecision",
     "IngestionResult",
     "MigrationResult",

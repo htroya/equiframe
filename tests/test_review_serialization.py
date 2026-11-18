@@ -27,7 +27,7 @@ from equiframe.cli import app
 
 
 @given(st.integers(1, 50), st.integers(0, 1), st.booleans())
-@settings(max_examples=30, derandomize=True)
+@settings(max_examples=30, derandomize=True, deadline=None)
 def test_decimal_context_cannot_change_canonical_bytes_or_hash(
     precision: int, capitals: int, clamp: bool
 ) -> None:

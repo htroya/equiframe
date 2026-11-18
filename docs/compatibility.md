@@ -4,7 +4,7 @@
 
 ## Admission is not a measured support matrix
 
-The 0.12.4 release contract declares **Python `>=3.10,<3.14`**, meaning 3.10, 3.11, 3.12 and
+The 0.13.1 release contract declares **Python `>=3.10,<3.14`**, meaning 3.10, 3.11, 3.12 and
 3.13. Dependency ranges describe installable admission, not every tested
 combination. A lock captures one resolution; it does not prove every operating
 system, architecture, Python patch or cross-product of package versions works.
@@ -19,7 +19,7 @@ that retains version `0.11.1`.
 
 The following implementation checks actually ran from installed A14 artifacts
 on 27 October 2026. They establish the listed workloads, rather than every input
-or dependency combination. The final 0.12.4 artifact must still pass its own
+or dependency combination. The 0.13.1 artifact must pass its own
 [release gates](releasing.md); a version change does not inherit an artifact hash.
 
 | OS / architecture | CPython actually exercised | Observed functional scope |
@@ -56,7 +56,7 @@ Platform-specific skips retain their meaning and are not successful checks.
 No macOS, PyPy, other architecture, every Python patch or full minimum-to-maximum
 dependency cross-product is established by this table. Earlier STEP6 x86_64
 results above retain their own artifact identities; none is silently relabelled
-as a 0.12.4 final-artifact result.
+as a 0.13.1 final-artifact result.
 
 The first-use builder selects an explicit Python minor and its own hash-pinned
 dependency closure. The legacy `requirements.lock` is the 3.12 closure;
@@ -134,7 +134,7 @@ when callers construct their own capability records.
 
 | Status | Main surfaces |
 |---|---|
-| Stable | Existing contracts/comparison/native execution/rules/assertions/Verify/bundles; local file reading and conversion; explicit DuckDB capture; closed IR and native pairwise migration, including admitted windows; profiles/preprocessing/IF/MAD/H; optional language-R review and finalization; their explicitly inventoried models/formats |
+| Stable | Grouped numeric comparison; existing contracts/comparison/native execution/rules/assertions/Verify/bundles; local file reading and conversion; explicit DuckDB capture; closed IR and native pairwise migration, including admitted windows; profiles/preprocessing/IF/MAD/H; optional language-R review and finalization; their explicitly inventoried models/formats |
 | Experimental | Standalone pipeline orchestration, ingestion/destinations/workflows, snapshot providers, pipeline reporting/reduction, first-use demo/doctor and the `equiframe.eda` namespace |
 | Unsupported | Quarantined historical `equiframe.benchmark` helper |
 | Outside this inventory | Private `_...` internals, dependency APIs and the separate benchmark package's experimental API |

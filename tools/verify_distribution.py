@@ -56,13 +56,14 @@ def single(pattern: str) -> Path:
 
 
 def readme_consumer_script(readme: str) -> str:
-    """Execute the three literal blocks with files and independent assertions."""
+    """Execute all four literal blocks with files and independent assertions."""
     blocks = [part.split("```", 1)[0] for part in readme.split("```python\n")[1:]]
     if (
-        len(blocks) != 3
+        len(blocks) != 4
         or 'ef.load_dataset("orders.json")' not in blocks[0]
         or 'ef.load_dataset("orders.parquet"' not in blocks[1]
         or "ef.diff(" not in blocks[2]
+        or "summary = ef.compare_grouped(" not in blocks[3]
     ):
         raise RuntimeError("README examples changed; review the installed consumer assertions")
     fixtures = """
@@ -96,9 +97,32 @@ except ef.EquivalenceAssertionError as _qa_error:
     assert _qa_error.code == "different"
 else:
     raise AssertionError("README regression was accepted")
-print("Three literal README blocks verified: JSON/Parquet 30000 rows and value 200 -> 201")
 """
-    return fixtures + blocks[0] + loaded + blocks[1] + parquet + blocks[2] + comparison
+    grouped = """
+from fractions import Fraction as _qa_Fraction
+assert summary.candidate_groups == summary.expected_groups == 4
+assert summary.common_groups == summary.comparable_groups == 3
+assert summary.union_groups == 5 and summary.modified_groups == 2
+assert summary.modified_group_proportion == _qa_Fraction(2, 3)
+assert summary.maximum_relative_difference == _qa_Fraction(1, 2)
+assert summary.changed_from_zero_groups == summary.zero_baseline_groups == 1
+assert summary.added_groups == summary.removed_groups == 1
+assert summary.group_coverage == summary.comparison_coverage == _qa_Fraction(3, 5)
+assert summary.reference_coverage == _qa_Fraction(3, 4)
+assert summary.complete is True and summary.unavailable_groups == 0
+print("Four literal README blocks verified: load, convert, row regression and exact grouped sums")
+"""
+    return (
+        fixtures
+        + blocks[0]
+        + loaded
+        + blocks[1]
+        + parquet
+        + blocks[2]
+        + comparison
+        + blocks[3]
+        + grouped
+    )
 
 
 def sync_consumer(
@@ -569,6 +593,10 @@ def main() -> None:
             "equiframe/schemas/r-execution-binding-1.0.schema.json",
             "equiframe/schemas/r-review-result-1.0.schema.json",
             "equiframe/schemas/reviewed-decision-1.0.schema.json",
+            "equiframe/schemas/grouped-comparison-options-1.0.schema.json",
+            "equiframe/schemas/grouped-comparison-result-1.0.schema.json",
+            "equiframe/schemas/grouped-difference-1.0.schema.json",
+            "equiframe/examples/grouped_compare.py",
         }
         if not required.issubset(names):
             raise RuntimeError("wheel is missing typed public files or reader/reviewer resources")
@@ -632,7 +660,8 @@ from importlib.resources import files
 handbook = files('equiframe').joinpath('docs')
 for title in ('index','quickstart','recipes','api','semantics','compatibility',
               'performance','upgrading','contributing','security','releasing','dependencies',
-              'adoption','maintenance','extending','lectura-conversion','r_review'):
+              'adoption','maintenance','extending','lectura-conversion','r_review',
+              'grouped-comparison'):
     assert handbook.joinpath(title + '.md').read_text(encoding='utf-8').strip()
 assert equiframe.__version__ == importlib.metadata.version('equiframe') == sys.argv[1]
 for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy', 'pyarrow',
@@ -660,6 +689,16 @@ assert equiframe.SnapshotManifest.model_json_schema()
 assert callable(equiframe.SnapshotDataSource) and callable(equiframe.snapshot_fingerprint)
 assert callable(equiframe.load_dataset) and callable(equiframe.inspect_dataset)
 assert callable(equiframe.convert_dataset)
+assert callable(equiframe.compare_grouped)
+assert equiframe.GroupedComparisonOptions().max_groups == 100_000
+import json
+for filename, model in (
+    ('grouped-comparison-options', equiframe.GroupedComparisonOptions),
+    ('grouped-comparison-result', equiframe.GroupedComparisonResult),
+    ('grouped-difference', equiframe.GroupedDifference),
+):
+    resource = files('equiframe').joinpath('schemas', filename + '-1.0.schema.json')
+    assert json.loads(resource.read_text(encoding='utf-8')) == model.model_json_schema()
 assert callable(equiframe.DatasetSource) and callable(equiframe.DatasetProvenance)
 assert callable(equiframe.review_with_r) and callable(equiframe.finalize_with_r)
 assert callable(equiframe.finalize_execution_with_r)
@@ -777,6 +816,15 @@ print('Installed wheel API roundtrips all five fixtures exactly')
             "src/equiframe/datasets.py",
             "src/equiframe/_dataset_provenance.py",
             "src/equiframe/r_review.py",
+            "src/equiframe/grouped.py",
+            "src/equiframe/grouped_types.py",
+            "tests/test_grouped.py",
+            "tests/test_grouped_matrix.py",
+            "examples/grouped_compare.py",
+            "docs/grouped-comparison.md",
+            "schemas/grouped-comparison-options-1.0.schema.json",
+            "schemas/grouped-comparison-result-1.0.schema.json",
+            "schemas/grouped-difference-1.0.schema.json",
             "src/equiframe/_r_review.R",
             "schemas/r-review-options-1.0.schema.json",
             "schemas/r-review-binding-1.0.schema.json",
@@ -850,6 +898,19 @@ import equiframe
 assert Path(equiframe.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
 """
         run([str(source_python), "-I", "-c", location_check], cwd=source, env=source_env)
+        run(
+            [
+                str(source_python),
+                "-I",
+                "-c",
+                "import runpy; from importlib.resources import files; "
+                "p = files('equiframe').joinpath('examples', 'grouped_compare.py'); "
+                "runpy.run_path(str(p), "
+                "run_name='__main__')",
+            ],
+            cwd=work,
+            env=source_env,
+        )
         run(
             [str(source_python), "-I", "tools/generate_assets.py", "--check"],
             cwd=source,

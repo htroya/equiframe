@@ -7,7 +7,7 @@ aceptación humana, certificación externa o ejecución de CI remota.
 
 ## Compromiso implementado
 
-- [Clasificación y deprecación](COMPATIBILITY.md): inventario explícito de
+- [Clasificación y deprecación](compatibility-legacy-0124.md): inventario explícito de
   343 exports, 20 comandos y 55 esquemas, con API/CLI/formatos/evidencia separados
 - Retirada estable: al menos dos releases minor y 90 días de aviso, ambas
   condiciones. Excepciones documentadas para rechazo de entradas inseguras,

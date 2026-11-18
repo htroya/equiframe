@@ -262,6 +262,11 @@ See [performance](performance.md), [security](security.md) and
 
 ## Rules and anomaly signals are not equivalence
 
+`compare_grouped` separately describes exact numeric sums under arbitrary keys.
+Its reference-relative metrics, missing/invalid groups and empty denominators
+follow the [grouped comparison contract](grouped-comparison.md). Equal grouped
+sums do not imply row equivalence or change any existing acceptance gate.
+
 R evaluates declared rules over one execution; M is Isolation Forest; B is MAD;
 H is R OR M; O is independent expected-output/review evidence. They remain
 separate. Profiles and detectors do not receive labels, mutations or another

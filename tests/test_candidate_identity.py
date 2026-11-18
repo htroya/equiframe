@@ -43,6 +43,8 @@ import equiframe as ef
         "0.12.1",
         "0.12.2",
         "0.12.3",
+        "0.12.4",
+        "0.13.0",
     ],
 )
 def test_detector_producer_history_remains_readable(version: str) -> None:
@@ -56,7 +58,7 @@ def test_current_detector_producer_matches_candidate_metadata() -> None:
     assert ef.DetectorVersions(python="3.12.14").equiframe == ef.__version__
     assert config["project"]["dynamic"] == ["version"] and "version" not in config["project"]
     backend = runpy.run_path(str(Path(__file__).parents[1] / "tools" / "release_version.py"))
-    assert backend["project_version"](Path(__file__).parents[1]) == ef.__version__ == "0.12.4"
+    assert backend["project_version"](Path(__file__).parents[1]) == ef.__version__ == "0.13.1"
 
 
 def test_unknown_detector_producer_is_not_silently_accepted() -> None:

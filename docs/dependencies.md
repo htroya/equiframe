@@ -74,15 +74,15 @@ CORE=.
 BENCH=packages/equiframe-benchmark
 
 $PY $TOOL generate --package "$CORE" \
-  --artifact "$CORE/dist/equiframe-0.12.4-py3-none-any.whl" \
-  --artifact "$CORE/dist/equiframe-0.12.4.tar.gz" \
+  --artifact "$CORE/dist/equiframe-0.13.1-py3-none-any.whl" \
+  --artifact "$CORE/dist/equiframe-0.13.1.tar.gz" \
   --output evidence/dependencies/core
 
 $PY $TOOL generate --package "$BENCH" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.12.4-py3-none-any.whl" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.12.4.tar.gz" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.13.1-py3-none-any.whl" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.13.1.tar.gz" \
   --environment-python "$BENCH/.venv/bin/python" \
-  --local-artifact "$CORE/dist/equiframe-0.12.4-py3-none-any.whl" \
+  --local-artifact "$CORE/dist/equiframe-0.13.1-py3-none-any.whl" \
   --output evidence/dependencies/benchmark
 ```
 
@@ -145,17 +145,17 @@ Reverify the final artifact bytes, lock, selected environment, BOMs and audit:
 
 ```sh
 $PY $TOOL verify --package "$CORE" \
-  --artifact "$CORE/dist/equiframe-0.12.4-py3-none-any.whl" \
-  --artifact "$CORE/dist/equiframe-0.12.4.tar.gz" \
+  --artifact "$CORE/dist/equiframe-0.13.1-py3-none-any.whl" \
+  --artifact "$CORE/dist/equiframe-0.13.1.tar.gz" \
   --inventory evidence/dependencies/core/inventory.json \
   --advisories evidence/dependencies/core-advisories/advisories.json \
   --max-age-hours 24 --require-clean
 
 $PY $TOOL verify --package "$BENCH" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.12.4-py3-none-any.whl" \
-  --artifact "$BENCH/dist/equiframe_benchmark-0.12.4.tar.gz" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.13.1-py3-none-any.whl" \
+  --artifact "$BENCH/dist/equiframe_benchmark-0.13.1.tar.gz" \
   --environment-python "$BENCH/.venv/bin/python" \
-  --local-artifact "$CORE/dist/equiframe-0.12.4-py3-none-any.whl" \
+  --local-artifact "$CORE/dist/equiframe-0.13.1-py3-none-any.whl" \
   --inventory evidence/dependencies/benchmark/inventory.json \
   --advisories evidence/dependencies/benchmark-advisories/advisories.json \
   --max-age-hours 24 --require-clean
@@ -195,14 +195,22 @@ dependency and retain the required acknowledgement:
 
 > This product includes software developed by David Giffin <david@giffin.org>.
 
-SciPy binary notices separately identify OpenBLAS/LAPACK, the GCC runtime with
-its runtime exception, and libquadmath under their respective terms. Docutils
+SciPy binary notices identify bundled components such as OpenBLAS/LAPACK and
+the GCC runtime with its runtime exception; some distributions also include
+libquadmath. Inspect the actual wheel's notices for its component inventory. Docutils
 identifies its public-domain files and separately licensed exceptions. These
 notices must not be replaced by EquiFrame's MIT license or collapsed into a
 guessed single SPDX expression. Normal dependency installation retains upstream
 notices; repackaging dependencies requires a separate review of the actual files.
 
 ## Interpreting advisory results
+
+Development and release QA require pytest `>=9.0.3,<10`. Earlier versions are
+affected by CVE-2025-71176 in UNIX temporary-directory handling; pytest is not a
+runtime dependency of EquiFrame. The floor follows the
+[upstream 9.0.3 correction](https://docs.pytest.org/en/9.0.x/changelog.html#pytest-9-0-3-2026-04-07).
+Use the reviewed locks and an explicit private QA temporary directory. Historical
+preflight results retain the tooling versions they actually used.
 
 Retain the query time, exact name/version, provider, URL, returned bytes/hash and
 errors. A successful response with no listed advisories means only that the

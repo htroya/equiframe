@@ -688,6 +688,19 @@ def test_sdist_journey_binding_matches_exact_installed_wheel_bytes(runner, tmp_p
 @pytest.mark.parametrize(
     "original,destination",
     [
+        ("examples/grouped_compare.py", "equiframe/examples/grouped_compare.py"),
+        (
+            "schemas/grouped-comparison-options-1.0.schema.json",
+            "equiframe/schemas/grouped-comparison-options-1.0.schema.json",
+        ),
+        (
+            "schemas/grouped-comparison-result-1.0.schema.json",
+            "equiframe/schemas/grouped-comparison-result-1.0.schema.json",
+        ),
+        (
+            "schemas/grouped-difference-1.0.schema.json",
+            "equiframe/schemas/grouped-difference-1.0.schema.json",
+        ),
         (
             "schemas/r-review-options-1.0.schema.json",
             "equiframe/schemas/r-review-options-1.0.schema.json",
