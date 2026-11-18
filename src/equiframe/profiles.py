@@ -30,6 +30,7 @@ from equiframe.profile_types import (
     ConversionReceipt,
     FeatureObservation,
     FeatureSupport,
+    GroupedProfileFeature,
     ProfileFeature,
     ProfileMetadata,
     ProfileMetric,
@@ -45,6 +46,8 @@ from equiframe.values import DateValue, TimestampValue
 
 if TYPE_CHECKING:
     import pyarrow as pa
+
+    from equiframe.grouped_types import GroupedComparisonResult
 
 _FAMILIES: dict[ProfileMetric, tuple[Family, ...]] = {
     "log_filas": ("nulls_types", "joins", "duplicates_order", "aggregations", "dates"),
@@ -69,6 +72,7 @@ class _ProfileContext:
         self.conversions: dict[str, ConversionReceipt] = {}
         self.hashes: dict[str, str] = {}
         self.output_sha256 = ""
+        self.grouped: dict[str, GroupedComparisonResult] = {}
 
     def checkpoint(self, cost: int = 1) -> None:
         self.work += cost
@@ -149,6 +153,32 @@ def _validate_references(execution: ExecutionResult, spec: ProfileSpec) -> None:
     tables = {t.name: t for t in (*contract.inputs, contract.output)}
     inputs = {t.name for t in contract.inputs}
     for feature in spec.features:
+        if isinstance(feature, GroupedProfileFeature):
+            if feature.table != contract.output.name or feature.reference_table not in inputs:
+                raise ValueError("grouped profiles require this execution's output and own input")
+            for group_table, group_columns in (
+                (feature.table, (*feature.by, feature.column)),
+                (feature.reference_table, (*feature.by, feature.reference_column)),
+            ):
+                if group_table not in tables or not set(group_columns) <= {
+                    c.name for c in tables[group_table].schema_spec.columns
+                }:
+                    raise ValueError("grouped profile references undeclared columns")
+            output_columns = {c.name: c for c in tables[feature.table].schema_spec.columns}
+            input_columns = {c.name: c for c in tables[feature.reference_table].schema_spec.columns}
+            for left_name, right_name in (
+                (feature.column, feature.reference_column),
+                *((name, name) for name in feature.by),
+            ):
+                left_policy = output_columns[left_name].numeric_policy
+                right_policy = input_columns[right_name].numeric_policy
+                if (
+                    left_policy is not None
+                    and right_policy is not None
+                    and left_policy.unit != right_policy.unit
+                ):
+                    raise ValueError("grouped profile numeric units must match")
+            continue
         for name, columns in (
             (feature.table, feature.columns),
             (feature.right_table, feature.right_columns),
@@ -380,7 +410,11 @@ def profile_execution(
     conversions = tuple(ConversionReceipt.model_validate(c) for c in conversions)
     if len({c.feature for c in conversions}) != len(conversions) or not {
         c.feature for c in conversions
-    } <= {f.name for f in spec.features if f.metric == "conversiones_fallidas"}:
+    } <= {
+        f.name
+        for f in spec.features
+        if isinstance(f, ProfileFeature) and f.metric == "conversiones_fallidas"
+    }:
         raise ValueError("conversion receipts must uniquely reference conversion features")
     identifier = "profile_" + uuid4().hex
     directory = (
@@ -402,6 +436,11 @@ def profile_execution(
                 observation = FeatureObservation(
                     name=feature.name, state="not_evaluable", reason=failure
                 )
+            elif isinstance(feature, GroupedProfileFeature):
+                from equiframe._grouped_profiles import measure_grouped
+
+                context.checkpoint()
+                observation = measure_grouped(feature, context)
             elif spec.family not in _FAMILIES[feature.metric]:
                 observation = FeatureObservation(
                     name=feature.name, state="not_applicable", reason="family_not_applicable"
@@ -424,6 +463,11 @@ def profile_execution(
             contract_sha256=execution.contract_sha256,
             execution_sha256=profile_digest(execution.model_dump(mode="json")),
             conversion_receipts=conversions,
+            implementation_version=(
+                "equiframe-profiles-1.1"
+                if spec.feature_version == "1.1"
+                else "equiframe-profiles-1.0"
+            ),
             artifacts=tuple(
                 ref
                 for a in (*execution.inputs, *((execution.output,) if execution.output else ()))

@@ -19,7 +19,7 @@ historical matrices retain their original dates and identities. Start with
 
 ## Admission is not a measured support matrix
 
-The 0.13.6 release contract declares **Python `>=3.10,<3.14`**, meaning 3.10, 3.11, 3.12 and
+The 0.14.0 release contract declares **Python `>=3.10,<3.14`**, meaning 3.10, 3.11, 3.12 and
 3.13. Dependency ranges describe installable admission, not every tested
 combination. A lock captures one resolution; it does not prove every operating
 system, architecture, Python patch or cross-product of package versions works.
@@ -133,6 +133,17 @@ Native engine/Arrow transport and timezone behavior must be rechecked, not just
 `pip check`. ML parity is against the installed scikit-learn version; fitted
 forests, thresholds and decisions are not promised identical across versions.
 See [dependency/SBOM policy](dependencies.md) before upgrading transitives.
+
+## Feature-version 1.1 admission
+
+The 0.14.0 target adds `GroupedProfileFeature` under the existing profile API.
+Only explicit `feature_version="1.1"` admits it. The outer profile/model format
+markers remain 1.0 and the nested feature version identifies the extended
+formulas. Current readers preserve 1.0 payloads and fingerprints; previous
+releases reject new formulas/version 1.1. `ProfileFeature` and all ten existing
+formulas are unchanged. New input/output group measurements are directly usable
+by existing preprocessing and detectors, without changing IF/MAD/H algorithms.
+See [admission, numerical bounds and leakage boundary](grouped-profiles.md).
 
 ## Overall project maturity
 

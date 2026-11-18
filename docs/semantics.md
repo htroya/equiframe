@@ -260,6 +260,19 @@ scope, not proof that R passed; child pipeline states and partial alerts remain.
 See [performance](performance.md), [security](security.md) and
 [upgrading](upgrading.md) for operating and recovery procedures.
 
+## Grouped profile relationships
+
+Feature-version 1.1 can measure grouped numeric sums between one execution's
+captured input and output. The table roles are checked against its contract;
+no external expected output or label is accepted. Exact arithmetic precedes
+finite model-value conversion. Empty support is undefined, invalid common
+measurements and failed bounds are not evaluable, and added/removed groups affect
+coverage rather than becoming zero. Legitimate transformations can change these
+relationships: define normal training/calibration selection for the actual
+transformation. These features introduce no new equivalence gate. See
+[grouped profile formulas](grouped-profiles.md). Existing 1.0 vectors retain their
+original definitions; do not relabel new vectors as old formats.
+
 ## Rules and anomaly signals are not equivalence
 
 `compare_grouped` separately describes exact numeric sums under arbitrary keys.

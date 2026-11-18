@@ -1,5 +1,8 @@
 # EquiFrame user handbook
 
+[Grouped execution profiles](grouped-profiles.md), new in the 0.14.0 target:
+versioned input/output group metrics for existing preprocessing and detectors.
+
 [Grouped numeric comparison](grouped-comparison.md), new in 0.13.1: compare sums
 for any grouping columns and numeric measure, with explicit coverage and
 zero-reference changes.
@@ -40,7 +43,7 @@ Consulta [fuentes](universal-sources.md), [ventanas](migration-ir.md) y
 
 ## Release status
 
-The current maintenance target is **0.13.6**. The preceding **0.13.5**
+The current feature target is **0.14.0**. The preceding **0.13.5**
 release is [published on PyPI](https://pypi.org/project/equiframe/0.13.5/),
 with final source, installed-package and compatibility results in its
 [release notes](https://github.com/htroya/equiframe/releases/tag/v0.13.5).

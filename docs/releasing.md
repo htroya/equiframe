@@ -2,8 +2,8 @@
 
 ## Current state
 
-The release target is `equiframe 0.13.6` with the exactly paired
-`equiframe-benchmark 0.13.6`, identified by commit and artifact SHA-256.
+The release target is `equiframe 0.14.0` with the exactly paired
+`equiframe-benchmark 0.14.0`, identified by commit and artifact SHA-256.
 Source preparation does not establish validation or publication: verify the
 artifact-bound receipts and official index inventory. The public 0.12.2 tag and
 its receipts retain their original identities. The local 0.12.3 candidate tag

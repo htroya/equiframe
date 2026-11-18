@@ -2,7 +2,7 @@
 
 [Handbook](index.md) · [Choose an API](choosing-api.md) · [Semantics](semantics.md) · [Compatibility](compatibility.md)
 
-Use `import equiframe as ef`. This reference describes the 0.13.6 implemented
+Use `import equiframe as ef`. This reference describes the 0.14.0 implemented
 entry points and their bounded stability contracts. Signatures below use Python notation;
 `...` in a signature means the other documented optional arguments, not an
 executable example. The exhaustive exported namespace is `ef.__all__` and its
@@ -142,7 +142,7 @@ matching, time and evidence. `DiffCaptureOptions` controls native capture
 separately. They are cooperative budgets; [defaults and costs](performance.md)
 are not hard resource quotas.
 
-### Grouped numeric comparison (0.13.6)
+### Grouped numeric comparison (0.14.0)
 
 ```text
 compare_grouped(candidate, expected, *, by, column, options=None,
@@ -310,6 +310,17 @@ Training/calibration wrappers (`NormalTrainingProfiles`,
 handles reviewed selection. An empty/unsupported component remains not evaluable.
 Reduction invokes a **trusted** predicate with bounded row subsets, preserves
 preconditions/signature and does not claim a global minimum.
+
+### Grouped execution profiles (0.14.0)
+
+`GroupedProfileFeature` with `ProfileSpec(feature_version="1.1")` describes exact
+grouped-sum changes between a captured output and an input of the same execution.
+The existing `profile_execution`, preprocessing, fit/calibrate/detect and JSON
+readers support these vectors; feature-version 1.0 remains unchanged. Four
+metrics cover modified common groups, maximum relative changes, changes from
+zero and common/union coverage. See [formulas and admission](grouped-profiles.md).
+These measurements do not use an independent expected output and do not prove
+business correctness. No label or peer-engine result becomes a predictor.
 
 ## 8. Native migration, Verify and ETL
 

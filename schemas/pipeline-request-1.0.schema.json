@@ -923,6 +923,88 @@
       "title": "GlobalKeyScope",
       "type": "object"
     },
+    "GroupedProfileFeature": {
+      "additionalProperties": false,
+      "description": "Grouped sums of one execution's output versus its own captured input.\n\nThis describes an input/output relationship, not an independent correctness\noracle. A legitimate transformation can change sums; normal training and\ncalibration must describe the same declared transformation and formulas.",
+      "properties": {
+        "absolute_tolerance": {
+          "default": "0",
+          "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+          "title": "Absolute Tolerance",
+          "type": "string"
+        },
+        "by": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "By",
+          "type": "array"
+        },
+        "column": {
+          "minLength": 1,
+          "title": "Column",
+          "type": "string"
+        },
+        "metric": {
+          "enum": [
+            "prop_grupos_suma_modificada",
+            "max_diferencia_relativa_grupo",
+            "prop_grupos_cambio_desde_cero",
+            "cobertura_grupos"
+          ],
+          "title": "Metric",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "null_keys": {
+          "default": "reject",
+          "enum": [
+            "reject",
+            "group"
+          ],
+          "title": "Null Keys",
+          "type": "string"
+        },
+        "reference_column": {
+          "minLength": 1,
+          "title": "Reference Column",
+          "type": "string"
+        },
+        "reference_table": {
+          "minLength": 1,
+          "title": "Reference Table",
+          "type": "string"
+        },
+        "relative_tolerance": {
+          "default": "0",
+          "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+          "title": "Relative Tolerance",
+          "type": "string"
+        },
+        "table": {
+          "minLength": 1,
+          "title": "Table",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "metric",
+        "table",
+        "column",
+        "reference_table",
+        "reference_column",
+        "by"
+      ],
+      "title": "GroupedProfileFeature",
+      "type": "object"
+    },
     "IgnoredOrder": {
       "additionalProperties": false,
       "properties": {
@@ -1752,14 +1834,24 @@
           "type": "string"
         },
         "feature_version": {
-          "const": "1.0",
           "default": "1.0",
+          "enum": [
+            "1.0",
+            "1.1"
+          ],
           "title": "Feature Version",
           "type": "string"
         },
         "features": {
           "items": {
-            "$ref": "#/$defs/ProfileFeature"
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ProfileFeature"
+              },
+              {
+                "$ref": "#/$defs/GroupedProfileFeature"
+              }
+            ]
           },
           "minItems": 1,
           "title": "Features",

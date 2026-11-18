@@ -1,3 +1,15 @@
+## 0.14.0 - versioned grouped execution profiles
+
+- Add opt-in feature-version 1.1 grouped-sum metrics from one captured
+  execution's own input/output, with exact ratios and explicit coverage.
+- Reuse preprocessing, fitting, calibration and inference without changing
+  detector algorithms or accepting peer outputs/labels as predictors.
+- Preserve 1.0 feature definitions/fingerprints and historical readers; old
+  consumers reject the new feature version instead of silently relabelling it.
+- Bound and cache per-execution grouping, retain unavailable/undefined states,
+  and test actual 30,000-row Pandas, Polars and DuckDB execution profiles.
+- Pair both packages at 0.14.0. New artifacts require their own release checks.
+
 ## 0.13.6 - paired maintenance release
 
 - Correct stale documentation that still described published 0.13.5 as a candidate.

@@ -3,6 +3,7 @@
 import hashlib
 import json
 import math
+from decimal import Decimal
 from typing import Annotated, Literal
 
 from pydantic import Field, model_validator
@@ -19,6 +20,7 @@ from equiframe._base import (
 )
 from equiframe.contracts import ColumnSpec, Family
 from equiframe.types import ArtifactRef, Sha256
+from equiframe.values import ExactDecimal
 
 ProfileMetric = Literal[
     "log_filas",
@@ -91,14 +93,60 @@ class ProfileFeature(FrozenModel):
         return self
 
 
-class ProfileSpec(FrozenModel):
-    schema_version: Literal["1.0"] = "1.0"
-    feature_version: Literal["1.0"] = "1.0"
-    family: Family
-    features: Annotated[tuple[ProfileFeature, ...], Field(min_length=1)]
+class GroupedProfileFeature(FrozenModel):
+    """Grouped sums of one execution's output versus its own captured input.
+
+    This describes an input/output relationship, not an independent correctness
+    oracle. A legitimate transformation can change sums; normal training and
+    calibration must describe the same declared transformation and formulas.
+    """
+
+    name: Identifier
+    metric: Literal[
+        "prop_grupos_suma_modificada",
+        "max_diferencia_relativa_grupo",
+        "prop_grupos_cambio_desde_cero",
+        "cobertura_grupos",
+    ]
+    table: Identifier
+    column: Text
+    reference_table: Identifier
+    reference_column: Text
+    by: Annotated[tuple[Text, ...], Field(min_length=1)]
+    absolute_tolerance: Annotated[ExactDecimal, Field(ge=0)] = Decimal(0)
+    relative_tolerance: Annotated[ExactDecimal, Field(ge=0)] = Decimal(0)
+    null_keys: Literal["reject", "group"] = "reject"
 
     @model_validator(mode="after")
     def consistent(self) -> Self:
+        from equiframe.grouped_types import GroupedComparisonOptions
+
+        unique(self.by, "by")
+        if self.column in self.by or self.reference_column in self.by:
+            raise ValueError("grouping keys must exclude the measured columns")
+        if self.table == self.reference_table:
+            raise ValueError("grouped profiles require distinct input and output tables")
+        # Share exact tolerance admission with the underlying grouped comparator.
+        GroupedComparisonOptions(
+            absolute_tolerance=self.absolute_tolerance,
+            relative_tolerance=self.relative_tolerance,
+            null_keys=self.null_keys,
+        )
+        return self
+
+
+class ProfileSpec(FrozenModel):
+    schema_version: Literal["1.0"] = "1.0"
+    feature_version: Literal["1.0", "1.1"] = "1.0"
+    family: Family
+    features: Annotated[tuple[ProfileFeature | GroupedProfileFeature, ...], Field(min_length=1)]
+
+    @model_validator(mode="after")
+    def consistent(self) -> Self:
+        if self.feature_version == "1.0" and any(
+            isinstance(f, GroupedProfileFeature) for f in self.features
+        ):
+            raise ValueError("grouped features require explicit feature_version=1.1")
         unique(tuple(f.name for f in self.features), "features")
         unique(
             tuple(
@@ -228,7 +276,12 @@ class ProfileVector(FrozenModel):
                 elif observation.denominator is None:
                     raise ValueError("rate must retain its denominator")
                 elif (
-                    feature.metric not in ("razon_salida_entrada", "expansion_union")
+                    feature.metric
+                    not in (
+                        "razon_salida_entrada",
+                        "expansion_union",
+                        "max_diferencia_relativa_grupo",
+                    )
                     and (observation.numerator or 0) > observation.denominator
                 ):
                     raise ValueError("proportion cannot exceed one")
@@ -243,7 +296,9 @@ class ProfileMetadata(FrozenModel):
     execution_sha256: Sha256
     artifacts: tuple[ArtifactRef, ...]
     conversion_receipts: tuple[ConversionReceipt, ...] = ()
-    implementation_version: Literal["equiframe-profiles-1.0"] = "equiframe-profiles-1.0"
+    implementation_version: Literal["equiframe-profiles-1.0", "equiframe-profiles-1.1"] = (
+        "equiframe-profiles-1.0"
+    )
 
 
 class ProfileResult(_ExplicitOutcome, FrozenModel):
@@ -263,6 +318,13 @@ class ProfileResult(_ExplicitOutcome, FrozenModel):
     def consistent(self) -> Self:
         if self.complete != all(o.state != "not_evaluable" for o in self.vector.observations):
             raise ValueError("profile completeness contradicts observations")
+        implementation = (
+            "equiframe-profiles-1.1"
+            if self.vector.spec.feature_version == "1.1"
+            else "equiframe-profiles-1.0"
+        )
+        if self.metadata.implementation_version != implementation:
+            raise ValueError("profile implementation differs from its feature version")
         return self
 
 

@@ -2,7 +2,7 @@
 
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Release process](releasing.md)
 
-The 0.13.6 release contract uses MIT for project-owned code; third-party materials
+The 0.14.0 release contract uses MIT for project-owned code; third-party materials
 retain their notices and licenses. Redistribution rights follow those licenses.
 Hernán Troya (`htroya`) maintains the project and owns releases/security
 coordination on a best-effort basis without a promised backup or response-time SLA.
