@@ -1,4 +1,4 @@
-# Readiness review and 0.13.3 action plan
+# Readiness review and 0.13.4 action plan
 
 ## Assessment of published 0.13.1
 
@@ -50,6 +50,12 @@ This plan is not itself a passing test or publication receipt.
 
 The local 0.13.2 tag was rejected before any upload. Comparing archived working
 files with actual Git objects found four line-ending conversions during staging
-and one globally ignored historical instruction file. Version 0.13.3 preserves
+and one globally ignored historical instruction file. Version 0.13.4 preserves
 those bytes with a Git attribute exception and checks both the working copy and
 Git HEAD. The earlier tag and its failure evidence remain unchanged.
+
+The local 0.13.3 candidate was also rejected before upload: the existing stale
+schema-inventory regression caught a sibling-module import error in the new
+asset-check integration when invoked through importlib. The entry point now
+loads its adjacent checker by an explicit source path. The original regression
+passes without weakening its expected failure, and 0.13.4 receives a new identity.

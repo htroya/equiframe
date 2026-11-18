@@ -1,4 +1,12 @@
-## 0.13.3 - preserved archive bytes and paired maintenance release
+## 0.13.4 - module-safe verification and paired maintenance release
+
+- Complete the maintenance changes prepared in unpublished 0.13.2/0.13.3.
+- Fix the asset-check entry point when loaded with importlib, preserving its
+  existing stale-schema rejection test as well as direct script execution.
+- Preserve both rejected local tags and receipts; neither candidate was uploaded.
+- Pair core and benchmark at 0.13.4, retaining previous producer readers.
+
+## 0.13.3 - unpublished candidate: preserved archive bytes and paired maintenance release
 
 - Complete the maintenance changes prepared in unpublished 0.13.2.
 - Reject that local candidate after Git-object checks found four archived JSON

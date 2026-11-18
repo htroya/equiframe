@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import runpy
 from decimal import Decimal
 from pathlib import Path
 
@@ -507,9 +508,8 @@ def main() -> None:
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     if args.check:
-        from check_repository_layout import layout_errors
-
-        errors = layout_errors(ROOT)
+        checker = runpy.run_path(str(ROOT / "tools/check_repository_layout.py"))
+        errors = checker["layout_errors"](ROOT)
         if errors:
             parser.exit(1, "Repository layout differs: " + "; ".join(errors) + "\n")
     contracts = examples()

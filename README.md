@@ -4,7 +4,7 @@
 
 <a id="english"></a>
 
-> Release target: **0.13.3**. Check the official index for availability and
+> Release target: **0.13.4**. Check the official index for availability and
 > verify the identified artifact hashes. Publication requires the
 > [release gates](docs/releasing.md).
 
@@ -34,11 +34,11 @@ explicitly identified. See the [readiness review](https://github.com/htroya/equi
 EquiFrame supports **Python 3.10, 3.11, 3.12 and 3.13**.
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.13.3"
+python -m pip install "equiframe[files,engines,ml]==0.13.4"
 python -m pip check
 ```
 
-The base installation is `python -m pip install equiframe==0.13.3`.
+The base installation is `python -m pip install equiframe==0.13.4`.
 Optional engines and machine-learning libraries are loaded when requested.
 
 | Extra | Purpose |
@@ -258,7 +258,7 @@ and [license scope](https://github.com/htroya/equiframe/blob/main/NOTICE.md).
 
 <a id="espanol"></a>
 
-> Objetivo de versión: **0.13.3**. Consulta su disponibilidad en el índice oficial
+> Objetivo de versión: **0.13.4**. Consulta su disponibilidad en el índice oficial
 > y verifica los hashes de los archivos identificados. La publicación requiere
 > las [comprobaciones de release](docs/releasing.md).
 
@@ -322,24 +322,24 @@ estables y las capacidades experimentales.
 Instala los extras necesarios para tu trabajo:
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.13.3"
+python -m pip install "equiframe[files,engines,ml]==0.13.4"
 python -m pip check
 ```
 
-La instalación base puede hacerse con `python -m pip install equiframe==0.13.3`.
+La instalación base puede hacerse con `python -m pip install equiframe==0.13.4`.
 Selecciona los extras necesarios para tu trabajo; el núcleo no importa los
 motores opcionales al ejecutar `import equiframe`.
 
 Para instalar un wheel local:
 
 ```bash
-python -m pip install "./equiframe-0.13.3-py3-none-any.whl[files,engines,ml]"
+python -m pip install "./equiframe-0.13.4-py3-none-any.whl[files,engines,ml]"
 ```
 
 El benchmark se instala por separado, después del núcleo:
 
 ```bash
-python -m pip install equiframe-benchmark==0.13.3
+python -m pip install equiframe-benchmark==0.13.4
 ```
 
 Consulta la [guía de instalación](https://github.com/htroya/equiframe/blob/main/docs/installed-private.md) para entornos aislados,
