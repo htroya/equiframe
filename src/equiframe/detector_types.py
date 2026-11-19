@@ -1,6 +1,7 @@
 """Declarative detector state: no executable estimators, labels or row metadata."""
 
 from fractions import Fraction
+from hashlib import sha256
 from math import ceil
 from typing import Annotated, Literal
 
@@ -8,7 +9,12 @@ from pydantic import Field, model_validator
 from typing_extensions import Self
 
 from equiframe._base import FrozenModel, NonNegativeInt, PositiveInt, Text, _ExplicitOutcome
-from equiframe.profile_types import PreprocessorBundle, ProfileVector, profile_digest
+from equiframe.profile_types import (
+    PreprocessorBundle,
+    ProfileVector,
+    _canonical_profile_json,
+    profile_digest,
+)
 from equiframe.types import DecisionState, Sha256
 
 ScoreValue = Annotated[float, Field(ge=0)] | Literal["+infinity"]
@@ -437,3 +443,17 @@ class HybridDecision(_ExplicitOutcome, FrozenModel):
 def detector_fingerprint(value: DetectorFit | DetectorBundle) -> str:
     validated = type(value).model_validate(value)
     return profile_digest(validated.model_dump(mode="json"))
+
+
+def _bundle_fingerprints(bundle: DetectorBundle) -> tuple[str, str]:
+    """Compute the historical bundle and fit digests from one validated model dump."""
+    payload = bundle.model_dump(mode="json")
+    fit_json = _canonical_profile_json(payload["fit"])
+    bundle_digest = sha256(b"{")
+    for index, name in enumerate(sorted(payload)):
+        if index:
+            bundle_digest.update(b",")
+        bundle_digest.update(_canonical_profile_json(name) + b":")
+        bundle_digest.update(fit_json if name == "fit" else _canonical_profile_json(payload[name]))
+    bundle_digest.update(b"}")
+    return bundle_digest.hexdigest(), sha256(fit_json).hexdigest()

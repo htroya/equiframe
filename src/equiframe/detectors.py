@@ -28,7 +28,7 @@ from equiframe.detector_types import (
     IsolationTree,
     NormalCalibrationProfiles,
     ScoreValue,
-    detector_fingerprint,
+    _bundle_fingerprints,
     numeric_score,
     quantile_rank,
 )
@@ -221,12 +221,11 @@ def _mad_score(model: DetectorModel, row: tuple[float, ...]) -> ScoreValue:
 def _inference_matrix(
     fit: DetectorFit, profiles: tuple[ProfileVector, ...]
 ) -> FeatureMatrix | None:
-    profiles = tuple(_compatible(p, fit.preprocessor.spec) for p in profiles)
-    return (
-        transform_profiles(fit.preprocessor, profiles)
-        if fit.preprocessor.state == "ready"
-        else None
-    )
+    if fit.preprocessor.state == "ready":
+        return transform_profiles(fit.preprocessor, profiles)
+    for profile in profiles:
+        _compatible(profile, fit.preprocessor.spec)
+    return None
 
 
 def _score_model(model: DetectorModel, matrix: FeatureMatrix | None) -> DetectorScores:
@@ -241,9 +240,15 @@ def _score_model(model: DetectorModel, matrix: FeatureMatrix | None) -> Detector
 def score_detectors(fit: DetectorFit, profiles: tuple[ProfileVector, ...]) -> DetectorScoreResult:
     """Frozen inference. Incompatible/failed profiles raise, never become no-alert."""
     fit = DetectorFit.model_validate(fit)
+    return _score_validated(fit, profiles, profile_digest(fit.model_dump(mode="json")))
+
+
+def _score_validated(
+    fit: DetectorFit, profiles: tuple[ProfileVector, ...], fit_sha256: str
+) -> DetectorScoreResult:
     matrix = _inference_matrix(fit, profiles)
     return DetectorScoreResult(
-        fit_sha256=detector_fingerprint(fit),
+        fit_sha256=fit_sha256,
         matrix_sha256=profile_digest(matrix.model_dump(mode="json")) if matrix else None,
         rows=len(profiles),
         m=_score_model(fit.m, matrix),
@@ -282,13 +287,17 @@ def calibrate_detectors(
     quantile_rank(alpha, max(1, len(calibration.profiles)))
     if calibration.selection_manifest_sha256 == fit.preprocessor.selection_manifest_sha256:
         raise ValueError("training and calibration selection manifests must differ")
-    scores = score_detectors(fit, calibration.profiles)
+    matrix = _inference_matrix(fit, calibration.profiles)
+    rows = len(calibration.profiles)
+    minimum = fit.support.min_calibration_rows
     return DetectorBundle(
         fit=fit,
         calibration_manifest_sha256=calibration.selection_manifest_sha256,
-        calibration_matrix_sha256=scores.matrix_sha256,
-        m=_calibrate(scores.m, alpha, scores.rows, fit.support.min_calibration_rows),
-        b=_calibrate(scores.b, alpha, scores.rows, fit.support.min_calibration_rows),
+        calibration_matrix_sha256=profile_digest(matrix.model_dump(mode="json"))
+        if matrix
+        else None,
+        m=_calibrate(_score_model(fit.m, matrix), alpha, rows, minimum),
+        b=_calibrate(_score_model(fit.b, matrix), alpha, rows, minimum),
     )
 
 
@@ -326,9 +335,10 @@ def _decisions(
 
 def detect(bundle: DetectorBundle, profiles: tuple[ProfileVector, ...]) -> DetectionResult:
     bundle = DetectorBundle.model_validate(bundle)
-    scores = score_detectors(bundle.fit, profiles)
+    bundle_sha256, fit_sha256 = _bundle_fingerprints(bundle)
+    scores = _score_validated(bundle.fit, profiles, fit_sha256)
     return DetectionResult(
-        bundle_sha256=detector_fingerprint(bundle),
+        bundle_sha256=bundle_sha256,
         scores=scores,
         m=_decisions(bundle.m, scores.m, scores.rows),
         b=_decisions(bundle.b, scores.b, scores.rows),
@@ -355,10 +365,11 @@ def detect_component(
         (bundle.fit.m, bundle.m) if method == "isolation_forest" else (bundle.fit.b, bundle.b)
     )
     scores = _score_model(model, matrix)
+    bundle_sha256, fit_sha256 = _bundle_fingerprints(bundle)
     return ComponentDetectionResult(
         method=method,
-        bundle_sha256=detector_fingerprint(bundle),
-        fit_sha256=detector_fingerprint(bundle.fit),
+        bundle_sha256=bundle_sha256,
+        fit_sha256=fit_sha256,
         profiles_sha256=profile_digest([p.model_dump(mode="json") for p in profiles]),
         matrix_sha256=profile_digest(matrix.model_dump(mode="json")) if matrix else None,
         rows=len(profiles),
@@ -374,7 +385,7 @@ def write_detector_bundle(bundle: DetectorBundle, path: Path) -> str:
     if len(payload) > 64 * 1024 * 1024:
         raise ValueError("detector bundle exceeds the 64 MiB document limit")
     _write_document(path, payload)
-    return detector_fingerprint(bundle)
+    return profile_digest(bundle.model_dump(mode="json"))
 
 
 def read_detector_bundle(path: Path, *, expected_sha256: str | None = None) -> DetectorBundle:
@@ -384,6 +395,9 @@ def read_detector_bundle(path: Path, *, expected_sha256: str | None = None) -> D
     except ResourceLimitError:
         raise ValueError("detector bundle exceeds the 64 MiB document limit") from None
     bundle = DetectorBundle.model_validate_json(raw)
-    if expected_sha256 is not None and detector_fingerprint(bundle) != expected_sha256:
+    if (
+        expected_sha256 is not None
+        and profile_digest(bundle.model_dump(mode="json")) != expected_sha256
+    ):
         raise ArtifactIntegrityError("detector bundle fingerprint mismatch")
     return bundle
