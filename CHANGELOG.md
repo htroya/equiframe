@@ -1,3 +1,8 @@
+## 0.14.4 - exact ETL acceptance and manual publishing
+
+- Require a successful reference comparison with `verify run --require-expected`.
+- Remove the external reviewer from the manual publication policy.
+
 ## 0.14.3 - frozen Isolation Forest inference
 
 - Validate detector state at the public boundary and reuse one canonical serialization of the fit for both fingerprints.

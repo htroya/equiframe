@@ -3,11 +3,11 @@
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Security](security.md) ·
 [Release/rollback](releasing.md)
 
-## 0.14.3: detector inference patch
+## 0.14.4: detector inference patch
 
 Existing 0.14.0 bundles retain their scores, decisions and fingerprints when read by
-0.14.3. New fits carry producer 0.14.3. Use a reader that admits that producer
-when exchanging new bundles. The optional benchmark is paired with core 0.14.3.
+0.14.4. New fits carry producer 0.14.4. Use a reader that admits that producer
+when exchanging new bundles. The optional benchmark is paired with core 0.14.4.
 See [version-specific guides](versions.md).
 
 ## 0.13.5: additive grouped numeric comparison
