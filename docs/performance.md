@@ -48,6 +48,30 @@ silently loosening exactness or dropping duplicates.
 
 ## Reproducible engineering measurements
 
+### Frozen Isolation Forest inference in the 0.14.3 candidate
+
+The probe reused a bundle produced by the published 0.14.0 wheel. It used 256
+training profiles, 64 normal calibration profiles and 200 trees with 40,994
+nodes. Both measurements used the same Windows host, Python 3.13.18,
+dependencies, saved bundle and input profiles. The 0.14.0 run preceded 0.14.3 in the paired replay. Each timing is the median of
+seven calls after warmup and includes validation, hashing, preprocessing and
+scoring.
+
+| Installed wheel | One profile | Batch of 16 profiles | Node validations per single call |
+| --- | ---: | ---: | ---: |
+| 0.14.0 | 2.18 s | 1.94 s | 122,982 |
+| 0.14.3 candidate | 0.66 s | 0.68 s | 40,994 |
+
+The bundle fingerprint and complete result digests matched for both input
+sizes. The measurements describe a synthetic single-feature scenario on a
+shared host running other jobs. Batch and single-profile medians come from
+separate measurement blocks. The original review recorded 2.4 seconds in
+an earlier run of the synthetic scenario.
+[Probe script](../validation/library_detection/benchmark_if_inference.py) ·
+[Timings and hashes](../validation/library_detection/results/if-inference-0143)
+
+### Scale tests
+
 The separate `equiframe-benchmark` package offers experimental `ScaleSpec`,
 `ScaleTrial`, `ScaleRun`, `measure_scale`, `read_scale` and `summarize_scale`.
 Install its identified matching wheel with the required dependency profile before

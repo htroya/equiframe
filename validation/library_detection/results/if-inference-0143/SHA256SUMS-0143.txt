@@ -1,0 +1,4 @@
+70ff9216c3f9bcd12048820b2ccdb4c1a0c7e0cfbe65c1f1cdaaf4fc2a1f3b6f equiframe-0.14.3-py3-none-any.whl
+a43e61a3b92ab1b74164b07c7aeefff8206d0129437b3c99e9ae07575d49d360 equiframe-0.14.3.tar.gz
+32b598b04d5cf79c32797e8c3054f11e4b1be73825b3e865a419df137e7d5b8c equiframe_benchmark-0.14.3-py3-none-any.whl
+764ec96406587476a080551dfee159d7857c9859df3448b4f28abd23066b129f equiframe_benchmark-0.14.3.tar.gz

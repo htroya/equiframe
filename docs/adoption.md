@@ -12,6 +12,13 @@ exact wheel, the real decision it supported, a minimized issue or dependency
 upgrade encountered, and a later change that exercised the same integration.
 Publish only the evidence the consumer agreed to share.
 
+The public check on 19 November 2026 found no issue reports and no external
+integrations in a code search for the package imports and extras. The public
+DW and portal contributions belong to the project work. This records the
+channels checked and leaves any private use unverified.
+[Issue tracker](https://github.com/htroya/equiframe/issues) ·
+[Contribution history](https://github.com/htroya/equiframe/pulls?q=is%3Apr+is%3Amerged)
+
 As of **2026-10-06**, no independent human pilot, participant consent or retained
 real-project integration is recorded. The three STEP1 pilot definitions and the
 first-use kit provide a starting protocol and synthetic technical exercises.

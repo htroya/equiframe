@@ -38,6 +38,14 @@ rollback rehearsal. The handover record should identify which duties were
 accepted and link to dated results. Keep credentials in each maintainer's own
 account and transfer repository or index access through their role controls.
 
+On 19 November 2026, the 0.14.3 rehearsal built the core and benchmark
+wheels and source archives twice from the identified tag. Both builds
+produced the same SHA-256 inventory. An isolated reinstall of the original
+0.14.0 wheel reproduced the historical bundle fingerprint and the complete
+Isolation Forest outputs for one and 16 profiles across the candidate tests.
+The exercise covers artifact reconstruction and a local rollback path.
+[Checksums and rollback receipts](../validation/library_detection/results/if-inference-0143)
+
 ## Report a problem
 
 Use [the public issue channel](https://github.com/htroya/equiframe/issues)

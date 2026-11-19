@@ -2,6 +2,13 @@
 
 ## Current state
 
+The [0.14.3 candidate tag](https://github.com/htroya/equiframe/tree/v0.14.3)
+identifies the compatible inference patch and its handbook. Both candidate
+packages were built and rebuilt locally. Index publication awaits independent
+artifact review and the remaining publication checks. The 0.14.1 candidate
+stopped at notebook lint and the 0.14.2 candidate stopped at the benchmark
+schema check. Their tags record those candidates. See [documentation by version](versions.md).
+
 `equiframe 0.14.0` and the exactly paired `equiframe-benchmark 0.14.0` are
 **public Beta releases**, published on TestPyPI and PyPI on **19 November 2026**.
 The 0.13.6 maintenance pair was published on both indices on the same date.

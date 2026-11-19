@@ -1,0 +1,45 @@
+{
+  "version": "0.14.0",
+  "wheel_sha256": "c1956d8cfeca3b558fccda9955d1cdba235934041df67ed753cca698ed461219",
+  "package_files_checked": 173,
+  "host": "Windows-11-10.0.26200-SP0",
+  "python": "3.13.18",
+  "dependencies": {
+    "pydantic": "2.13.5",
+    "numpy": "2.5.3",
+    "scikit-learn": "1.9.1"
+  },
+  "producer": "0.14.0",
+  "bundle_sha256": "ed39a9029ee43b7ecb2f5fec2ba187c8f4305f44c5f84e45f76119bf3d1d6087",
+  "trees": 200,
+  "nodes": 40994,
+  "node_validations_per_single_call": 122982,
+  "measurements": {
+    "1": {
+      "median_ms": 2179.2661,
+      "raw_ms": [
+        2179.2661,
+        1876.25,
+        1960.367,
+        2370.2902,
+        1935.2592,
+        2918.8077,
+        2252.1282
+      ],
+      "result_sha256": "5cf8ad3d2dd1515f8667021b97e49669228bb28d5f397e7df647ed8c634964df"
+    },
+    "16": {
+      "median_ms": 1942.4284,
+      "raw_ms": [
+        1942.4284,
+        2577.8737,
+        2696.7784,
+        2143.174,
+        1827.2124,
+        1585.1536,
+        1645.2804
+      ],
+      "result_sha256": "10290c7049a8e4753745bcee0e6de00a6f17592092920a0aeaab194c8ee33162"
+    }
+  }
+}

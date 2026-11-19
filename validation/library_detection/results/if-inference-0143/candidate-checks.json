@@ -1,0 +1,13 @@
+{
+  "candidate_tag": "v0.14.3",
+  "candidate_commit": "f68af45ac32d26f1490e83ba223de49f2b80692f",
+  "core_wheel_sha256": "70ff9216c3f9bcd12048820b2ccdb4c1a0c7e0cfbe65c1f1cdaaf4fc2a1f3b6f",
+  "installed_core_focused_tests_passed": 495,
+  "installed_benchmark_schema_regressions_passed": 2,
+  "core_assets_verified": 79,
+  "benchmark_schemas_verified": 58,
+  "archives_twine_strict_passed": 4,
+  "archives_rebuilt_with_identical_hash": 4,
+  "independent_release_review": "pending",
+  "index_publication": "not performed"
+}
