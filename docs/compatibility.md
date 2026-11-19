@@ -4,8 +4,8 @@
 
 ## Current release evidence
 
-The 0.14.4 patch keeps the profile feature versions admitted by 0.14.0 and
-reads its existing detector bundles. New fits record producer 0.14.4.
+The 0.14.5 patch keeps the profile feature versions admitted by 0.14.0 and
+reads its existing detector bundles. New fits record producer 0.14.5.
 See [upgrading](upgrading.md) and the [documentation by version](versions.md).
 
 EquiFrame 0.14.0 was published as a public Beta on 19 November 2026. Its

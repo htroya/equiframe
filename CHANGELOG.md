@@ -1,3 +1,9 @@
+## 0.14.5 - verify distinct expected artifacts
+
+- Reject candidate aliases under strict ETL acceptance, including hard links.
+- Bind an expected artifact to a trusted contract, plan and named snapshots.
+- Verify complete keys, multiplicity, zero and NULL when group sums coincide.
+
 ## 0.14.4 - exact ETL acceptance and manual publishing
 
 - Require a successful reference comparison with `verify run --require-expected`.

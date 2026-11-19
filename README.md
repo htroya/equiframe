@@ -4,16 +4,16 @@
 
 <a id="english"></a>
 
-> **EquiFrame 0.14.4 Beta** improves frozen Isolation Forest inference.
-> [Version 0.14.4 handbook](https://github.com/htroya/equiframe/blob/v0.14.4/docs/index.md)
-> · [Documentation by version](https://github.com/htroya/equiframe/blob/v0.14.4/docs/versions.md)
-> [0.14.0 errata](https://github.com/htroya/equiframe/blob/v0.14.4/docs/equiframe-0.14.0-errata.md)
+> **EquiFrame 0.14.5 Beta** strengthens exact ETL acceptance.
+> [Version 0.14.5 handbook](https://github.com/htroya/equiframe/blob/v0.14.5/docs/index.md)
+> · [Documentation by version](https://github.com/htroya/equiframe/blob/v0.14.5/docs/versions.md)
+> [0.14.0 errata](https://github.com/htroya/equiframe/blob/v0.14.5/docs/equiframe-0.14.0-errata.md)
 
 # EquiFrame: semantic comparison and dataframe migration
 
-[Documentation](https://github.com/htroya/equiframe/blob/v0.14.4/docs/index.md) |
-[API](https://github.com/htroya/equiframe/blob/v0.14.4/docs/api.md) |
-[Examples](https://github.com/htroya/equiframe/blob/v0.14.4/docs/journeys.md) |
+[Documentation](https://github.com/htroya/equiframe/blob/v0.14.5/docs/index.md) |
+[API](https://github.com/htroya/equiframe/blob/v0.14.5/docs/api.md) |
+[Examples](https://github.com/htroya/equiframe/blob/v0.14.5/docs/journeys.md) |
 [Issues](https://github.com/htroya/equiframe/issues)
 
 **EquiFrame** checks whether tabular data and supported transformations preserve
@@ -35,11 +35,11 @@ explicitly identified. See the [readiness review](https://github.com/htroya/equi
 EquiFrame supports **Python 3.10, 3.11, 3.12 and 3.13**.
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.14.4"
+python -m pip install "equiframe[files,engines,ml]==0.14.5"
 python -m pip check
 ```
 
-The base installation is `python -m pip install equiframe==0.14.4`.
+The base installation is `python -m pip install equiframe==0.14.5`.
 Optional engines and machine-learning libraries are loaded when requested.
 
 | Extra | Purpose |
@@ -132,7 +132,7 @@ acceptance with `ef.assert_equivalent(result)`; divergent or incomplete results
 raise `ef.EquivalenceAssertionError`. Operational failures use the
 `ef.EquiFrameError` hierarchy, including `DatasetReadError`,
 `MissingDependencyError` and `InvalidExecutionInput`. See the
-[API reference](https://github.com/htroya/equiframe/blob/v0.14.4/docs/api.md)
+[API reference](https://github.com/htroya/equiframe/blob/v0.14.5/docs/api.md)
 for argument-validation exceptions and command-specific exits.
 
 All six directed combinations of Pandas, Polars and DuckDB are supported.
@@ -214,7 +214,7 @@ python examples/load_convert_compare.py --rows 30000
 
 Installed wheels provide the same example as
 `python -m equiframe.examples.load_convert_compare --rows 30000`. Further
-[examples](https://github.com/htroya/equiframe/blob/v0.14.4/docs/journeys.md)
+[examples](https://github.com/htroya/equiframe/blob/v0.14.5/docs/journeys.md)
 and [recipes](https://github.com/htroya/equiframe/blob/main/docs/recipes.md)
 cover ETL, reconciliation and terminal usage.
 
@@ -259,12 +259,12 @@ and [license scope](https://github.com/htroya/equiframe/blob/main/NOTICE.md).
 
 <a id="espanol"></a>
 
-> **EquiFrame 0.14.4 Beta** reduce el costo de inferencia de Isolation Forest.
+> **EquiFrame 0.14.5 Beta** refuerza la aceptación exacta de cargas ETL.
 > [Documentación por versión](docs/versions.md) · [Erratas de 0.14.0](docs/equiframe-0.14.0-errata.md)
 
 # EquiFrame: comparación semántica y migración de datos en Python
 
-[Documentación](https://github.com/htroya/equiframe/blob/v0.14.4/docs/index.md) · [API](https://github.com/htroya/equiframe/blob/v0.14.4/docs/api.md) · [Ejemplos](https://github.com/htroya/equiframe/blob/v0.14.4/docs/journeys.md) · [Contribuir](https://github.com/htroya/equiframe/blob/main/CONTRIBUTING.md) · [Licencia MIT](https://github.com/htroya/equiframe/blob/main/LICENSE)
+[Documentación](https://github.com/htroya/equiframe/blob/v0.14.5/docs/index.md) · [API](https://github.com/htroya/equiframe/blob/v0.14.5/docs/api.md) · [Ejemplos](https://github.com/htroya/equiframe/blob/v0.14.5/docs/journeys.md) · [Contribuir](https://github.com/htroya/equiframe/blob/main/CONTRIBUTING.md) · [Licencia MIT](https://github.com/htroya/equiframe/blob/main/LICENSE)
 
 ## ¿Qué es EquiFrame?
 
@@ -322,24 +322,24 @@ estables y las capacidades experimentales.
 Instala los extras necesarios para tu trabajo:
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.14.4"
+python -m pip install "equiframe[files,engines,ml]==0.14.5"
 python -m pip check
 ```
 
-La instalación base puede hacerse con `python -m pip install equiframe==0.14.4`.
+La instalación base puede hacerse con `python -m pip install equiframe==0.14.5`.
 Selecciona los extras necesarios para tu trabajo; el núcleo no importa los
 motores opcionales al ejecutar `import equiframe`.
 
 Para instalar un wheel local:
 
 ```bash
-python -m pip install "./equiframe-0.14.4-py3-none-any.whl[files,engines,ml]"
+python -m pip install "./equiframe-0.14.5-py3-none-any.whl[files,engines,ml]"
 ```
 
 El benchmark se instala por separado, después del núcleo:
 
 ```bash
-python -m pip install equiframe-benchmark==0.14.4
+python -m pip install equiframe-benchmark==0.14.5
 ```
 
 Consulta la [guía de instalación](https://github.com/htroya/equiframe/blob/main/docs/installed-private.md) para entornos aislados,
@@ -478,16 +478,16 @@ La [revisión con R](https://github.com/htroya/equiframe/blob/main/docs/r_review
 y los componentes que no pudieron evaluarse.
 
 Los planes admitidos, políticas y límites se describen en
-[semántica](https://github.com/htroya/equiframe/blob/main/docs/semantics.md), [API](https://github.com/htroya/equiframe/blob/v0.14.4/docs/api.md) y [recetas](https://github.com/htroya/equiframe/blob/main/docs/recipes.md).
+[semántica](https://github.com/htroya/equiframe/blob/main/docs/semantics.md), [API](https://github.com/htroya/equiframe/blob/v0.14.5/docs/api.md) y [recetas](https://github.com/htroya/equiframe/blob/main/docs/recipes.md).
 
 ## Documentación
 
-- [Manual de la biblioteca](https://github.com/htroya/equiframe/blob/v0.14.4/docs/index.md) e [inicio en español](https://github.com/htroya/equiframe/blob/main/docs/inicio.md).
-- [Referencia de la API y CLI](https://github.com/htroya/equiframe/blob/v0.14.4/docs/api.md).
-- [Ejemplos de uso completos](https://github.com/htroya/equiframe/blob/v0.14.4/docs/journeys.md).
+- [Manual de la biblioteca](https://github.com/htroya/equiframe/blob/v0.14.5/docs/index.md) e [inicio en español](https://github.com/htroya/equiframe/blob/main/docs/inicio.md).
+- [Referencia de la API y CLI](https://github.com/htroya/equiframe/blob/v0.14.5/docs/api.md).
+- [Ejemplos de uso completos](https://github.com/htroya/equiframe/blob/v0.14.5/docs/journeys.md).
 - [Compatibilidad](https://github.com/htroya/equiframe/blob/main/docs/compatibility.md) y [cambios entre versiones](https://github.com/htroya/equiframe/blob/main/CHANGELOG.md).
 - [Seguridad](https://github.com/htroya/equiframe/blob/main/SECURITY.md) y [licencias de terceros](https://github.com/htroya/equiframe/blob/main/THIRD_PARTY_NOTICES.md).
-- [Portal del proyecto y seguimiento técnico](https://github.com/htroya/equiframe/blob/v0.14.4/docs/index.md).
+- [Portal del proyecto y seguimiento técnico](https://github.com/htroya/equiframe/blob/v0.14.5/docs/index.md).
 
 ## Origen del proyecto
 

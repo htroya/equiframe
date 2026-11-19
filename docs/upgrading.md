@@ -3,6 +3,13 @@
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Security](security.md) ·
 [Release/rollback](releasing.md)
 
+## 0.14.5: expected artifact and batch identity
+
+Strict verification requires a distinct expected file. A trusted binding can
+also tie the reference to named input hashes, the contract and the plan.
+New detector fits record producer 0.14.5. The optional benchmark is paired
+with core 0.14.5. Existing admitted detector formats remain readable.
+
 ## 0.14.4: detector inference patch
 
 Existing 0.14.0 bundles retain their scores, decisions and fingerprints when read by
