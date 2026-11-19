@@ -20,5 +20,5 @@ and are reported separately from measurements on 0.14.0.
 The 200-tree synthetic Isolation Forest probe timed a single profile at a
 median of 2.4 seconds in the review scenario. It included validation,
 fingerprints, preprocessing and scoring on that host. The practical cost
-depends on the model, input and environment. The 0.14.1 patch reduces
+depends on the model, input and environment. The 0.14.2 patch reduces
 repeated work within each call.

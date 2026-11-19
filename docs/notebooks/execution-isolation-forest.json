@@ -1,18 +1,25 @@
 {
-  "started_at": "2026-11-19T21:37:25.678364+00:00",
+  "started_at": "2026-11-19T21:58:15.774063+00:00",
   "python": "3.12.4 | packaged by Anaconda, Inc. | (main, Jun 18 2024, 15:03:56) [MSC v.1929 64 bit (AMD64)]",
   "platform": "Windows-11-10.0.26200-SP0",
   "installation_skipped": false,
   "notebooks": [
     {
       "file": "03_isolation_forest.ipynb",
-      "input_sha256": "28cf7f7cfb57731ab78fc4a56e9856966c9eaa2ae3f1b645fb08370001219d61",
-      "executed_sha256": "1ccef226030bfb4051c6d8d076f3f0d5a2ce3ecf8a5e06eaa4c099993f181682",
+      "input_sha256": "53c05de1a53e7179ea99bff7092bd81c33edd88cdf7a8912bf5beb47ab135732",
+      "executed_sha256": "3594c8a141be94b8b82e6688b08a437dc00ebf11a6720d4ce8def1ebc3b9f5d5",
       "code_cells": 5,
       "all_cells_executed": true,
-      "error_outputs": 0
+      "error_outputs": 0,
+      "repository_lf_sha256": "5d456c0c8ad97e6de80172e3595ec6ab1d9dba3d974fbc2fc9d4bb586d2f1444"
     }
   ],
   "passed": true,
-  "finished_at": "2026-11-19T21:45:20.007087+00:00"
+  "finished_at": "2026-11-19T21:58:41.010323+00:00",
+  "installed_wheel": {
+    "version": "0.14.0",
+    "wheel_sha256": "c1956d8cfeca3b558fccda9955d1cdba235934041df67ed753cca698ed461219",
+    "files_checked": 173,
+    "all_package_files_equal": true
+  }
 }

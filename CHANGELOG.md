@@ -1,7 +1,11 @@
-## 0.14.1 - frozen Isolation Forest inference
+## 0.14.2 - frozen Isolation Forest inference
 
 - Validate detector state at the public boundary and reuse one canonical serialization of the fit for both fingerprints.
 - Document 0.14.0 errata and version-specific installation and upgrade paths.
+
+## 0.14.1 - rejected candidate
+
+The candidate stopped before index upload because the notebook did not pass Ruff. Its tag remains available for traceability.
 
 ## 0.14.0 - versioned grouped execution profiles
 
