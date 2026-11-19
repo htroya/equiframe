@@ -1,0 +1,1536 @@
+{
+  "protocol_sha256": "f695da8f002b471afa1360e1f8d0548974da718dff67d2a07a5f5d2a869db38f",
+  "cases": 1728,
+  "unique_test_cases": 1152,
+  "native_executions": 4032,
+  "engine_output_and_profile_parity": true,
+  "source_selection": {
+    "training": {
+      "source_procedures": 8157,
+      "used_ids_sha256": "18adf5140c99d3c9581bd11e5a15423d2b9d8b52da7fc37e63f64ba9ce9a852c",
+      "available_procedures": 67580,
+      "skipped_nonapplicable_chunks": 0
+    },
+    "development": {
+      "source_procedures": 2041,
+      "used_ids_sha256": "9f74dfbf7b64cab3e389016fdeaa9212effb8bcc5390f0058c3397c3e581d7e0",
+      "available_procedures": 16810,
+      "skipped_nonapplicable_chunks": 0
+    },
+    "calibration": {
+      "source_procedures": 8154,
+      "used_ids_sha256": "4ce1eb9a2ea804b7031b676db37dbdaa2923d766dab0ecffa7d48761214b80b6",
+      "available_procedures": 33790,
+      "skipped_nonapplicable_chunks": 0
+    },
+    "test": {
+      "source_procedures": 40832,
+      "used_ids_sha256": "ae2e0ff386c8235ec54d8141a43b8202dfb7d2da8654bd5be1f73a3e584e3c29",
+      "available_procedures": 50616,
+      "skipped_nonapplicable_chunks": 0
+    }
+  },
+  "summaries": [
+    {
+      "version": "1.1",
+      "seed": 7,
+      "main": {
+        "r": {
+          "cases": 1024,
+          "tp": 384,
+          "fp": 0,
+          "tn": 512,
+          "fn": 128,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": 0.75,
+          "precision": 1.0,
+          "f1": 0.8571428571428571,
+          "false_positive_rate": 0.0,
+          "recall_wilson95": [
+            0.71072470186089,
+            0.7855518102776686
+          ],
+          "fpr_wilson95": [
+            0.0,
+            0.007446975722882739
+          ]
+        },
+        "m": {
+          "cases": 1024,
+          "tp": 153,
+          "fp": 14,
+          "tn": 498,
+          "fn": 359,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": 0.298828125,
+          "precision": 0.9161676646706587,
+          "f1": 0.45066273932253315,
+          "false_positive_rate": 0.02734375,
+          "recall_wilson95": [
+            0.26079640676088733,
+            0.3398560873776163
+          ],
+          "fpr_wilson95": [
+            0.016356725239303357,
+            0.04537049399873423
+          ]
+        },
+        "b": {
+          "cases": 1024,
+          "tp": 0,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "unavailable": 1024,
+          "coverage": 0.0,
+          "recall": null,
+          "precision": null,
+          "f1": null,
+          "false_positive_rate": null,
+          "recall_wilson95": null,
+          "fpr_wilson95": null
+        },
+        "h": {
+          "cases": 1024,
+          "tp": 400,
+          "fp": 14,
+          "tn": 498,
+          "fn": 112,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": 0.78125,
+          "precision": 0.966183574879227,
+          "f1": 0.8639308855291576,
+          "false_positive_rate": 0.02734375,
+          "recall_wilson95": [
+            0.7434195158330943,
+            0.8148915603227842
+          ],
+          "fpr_wilson95": [
+            0.016356725239303357,
+            0.04537049399873423
+          ]
+        }
+      },
+      "shifted_normal": {
+        "r": {
+          "cases": 128,
+          "tp": 0,
+          "fp": 0,
+          "tn": 128,
+          "fn": 0,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": null,
+          "precision": null,
+          "f1": null,
+          "false_positive_rate": 0.0,
+          "recall_wilson95": null,
+          "fpr_wilson95": [
+            0.0,
+            0.029136956273508416
+          ]
+        },
+        "m": {
+          "cases": 128,
+          "tp": 0,
+          "fp": 11,
+          "tn": 117,
+          "fn": 0,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": null,
+          "precision": 0.0,
+          "f1": 0.0,
+          "false_positive_rate": 0.0859375,
+          "recall_wilson95": null,
+          "fpr_wilson95": [
+            0.04866313137138619,
+            0.14734091054261295
+          ]
+        },
+        "b": {
+          "cases": 128,
+          "tp": 0,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "unavailable": 128,
+          "coverage": 0.0,
+          "recall": null,
+          "precision": null,
+          "f1": null,
+          "false_positive_rate": null,
+          "recall_wilson95": null,
+          "fpr_wilson95": null
+        },
+        "h": {
+          "cases": 128,
+          "tp": 0,
+          "fp": 11,
+          "tn": 117,
+          "fn": 0,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": null,
+          "precision": 0.0,
+          "f1": 0.0,
+          "false_positive_rate": 0.0859375,
+          "recall_wilson95": null,
+          "fpr_wilson95": [
+            0.04866313137138619,
+            0.14734091054261295
+          ]
+        }
+      },
+      "per_fault": {
+        "drop_group": {
+          "r": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          },
+          "m": {
+            "cases": 128,
+            "tp": 3,
+            "fp": 0,
+            "tn": 0,
+            "fn": 125,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.0234375,
+            "precision": 1.0,
+            "f1": 0.04580152671755725,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.008002416396755481,
+              0.06664374505143222
+            ],
+            "fpr_wilson95": null
+          },
+          "b": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 128,
+            "coverage": 0.0,
+            "recall": null,
+            "precision": null,
+            "f1": null,
+            "false_positive_rate": null,
+            "recall_wilson95": null,
+            "fpr_wilson95": null
+          },
+          "h": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          }
+        },
+        "scale_group": {
+          "r": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          },
+          "m": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          },
+          "b": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 128,
+            "coverage": 0.0,
+            "recall": null,
+            "precision": null,
+            "f1": null,
+            "false_positive_rate": null,
+            "recall_wilson95": null,
+            "fpr_wilson95": null
+          },
+          "h": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          }
+        },
+        "redistribute": {
+          "r": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 128,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.0,
+            "precision": null,
+            "f1": 0.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.0,
+              0.029136956273508416
+            ],
+            "fpr_wilson95": null
+          },
+          "m": {
+            "cases": 128,
+            "tp": 16,
+            "fp": 0,
+            "tn": 0,
+            "fn": 112,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.125,
+            "precision": 1.0,
+            "f1": 0.2222222222222222,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.07842644638761664,
+              0.19342627081751468
+            ],
+            "fpr_wilson95": null
+          },
+          "b": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 128,
+            "coverage": 0.0,
+            "recall": null,
+            "precision": null,
+            "f1": null,
+            "false_positive_rate": null,
+            "recall_wilson95": null,
+            "fpr_wilson95": null
+          },
+          "h": {
+            "cases": 128,
+            "tp": 16,
+            "fp": 0,
+            "tn": 0,
+            "fn": 112,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.125,
+            "precision": 1.0,
+            "f1": 0.2222222222222222,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.07842644638761664,
+              0.19342627081751468
+            ],
+            "fpr_wilson95": null
+          }
+        },
+        "one_cent": {
+          "r": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          },
+          "m": {
+            "cases": 128,
+            "tp": 6,
+            "fp": 0,
+            "tn": 0,
+            "fn": 122,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.046875,
+            "precision": 1.0,
+            "f1": 0.08955223880597014,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.021657844171923776,
+              0.09849752245094322
+            ],
+            "fpr_wilson95": null
+          },
+          "b": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 128,
+            "coverage": 0.0,
+            "recall": null,
+            "precision": null,
+            "f1": null,
+            "false_positive_rate": null,
+            "recall_wilson95": null,
+            "fpr_wilson95": null
+          },
+          "h": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          }
+        }
+      },
+      "hybrid_minus_rules_recall": {
+        "n": 512,
+        "delta": 0.03125,
+        "paired_case_bootstrap95": [
+          0.017578125,
+          0.046875
+        ],
+        "scope": "Conditional on frozen source selection and fitted model; engines and seeds are not resampling units."
+      },
+      "hybrid_minus_rules_fpr": {
+        "n": 512,
+        "delta": 0.02734375,
+        "paired_case_bootstrap95": [
+          0.013671875,
+          0.04296875
+        ],
+        "scope": "Conditional on frozen source selection and fitted model; engines and seeds are not resampling units."
+      },
+      "inference_batch_seconds": 20.952044199919328,
+      "bundle_sha256": "eb466807d833f81213ba5326a4a8468f22cbb12d3f45ddb19c588481fce72d01",
+      "m_state": "fitted",
+      "m_tree_count": 200,
+      "m_split_nodes": 9016,
+      "calibration_state": "ready",
+      "threshold": 0.6318062999158858,
+      "ablation": "R omits M; H differs only by OR with the recorded actual M decisions"
+    },
+    {
+      "version": "1.1",
+      "seed": 23,
+      "main": {
+        "r": {
+          "cases": 1024,
+          "tp": 384,
+          "fp": 0,
+          "tn": 512,
+          "fn": 128,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": 0.75,
+          "precision": 1.0,
+          "f1": 0.8571428571428571,
+          "false_positive_rate": 0.0,
+          "recall_wilson95": [
+            0.71072470186089,
+            0.7855518102776686
+          ],
+          "fpr_wilson95": [
+            0.0,
+            0.007446975722882739
+          ]
+        },
+        "m": {
+          "cases": 1024,
+          "tp": 158,
+          "fp": 16,
+          "tn": 496,
+          "fn": 354,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": 0.30859375,
+          "precision": 0.9080459770114943,
+          "f1": 0.4606413994169096,
+          "false_positive_rate": 0.03125,
+          "recall_wilson95": [
+            0.27013248750358254,
+            0.34990580789033354
+          ],
+          "fpr_wilson95": [
+            0.019325484326306944,
+            0.05015605541389563
+          ]
+        },
+        "b": {
+          "cases": 1024,
+          "tp": 0,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "unavailable": 1024,
+          "coverage": 0.0,
+          "recall": null,
+          "precision": null,
+          "f1": null,
+          "false_positive_rate": null,
+          "recall_wilson95": null,
+          "fpr_wilson95": null
+        },
+        "h": {
+          "cases": 1024,
+          "tp": 405,
+          "fp": 16,
+          "tn": 496,
+          "fn": 107,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": 0.791015625,
+          "precision": 0.9619952494061758,
+          "f1": 0.8681672025723473,
+          "false_positive_rate": 0.03125,
+          "recall_wilson95": [
+            0.7536951237380339,
+            0.824001753673257
+          ],
+          "fpr_wilson95": [
+            0.019325484326306944,
+            0.05015605541389563
+          ]
+        }
+      },
+      "shifted_normal": {
+        "r": {
+          "cases": 128,
+          "tp": 0,
+          "fp": 0,
+          "tn": 128,
+          "fn": 0,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": null,
+          "precision": null,
+          "f1": null,
+          "false_positive_rate": 0.0,
+          "recall_wilson95": null,
+          "fpr_wilson95": [
+            0.0,
+            0.029136956273508416
+          ]
+        },
+        "m": {
+          "cases": 128,
+          "tp": 0,
+          "fp": 13,
+          "tn": 115,
+          "fn": 0,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": null,
+          "precision": 0.0,
+          "f1": 0.0,
+          "false_positive_rate": 0.1015625,
+          "recall_wilson95": null,
+          "fpr_wilson95": [
+            0.060318648726840854,
+            0.16602486330361116
+          ]
+        },
+        "b": {
+          "cases": 128,
+          "tp": 0,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "unavailable": 128,
+          "coverage": 0.0,
+          "recall": null,
+          "precision": null,
+          "f1": null,
+          "false_positive_rate": null,
+          "recall_wilson95": null,
+          "fpr_wilson95": null
+        },
+        "h": {
+          "cases": 128,
+          "tp": 0,
+          "fp": 13,
+          "tn": 115,
+          "fn": 0,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": null,
+          "precision": 0.0,
+          "f1": 0.0,
+          "false_positive_rate": 0.1015625,
+          "recall_wilson95": null,
+          "fpr_wilson95": [
+            0.060318648726840854,
+            0.16602486330361116
+          ]
+        }
+      },
+      "per_fault": {
+        "drop_group": {
+          "r": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          },
+          "m": {
+            "cases": 128,
+            "tp": 2,
+            "fp": 0,
+            "tn": 0,
+            "fn": 126,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.015625,
+            "precision": 1.0,
+            "f1": 0.03076923076923077,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.004295449710144082,
+              0.055180976679817195
+            ],
+            "fpr_wilson95": null
+          },
+          "b": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 128,
+            "coverage": 0.0,
+            "recall": null,
+            "precision": null,
+            "f1": null,
+            "false_positive_rate": null,
+            "recall_wilson95": null,
+            "fpr_wilson95": null
+          },
+          "h": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          }
+        },
+        "scale_group": {
+          "r": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          },
+          "m": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          },
+          "b": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 128,
+            "coverage": 0.0,
+            "recall": null,
+            "precision": null,
+            "f1": null,
+            "false_positive_rate": null,
+            "recall_wilson95": null,
+            "fpr_wilson95": null
+          },
+          "h": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          }
+        },
+        "redistribute": {
+          "r": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 128,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.0,
+            "precision": null,
+            "f1": 0.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.0,
+              0.029136956273508416
+            ],
+            "fpr_wilson95": null
+          },
+          "m": {
+            "cases": 128,
+            "tp": 21,
+            "fp": 0,
+            "tn": 0,
+            "fn": 107,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.1640625,
+            "precision": 1.0,
+            "f1": 0.28187919463087246,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.1098833164591933,
+              0.23781807603707017
+            ],
+            "fpr_wilson95": null
+          },
+          "b": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 128,
+            "coverage": 0.0,
+            "recall": null,
+            "precision": null,
+            "f1": null,
+            "false_positive_rate": null,
+            "recall_wilson95": null,
+            "fpr_wilson95": null
+          },
+          "h": {
+            "cases": 128,
+            "tp": 21,
+            "fp": 0,
+            "tn": 0,
+            "fn": 107,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.1640625,
+            "precision": 1.0,
+            "f1": 0.28187919463087246,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.1098833164591933,
+              0.23781807603707017
+            ],
+            "fpr_wilson95": null
+          }
+        },
+        "one_cent": {
+          "r": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          },
+          "m": {
+            "cases": 128,
+            "tp": 7,
+            "fp": 0,
+            "tn": 0,
+            "fn": 121,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.0546875,
+            "precision": 1.0,
+            "f1": 0.1037037037037037,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.026740201381346355,
+              0.10858490029974707
+            ],
+            "fpr_wilson95": null
+          },
+          "b": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 128,
+            "coverage": 0.0,
+            "recall": null,
+            "precision": null,
+            "f1": null,
+            "false_positive_rate": null,
+            "recall_wilson95": null,
+            "fpr_wilson95": null
+          },
+          "h": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          }
+        }
+      },
+      "hybrid_minus_rules_recall": {
+        "n": 512,
+        "delta": 0.041015625,
+        "paired_case_bootstrap95": [
+          0.025390625,
+          0.05859375
+        ],
+        "scope": "Conditional on frozen source selection and fitted model; engines and seeds are not resampling units."
+      },
+      "hybrid_minus_rules_fpr": {
+        "n": 512,
+        "delta": 0.03125,
+        "paired_case_bootstrap95": [
+          0.017578125,
+          0.046875
+        ],
+        "scope": "Conditional on frozen source selection and fitted model; engines and seeds are not resampling units."
+      },
+      "inference_batch_seconds": 19.5596469999291,
+      "bundle_sha256": "842d8b3316f16ab2e8eb26acd62bfb9d74303700cccfcb051d714e68b6e6b900",
+      "m_state": "fitted",
+      "m_tree_count": 200,
+      "m_split_nodes": 8937,
+      "calibration_state": "ready",
+      "threshold": 0.6306919936460995,
+      "ablation": "R omits M; H differs only by OR with the recorded actual M decisions"
+    },
+    {
+      "version": "1.1",
+      "seed": 71,
+      "main": {
+        "r": {
+          "cases": 1024,
+          "tp": 384,
+          "fp": 0,
+          "tn": 512,
+          "fn": 128,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": 0.75,
+          "precision": 1.0,
+          "f1": 0.8571428571428571,
+          "false_positive_rate": 0.0,
+          "recall_wilson95": [
+            0.71072470186089,
+            0.7855518102776686
+          ],
+          "fpr_wilson95": [
+            0.0,
+            0.007446975722882739
+          ]
+        },
+        "m": {
+          "cases": 1024,
+          "tp": 161,
+          "fp": 17,
+          "tn": 495,
+          "fn": 351,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": 0.314453125,
+          "precision": 0.9044943820224719,
+          "f1": 0.4666666666666667,
+          "false_positive_rate": 0.033203125,
+          "recall_wilson95": [
+            0.2757440988618599,
+            0.35592567728530355
+          ],
+          "fpr_wilson95": [
+            0.02083204403601035,
+            0.05252665595527472
+          ]
+        },
+        "b": {
+          "cases": 1024,
+          "tp": 0,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "unavailable": 1024,
+          "coverage": 0.0,
+          "recall": null,
+          "precision": null,
+          "f1": null,
+          "false_positive_rate": null,
+          "recall_wilson95": null,
+          "fpr_wilson95": null
+        },
+        "h": {
+          "cases": 1024,
+          "tp": 405,
+          "fp": 17,
+          "tn": 495,
+          "fn": 107,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": 0.791015625,
+          "precision": 0.9597156398104265,
+          "f1": 0.867237687366167,
+          "false_positive_rate": 0.033203125,
+          "recall_wilson95": [
+            0.7536951237380339,
+            0.824001753673257
+          ],
+          "fpr_wilson95": [
+            0.02083204403601035,
+            0.05252665595527472
+          ]
+        }
+      },
+      "shifted_normal": {
+        "r": {
+          "cases": 128,
+          "tp": 0,
+          "fp": 0,
+          "tn": 128,
+          "fn": 0,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": null,
+          "precision": null,
+          "f1": null,
+          "false_positive_rate": 0.0,
+          "recall_wilson95": null,
+          "fpr_wilson95": [
+            0.0,
+            0.029136956273508416
+          ]
+        },
+        "m": {
+          "cases": 128,
+          "tp": 0,
+          "fp": 13,
+          "tn": 115,
+          "fn": 0,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": null,
+          "precision": 0.0,
+          "f1": 0.0,
+          "false_positive_rate": 0.1015625,
+          "recall_wilson95": null,
+          "fpr_wilson95": [
+            0.060318648726840854,
+            0.16602486330361116
+          ]
+        },
+        "b": {
+          "cases": 128,
+          "tp": 0,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "unavailable": 128,
+          "coverage": 0.0,
+          "recall": null,
+          "precision": null,
+          "f1": null,
+          "false_positive_rate": null,
+          "recall_wilson95": null,
+          "fpr_wilson95": null
+        },
+        "h": {
+          "cases": 128,
+          "tp": 0,
+          "fp": 13,
+          "tn": 115,
+          "fn": 0,
+          "unavailable": 0,
+          "coverage": 1.0,
+          "recall": null,
+          "precision": 0.0,
+          "f1": 0.0,
+          "false_positive_rate": 0.1015625,
+          "recall_wilson95": null,
+          "fpr_wilson95": [
+            0.060318648726840854,
+            0.16602486330361116
+          ]
+        }
+      },
+      "per_fault": {
+        "drop_group": {
+          "r": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          },
+          "m": {
+            "cases": 128,
+            "tp": 4,
+            "fp": 0,
+            "tn": 0,
+            "fn": 124,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.03125,
+            "precision": 1.0,
+            "f1": 0.06060606060606061,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.01221826524505338,
+              0.07759763126136077
+            ],
+            "fpr_wilson95": null
+          },
+          "b": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 128,
+            "coverage": 0.0,
+            "recall": null,
+            "precision": null,
+            "f1": null,
+            "false_positive_rate": null,
+            "recall_wilson95": null,
+            "fpr_wilson95": null
+          },
+          "h": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          }
+        },
+        "scale_group": {
+          "r": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          },
+          "m": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          },
+          "b": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 128,
+            "coverage": 0.0,
+            "recall": null,
+            "precision": null,
+            "f1": null,
+            "false_positive_rate": null,
+            "recall_wilson95": null,
+            "fpr_wilson95": null
+          },
+          "h": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          }
+        },
+        "redistribute": {
+          "r": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 128,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.0,
+            "precision": null,
+            "f1": 0.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.0,
+              0.029136956273508416
+            ],
+            "fpr_wilson95": null
+          },
+          "m": {
+            "cases": 128,
+            "tp": 21,
+            "fp": 0,
+            "tn": 0,
+            "fn": 107,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.1640625,
+            "precision": 1.0,
+            "f1": 0.28187919463087246,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.1098833164591933,
+              0.23781807603707017
+            ],
+            "fpr_wilson95": null
+          },
+          "b": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 128,
+            "coverage": 0.0,
+            "recall": null,
+            "precision": null,
+            "f1": null,
+            "false_positive_rate": null,
+            "recall_wilson95": null,
+            "fpr_wilson95": null
+          },
+          "h": {
+            "cases": 128,
+            "tp": 21,
+            "fp": 0,
+            "tn": 0,
+            "fn": 107,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.1640625,
+            "precision": 1.0,
+            "f1": 0.28187919463087246,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.1098833164591933,
+              0.23781807603707017
+            ],
+            "fpr_wilson95": null
+          }
+        },
+        "one_cent": {
+          "r": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          },
+          "m": {
+            "cases": 128,
+            "tp": 8,
+            "fp": 0,
+            "tn": 0,
+            "fn": 120,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 0.0625,
+            "precision": 1.0,
+            "f1": 0.11764705882352941,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.03200692569506119,
+              0.11848791104425865
+            ],
+            "fpr_wilson95": null
+          },
+          "b": {
+            "cases": 128,
+            "tp": 0,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 128,
+            "coverage": 0.0,
+            "recall": null,
+            "precision": null,
+            "f1": null,
+            "false_positive_rate": null,
+            "recall_wilson95": null,
+            "fpr_wilson95": null
+          },
+          "h": {
+            "cases": 128,
+            "tp": 128,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0,
+            "unavailable": 0,
+            "coverage": 1.0,
+            "recall": 1.0,
+            "precision": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": null,
+            "recall_wilson95": [
+              0.9708630437264916,
+              1.0
+            ],
+            "fpr_wilson95": null
+          }
+        }
+      },
+      "hybrid_minus_rules_recall": {
+        "n": 512,
+        "delta": 0.041015625,
+        "paired_case_bootstrap95": [
+          0.0234375,
+          0.05859375
+        ],
+        "scope": "Conditional on frozen source selection and fitted model; engines and seeds are not resampling units."
+      },
+      "hybrid_minus_rules_fpr": {
+        "n": 512,
+        "delta": 0.033203125,
+        "paired_case_bootstrap95": [
+          0.01953125,
+          0.05078125
+        ],
+        "scope": "Conditional on frozen source selection and fitted model; engines and seeds are not resampling units."
+      },
+      "inference_batch_seconds": 20.263278299942613,
+      "bundle_sha256": "9f1ee81f036c8e9141c388dfcc796d9085df7373e8a3a0092a22f497441fa73e",
+      "m_state": "fitted",
+      "m_tree_count": 200,
+      "m_split_nodes": 8968,
+      "calibration_state": "ready",
+      "threshold": 0.633285793157829,
+      "ablation": "R omits M; H differs only by OR with the recorded actual M decisions"
+    }
+  ],
+  "timings": {
+    "pandas": {
+      "execution_seconds": {
+        "n": 1728,
+        "median_seconds": 0.16313924989663064,
+        "p95_seconds": 0.3299936999101192,
+        "total_seconds": 323.2316558959428
+      },
+      "profile_seconds_1.1": {
+        "n": 1728,
+        "median_seconds": 0.09577190002892166,
+        "p95_seconds": 0.18570050015114248,
+        "total_seconds": 182.18667139834724
+      },
+      "oracle_seconds": {
+        "n": 1728,
+        "median_seconds": 0.0007729500066488981,
+        "p95_seconds": 0.0017333000432699919,
+        "total_seconds": 1.5317369040567428
+      },
+      "comparison_seconds": {
+        "n": 1728,
+        "median_seconds": 0.1764938998967409,
+        "p95_seconds": 0.333765699993819,
+        "total_seconds": 342.9067264990881
+      },
+      "rule_seconds": {
+        "n": 1728,
+        "median_seconds": 8.859997615218163e-05,
+        "p95_seconds": 0.0001722997985780239,
+        "total_seconds": 0.1787085982505232
+      }
+    },
+    "polars": {
+      "execution_seconds": {
+        "n": 1152,
+        "median_seconds": 0.11199720005970448,
+        "p95_seconds": 0.24547319998964667,
+        "total_seconds": 152.9498670003377
+      },
+      "profile_seconds_1.1": {
+        "n": 1152,
+        "median_seconds": 0.07992280006874353,
+        "p95_seconds": 0.16260509984567761,
+        "total_seconds": 105.21182020613924
+      },
+      "oracle_seconds": {
+        "n": 1152,
+        "median_seconds": 0.0007927999831736088,
+        "p95_seconds": 0.00176139990799129,
+        "total_seconds": 1.0703951986506581
+      },
+      "comparison_seconds": {
+        "n": 1152,
+        "median_seconds": 0.15556990006007254,
+        "p95_seconds": 0.28992810007184744,
+        "total_seconds": 205.58351259981282
+      },
+      "rule_seconds": {
+        "n": 1152,
+        "median_seconds": 8.915003854781389e-05,
+        "p95_seconds": 0.0001721000298857689,
+        "total_seconds": 0.13720989762805402
+      }
+    },
+    "duckdb": {
+      "execution_seconds": {
+        "n": 1152,
+        "median_seconds": 0.18160304997581989,
+        "p95_seconds": 0.35537140001542866,
+        "total_seconds": 238.08079969673418
+      },
+      "profile_seconds_1.1": {
+        "n": 1152,
+        "median_seconds": 0.0813873999286443,
+        "p95_seconds": 0.1624716001097113,
+        "total_seconds": 104.99545830162242
+      },
+      "oracle_seconds": {
+        "n": 1152,
+        "median_seconds": 0.0008023998234421015,
+        "p95_seconds": 0.0018378999084234238,
+        "total_seconds": 1.0945213963277638
+      },
+      "comparison_seconds": {
+        "n": 1152,
+        "median_seconds": 0.1554863500641659,
+        "p95_seconds": 0.29577560001052916,
+        "total_seconds": 202.02845860435627
+      },
+      "rule_seconds": {
+        "n": 1152,
+        "median_seconds": 8.96998681128025e-05,
+        "p95_seconds": 0.000179799972102046,
+        "total_seconds": 0.14181760186329484
+      }
+    }
+  },
+  "H3_scope": "Profile and full-comparison stages exclude native execution. The same captured output and already materialized independent expected table are used; costs include each API's reads and validation. Inference is a shared frozen-model batch, not isolated single-case latency.",
+  "interpretation": "Real public inputs with controlled ETL defects; no fraud labels, field deployment or human review. Conditional uncertainty, single snapshot and host. Test entities may recur across procedure-disjoint partitions."
+}

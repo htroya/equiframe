@@ -1,0 +1,36 @@
+{
+  "artifact": "equiframe-0.14.0-py3-none-any.whl",
+  "wheel_sha256": "c1956d8cfeca3b558fccda9955d1cdba235934041df67ed753cca698ed461219",
+  "profile_feature_version": "1.1",
+  "unique_test_cases": 1152,
+  "native_executions": 4032,
+  "scored_rows_reconciled": 3456,
+  "rows_matching_frozen_dev1_inputs_output_oracle_rules_and_1_1_profile_hashes": 4032,
+  "files": [
+    {
+      "path": "protocol.json",
+      "sha256": "f695da8f002b471afa1360e1f8d0548974da718dff67d2a07a5f5d2a869db38f",
+      "decoded_sha256": "f695da8f002b471afa1360e1f8d0548974da718dff67d2a07a5f5d2a869db38f"
+    },
+    {
+      "path": "report.json",
+      "sha256": "b823b6d0d5183fee9edf220d037a450a30822991c0bd6cf28ec421d791e8f1ff",
+      "decoded_sha256": "b823b6d0d5183fee9edf220d037a450a30822991c0bd6cf28ec421d791e8f1ff"
+    },
+    {
+      "path": "native-records.json.gz",
+      "sha256": "f7760a32575b91e876392c4e3b42439dc0ee243a7ed674e9464d22cf7bf66e8f",
+      "decoded_sha256": "2f949dc1ed1de388195646e4c43606f8d9576349dc74b5db0d7788e79c57a44e"
+    },
+    {
+      "path": "scored-records.json.gz",
+      "sha256": "8b69ebba93ee2885aa8058de7a902dfe7253474dac06c49ed248704b8521bb82",
+      "decoded_sha256": "a71b090de3e2ec348217e696d4ca8c19f69b5d2f649090618065fd41ce8ef31b"
+    },
+    {
+      "path": "cost.json",
+      "sha256": "a35a3825873a387c3c332bbe692f4cf926aa1091889886b49e010ab5fc518589",
+      "decoded_sha256": "a35a3825873a387c3c332bbe692f4cf926aa1091889886b49e010ab5fc518589"
+    }
+  ]
+}

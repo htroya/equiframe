@@ -11,6 +11,9 @@ versioned input/output group metrics for existing preprocessing and detectors.
 [Measured detection, false alarms and API costs](detection-benchmark.md): a
 standalone generated-data experiment against the installed public 0.14.0 library.
 
+[Evaluation on public SERCOP data](equiframe-0.14.0-evaluation.md) reports
+detection, false alarms, misses and cost for the published 0.14.0 wheel.
+
 [Grouped numeric comparison](grouped-comparison.md), new in 0.13.1: compare sums
 for any grouping columns and numeric measure, with explicit coverage and
 zero-reference changes.

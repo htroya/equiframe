@@ -40,7 +40,10 @@ def reconcile(records: list[dict[str, Any]], method: str, claimed: dict[str, Any
             raise ValueError("Metric denominator or value disagrees")
 
 
-def verify(primary: Path, severity: Path) -> dict[str, Any]:
+def verify_primary(
+    primary: Path,
+) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
+    protocol = load(primary, "protocol.json")
     report, rows, native = (
         load(primary, n) for n in ("report.json", "scored-records.json", "native-records.json")
     )
@@ -49,25 +52,45 @@ def verify(primary: Path, severity: Path) -> dict[str, Any]:
         != hashlib.sha256((primary / "protocol.json").read_bytes()).hexdigest()
     ):
         raise ValueError("Primary protocol identity disagrees")
-    if len(rows) != 6912 or len(native) != 4032 or report["cases"] != 1728:
+    versions = protocol["profile_versions"]
+    if versions not in (["1.1"], ["1.1", "1.2"]):
+        raise ValueError("Unexpected profile versions in the frozen experiment")
+    expected_cells = {(v, seed) for v in versions for seed in (7, 23, 71)}
+    if len(rows) != 1152 * len(expected_cells) or len(native) != 4032 or report["cases"] != 1728:
         raise ValueError("Unexpected frozen experiment size")
     unique = {(r["split"], r["index"], r["source_sha256"]) for r in rows}
     if len(unique) != 1152 or len({r["source_sha256"] for r in rows}) != 1152:
         raise ValueError("Test sample identity is duplicated")
+    cells = [(summary["version"], summary["seed"]) for summary in report["summaries"]]
+    if set(cells) != expected_cells or len(cells) != len(expected_cells):
+        raise ValueError("Unexpected or repeated profile/seed cell")
     for summary in report["summaries"]:
         selected = [
             r for r in rows if (r["version"], r["seed"]) == (summary["version"], summary["seed"])
         ]
+        if {(r["split"], r["index"], r["source_sha256"]) for r in selected} != unique or len(
+            selected
+        ) != len(unique):
+            raise ValueError("Each profile/seed cell must cover the same test cases once")
         for section, split in (("main", "test"), ("shifted_normal", "shifted_normal")):
             subset = [r for r in selected if r["split"] == split]
             for method in ("r", "m", "b", "h"):
                 reconcile(subset, method, summary[section][method])
+        for fault, results in summary["per_fault"].items():
+            subset = [r for r in selected if r["split"] == "test" and r["kind"] == fault]
+            for method, claimed in results.items():
+                reconcile(subset, method, claimed)
         for row in selected:
             if row["m"] != ("alert" if row["m_score"] > row["m_threshold"] else "no_alert"):
                 raise ValueError("M decision does not follow the frozen strict threshold")
             expected_h = "alert" if "alert" in (row["r"], row["m"]) else "no_alert"
             if row["h"] != expected_h:
                 raise ValueError("Hybrid decision disagrees")
+    return report, rows, native
+
+
+def verify(primary: Path, severity: Path) -> dict[str, Any]:
+    report, rows, native = verify_primary(primary)
     extra, extra_rows, extra_native = (
         load(severity, n) for n in ("report.json", "records.json", "native-records.json")
     )
@@ -118,9 +141,19 @@ def verify(primary: Path, severity: Path) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--primary", type=Path, required=True)
-    parser.add_argument("--severity", type=Path, required=True)
+    parser.add_argument("--severity", type=Path)
     args = parser.parse_args()
-    print(json.dumps(verify(args.primary, args.severity), indent=2))
+    if args.severity is not None:
+        result = verify(args.primary, args.severity)
+    else:
+        report, rows, native = verify_primary(args.primary)
+        result = {
+            "passed": True,
+            "primary_unique_test_cases": report["unique_test_cases"],
+            "primary_native_executions": len(native),
+            "scored_rows_reconciled": len(rows),
+        }
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":
