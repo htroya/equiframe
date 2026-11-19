@@ -21,6 +21,25 @@ diferencia se rechaza incluso cuando el detector devuelve `no_alert`.
 Puedes producir la referencia con SQL, Python o R. Identifica la fuente y
 valida que la referencia cubra el mismo alcance que la carga.
 
+En una repetición con el wheel 0.14.4 se probaron 144 casos del corpus
+público de adjudicaciones, con 432 ejecuciones en Pandas, Polars y DuckDB.
+Se seleccionaron 80 casos normales y 64 fallos controlados por cuotas
+fijadas antes de puntuar. El esperado se calculó en Python desde las
+entradas. Las tres rutas de ejecución coincidieron.
+
+| Método | Fallos detectados (64) | Omisiones | Falsas alarmas (80 normales) |
+| --- | ---: | ---: | ---: |
+| Isolation Forest, modelo congelado del estudio 1.1 | 22 | 42 | 3 |
+| Comparación exacta de sumas por comprador y moneda | 64 | 0 | 0 |
+| Aceptación mediante comparación exacta completa | 64 | 0 | 0 |
+
+Se probaron eliminaciones de grupo, escalados, redistribuciones y cambios de un
+centavo. El resultado se refiere a ese conjunto y contrato. Las pruebas de CLI
+cubren también duplicados, claves inesperadas, reordenamiento válido y ausencia
+del esperado.
+[Recibo del wheel y resultados por caso](../validation/library_detection/results/operational-0144/replay.json) ·
+[Código de la repetición](../validation/library_detection/operational_replay.py)
+
 Object presence, completed execution, observed equivalence, agreement with an
 expected output and authorization to publish are different claims. A returned
 object, empty output, empty alert list or generated report cannot supply the

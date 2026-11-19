@@ -1,5 +1,8 @@
 ## Unreleased — experimental grouped profile 1.2
 
+- Add `verify run --require-expected` to enforce an expected-artifact comparison in automated acceptance.
+- Apply the maintainer's manual TestPyPI and PyPI publication policy.
+
 - Add opt-in exact-rational mean and population variance of eligible group relative changes; preserve 1.0/1.1 defaults and old payloads.
 - Validate nested detector models once at public inference boundaries and reuse the canonical fit serialization for both fingerprints.
 - Review schema and stable-model enum expansions explicitly. No new index release is claimed.
