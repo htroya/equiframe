@@ -4,9 +4,11 @@
 
 <a id="english"></a>
 
-> Release target: **0.14.0**. Check the official index for availability and
-> verify the identified artifact hashes. Publication requires the
-> [release gates](docs/releasing.md).
+> **Public Beta 0.14.0 — published 19 November 2026 on PyPI and TestPyPI.**
+> Install [EquiFrame](https://pypi.org/project/equiframe/0.14.0/) and the optional,
+> exactly paired [equiframe-benchmark](https://pypi.org/project/equiframe-benchmark/0.14.0/).
+> [Release notes and SHA-256 hashes](https://github.com/htroya/equiframe/releases/tag/v0.14.0)
+> identify the published files; see the [release procedure](docs/releasing.md).
 
 # EquiFrame: semantic comparison and dataframe migration
 
@@ -258,9 +260,11 @@ and [license scope](https://github.com/htroya/equiframe/blob/main/NOTICE.md).
 
 <a id="espanol"></a>
 
-> Objetivo de versión: **0.14.0**. Consulta su disponibilidad en el índice oficial
-> y verifica los hashes de los archivos identificados. La publicación requiere
-> las [comprobaciones de release](docs/releasing.md).
+> **Beta pública 0.14.0 — publicada el 19 de noviembre de 2026 en PyPI y TestPyPI.**
+> Instala [EquiFrame](https://pypi.org/project/equiframe/0.14.0/) y, si lo necesitas,
+> [equiframe-benchmark](https://pypi.org/project/equiframe-benchmark/0.14.0/) de la misma versión.
+> Las [notas de publicación y huellas SHA-256](https://github.com/htroya/equiframe/releases/tag/v0.14.0)
+> identifican los archivos; consulta el [procedimiento de publicación](docs/releasing.md).
 
 # EquiFrame: comparación semántica y migración de datos en Python
 
