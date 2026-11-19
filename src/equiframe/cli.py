@@ -323,7 +323,15 @@ def verification_validate(request: Path) -> None:
 
 
 @verify_app.command("run")
-def verification_run(request: Path, output: Path = typer.Option(Path("equiframe-runs"))) -> None:
+def verification_run(
+    request: Path,
+    output: Path = typer.Option(Path("equiframe-runs")),
+    require_expected: bool = typer.Option(
+        False,
+        "--require-expected",
+        help="Require a successful comparison against the expected artifact.",
+    ),
+) -> None:
     """Verify one or more existing artifacts. Exit 0 passed, 1 failed, 2 invalid, 3 unavailable."""
     try:
         document = load_json(VerificationRequest, request)
@@ -334,7 +342,7 @@ def verification_run(request: Path, output: Path = typer.Option(Path("equiframe-
             provenance=document.provenance,
             reviews=document.reviews,
             request_review=document.request_review,
-            require_expected=document.require_expected,
+            require_expected=require_expected or document.require_expected,
             require_rules=document.require_rules,
             snapshots={item.name: item.artifact for item in document.snapshots},
             plan_sha256=document.plan_sha256,

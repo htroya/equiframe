@@ -1,5 +1,26 @@
 # Explicit outcome gates
 
+## Aceptación de cargas ETL
+
+Ejecuta `equiframe verify run request.json --require-expected` con el archivo
+esperado de una implementación de referencia. Declara claves de negocio,
+conservación de multiplicidad y comparación numérica exacta en el contrato.
+El proceso acepta con código 0, rechaza una diferencia con 1 y devuelve 3
+cuando falta la referencia o la comparación queda incompleta.
+
+Si la transformación conserva sumas, declara un `AggregateCheck` por las
+claves de negocio sobre las filas que el filtro admite. Por ejemplo, un
+control de suma por comprador y moneda detecta una redistribución aunque el
+total general coincida. Conserva la comparación completa para exigir también
+campos y multiplicidad. Consulta [reglas y comparación](api.md).
+
+Puedes usar Isolation Forest para priorizar qué casos inspeccionar. La
+comparación exacta establece la aceptación bajo el contrato. Una alerta
+sobre una salida equivalente sigue disponible como diagnóstico; una
+diferencia se rechaza incluso cuando el detector devuelve `no_alert`.
+Puedes producir la referencia con SQL, Python o R. Identifica la fuente y
+valida que la referencia cubra el mismo alcance que la carga.
+
 Object presence, completed execution, observed equivalence, agreement with an
 expected output and authorization to publish are different claims. A returned
 object, empty output, empty alert list or generated report cannot supply the

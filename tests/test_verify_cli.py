@@ -1,12 +1,15 @@
 """CLI distinguishes semantic outcomes from intact evidence and portable inspection."""
 
 import json
+from decimal import Decimal
 
 import pyarrow as pa
+import pytest
 from test_migration import contract, run, table
 from test_verify import artifact
 from typer.testing import CliRunner
 
+import equiframe as ef
 from equiframe.cli import app
 from equiframe.evidence import publish_json
 from equiframe.pipeline_types import PipelineInput
@@ -59,6 +62,85 @@ def test_cli_required_expected_absent_and_invalid_request(tmp_path):
     data["outputs"] = []
     path.write_text(json.dumps(data), encoding="utf-8")
     assert runner.invoke(app, ["verify", "validate", str(path)]).exit_code == 2
+
+
+def test_cli_can_require_expected_even_if_request_omits_it(tmp_path):
+    path = request(tmp_path)
+    runner = CliRunner()
+    command = ["verify", "run", str(path), "--output", str(tmp_path / "runs")]
+    assert runner.invoke(app, command).exit_code == 0
+    required = runner.invoke(app, [*command, "--require-expected"])
+    assert required.exit_code == 3
+    summary = json.loads(required.stdout)
+    assert summary["operational_state"] == "not_evaluable"
+    assert summary["publishable"] is False
+
+
+@pytest.mark.parametrize(
+    ("amounts", "buyers", "exit_code"),
+    [
+        (("30.00", "20.00"), ("B", "A"), 0),
+        (("20.01", "29.99"), ("A", "B"), 1),
+        (("20.00",), ("A",), 1),
+        (("20.00", "30.00", "20.00"), ("A", "B", "A"), 1),
+        (("20.00", "30.00"), ("X", "B"), 1),
+    ],
+    ids=["equal-reordered", "same-total-redistribution", "missing", "duplicate", "unexpected"],
+)
+def test_cli_expected_gate_checks_money_by_buyer_and_currency(tmp_path, amounts, buyers, exit_code):
+    money = pa.decimal128(12, 2)
+    columns = (
+        ef.ColumnSpec(
+            name="buyer",
+            logical_type=ef.StringType(),
+            nullable=False,
+            null_policy=ef.NullPolicy(representations=("null",)),
+        ),
+        ef.ColumnSpec(
+            name="currency",
+            logical_type=ef.StringType(),
+            nullable=False,
+            null_policy=ef.NullPolicy(representations=("null",)),
+        ),
+        ef.ColumnSpec(
+            name="amount",
+            logical_type=ef.DecimalType(precision=12, scale=2),
+            nullable=False,
+            null_policy=ef.NullPolicy(representations=("null",)),
+            numeric_policy=ef.NumericPolicy(comparison="exact", unit="USD"),
+        ),
+    )
+    declaration = ef.keyed_contract(columns, keys=("buyer", "currency"))
+    expected = pa.table(
+        {
+            "buyer": ["A", "B"],
+            "currency": ["USD", "USD"],
+            "amount": pa.array([Decimal("20.00"), Decimal("30.00")], type=money),
+        }
+    )
+    candidate = pa.table(
+        {
+            "buyer": list(buyers),
+            "currency": ["USD"] * len(buyers),
+            "amount": pa.array([Decimal(amount) for amount in amounts], type=money),
+        }
+    )
+    path = tmp_path / "request.json"
+    publish_json(
+        VerificationRequest(
+            contract=declaration.spec.contract,
+            outputs=(
+                PipelineInput(name="candidate", artifact=artifact(tmp_path, "actual", candidate)),
+            ),
+            expected=artifact(tmp_path, "expected", expected),
+        ),
+        path,
+    )
+    result = CliRunner().invoke(
+        app, ["verify", "run", str(path), "--require-expected", "--output", str(tmp_path / "runs")]
+    )
+    assert result.exit_code == exit_code, result.stdout
+    assert json.loads(result.stdout)["publishable"] is (exit_code == 0)
 
 
 def test_cli_bundle_export_import_verify_preserve_semantic_failure(tmp_path):
