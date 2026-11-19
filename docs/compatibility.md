@@ -4,6 +4,17 @@
 
 ## Current release evidence
 
+**0.14.0 is published as public Beta** on PyPI and TestPyPI as of 19 November
+2026, together with the exactly paired benchmark package. Downloaded wheel and
+source-archive consumers passed on both indices. See the
+[0.14.0 release notes](https://github.com/htroya/equiframe/releases/tag/v0.14.0)
+for its Windows/Linux source and installed suites, Python 3.10–3.13 matrix,
+omissions and exact artifact hashes. The 0.13.6 maintenance pair is also published.
+Use the current version-specific [core](https://pypi.org/project/equiframe/0.14.0/)
+and [benchmark](https://pypi.org/project/equiframe-benchmark/0.14.0/) index pages.
+
+### Historical 0.13.5 evidence
+
 The published [0.13.5 release](https://github.com/htroya/equiframe/releases/tag/v0.13.5)
 records the identified final artifacts and their actual checks: core source and
 installed suites each passed 10,299 tests on Windows (94 skipped) and 10,355 on
@@ -136,7 +147,7 @@ See [dependency/SBOM policy](dependencies.md) before upgrading transitives.
 
 ## Feature-version 1.1 admission
 
-The 0.14.0 target adds `GroupedProfileFeature` under the existing profile API.
+The published 0.14.0 release adds `GroupedProfileFeature` under the existing profile API.
 Only explicit `feature_version="1.1"` admits it. The outer profile/model format
 markers remain 1.0 and the nested feature version identifies the extended
 formulas. Current readers preserve 1.0 payloads and fingerprints; previous

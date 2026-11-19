@@ -1,0 +1,435 @@
+{
+  "protocol": {
+    "protocol": "equiframe-component-api-cost-1",
+    "dimensions": [
+      4,
+      6
+    ],
+    "training": 256,
+    "calibration": 256,
+    "batch_sizes": [
+      1,
+      32,
+      512
+    ],
+    "repetitions": 5,
+    "forest_seed": 7,
+    "n_estimators": 200,
+    "max_samples": 256,
+    "input": "Generated rate vectors, not native execution profiles; no efficacy labels",
+    "scope": "Warm API wall clock including validation, preprocessing and provenance hashing",
+    "exclusions": "Generation, execution, profiling, cold import, I/O and peak memory",
+    "code_sha256": "6e1e4d1303db89ac3919fa6f5e4217f4fc308eae2a7ea129860b2c765ae66358"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+  "logical_processors": 8,
+  "python": "3.13.18 (main, Oct 26 2026, 14:10:48) [MSC v.1944 64 bit (AMD64)]",
+  "equiframe": "0.14.0",
+  "dependencies": {
+    "numpy": "2.5.3",
+    "scikit-learn": "1.9.1"
+  },
+  "experiments": [
+    {
+      "raw_features": 4,
+      "matrix_columns": 12,
+      "joint_fit_seconds": 3.915785900084302,
+      "joint_fit_cpu_seconds": 3.78125,
+      "joint_calibration_seconds": 3.0635720000136644,
+      "joint_calibration_cpu_seconds": 3.03125,
+      "model_sha256": "2c51d0aa8ba0cec7fc42cd92375e808ca14a69141286937f45b45ad4de8db95b",
+      "batches": [
+        {
+          "batch_size": 1,
+          "methods": {
+            "isolation_forest_only": {
+              "seconds": [
+                2.5585173999425024,
+                2.099627299932763,
+                1.636313800001517,
+                1.546292999992147,
+                1.465491099981591
+              ],
+              "process_cpu_seconds": [
+                2.46875,
+                2.015625,
+                1.640625,
+                1.546875,
+                1.46875
+              ],
+              "median_process_cpu_seconds": 1.640625,
+              "median_batch_seconds": 1.636313800001517,
+              "median_amortized_seconds_per_profile": 1.636313800001517
+            },
+            "mad_only": {
+              "seconds": [
+                2.1713362999726087,
+                2.026112899882719,
+                1.7387318999972194,
+                1.5575757999904454,
+                1.568059500074014
+              ],
+              "process_cpu_seconds": [
+                2.0625,
+                2.015625,
+                1.71875,
+                1.5625,
+                1.546875
+              ],
+              "median_process_cpu_seconds": 1.71875,
+              "median_batch_seconds": 1.7387318999972194,
+              "median_amortized_seconds_per_profile": 1.7387318999972194
+            },
+            "joint_m_b": {
+              "seconds": [
+                2.548369999974966,
+                2.497377200052142,
+                1.9094743998721242,
+                1.9968256999272853,
+                2.0341322000604123
+              ],
+              "process_cpu_seconds": [
+                2.5,
+                2.375,
+                1.90625,
+                2.0,
+                2.015625
+              ],
+              "median_process_cpu_seconds": 2.015625,
+              "median_batch_seconds": 2.0341322000604123,
+              "median_amortized_seconds_per_profile": 2.0341322000604123
+            }
+          }
+        },
+        {
+          "batch_size": 32,
+          "methods": {
+            "isolation_forest_only": {
+              "seconds": [
+                1.6442320998758078,
+                1.6724918000400066,
+                1.714486900018528,
+                1.6203964999876916,
+                1.621915299911052
+              ],
+              "process_cpu_seconds": [
+                1.640625,
+                1.65625,
+                1.71875,
+                1.609375,
+                1.59375
+              ],
+              "median_process_cpu_seconds": 1.640625,
+              "median_batch_seconds": 1.6442320998758078,
+              "median_amortized_seconds_per_profile": 0.05138225312111899
+            },
+            "mad_only": {
+              "seconds": [
+                1.613354700151831,
+                1.6270842000376433,
+                1.6129255001433194,
+                1.6146633999887854,
+                2.1243994999676943
+              ],
+              "process_cpu_seconds": [
+                1.546875,
+                1.625,
+                1.609375,
+                1.5625,
+                1.9375
+              ],
+              "median_process_cpu_seconds": 1.609375,
+              "median_batch_seconds": 1.6146633999887854,
+              "median_amortized_seconds_per_profile": 0.05045823124964954
+            },
+            "joint_m_b": {
+              "seconds": [
+                1.987682499922812,
+                2.001860100077465,
+                2.010399700142443,
+                1.9590501000639051,
+                2.158718900056556
+              ],
+              "process_cpu_seconds": [
+                1.984375,
+                1.953125,
+                2.0,
+                1.953125,
+                2.171875
+              ],
+              "median_process_cpu_seconds": 1.984375,
+              "median_batch_seconds": 2.001860100077465,
+              "median_amortized_seconds_per_profile": 0.06255812812742079
+            }
+          }
+        },
+        {
+          "batch_size": 512,
+          "methods": {
+            "isolation_forest_only": {
+              "seconds": [
+                3.929499499965459,
+                2.9708103998564184,
+                3.021245000185445,
+                3.071225000079721,
+                2.979345800122246
+              ],
+              "process_cpu_seconds": [
+                3.84375,
+                2.96875,
+                2.984375,
+                3.0625,
+                2.953125
+              ],
+              "median_process_cpu_seconds": 2.984375,
+              "median_batch_seconds": 3.021245000185445,
+              "median_amortized_seconds_per_profile": 0.005900869140987197
+            },
+            "mad_only": {
+              "seconds": [
+                2.832401300081983,
+                3.4867010000161827,
+                2.697474699933082,
+                2.8377427998930216,
+                2.6695888999383897
+              ],
+              "process_cpu_seconds": [
+                2.828125,
+                3.4375,
+                2.6875,
+                2.8125,
+                2.671875
+              ],
+              "median_process_cpu_seconds": 2.8125,
+              "median_batch_seconds": 2.832401300081983,
+              "median_amortized_seconds_per_profile": 0.0055320337892226235
+            },
+            "joint_m_b": {
+              "seconds": [
+                3.385147999972105,
+                3.254085899796337,
+                3.242292699869722,
+                3.2699345001019537,
+                3.2802973000798374
+              ],
+              "process_cpu_seconds": [
+                3.328125,
+                3.234375,
+                3.21875,
+                3.1875,
+                3.28125
+              ],
+              "median_process_cpu_seconds": 3.234375,
+              "median_batch_seconds": 3.2699345001019537,
+              "median_amortized_seconds_per_profile": 0.006386590820511628
+            }
+          }
+        }
+      ]
+    },
+    {
+      "raw_features": 6,
+      "matrix_columns": 18,
+      "joint_fit_seconds": 3.709384199930355,
+      "joint_fit_cpu_seconds": 3.65625,
+      "joint_calibration_seconds": 3.2272097000386566,
+      "joint_calibration_cpu_seconds": 3.1875,
+      "model_sha256": "5ff32d434548986c9aaa3a6ab176db1991a4a4b742682416478993976fe1ae52",
+      "batches": [
+        {
+          "batch_size": 1,
+          "methods": {
+            "isolation_forest_only": {
+              "seconds": [
+                2.5741908999625593,
+                2.1558698997832835,
+                2.6097111999988556,
+                1.6802197000943124,
+                1.668256500037387
+              ],
+              "process_cpu_seconds": [
+                2.265625,
+                2.09375,
+                2.359375,
+                1.671875,
+                1.65625
+              ],
+              "median_process_cpu_seconds": 2.09375,
+              "median_batch_seconds": 2.1558698997832835,
+              "median_amortized_seconds_per_profile": 2.1558698997832835
+            },
+            "mad_only": {
+              "seconds": [
+                2.5373516001272947,
+                2.3097210000269115,
+                1.7782916000578552,
+                1.716764000011608,
+                1.7304346000310034
+              ],
+              "process_cpu_seconds": [
+                2.390625,
+                2.15625,
+                1.703125,
+                1.71875,
+                1.65625
+              ],
+              "median_process_cpu_seconds": 1.71875,
+              "median_batch_seconds": 1.7782916000578552,
+              "median_amortized_seconds_per_profile": 1.7782916000578552
+            },
+            "joint_m_b": {
+              "seconds": [
+                2.3976102999877185,
+                3.236171499826014,
+                2.06287829997018,
+                2.198791400063783,
+                2.6378254001028836
+              ],
+              "process_cpu_seconds": [
+                2.359375,
+                2.953125,
+                2.046875,
+                2.109375,
+                2.5625
+              ],
+              "median_process_cpu_seconds": 2.359375,
+              "median_batch_seconds": 2.3976102999877185,
+              "median_amortized_seconds_per_profile": 2.3976102999877185
+            }
+          }
+        },
+        {
+          "batch_size": 32,
+          "methods": {
+            "isolation_forest_only": {
+              "seconds": [
+                2.3307100001256913,
+                1.9240074998233467,
+                2.3580389998387545,
+                3.1656963999848813,
+                4.114873500075191
+              ],
+              "process_cpu_seconds": [
+                2.28125,
+                1.875,
+                2.25,
+                2.890625,
+                3.3125
+              ],
+              "median_process_cpu_seconds": 2.28125,
+              "median_batch_seconds": 2.3580389998387545,
+              "median_amortized_seconds_per_profile": 0.07368871874496108
+            },
+            "mad_only": {
+              "seconds": [
+                2.0093462001532316,
+                2.1758739000651985,
+                3.1650896999053657,
+                1.947183399926871,
+                3.628745200112462
+              ],
+              "process_cpu_seconds": [
+                1.921875,
+                2.09375,
+                3.0,
+                1.90625,
+                3.171875
+              ],
+              "median_process_cpu_seconds": 2.09375,
+              "median_batch_seconds": 2.1758739000651985,
+              "median_amortized_seconds_per_profile": 0.06799605937703745
+            },
+            "joint_m_b": {
+              "seconds": [
+                2.2470048000104725,
+                3.2460614999290556,
+                5.9095582000445575,
+                2.6193303000181913,
+                4.26941810012795
+              ],
+              "process_cpu_seconds": [
+                2.25,
+                3.09375,
+                4.75,
+                2.53125,
+                3.671875
+              ],
+              "median_process_cpu_seconds": 3.09375,
+              "median_batch_seconds": 3.2460614999290556,
+              "median_amortized_seconds_per_profile": 0.10143942187278299
+            }
+          }
+        },
+        {
+          "batch_size": 512,
+          "methods": {
+            "isolation_forest_only": {
+              "seconds": [
+                4.530145599972457,
+                4.341674099909142,
+                4.6917777000926435,
+                4.559592500096187,
+                4.178446599980816
+              ],
+              "process_cpu_seconds": [
+                4.390625,
+                4.203125,
+                4.453125,
+                4.359375,
+                4.078125
+              ],
+              "median_process_cpu_seconds": 4.359375,
+              "median_batch_seconds": 4.530145599972457,
+              "median_amortized_seconds_per_profile": 0.008847940624946204
+            },
+            "mad_only": {
+              "seconds": [
+                4.634909600019455,
+                4.095287699950859,
+                4.016309600090608,
+                4.064892400056124,
+                3.9071623000781983
+              ],
+              "process_cpu_seconds": [
+                4.203125,
+                3.984375,
+                3.921875,
+                3.96875,
+                3.75
+              ],
+              "median_process_cpu_seconds": 3.96875,
+              "median_batch_seconds": 4.064892400056124,
+              "median_amortized_seconds_per_profile": 0.007939242968859617
+            },
+            "joint_m_b": {
+              "seconds": [
+                5.200478399870917,
+                6.176489399978891,
+                7.574116899864748,
+                5.406504699960351,
+                4.634285200154409
+              ],
+              "process_cpu_seconds": [
+                5.0625,
+                5.796875,
+                6.21875,
+                5.09375,
+                4.625
+              ],
+              "median_process_cpu_seconds": 5.09375,
+              "median_batch_seconds": 5.406504699960351,
+              "median_amortized_seconds_per_profile": 0.01055957949211006
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Generated-vector compute benchmark only; no end-to-end execution accuracy claim",
+    "fit_detectors and calibrate_detectors measure M+B jointly; no M-only fit claim",
+    "Component APIs include provenance work and differ from bare sklearn score_samples",
+    "One host, one fitted model per dimension; five timing repetitions are not five models"
+  ]
+}

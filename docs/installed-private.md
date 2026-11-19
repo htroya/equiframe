@@ -2,10 +2,11 @@
 
 [Quick start](quickstart.md) · [Compatibility](compatibility.md) · [Release policy](releasing.md)
 
-The release target is `0.14.0` for both `equiframe` and
-`equiframe-benchmark`; publication remains a separately verified step in the
-[release process](releasing.md). This guide is the optional offline/local-artifact
-route, not a claim that a private kit or public registry file is already available.
+The `0.14.0` public Beta is available on PyPI and TestPyPI for both `equiframe`
+and `equiframe-benchmark` since 19 November 2026; see the verified
+[release status](releasing.md). This guide describes the optional
+offline/local-artifact route. A private wheelhouse needs its own inventory and
+matching Python/platform dependencies even when the package is publicly available.
 Historical A7 introduced the minimum-Polars expression-composition correction;
 earlier alpha revisions remain in the changelog. Identify both current artifacts
 by their separate wheel hashes.

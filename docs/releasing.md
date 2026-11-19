@@ -2,8 +2,27 @@
 
 ## Current state
 
-The release target is `equiframe 0.14.0` with the exactly paired
-`equiframe-benchmark 0.14.0`, identified by commit and artifact SHA-256.
+`equiframe 0.14.0` and the exactly paired `equiframe-benchmark 0.14.0` are
+**public Beta releases**, published on TestPyPI and PyPI on **19 November 2026**.
+The 0.13.6 maintenance pair was published on both indices on the same date.
+The downloaded wheels and source archives matched their approved SHA-256 hashes;
+clean consumers and offline source-archive rebuilds passed for both version pairs.
+
+- PyPI: [core 0.14.0](https://pypi.org/project/equiframe/0.14.0/) and
+  [benchmark 0.14.0](https://pypi.org/project/equiframe-benchmark/0.14.0/).
+- TestPyPI: [core 0.14.0](https://test.pypi.org/project/equiframe/0.14.0/) and
+  [benchmark 0.14.0](https://test.pypi.org/project/equiframe-benchmark/0.14.0/).
+- [0.14.0 release notes, original files and hashes](https://github.com/htroya/equiframe/releases/tag/v0.14.0).
+- Maintenance: [core 0.13.6](https://pypi.org/project/equiframe/0.13.6/),
+  [benchmark 0.13.6](https://pypi.org/project/equiframe-benchmark/0.13.6/) and
+  [release notes](https://github.com/htroya/equiframe/releases/tag/v0.13.6).
+
+Publication used the manual route below, without GitHub Actions; the temporary
+project tokens were revoked. The existing tags and index files are unchanged.
+The library is usable independently of a research corpus, DW or portal.
+Integration and scientific claims require their own evidence for their stated scope.
+
+The 0.14.0 source is identified by commit and artifact SHA-256.
 Source preparation does not establish validation or publication: verify the
 artifact-bound receipts and official index inventory. The public 0.12.2 tag and
 its receipts retain their original identities. The local 0.12.3 candidate tag

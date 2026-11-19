@@ -202,6 +202,10 @@ and [R review](https://github.com/htroya/equiframe/blob/main/docs/r_review.md).
 Registered callbacks and SQL are trusted application code; EquiFrame does not
 sandbox untrusted programs.
 
+See the [standalone detection benchmark](https://github.com/htroya/equiframe/blob/main/docs/detection-benchmark.md)
+for measured detection, false alarms and component API costs on generated cases,
+including missed errors and correct changes of workload.
+
 ## Run a complete example
 
 The source distribution includes `examples/load_convert_compare.py`. It creates
@@ -477,6 +481,9 @@ nativa del plan admitido.
 
 Las reglas y los detectores de anomalías tienen resultados separados.
 Isolation Forest requiere ajuste y calibración adecuados a los datos.
+La [evaluación autónoma de detección](https://github.com/htroya/equiframe/blob/main/docs/detection-benchmark.md)
+presenta mediciones de detección, falsas alarmas y costo con casos generados,
+junto con sus errores omitidos y límites de aplicación.
 La [revisión con R](https://github.com/htroya/equiframe/blob/main/docs/r_review.md) puede completar la decisión mediante
 `finalize_with_r` o `finalize_execution_with_r`, manteniendo visibles las alertas
 y los componentes que no pudieron evaluarse.

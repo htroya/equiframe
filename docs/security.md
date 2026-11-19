@@ -1,8 +1,10 @@
 # Security boundaries and responsible use
 
 EquiFrame is a local Python library, not a sandbox or a hosted service.
-The `0.13.5` release must satisfy the [release gates](releasing.md) before
-publication; a version string alone does not establish acceptance. The historical
+The current `0.14.0` public Beta passed its dated source/dependency and publication
+[release gates](releasing.md); its reviewed files were published on TestPyPI and
+PyPI on 19 November 2026. A version string alone does not establish acceptance.
+The historical
 STEP9 assessment remains **incomplete** and is not relabelled by a later release.
 Ordinary source review, dependency advisories and security regressions have their
 own explicit scope. There is no completed security certification, universal

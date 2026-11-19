@@ -1,7 +1,10 @@
 # EquiFrame user handbook
 
-[Grouped execution profiles](grouped-profiles.md), new in the 0.14.0 target:
+[Grouped execution profiles](grouped-profiles.md), new in public Beta 0.14.0:
 versioned input/output group metrics for existing preprocessing and detectors.
+
+[Measured detection, false alarms and API costs](detection-benchmark.md): a
+standalone generated-data experiment against the installed public 0.14.0 library.
 
 [Grouped numeric comparison](grouped-comparison.md), new in 0.13.1: compare sums
 for any grouping columns and numeric measure, with explicit coverage and
@@ -43,11 +46,14 @@ Consulta [fuentes](universal-sources.md), [ventanas](migration-ir.md) y
 
 ## Release status
 
-The current feature target is **0.14.0**. The preceding **0.13.5**
-release is [published on PyPI](https://pypi.org/project/equiframe/0.13.5/),
-with final source, installed-package and compatibility results in its
-[release notes](https://github.com/htroya/equiframe/releases/tag/v0.13.5).
-Those results identify 0.13.5; every new artifact needs its own checks.
+**0.14.0 is published as public Beta**, together with the exactly paired
+`equiframe-benchmark`, on PyPI and TestPyPI since **19 November 2026**.
+Install the [core](https://pypi.org/project/equiframe/0.14.0/) and optional
+[benchmark](https://pypi.org/project/equiframe-benchmark/0.14.0/) from their
+version-specific pages. Its [release notes](https://github.com/htroya/equiframe/releases/tag/v0.14.0)
+identify source/installed tests, compatibility, omissions and the published
+artifact hashes. The 0.13.6 maintenance pair is also published on both indices.
+Downloaded consumers and source-archive rebuilds passed for both version pairs.
 See [current versus historical compatibility evidence](compatibility.md) and
 the [manual release procedure](releasing.md). Stable API and persisted-format
 commitments remain unchanged. Historical Alpha materials are preserved under

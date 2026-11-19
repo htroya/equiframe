@@ -1,0 +1,46 @@
+{
+  "protocol": "equiframe-library-detection-1",
+  "scope": "Generated-data library evaluation; not real-world efficacy or thesis acceptance",
+  "purpose": "evaluation",
+  "generator_seed": 20261119,
+  "training": 256,
+  "calibration": 256,
+  "test_normal": 256,
+  "test_per_fault": 64,
+  "shifted_normal": 128,
+  "workloads": [
+    "identity",
+    "discount_aggregation"
+  ],
+  "faults": {
+    "identity": [
+      "fill_null",
+      "drop_rows",
+      "duplicate_rows",
+      "permute_values"
+    ],
+    "discount_aggregation": [
+      "drop_group",
+      "scale_amount",
+      "redistribute",
+      "one_cent"
+    ]
+  },
+  "primary_forest_seed": 7,
+  "sensitivity_forest_seeds": [
+    23,
+    71
+  ],
+  "n_estimators": 200,
+  "max_samples": 256,
+  "alpha": "0.05",
+  "threshold_rule": "strict score > empirical calibration quantile ceil((1-alpha)*n)",
+  "selection": "Training and calibration contain only exact-oracle-confirmed correct executions; no labels/fault IDs/expected or peer outputs in profile",
+  "partitions": "Independent deterministic seeds per workload/split/index; unique source hashes checked; test never used to tune features/thresholds/models",
+  "normal_distributions": "256..1024 rows; identity null probability U(.05,.20); 8..24 groups; per-group discount 500..1500bp; integer cents",
+  "shifted_normal_distribution": "4096..8192 rows; identity null probability U(.35,.45); 40..64 groups; same correct transformation",
+  "claims": "Per-workload/fault recall, FPR and unavailable coverage; Wilson95 intervals conditional on this generator and fixed model. Shifted correct cases reported separately. No acceptance score threshold or best-seed selection.",
+  "cost_scope": "Wall clock per native execution/materialization, profile extraction and Python exact labeling; fit/calibration/batch inference separately; generation/import/file cleanup excluded. Not an end-to-end production latency guarantee.",
+  "code_sha256": "c47180a4ea5ee2354a325bbecfd9d2cb00e7ee1917f1ed1bbc9f586c844f98f8",
+  "equiframe_required": "0.14.0"
+}

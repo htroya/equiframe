@@ -1,8 +1,11 @@
 # EquiFrame: semantic comparison and dataframe migration
 
-> Release target: **0.14.0**. Check the official index for availability and
-> verify the identified artifact hashes. Publication requires the
-> [release gates](https://github.com/htroya/equiframe/blob/main/docs/releasing.md).
+> **Public Beta 0.14.0 — published 19 November 2026 on PyPI and TestPyPI.**
+> Install [EquiFrame](https://pypi.org/project/equiframe/0.14.0/) and the optional,
+> exactly paired [equiframe-benchmark](https://pypi.org/project/equiframe-benchmark/0.14.0/).
+> [Release notes and SHA-256 hashes](https://github.com/htroya/equiframe/releases/tag/v0.14.0)
+> identify the published files; see the
+> [release procedure](https://github.com/htroya/equiframe/blob/main/docs/releasing.md).
 
 [Documentation](https://github.com/htroya/equiframe/blob/main/docs/index.md) |
 [API](https://github.com/htroya/equiframe/blob/main/docs/api.md) |
@@ -193,6 +196,10 @@ See [entry points](https://github.com/htroya/equiframe/blob/main/docs/choosing-a
 and [R review](https://github.com/htroya/equiframe/blob/main/docs/r_review.md).
 Registered callbacks and SQL are trusted application code; EquiFrame does not
 sandbox untrusted programs.
+
+See the [standalone detection benchmark](https://github.com/htroya/equiframe/blob/main/docs/detection-benchmark.md)
+for measured detection, false alarms and component API costs on generated cases,
+including missed errors and correct changes of workload.
 
 ## Run a complete example
 

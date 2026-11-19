@@ -1,0 +1,22 @@
+{
+  "protocol": "equiframe-component-api-cost-1",
+  "dimensions": [
+    4,
+    6
+  ],
+  "training": 256,
+  "calibration": 256,
+  "batch_sizes": [
+    1,
+    32,
+    512
+  ],
+  "repetitions": 5,
+  "forest_seed": 7,
+  "n_estimators": 200,
+  "max_samples": 256,
+  "input": "Generated rate vectors, not native execution profiles; no efficacy labels",
+  "scope": "Warm API wall clock including validation, preprocessing and provenance hashing",
+  "exclusions": "Generation, execution, profiling, cold import, I/O and peak memory",
+  "code_sha256": "6e1e4d1303db89ac3919fa6f5e4217f4fc308eae2a7ea129860b2c765ae66358"
+}
