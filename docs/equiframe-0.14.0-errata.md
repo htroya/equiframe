@@ -17,8 +17,11 @@ development build. The experiments run with `0.15.0.dev1` identify that wheel
 and are reported separately from measurements on 0.14.0.
 [0.14.0 grouped profiles guide](https://github.com/htroya/equiframe/blob/v0.14.0/docs/grouped-profiles.md)
 
+The [exact-wheel public-data evaluation](https://github.com/htroya/equiframe/blob/main/docs/equiframe-0.14.0-evaluation.md)
+reports detection, false alarms, misses and cost for feature version 1.1.
+
 The 200-tree synthetic Isolation Forest probe timed a single profile at a
 median of 2.4 seconds in the review scenario. It included validation,
 fingerprints, preprocessing and scoring on that host. The practical cost
-depends on the model, input and environment. The 0.14.2 patch reduces
+depends on the model, input and environment. The 0.14.3 patch reduces
 repeated work within each call.
