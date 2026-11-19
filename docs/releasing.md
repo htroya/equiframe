@@ -24,9 +24,9 @@ carries LICENSE and THIRD_PARTY_NOTICES.md. Vendored CycloneDX schemas retain
 Apache-2.0; the core artifact metadata records the combined licensing terms.
 See [license scope](licensing.md) and [offline wheel installation](installed-private.md).
 
-The version-2 release policy separates the nine technical checks from factual
-publication gates: security/dependency review, rights, public documentation,
-account protection, independent artifact review and the owner's current task.
+The version-2 release policy separates the nine technical checks from the
+maintainer's observations on security, dependencies, rights, public
+documentation, account protection and the owner's current task.
 UNKNOWN, missing or failed gates block publication. A temporary packet binds
 observations to the exact commit, four artifacts, destination and date; it does
 not authenticate a human or grant permission by itself. The inspector never

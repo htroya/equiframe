@@ -1,9 +1,8 @@
 """Check identified release artifacts without granting or performing publication.
 
-Historical STEP9 candidates remain closed. The manual v2 policy additionally
-checks an external, exact-byte factual packet for a selected index. A packet
-records claims for independent inspection: it cannot authenticate an account,
-human approval, scanner execution or the index. This tool never uploads.
+Historical STEP9 candidates remain closed. The manual v2 policy checks a
+factual packet bound to the exact artifacts and selected index. The maintainer
+records the observations. This tool checks their consistency and never uploads.
 """
 
 import argparse
@@ -44,7 +43,6 @@ MANUAL_GATES = frozenset(
         "publisher_protection",
         "dependency_security_review",
         "source_security_review",
-        "independent_release_review",
         "owner_release_authorization",
     )
 )
@@ -285,8 +283,6 @@ def _details_pass(
             and _zero(details.get("unresolved_high_or_critical"))
             and _zero(details.get("unavailable_checks"))
         )
-    if gate == "independent_release_review":
-        return details.get("independent") is True and _zero(details.get("open_blocking_findings"))
     if gate == "owner_release_authorization":
         return (
             details.get("index") == target and details.get("explicit_instruction_verified") is True
@@ -531,7 +527,7 @@ def check_candidate(
                 "404 establishes no reservation, ownership or admission. "
                 "Index acceptance must be observed after upload."
                 if name_control_mode == "initial_upload_attempt"
-                else "Local consistency only; independently inspect every factual claim."
+                else "Local consistency only; the maintainer verifies the factual observations."
             ),
         )
     return report

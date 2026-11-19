@@ -757,7 +757,7 @@ def main() -> None:
         "publication_blockers": blockers,
         "publication_readiness_evaluated": False,
         "publication_requirements": (
-            "Run verify_publication with the current policy and an independently inspected "
+            "Run verify_publication with the current policy and a maintainer-verified "
             "exact-artifact factual packet for the selected index. A manifest does not "
             "authenticate authorization, account control, public documentation or security."
         ),

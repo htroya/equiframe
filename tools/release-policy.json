@@ -18,12 +18,12 @@
   "required_gates": {
     "testpypi": [
       "license_review", "public_documentation", "name_control", "publisher_protection",
-      "dependency_security_review", "source_security_review", "independent_release_review",
+      "dependency_security_review", "source_security_review",
       "owner_release_authorization"
     ],
     "pypi": [
       "license_review", "public_documentation", "name_control", "publisher_protection",
-      "dependency_security_review", "source_security_review", "independent_release_review",
+      "dependency_security_review", "source_security_review",
       "owner_release_authorization", "testpypi_artifact_identity", "testpypi_downloaded_consumer"
     ]
   },

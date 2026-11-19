@@ -400,7 +400,7 @@ equiframe migration validate migration-spec.json
 equiframe migration run migration-request.json --output migrations
 equiframe migration verify migrations/migration_ID
 equiframe verify validate verification-request.json
-equiframe verify run verification-request.json --output verifications
+equiframe verify run verification-request.json --require-expected --output verifications
 equiframe verify migration migrations/migration_ID --output verifications
 equiframe verify inspect verifications/verification_ID
 equiframe ingestion run ingestion-spec.json input.csv --output ingestion
@@ -418,6 +418,11 @@ equiframe bundle import portable-bundle imported-bundle
 Pipeline `run`, `report`, `evidence verify` and `reduce` are also available;
 explicit factory references load **trusted code** and are not safe for arbitrary
 untrusted modules. `report` is the pipeline reporter, not a comparison report CLI.
+
+For automated ETL acceptance, `verify run --require-expected` requires each
+output to pass its comparison with the request's expected artifact, even when
+the request omits `require_expected`. Set the request contract's keys and
+numeric policies for the equality the job must enforce.
 
 | Command category | Exit meaning |
 |---|---|
