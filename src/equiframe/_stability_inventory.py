@@ -960,6 +960,7 @@ CLI_INVENTORY = (
             "argument|request|request|required=True|default=None",
             "option|output|--output|required=False|default=equiframe-runs",
             "option|require_expected|--require-expected|required=False|default=False",
+            "option|reference_binding|--reference-binding|required=False|default=None",
         ),
         (0, 1, 2, 3),
     ),

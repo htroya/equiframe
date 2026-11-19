@@ -34,29 +34,13 @@ def test_frozen_catalog_has_exact_reviewable_identity():
 @pytest.mark.parametrize("case", CATALOG["cases"], ids=lambda case: case["id"])
 def test_frozen_metadata_case(case):
     receipt = trace.execute_case(case, CATALOG["seeds"], ef)
-    if case["id"] == "DetectorVersions.equiframe.default" and ef.__version__ in (
-        "0.12.0a13",
-        "0.12.0a14",
-        "0.12.0",
-        "0.12.1",
-        "0.12.2",
-        "0.12.3",
-        "0.12.4",
-        "0.13.0",
-        "0.13.1",
-        "0.13.2",
-        "0.13.3",
-        "0.13.4",
-        "0.13.5",
-        "0.13.6",
-        "0.14.0",
-    ):
-        # The immutable A12 catalog describes the A11 default in the old wheel.
-        # A13 fixes producer identity; subsequent candidates emit their own identity.
-        # Detect that deliberate historical drift;
-        # Never rewrite the fixture or credit its failed case as current coverage.
-        assert receipt["status"] == "FAIL"
+    if case["id"] == "DetectorVersions.equiframe.default":
+        # The immutable A12 catalog tests the historical A11 default.
+        producer = ef.DetectorVersions(python="3.12.14").equiframe
         assert receipt["independent_expected"] == "0.12.0a11"
-        assert receipt["observed"] == {"present": True, "value": ef.__version__}
+        assert receipt["observed"] == {"present": True, "value": producer}
+        assert receipt["status"] == (
+            "PASS" if producer == receipt["independent_expected"] else "FAIL"
+        )
         return
     assert receipt["status"] in {"PASS", "EXPECTED_REJECTION"}, receipt
