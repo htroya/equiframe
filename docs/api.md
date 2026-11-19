@@ -2,8 +2,9 @@
 
 [Handbook](index.md) · [Choose an API](choosing-api.md) · [Semantics](semantics.md) · [Compatibility](compatibility.md)
 
-Use `import equiframe as ef`. This reference describes the 0.14.0 implemented
-entry points and their bounded stability contracts. Signatures below use Python notation;
+Use `import equiframe as ef`. This reference tracks the entry points on the
+main branch. For an installed release, use its [versioned reference](versions.md).
+Signatures below use Python notation.
 `...` in a signature means the other documented optional arguments, not an
 executable example. The exhaustive exported namespace is `ef.__all__` and its
 per-name stability classifications are returned by `ef.get_stability_register()`.

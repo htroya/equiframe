@@ -8,6 +8,20 @@ conservación de multiplicidad y comparación numérica exacta en el contrato.
 El proceso acepta con código 0, rechaza una diferencia con 1 y devuelve 3
 cuando falta la referencia o la comparación queda incompleta.
 
+Desde 0.14.5, la salida y la referencia deben estar en archivos distintos.
+Si la misma ruta o un enlace duro apunta al mismo archivo, el código es 3.
+Usa `--reference-binding binding.json` para exigir además las huellas
+de la referencia, de las entradas del lote, del contrato y del plan.
+El generador de referencia debe entregar este archivo por un canal que el
+proceso que produjo la salida no pueda modificar. Consulta el
+[formato de la vinculación](api.md#10-command-line-interface).
+
+En la prueba temporal de 0.14.5, Isolation Forest detectó 9 de 24 fallos y
+alertó en 3 de 36 lotes correctos. La comparación exacta detectó los 24 fallos y
+aceptó los 36 lotes correctos. La prueba reservó los datos de octubre a diciembre
+de 2025 para medir el resultado después de entrenar y calibrar con meses
+anteriores. Consulta el [informe por mes y tipo de fallo](../validation/library_detection/results/temporal-0145/README.md).
+
 Si la transformación conserva sumas, declara un `AggregateCheck` por las
 claves de negocio sobre las filas que el filtro admite. Por ejemplo, un
 control de suma por comprador y moneda detecta una redistribución aunque el

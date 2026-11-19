@@ -133,3 +133,10 @@ experiment source when they disagree with the retained measurement records.
 ## Public-spending extension (experimental candidate)
 
 The generated 0.14.0 experiment above remains unchanged. A separate [public-data study](../../docs/public-spending-evaluation.md) uses an installed experimental candidate with profile 1.2, three native engines, an independent expected result, a prespecified severity extension, a stronger exact grouped rule and actual tree-path reconstruction. Its protocol and exact artifact identity are separate. See `results/public-spending-20261119/README.md` for reproduction and frozen records.
+
+## Temporal evaluation on the 0.14.5 wheel
+
+A new profile 1.1 model was trained on January through June 2025 and calibrated
+on July through September. October, November and December formed the holdout.
+See the [temporal experiment](results/temporal-0145/README.md) for the protocol,
+wheel identity and performance by month and fault.
