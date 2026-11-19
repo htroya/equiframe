@@ -1,5 +1,7 @@
 """Independent declarative forest, parity, availability and isolated scoring."""
 
+import hashlib
+import json
 import math
 
 import pytest
@@ -63,8 +65,15 @@ def test_single_component_matches_joint_inference_and_restoration(tmp_path, meth
     assert component.scores == getattr(joint.scores, field)
     assert component.decisions == getattr(joint, field)
     assert component.matrix_sha256 == joint.scores.matrix_sha256
-    assert component.bundle_sha256 == joint.bundle_sha256
-    assert component.fit_sha256 == joint.scores.fit_sha256
+    for model, component_hash, joint_hash in (
+        (bundle, component.bundle_sha256, joint.bundle_sha256),
+        (bundle.fit, component.fit_sha256, joint.scores.fit_sha256),
+    ):
+        canonical = json.dumps(
+            model.model_dump(mode="json"), sort_keys=True, separators=(",", ":"), ensure_ascii=True
+        ).encode("ascii")
+        assert component_hash == joint_hash == hashlib.sha256(canonical).hexdigest()
+    assert ef.score_detectors(bundle.fit, probes) == joint.scores
     assert component.profiles_sha256 == profile_digest([p.model_dump(mode="json") for p in probes])
     path = tmp_path / "model.json"
     fingerprint = ef.write_detector_bundle(bundle, path)
@@ -72,6 +81,25 @@ def test_single_component_matches_joint_inference_and_restoration(tmp_path, meth
     assert ef.detect_component(restored, probes, method=method) == component
     assert ef.ComponentDetectionResult.model_validate_json(component.model_dump_json()) == component
     assert ef.detect_component(bundle, (), method=method).decisions == ()
+
+
+def test_forged_nested_forest_is_rejected_even_after_valid_inference():
+    bundle = frozen_bundle()
+    probes = (vector(1, 4),)
+    assert ef.detect_component(bundle, probes, method="isolation_forest").complete
+
+    tree = bundle.fit.m.trees[0]
+    invalid_node = tree.nodes[0].model_copy(update={"feature": 100})
+    invalid_tree = tree.model_copy(update={"nodes": (invalid_node, *tree.nodes[1:])})
+    invalid_model = bundle.fit.m.model_copy(update={"trees": (invalid_tree,)})
+    invalid_fit = bundle.fit.model_copy(update={"m": invalid_model})
+    invalid_bundle = bundle.model_copy(update={"fit": invalid_fit})
+    with pytest.raises(ValidationError, match="feature outside the frozen matrix"):
+        ef.detect_component(invalid_bundle, probes, method="isolation_forest")
+    with pytest.raises(ValidationError, match="feature outside the frozen matrix"):
+        ef.detect(invalid_bundle, probes)
+    with pytest.raises(ValidationError, match="feature outside the frozen matrix"):
+        ef.score_detectors(invalid_fit, probes)
 
 
 def test_forest_reference_and_other_scorer_is_never_called(monkeypatch):

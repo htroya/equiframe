@@ -37,12 +37,14 @@ ProfileMetric = Literal[
 FeatureState = Literal["available", "undefined", "not_applicable", "not_evaluable"]
 
 
+def _canonical_profile_json(value: object) -> bytes:
+    return json.dumps(
+        value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False
+    ).encode("ascii")
+
+
 def profile_digest(value: object) -> str:
-    return hashlib.sha256(
-        json.dumps(
-            value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False
-        ).encode("ascii")
-    ).hexdigest()
+    return hashlib.sha256(_canonical_profile_json(value)).hexdigest()
 
 
 class ProfileFeature(FrozenModel):
