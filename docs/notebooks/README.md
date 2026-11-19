@@ -1,25 +1,29 @@
 # Cuadernos públicos de EquiFrame
 
-Estos dos cuadernos pueden abrirse en Google Colab o en Jupyter. Cada uno
-descarga 10.000 registros reales desde Kaggle y contiene instrucciones, tipos
-explícitos, controles de aceptación y resultados de una ejecución comprobada.
-No requieren claves API, GPU ni acceso a la VM del proyecto.
+Estos cuadernos pueden abrirse en Google Colab o en Jupyter. Los dos primeros
+descargan 10.000 registros reales desde Kaggle. El tercero genera lotes
+sintéticos en memoria. Los tres incluyen resultados de una ejecución comprobada.
 
 | Cuaderno | Contenido | Abrir en Colab |
 | --- | --- | --- |
 | [Instalación y uso](01_instalacion_y_uso.ipynb) | Instalación identificada, lectura de 10.000 registros, CSV/JSONL/Parquet, comparación y rechazo de una modificación controlada | [Abrir](https://colab.research.google.com/github/htroya/equiframe/blob/main/docs/notebooks/01_instalacion_y_uso.ipynb) |
 | [Tres motores con 10.000 registros](02_kaggle_10000_tres_motores.ipynb) | Agregaciones nativas en Pandas, Polars y DuckDB, esperado construido por separado, tres parejas, perfiles agrupados 1.1 y redistribución controlada | [Abrir](https://colab.research.google.com/github/htroya/equiframe/blob/main/docs/notebooks/02_kaggle_10000_tres_motores.ipynb) |
+| [Isolation Forest](03_isolation_forest.ipynb) | Entrenamiento, calibración, puntuaciones, umbral, falsas alarmas y omisiones | [Abrir](https://colab.research.google.com/github/htroya/equiframe/blob/main/docs/notebooks/03_isolation_forest.ipynb) |
 
 ## Ejecución
 
 1. Abre un cuaderno y selecciona un entorno CPU con Python 3.10, 3.11, 3.12 o 3.13.
-2. Ejecuta las celdas en orden. La primera usa `%pip install --upgrade "equiframe[engines]"`
+2. Ejecuta las celdas en orden. En los dos primeros cuadernos se usa `%pip install --upgrade "equiframe[engines]"`
    desde PyPI, sin fijar una versión, y muestra la versión que se instaló. Después
    puedes usar `import equiframe as ef`.
 3. Examina los estados y la completitud antes de aceptar una comparación.
    Los controles modificados deben producir `different` y rechazar la aceptación.
 4. La última celda elimina los archivos temporales de esa ejecución. Al repetir,
    vuelve a ejecutar desde el principio para crear un espacio nuevo.
+
+El tercero instala `equiframe[engines,ml]==0.14.0` y conserva la salida de
+sus cinco celdas ejecutadas en Jupyter sobre Windows. Consulta el
+[recibo del cuaderno de Isolation Forest](execution-isolation-forest.json).
 
 La lectura pública en GitHub y Colab no requiere pertenecer al proyecto.
 Google puede solicitar una cuenta propia para asignar un entorno de ejecución;

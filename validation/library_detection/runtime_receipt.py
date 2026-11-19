@@ -1,4 +1,4 @@
-"""Identify an installed experimental package by comparing it with its local wheel."""
+"""Identify an installed EquiFrame package by comparing it with its local wheel."""
 
 from __future__ import annotations
 

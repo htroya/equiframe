@@ -7,7 +7,7 @@
 > identify the published files; see the
 > [release procedure](https://github.com/htroya/equiframe/blob/main/docs/releasing.md).
 
-[Documentation](https://github.com/htroya/equiframe/blob/main/docs/index.md) |
+[Documentation by version](https://github.com/htroya/equiframe/blob/main/docs/versions.md) |
 [API](https://github.com/htroya/equiframe/blob/main/docs/api.md) |
 [Examples](https://github.com/htroya/equiframe/blob/main/docs/journeys.md) |
 [Issues](https://github.com/htroya/equiframe/issues)

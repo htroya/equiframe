@@ -24,6 +24,7 @@ from zoneinfo import ZoneInfo
 
 import pyarrow as pa
 from run import canonical, digest, distribution, metrics, table_spec
+from runtime_receipt import receipt
 
 import equiframe as ef
 
@@ -328,7 +329,11 @@ def registration(source: list[dict[str, Any]], kind: str, engine: str) -> Any:
 
 
 def execute_case(
-    case: dict[str, Any], engine: str, folder: Path, profile: bool
+    case: dict[str, Any],
+    engine: str,
+    folder: Path,
+    profile: bool,
+    versions: tuple[Version, ...] = VERSIONS,
 ) -> tuple[dict[str, Any], dict[str, ef.ProfileVector]]:
     source = case["source"]
     contract, _ = specifications("1.1")
@@ -428,7 +433,7 @@ def execute_case(
     )
     vectors: dict[str, ef.ProfileVector] = {}
     if profile:
-        for version in VERSIONS:
+        for version in versions:
             _, spec = specifications(version)
             start = time.perf_counter()
             measured = ef.profile_execution(
@@ -470,8 +475,21 @@ def main() -> None:
     parser.add_argument("--csv-dir", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--runtime-receipt", type=Path, required=True)
+    parser.add_argument("--wheel", type=Path, help="Reverify the receipt against installed bytes")
+    parser.add_argument("--baseline-only", action="store_true", help="Measure only profile 1.1")
+    parser.add_argument(
+        "--cost-model-dir", type=Path, help="Private output for the frozen seed-7 bundles"
+    )
     parser.add_argument("--smoke", action="store_true")
     args = parser.parse_args()
+    versions = VERSIONS[:1] if args.baseline_only else VERSIONS
+    identity = json.loads(args.runtime_receipt.read_bytes())
+    if identity["version"] != ef.__version__:
+        raise ValueError("Receipt version does not match the installed distribution")
+    if args.wheel is not None and receipt(args.wheel) != identity:
+        raise ValueError("Receipt does not match the installed wheel bytes")
+    if args.cost_model_dir is not None:
+        args.cost_model_dir.mkdir(exist_ok=False)
     args.output.mkdir(exist_ok=False)
     counts = (
         {"training": 8, "development": 4, "calibration": 8, "normal": 8, "fault": 8, "shift": 4}
@@ -494,7 +512,8 @@ def main() -> None:
         "engineering_smoke": args.smoke,
         "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "runtime_source_root": "installed equiframe package; exact modules listed below",
-        "runtime_identity": json.loads(args.runtime_receipt.read_bytes()),
+        "runtime_identity": identity,
+        "wheel_reverified_at_execution": args.wheel is not None,
         "runtime_distribution_metadata_version": ef.__version__,
         "source_files": FILES,
         "inventory": inventory,
@@ -512,7 +531,7 @@ def main() -> None:
         ).hexdigest(),
         "actual_limit_cents": LIMIT_CENTS,
         "partition_unit": "whole OCID; deterministic hash buckets 40/10/20/30",
-        "profile_versions": ["1.1", "1.2"],
+        "profile_versions": versions,
         "alpha": "0.05",
         "trees": 200,
         "max_samples": 256,
@@ -526,7 +545,9 @@ def main() -> None:
                 "the same materialized outputs"
             ),
         },
-        "new_feature_contrast": (
+        "new_feature_contrast": None
+        if args.baseline_only
+        else (
             "same cases and information in baseline; add only group-relat"
             "ive-change population mean and variance"
         ),
@@ -545,7 +566,7 @@ def main() -> None:
     }
     (args.output / "protocol.json").write_text(json.dumps(protocol, indent=2), encoding="utf-8")
     vectors: dict[str, dict[str, list[ef.ProfileVector]]] = {
-        version: defaultdict(list) for version in ("1.1", "1.2")
+        version: defaultdict(list) for version in versions
     }
     records = []
     native = []
@@ -556,7 +577,9 @@ def main() -> None:
         primary_vectors = None
         for engine in ENGINES if is_testing else ("pandas",):
             with tempfile.TemporaryDirectory(prefix="equiframe-spending-") as scratch:
-                row, measured = execute_case(case, engine, Path(scratch), profile=True)
+                row, measured = execute_case(
+                    case, engine, Path(scratch), profile=True, versions=versions
+                )
             native.append(row)
             if primary is None:
                 primary, primary_vectors = row, measured
@@ -565,8 +588,7 @@ def main() -> None:
                     "divergent",
                     "r",
                     "actual_sha256",
-                    "profile_sha256_1.1",
-                    "profile_sha256_1.2",
+                    *("profile_sha256_" + version for version in versions),
                 ):
                     if row[key] != primary[key]:
                         raise RuntimeError(
@@ -589,7 +611,7 @@ def main() -> None:
             )
     summaries = []
     scored: list[dict[str, Any]] = []
-    for version in VERSIONS:
+    for version in versions:
         for seed in (7, 23, 71):
             fit = ef.fit_detectors(
                 ef.NormalTrainingProfiles(
@@ -619,6 +641,10 @@ def main() -> None:
                 ),
                 alpha="0.05",
             )
+            if seed == 7 and args.cost_model_dir is not None:
+                ef.write_detector_bundle(
+                    bundle, args.cost_model_dir / f"private-model-{version}.json"
+                )
             testing = [r.copy() for r in records if r["split"] in ("test", "shifted_normal")]
             probes = tuple(vectors[version]["test"] + vectors[version]["shifted_normal"])
             start = time.perf_counter()
@@ -689,8 +715,7 @@ def main() -> None:
                 key: distribution([r[key] for r in native if r["engine"] == engine])
                 for key in (
                     "execution_seconds",
-                    "profile_seconds_1.1",
-                    "profile_seconds_1.2",
+                    *("profile_seconds_" + version for version in versions),
                     "oracle_seconds",
                     "comparison_seconds",
                     "rule_seconds",

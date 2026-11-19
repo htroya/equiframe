@@ -1,7 +1,7 @@
 ## Unreleased — experimental grouped profile 1.2
 
 - Add opt-in exact-rational mean and population variance of eligible group relative changes; preserve 1.0/1.1 defaults and old payloads.
-- Validate nested detector models once at public inference boundaries; retain rejection of manipulated forests.
+- Validate nested detector models once at public inference boundaries and reuse the canonical fit serialization for both fingerprints.
 - Review schema and stable-model enum expansions explicitly. No new index release is claimed.
 - Publish separate public-spending measurements, severity controls, tree paths and costs, including negative findings.
 - Simplify both public tutorials to an unversioned PyPI installation, explain their purpose in plain Spanish, and retain fully executed Linux notebook outputs.

@@ -24,6 +24,20 @@ those components' owners; an adapter issue does not authorize redesigning them.
 Keep experimental benchmark/scientific acceptance distinct from operational
 comparison maintenance.
 
+## Continuity and handover
+
+Keep an up-to-date handover record with the current release tag and artifact
+hashes, supported Python and engine combinations, open regressions, and the
+status of public issues and private security intake. Use the existing
+[release and rollback procedure](releasing.md) to rehearse building an identified
+release and reinstalling its exact wheel in a clean environment.
+
+A backup maintainer takes responsibility after accepting the role and
+demonstrating a clean artifact check, a dependency-upgrade validation and a
+rollback rehearsal. The handover record should identify which duties were
+accepted and link to dated results. Keep credentials in each maintainer's own
+account and transfer repository or index access through their role controls.
+
 ## Report a problem
 
 Use [the public issue channel](https://github.com/htroya/equiframe/issues)

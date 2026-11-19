@@ -1,5 +1,10 @@
 # EquiFrame user handbook
 
+[Documentation by version](versions.md) · [0.14.0 errata](equiframe-0.14.0-errata.md)
+
+[Isolation Forest notebook](notebooks/03_isolation_forest.ipynb) shows training,
+calibration, detection, false alarms and missed faults on labeled synthetic lots.
+
 [Grouped execution profiles](grouped-profiles.md), new in public Beta 0.14.0:
 versioned input/output group metrics for existing preprocessing and detectors.
 

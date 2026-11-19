@@ -27,13 +27,17 @@ def run(csv_dir: Path, primary_dir: Path, model_dir: Path, output: Path) -> None
     if output.exists():
         raise ValueError("Use a fresh output folder")
     protocol = json.loads((primary_dir / "protocol.json").read_bytes())
+    if protocol["runtime_distribution_metadata_version"] != ef.__version__:
+        raise ValueError("Cost and primary evaluation must use the same installed version")
+    versions = tuple(v for v in primary.VERSIONS if v in protocol["profile_versions"])
+    if list(versions) != protocol["profile_versions"]:
+        raise ValueError("Unexpected profile versions in the primary protocol")
     report = json.loads((primary_dir / "report.json").read_bytes())
     procedures, _ = primary.cohort(csv_dir)
     cases, _ = primary.select_cases(procedures, protocol["counts"])
     probes = [c for c in cases if c["split"] == "test" and c["kind"] == "normal"][:16]
     models = {
-        v: ef.read_detector_bundle(model_dir / ("private-model-" + v + ".json"))
-        for v in primary.VERSIONS
+        v: ef.read_detector_bundle(model_dir / ("private-model-" + v + ".json")) for v in versions
     }
     for v, model in models.items():
         expected_id = next(
@@ -42,7 +46,7 @@ def run(csv_dir: Path, primary_dir: Path, model_dir: Path, output: Path) -> None
         if ef.detector_fingerprint(model) != expected_id:
             raise RuntimeError("Cost pass must reuse the frozen primary model")
     rows = []
-    vectors: dict[str, list[ef.ProfileVector]] = {v: [] for v in primary.VERSIONS}
+    vectors: dict[str, list[ef.ProfileVector]] = {v: [] for v in versions}
     for i, case in enumerate(probes):
         registry = ef.TransformationRegistry()
         registry.register(primary.registration(case["source"], "normal", "pandas"))
@@ -70,8 +74,9 @@ def run(csv_dir: Path, primary_dir: Path, model_dir: Path, output: Path) -> None
                     "source_sha256": case["source_sha256"],
                 }
                 # Alternate operation order to limit a systematic order effect.
-                operations: list[Literal["compare", "1.1", "1.2"]] = ["compare", "1.1", "1.2"]
-                operations = operations[repeat:] + operations[:repeat]
+                operations: list[Literal["compare", "1.1", "1.2"]] = ["compare", *versions]
+                offset = repeat % len(operations)
+                operations = operations[offset:] + operations[:offset]
                 for operation in operations:
                     start = time.perf_counter()
                     if operation == "compare":
@@ -120,7 +125,7 @@ def run(csv_dir: Path, primary_dir: Path, model_dir: Path, output: Path) -> None
             "median_seconds_per_case": statistics.median(elapsed) / 16,
         }
     summary = {}
-    for v in primary.VERSIONS:
+    for v in versions:
         combined = [r["profile_seconds_" + v] + r["m_single_seconds_" + v] for r in rows]
         summary[v] = {
             "profile_median_seconds": statistics.median(r["profile_seconds_" + v] for r in rows),
@@ -144,6 +149,7 @@ def run(csv_dir: Path, primary_dir: Path, model_dir: Path, output: Path) -> None
                 "platform": platform.platform(),
                 "python": platform.python_version(),
                 "library": ef.__version__,
+                "runtime_wheel_sha256": protocol["runtime_identity"]["wheel_sha256"],
                 "models_refitted": False,
                 "scope": (
                     "Repeated local API wall-clock costs; 48 pairs are 16 inputs with three "
