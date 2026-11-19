@@ -4,16 +4,26 @@
 
 ## Current release evidence
 
+The 0.14.1 patch keeps the profile feature versions admitted by 0.14.0 and
+reads its existing detector bundles. New fits record producer 0.14.1.
+See [upgrading](upgrading.md) and the [documentation by version](versions.md).
+
+EquiFrame 0.14.0 was published as a public Beta on 19 November 2026. Its
+[release notes](https://github.com/htroya/equiframe/releases/tag/v0.14.0)
+identify the public wheel and its release checks. The [0.14.0 errata](equiframe-0.14.0-errata.md)
+updates the publication information shipped in that wheel.
+
+### Historical 0.13.5 evidence
+
 The published [0.13.5 release](https://github.com/htroya/equiframe/releases/tag/v0.13.5)
 records the identified final artifacts and their actual checks: core source and
 installed suites each passed 10,299 tests on Windows (94 skipped) and 10,355 on
 Linux aarch64 (38 skipped). Sixteen installed minimum/latest cells across Python
 3.10–3.13 passed 167 cases each. The release notes distinguish the matrix scope,
 omissions and Linux-only current real-R execution. These results belong to
-0.13.5, not to this new 0.13.6 maintenance target or a later artifact.
+0.13.5.
 
-The current candidate requires fresh artifact-bound checks. The following
-historical matrices retain their original dates and identities. Start with
+The following historical matrices retain their original dates and identities. Start with
 [choosing an API](choosing-api.md) for existing workflows and consult the
 [release procedure](releasing.md) for current candidate acceptance.
 
@@ -136,7 +146,7 @@ See [dependency/SBOM policy](dependencies.md) before upgrading transitives.
 
 ## Feature-version 1.1 admission
 
-The 0.14.0 target adds `GroupedProfileFeature` under the existing profile API.
+EquiFrame 0.14.0 introduced `GroupedProfileFeature` under the existing profile API.
 Only explicit `feature_version="1.1"` admits it. The outer profile/model format
 markers remain 1.0 and the nested feature version identifies the extended
 formulas. Current readers preserve 1.0 payloads and fingerprints; previous

@@ -5,6 +5,13 @@
 
 ## Current status and the acceptance boundary
 
+The November 2026 0.14.0 review recorded an artifact-based technical replay
+and a public-data experiment by the project team. The adoption register still
+awaits independent consumer evidence. For a consented integration, record the
+exact wheel, the real decision it supported, a minimized issue or dependency
+upgrade encountered, and a later change that exercised the same integration.
+Publish only the evidence the consumer agreed to share.
+
 As of **2026-10-06**, no independent human pilot, participant consent or retained
 real-project integration is recorded. The three STEP1 pilot definitions and the
 first-use kit provide a starting protocol and synthetic technical exercises.

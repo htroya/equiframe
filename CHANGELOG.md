@@ -1,3 +1,8 @@
+## 0.14.1 - frozen Isolation Forest inference
+
+- Validate detector state at the public boundary and reuse one canonical serialization of the fit for both fingerprints.
+- Document 0.14.0 errata and version-specific installation and upgrade paths.
+
 ## 0.14.0 - versioned grouped execution profiles
 
 - Add opt-in feature-version 1.1 grouped-sum metrics from one captured

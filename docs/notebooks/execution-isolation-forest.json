@@ -1,0 +1,18 @@
+{
+  "started_at": "2026-11-19T21:37:25.678364+00:00",
+  "python": "3.12.4 | packaged by Anaconda, Inc. | (main, Jun 18 2024, 15:03:56) [MSC v.1929 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "installation_skipped": false,
+  "notebooks": [
+    {
+      "file": "03_isolation_forest.ipynb",
+      "input_sha256": "28cf7f7cfb57731ab78fc4a56e9856966c9eaa2ae3f1b645fb08370001219d61",
+      "executed_sha256": "1ccef226030bfb4051c6d8d076f3f0d5a2ce3ecf8a5e06eaa4c099993f181682",
+      "code_cells": 5,
+      "all_cells_executed": true,
+      "error_outputs": 0
+    }
+  ],
+  "passed": true,
+  "finished_at": "2026-11-19T21:45:20.007087+00:00"
+}
