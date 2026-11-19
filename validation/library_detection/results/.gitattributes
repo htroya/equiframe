@@ -1,0 +1,4 @@
+# Preserve measured evidence bytes and hashes across operating systems.
+*.json -text
+*.csv -text
+*.gz -text

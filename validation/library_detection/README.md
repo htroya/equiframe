@@ -33,6 +33,8 @@ python -I validation/library_detection/verify_results.py validation/library_dete
 
 The verifier reads either `cases.csv` or its lossless `cases.csv.gz` publication,
 checks hashes and recomputes counts, unavailable coverage and rate denominators.
+The results directory disables Git newline conversion so the retained measurement
+files keep their original bytes when cloned on another operating system.
 
 For a short engineering check, use `--smoke` with another new output directory.
 Smoke results are explicitly marked and are not the reported evaluation.
