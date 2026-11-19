@@ -1,0 +1,19 @@
+{
+  "candidate_commit": "f2d06c56a56049aeab2fb323ea33b5d564a0f573",
+  "tested_core_wheel_sha256": "868e9b45df77c85785e091cb8138ec8719f29762287998d8e0ea98a8be5c83f3",
+  "installed_core_focused_tests": {
+    "passed": 280,
+    "skipped": 4,
+    "skip_reason": "Windows symlink creation unavailable"
+  },
+  "installed_benchmark_schema_regressions": {
+    "passed": 2
+  },
+  "core_and_benchmark_schemas_checked": [
+    79,
+    58
+  ],
+  "archives_passed_strict_twine_check": 4,
+  "technical_release_suites": "started; completion tracked separately from these focused results",
+  "index_publication": "pending"
+}
