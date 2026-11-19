@@ -417,6 +417,7 @@ def verify(
     started = datetime.now(UTC).isoformat()
     start = time.perf_counter()
     captured: dict[str, ArtifactRef] = {}
+    output_sources: dict[str, ArtifactRef] = {}
     executions: dict[str, ExecutionResult] = {}
     errors: list[VerificationCheck] = []
     technical_checks: list[VerificationCheck] = []
@@ -463,8 +464,9 @@ def verify(
                     {**value.model_dump(), "inputs": inputs, "output": output}
                 )
                 executions[name] = execution
-                if output:
+                if output is not None and value.output is not None:
                     captured[name] = output.data
+                    output_sources[name] = value.output.data
             except Exception as error:
                 technical_checks[-1] = _check(
                     "not_evaluable", "Execution evidence could not be captured", name
@@ -483,12 +485,14 @@ def verify(
             )
             try:
                 captured[name] = capture(value)
+                output_sources[name] = value
             except Exception as error:
                 errors.append(
                     _check("failed", report_failure(error, "artifact_capture_failed"), name)
                 )
     fixed_expected = None
     expected_engine = None
+    expected_unavailable = "Expected comparison unavailable"
     if isinstance(expected, ExecutionResult):
         expected = ExecutionResult.model_validate(expected)
         expected_engine = expected.plan.engine
@@ -509,7 +513,14 @@ def verify(
             expected = expected.output.data
     if expected is not None:
         try:
-            fixed_expected = capture(expected)
+            # Compare source files: snapshots may legitimately coalesce identical bytes.
+            if require_expected and any(
+                local_path(expected).samefile(local_path(source))
+                for source in output_sources.values()
+            ):
+                expected_unavailable = "Expected and candidate refer to the same file"
+            else:
+                fixed_expected = capture(expected)
         except Exception as error:
             errors.append(_check("failed", report_failure(error, "expected_capture_failed")))
     fixed_snapshots = {name: capture(ref) for name, ref in (snapshots or {}).items()}
@@ -589,7 +600,7 @@ def verify(
             expected_checks.append(
                 _check(
                     "not_evaluable" if requested else "not_requested",
-                    "Expected comparison unavailable" if requested else "No expected requested",
+                    expected_unavailable if requested else "No expected requested",
                     name,
                 )
             )

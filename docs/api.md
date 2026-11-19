@@ -421,8 +421,20 @@ untrusted modules. `report` is the pipeline reporter, not a comparison report CL
 
 For automated ETL acceptance, `verify run --require-expected` requires each
 output to pass its comparison with the request's expected artifact, even when
-the request omits `require_expected`. Set the request contract's keys and
-numeric policies for the equality the job must enforce.
+the request omits `require_expected`. The expected artifact must be a distinct
+file. The same path or a hard link to a candidate yields exit 3. Separate
+files can contain identical bytes. Set the request contract's full business
+key, multiplicity and numeric policies for the equality the job must enforce.
+
+`--reference-binding binding.json` also requires the expected comparison.
+Use a JSON `VerificationBinding` from your trusted reference generator with
+`contract_sha256`, `expected_sha256`, `plan_sha256`, a nonempty list of
+`[name, sha256]` pairs in `snapshots` and an empty list in `outputs`.
+The hashes must match the request and the reference and snapshot bytes are
+checked during capture. A binding mismatch yields exit 3. A reference whose
+bytes fail integrity checks yields exit 1. Obtain the binding through
+a channel the candidate-producing job cannot write to. You can generate the
+reference with SQL, Python or R.
 
 | Command category | Exit meaning |
 |---|---|

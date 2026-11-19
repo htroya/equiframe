@@ -54,6 +54,7 @@ from equiframe.serialization import contract_fingerprint, read_contract
 from equiframe.tables import ArrowInput, LocalDataSource, read_table
 from equiframe.verification_request import VerificationRequest
 from equiframe.verify import read_verification, verification_summary, verify, verify_migration
+from equiframe.verify_types import VerificationBinding
 from equiframe.workflow import read_workflow, run_workflow
 from equiframe.workflow_request import WorkflowRequest
 
@@ -331,10 +332,32 @@ def verification_run(
         "--require-expected",
         help="Require a successful comparison against the expected artifact.",
     ),
+    reference_binding: Path | None = typer.Option(
+        None, "--reference-binding", help="Require a trusted reference identity document."
+    ),
 ) -> None:
     """Verify one or more existing artifacts. Exit 0 passed, 1 failed, 2 invalid, 3 unavailable."""
     try:
         document = load_json(VerificationRequest, request)
+        if reference_binding is not None:
+            binding = load_json(VerificationBinding, reference_binding)
+            if not (
+                document.expected is not None
+                and binding.expected_sha256 == document.expected.sha256
+                and binding.contract_sha256 == contract_fingerprint(document.contract)
+                and binding.plan_sha256 is not None
+                and binding.plan_sha256 == document.plan_sha256
+                and binding.snapshots
+                and dict(binding.snapshots)
+                == {item.name: item.artifact.sha256 for item in document.snapshots}
+                and not binding.outputs
+            ):
+                typer.echo(
+                    "reference_binding_mismatch: Check the expected hash, contract, plan "
+                    "and named input snapshots against the trusted document.",
+                    err=True,
+                )
+                raise typer.Exit(code=3)
         result = verify(
             {item.name: item.artifact for item in document.outputs},
             contract=document.contract,
@@ -342,7 +365,9 @@ def verification_run(
             provenance=document.provenance,
             reviews=document.reviews,
             request_review=document.request_review,
-            require_expected=require_expected or document.require_expected,
+            require_expected=(
+                require_expected or document.require_expected or reference_binding is not None
+            ),
             require_rules=document.require_rules,
             snapshots={item.name: item.artifact for item in document.snapshots},
             plan_sha256=document.plan_sha256,
@@ -350,6 +375,8 @@ def verification_run(
             options=document.options,
             work_dir=output,
         )
+    except typer.Exit:
+        raise
     except Exception as error:
         _failure(error)
         return

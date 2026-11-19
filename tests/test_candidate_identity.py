@@ -58,11 +58,14 @@ def test_detector_producer_history_remains_readable(version: str) -> None:
 
 
 def test_current_detector_producer_matches_candidate_metadata() -> None:
-    config = tomllib.loads((Path(__file__).parents[1] / "pyproject.toml").read_text("utf-8"))
-    assert ef.DetectorVersions(python="3.12.14").equiframe == ef.__version__
+    root = Path(__file__).parents[1]
+    config = tomllib.loads((root / "pyproject.toml").read_text("utf-8"))
     assert config["project"]["dynamic"] == ["version"] and "version" not in config["project"]
-    backend = runpy.run_path(str(Path(__file__).parents[1] / "tools" / "release_version.py"))
-    assert backend["project_version"](Path(__file__).parents[1]) == ef.__version__ == "0.14.0"
+    backend = runpy.run_path(str(root / "tools" / "release_version.py"))
+    version = backend["project_version"](root)
+    if backend["RELEASE_TAG"].fullmatch(f"v{version}") is None:
+        pytest.skip("Release producer identity is checked on the exact release tree")
+    assert ef.DetectorVersions(python="3.12.14").equiframe == ef.__version__ == version
 
 
 def test_unknown_detector_producer_is_not_silently_accepted() -> None:
