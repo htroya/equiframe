@@ -241,9 +241,14 @@ def _score_model(model: DetectorModel, matrix: FeatureMatrix | None) -> Detector
 def score_detectors(fit: DetectorFit, profiles: tuple[ProfileVector, ...]) -> DetectorScoreResult:
     """Frozen inference. Incompatible/failed profiles raise, never become no-alert."""
     fit = DetectorFit.model_validate(fit)
+    return _score_validated(fit, profiles)
+
+
+def _score_validated(fit: DetectorFit, profiles: tuple[ProfileVector, ...]) -> DetectorScoreResult:
+    """An internal path for a fit already recursively validated at this API boundary."""
     matrix = _inference_matrix(fit, profiles)
     return DetectorScoreResult(
-        fit_sha256=detector_fingerprint(fit),
+        fit_sha256=profile_digest(fit.model_dump(mode="json")),
         matrix_sha256=profile_digest(matrix.model_dump(mode="json")) if matrix else None,
         rows=len(profiles),
         m=_score_model(fit.m, matrix),
@@ -282,7 +287,7 @@ def calibrate_detectors(
     quantile_rank(alpha, max(1, len(calibration.profiles)))
     if calibration.selection_manifest_sha256 == fit.preprocessor.selection_manifest_sha256:
         raise ValueError("training and calibration selection manifests must differ")
-    scores = score_detectors(fit, calibration.profiles)
+    scores = _score_validated(fit, calibration.profiles)
     return DetectorBundle(
         fit=fit,
         calibration_manifest_sha256=calibration.selection_manifest_sha256,
@@ -326,9 +331,9 @@ def _decisions(
 
 def detect(bundle: DetectorBundle, profiles: tuple[ProfileVector, ...]) -> DetectionResult:
     bundle = DetectorBundle.model_validate(bundle)
-    scores = score_detectors(bundle.fit, profiles)
+    scores = _score_validated(bundle.fit, profiles)
     return DetectionResult(
-        bundle_sha256=detector_fingerprint(bundle),
+        bundle_sha256=profile_digest(bundle.model_dump(mode="json")),
         scores=scores,
         m=_decisions(bundle.m, scores.m, scores.rows),
         b=_decisions(bundle.b, scores.b, scores.rows),
@@ -357,8 +362,8 @@ def detect_component(
     scores = _score_model(model, matrix)
     return ComponentDetectionResult(
         method=method,
-        bundle_sha256=detector_fingerprint(bundle),
-        fit_sha256=detector_fingerprint(bundle.fit),
+        bundle_sha256=profile_digest(bundle.model_dump(mode="json")),
+        fit_sha256=profile_digest(bundle.fit.model_dump(mode="json")),
         profiles_sha256=profile_digest([p.model_dump(mode="json") for p in profiles]),
         matrix_sha256=profile_digest(matrix.model_dump(mode="json")) if matrix else None,
         rows=len(profiles),

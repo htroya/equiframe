@@ -129,3 +129,7 @@ The checks cover exact labels, multiplicity, NULL/zero, value permutations,
 per-row rounding, disjoint partitions, unavailable outcomes and denominators.
 Result checks also reject an improved-looking detection count and changed
 experiment source when they disagree with the retained measurement records.
+
+## Public-spending extension (experimental candidate)
+
+The generated 0.14.0 experiment above remains unchanged. A separate [public-data study](../../docs/public-spending-evaluation.md) uses an installed experimental candidate with profile 1.2, three native engines, an independent expected result, a prespecified severity extension, a stronger exact grouped rule and actual tree-path reconstruction. Its protocol and exact artifact identity are separate. See `results/public-spending-20261119/README.md` for reproduction and frozen records.

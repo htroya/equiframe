@@ -103,6 +103,25 @@ def test_mad_reference_without_forest_inference(monkeypatch):
     assert [d.result.decision for d in result.decisions] == ["alert", "alert"]
 
 
+@pytest.mark.parametrize("api", ["joint", "component", "score"])
+def test_each_public_boundary_revalidates_forged_nested_forest(api):
+    bundle = frozen_bundle()
+    root = bundle.fit.m.trees[0].nodes[0].model_copy(update={"right": 9999})
+    tree = bundle.fit.m.trees[0].model_copy(
+        update={"nodes": (root, *bundle.fit.m.trees[0].nodes[1:])}
+    )
+    model = bundle.fit.m.model_copy(update={"trees": (tree,)})
+    fit = bundle.fit.model_copy(update={"m": model})
+    forged = bundle.model_copy(update={"fit": fit})
+    with pytest.raises(ValidationError):
+        if api == "joint":
+            ef.detect(forged, (vector(0, 4),))
+        elif api == "component":
+            ef.detect_component(forged, (vector(0, 4),), method="isolation_forest")
+        else:
+            ef.score_detectors(fit, (vector(0, 4),))
+
+
 @pytest.mark.parametrize("method", ["isolation_forest", "mad"])
 def test_missing_calibration_preserves_scores_and_unavailable_decision(method):
     bundle = frozen_bundle()

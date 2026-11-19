@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-19",
+  "scope": "Experimental source and public-spending study; no new index release",
+  "source_full_suite": {
+    "passed": 10343,
+    "failed": 3,
+    "skipped": 94,
+    "seconds": 4314.9,
+    "failures": [
+      "dirty SCM version versus installed baseline in identity test",
+      "same version mismatch in isolated lazy-import subprocess",
+      "stable-model enum inventory required explicit review"
+    ]
+  },
+  "focused_resolution": {
+    "passed": 63,
+    "failed": 0,
+    "source_scm_override": "0.14.0 matches unchanged baseline producer and isolated installed baseline",
+    "reviewed_model_enum_expansions": 15,
+    "defaults_changed": false
+  },
+  "focused_source": {
+    "passed": 107
+  },
+  "installed_experimental_artifact": {
+    "version": "0.15.0.dev1",
+    "package_files_verified": 177,
+    "wheel_sha256": "1bdcdfaec39f1a5508e2b0064ad88804b0af703dab2854ff83bcd578b20b7fbe",
+    "focused_tests_passed": 21
+  },
+  "severity_and_detector_tests": {
+    "passed": 20
+  },
+  "generated_assets": {
+    "checked": 79
+  },
+  "static_checks": {
+    "ruff": "passed on changed core/tests/research scripts",
+    "mypy": "strict passed on changed core and research scripts"
+  },
+  "result_reconciliation": {
+    "scored_rows": 7552,
+    "forest_traces": 10,
+    "passed": true
+  },
+  "limitations": [
+    "Full suite was not rerun after the isolated inventory-only correction; affected identity, CLI and compatibility checks passed.",
+    "Windows symlink and POSIX cases are skipped where unsupported; this is not a new cross-platform release certification.",
+    "Study artifacts retain their measured byte identities; later compatibility-inventory corrections do not rewrite them."
+  ]
+}

@@ -13,8 +13,9 @@ No requieren claves API, GPU ni acceso a la VM del proyecto.
 ## Ejecución
 
 1. Abre un cuaderno y selecciona un entorno CPU con Python 3.10, 3.11, 3.12 o 3.13.
-2. Ejecuta las celdas en orden. La primera instala el wheel público 0.14.0 desde
-   GitHub con su SHA-256 y versiones identificadas de los motores.
+2. Ejecuta las celdas en orden. La primera usa `%pip install --upgrade "equiframe[engines]"`
+   desde PyPI, sin fijar una versión, y muestra la versión que se instaló. Después
+   puedes usar `import equiframe as ef`.
 3. Examina los estados y la completitud antes de aceptar una comparación.
    Los controles modificados deben producir `different` y rechazar la aceptación.
 4. La última celda elimina los archivos temporales de esa ejecución. Al repetir,
@@ -40,13 +41,17 @@ Los datos y las capturas se descargan al ejecutar y quedan fuera de Git.
 
 ## Verificación realizada
 
-Ambos cuerpos de código se ejecutaron en Windows con CPython 3.13.18 y la
-distribución identificada. Además, ambos cuadernos completos, incluida su
-instalación pública, finalizaron en un entorno nuevo de Linux ARM64 con CPython
-3.13.18. Cada uno procesó 10.000 registros, comprobó los tres formatos y rechazó
-su control negativo. El segundo ejecutó los tres motores, sus tres contrastes
-con un esperado separado, las tres parejas y los tres perfiles agrupados.
+La revisión actual se ejecutó completa el 19 de noviembre de 2026 en un entorno
+nuevo de Linux ARM64 con CPython 3.12.15 y kernels Jupyter reales, incluida la
+celda `%pip` de instalación sin versión. PyPI resolvió EquiFrame 0.14.0. Se
+ejecutaron las cinco celdas de código del primer cuaderno y las ocho del segundo,
+con cero salidas de error. Cada uno procesó 10.000 registros, comprobó los tres
+formatos y rechazó su control negativo. El segundo ejecutó los tres motores,
+sus tres contrastes con un esperado separado, las tres parejas y tres perfiles.
+El [recibo de ejecución](execution-20261119.json) registra sus huellas y entorno.
 
-Las salidas incorporadas proceden de esa ejecución Linux; no se afirma una
+Las versiones anteriores de los cuerpos de cálculo también se verificaron en
+Windows; la instalación simplificada de esta revisión se ejecutó en Linux.
+Las salidas incorporadas proceden de la ejecución Linux; no se afirma una
 ejecución en el servicio alojado de Colab. Los ejemplos comprueban software y
 no estiman eficacia de detectores ni resultados científicos sobre SERCOP.

@@ -408,7 +408,9 @@
             "prop_grupos_suma_modificada",
             "max_diferencia_relativa_grupo",
             "prop_grupos_cambio_desde_cero",
-            "cobertura_grupos"
+            "cobertura_grupos",
+            "media_diferencia_relativa_grupo",
+            "varianza_diferencia_relativa_grupo"
           ],
           "title": "Metric",
           "type": "string"
@@ -1084,7 +1086,8 @@
       "default": "1.0",
       "enum": [
         "1.0",
-        "1.1"
+        "1.1",
+        "1.2"
       ],
       "title": "Feature Version",
       "type": "string"

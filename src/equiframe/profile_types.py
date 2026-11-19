@@ -107,6 +107,8 @@ class GroupedProfileFeature(FrozenModel):
         "max_diferencia_relativa_grupo",
         "prop_grupos_cambio_desde_cero",
         "cobertura_grupos",
+        "media_diferencia_relativa_grupo",
+        "varianza_diferencia_relativa_grupo",
     ]
     table: Identifier
     column: Text
@@ -137,7 +139,7 @@ class GroupedProfileFeature(FrozenModel):
 
 class ProfileSpec(FrozenModel):
     schema_version: Literal["1.0"] = "1.0"
-    feature_version: Literal["1.0", "1.1"] = "1.0"
+    feature_version: Literal["1.0", "1.1", "1.2"] = "1.0"
     family: Family
     features: Annotated[tuple[ProfileFeature | GroupedProfileFeature, ...], Field(min_length=1)]
 
@@ -147,6 +149,15 @@ class ProfileSpec(FrozenModel):
             isinstance(f, GroupedProfileFeature) for f in self.features
         ):
             raise ValueError("grouped features require explicit feature_version=1.1")
+        if self.feature_version != "1.2" and any(
+            f.metric
+            in (
+                "media_diferencia_relativa_grupo",
+                "varianza_diferencia_relativa_grupo",
+            )
+            for f in self.features
+        ):
+            raise ValueError("group distribution features require explicit feature_version=1.2")
         unique(tuple(f.name for f in self.features), "features")
         unique(
             tuple(
@@ -281,6 +292,8 @@ class ProfileVector(FrozenModel):
                         "razon_salida_entrada",
                         "expansion_union",
                         "max_diferencia_relativa_grupo",
+                        "media_diferencia_relativa_grupo",
+                        "varianza_diferencia_relativa_grupo",
                     )
                     and (observation.numerator or 0) > observation.denominator
                 ):
@@ -296,9 +309,9 @@ class ProfileMetadata(FrozenModel):
     execution_sha256: Sha256
     artifacts: tuple[ArtifactRef, ...]
     conversion_receipts: tuple[ConversionReceipt, ...] = ()
-    implementation_version: Literal["equiframe-profiles-1.0", "equiframe-profiles-1.1"] = (
-        "equiframe-profiles-1.0"
-    )
+    implementation_version: Literal[
+        "equiframe-profiles-1.0", "equiframe-profiles-1.1", "equiframe-profiles-1.2"
+    ] = "equiframe-profiles-1.0"
 
 
 class ProfileResult(_ExplicitOutcome, FrozenModel):
@@ -318,11 +331,7 @@ class ProfileResult(_ExplicitOutcome, FrozenModel):
     def consistent(self) -> Self:
         if self.complete != all(o.state != "not_evaluable" for o in self.vector.observations):
             raise ValueError("profile completeness contradicts observations")
-        implementation = (
-            "equiframe-profiles-1.1"
-            if self.vector.spec.feature_version == "1.1"
-            else "equiframe-profiles-1.0"
-        )
+        implementation = "equiframe-profiles-" + self.vector.spec.feature_version
         if self.metadata.implementation_version != implementation:
             raise ValueError("profile implementation differs from its feature version")
         return self

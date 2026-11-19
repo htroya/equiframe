@@ -297,3 +297,7 @@ The benchmark declares `tomli` only below Python 3.11. Source-development tools
 use the same fallback from the explicitly declared development dependency.
 Normal pip resolution chooses compatible branches within unchanged native
 dependency ranges; the recorded locks identify those branches per Python.
+
+## Unreleased feature version 1.2
+
+Current development source explicitly admits feature version 1.2 and its mean/variance grouped metrics. The published 0.14.0 reader rejects 1.2; do not pass these new payloads to that reader. Outer format markers remain 1.0, and defaults and old feature formulas remain unchanged. Reviewed compatibility and schema fingerprints admit only the new enum alternatives. Exact experimental artifact identities and the legacy model-producer marker limitation are documented in the [public-data study](public-spending-evaluation.md). This does not publish a new stable producer or change earlier tags.

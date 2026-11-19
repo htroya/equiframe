@@ -31,6 +31,10 @@ The distribution is classified **Beta**. Existing stable APIs and persisted
 formats retain their compatibility commitments; experimental workflows remain
 explicitly identified. See the [readiness review](https://github.com/htroya/equiframe/blob/main/docs/review-0132.md).
 
+
+[Public-data detection study](docs/public-spending-evaluation.md) · [Exact verdicts and statistical alerts](docs/reliability.md).
+New profile 1.2 work is experimental source; the public index release remains 0.14.0.
+
 ## Install
 
 EquiFrame supports **Python 3.10, 3.11, 3.12 and 3.13**.
@@ -273,6 +277,10 @@ and [license scope](https://github.com/htroya/equiframe/blob/main/NOTICE.md).
 # EquiFrame: comparación semántica y migración de datos en Python
 
 [Documentación](https://github.com/htroya/equiframe/blob/main/docs/index.md) · [API](https://github.com/htroya/equiframe/blob/main/docs/api.md) · [Ejemplos](https://github.com/htroya/equiframe/blob/main/docs/journeys.md) · [Contribuir](https://github.com/htroya/equiframe/blob/main/CONTRIBUTING.md) · [Licencia MIT](https://github.com/htroya/equiframe/blob/main/LICENSE)
+
+
+[Evaluación con datos públicos](docs/public-spending-evaluation.md) · [Fiabilidad y alertas estadísticas](docs/reliability.md).
+Las características 1.2 son experimentales; la versión publicada en los índices sigue siendo 0.14.0.
 
 ## ¿Qué es EquiFrame?
 

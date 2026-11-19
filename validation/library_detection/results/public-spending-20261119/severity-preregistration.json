@@ -1,0 +1,25 @@
+{
+  "created_at_utc": "2026-11-19T17:09:47.300Z",
+  "purpose": "Prespecified extension of public-spending proof of concept, before primary forest fitting/scoring has completed",
+  "main_protocol": "public-spending-full-01/protocol.json",
+  "independent_source_groups": 64,
+  "selection": "Unused test-partition OCIDs after the complete primary selection; whole procedures, chunks of at least 32 awards, at least two positive eligible groups; never use training/calibration source procedures",
+  "conditions": [
+    "correct",
+    "redistribution of 1 cent",
+    "redistribution of 1% of smaller target group total",
+    "redistribution of 10% of smaller target group total",
+    "redistribution of 50% of smaller target group total"
+  ],
+  "engines": [
+    "pandas",
+    "polars",
+    "duckdb"
+  ],
+  "models": "Reuse numerically identical primary fitted/calibrated models for profile versions 1.1 and 1.2, seed 7; verify bundle fingerprints against primary report. No tuning.",
+  "strong_baseline": "R_group computes exact grouped conservation against the independently filtered source using Arrow and EquiFrame compare_grouped; compare with R_global, M, MAD and hybrids. Do not interpret gains over incomplete R_global as superiority over comprehensive known rules.",
+  "uncertainty": "Bootstrap whole source chunks including all five paired variants; engine repetitions and severity variants do not inflate independent sample size.",
+  "trace": "Reconstruct paths and score on the first selected source at each fixed severity, without selecting examples by favorable decisions.",
+  "timing": "Primary pass costs are observational while other QA jobs run. A later isolated repeated measurement must distinguish M-only API, profile, rule and full comparison; do not claim H3 from joint M+B timing.",
+  "outcomes": "Report unfavorable or null outcomes and blind spots; do not describe controlled defects as actual misconduct or real source corruption."
+}

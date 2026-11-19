@@ -1,0 +1,26 @@
+{
+  "started_at": "2026-11-19T17:58:21.672800+00:00",
+  "python": "3.12.15 (main, Oct  1 2026, 15:41:07) [GCC 11.4.0]",
+  "platform": "Linux-6.8.0-1060-oracle-aarch64-with-glibc2.35",
+  "installation_skipped": false,
+  "notebooks": [
+    {
+      "file": "01_instalacion_y_uso.ipynb",
+      "input_sha256": "75352c6304de6efc98bf932833f65262d62c79f162c385b917dc3e68a8353019",
+      "executed_sha256": "1c51bdadd81271cd3dc085b3a3146ceecbf3ce5b08fa1143bedb4446d179e742",
+      "code_cells": 5,
+      "all_cells_executed": true,
+      "error_outputs": 0
+    },
+    {
+      "file": "02_kaggle_10000_tres_motores.ipynb",
+      "input_sha256": "900d52be7d7b113b67f0f96550b31ab401e944a3b8b0471f9707462301b4b448",
+      "executed_sha256": "d99657e93ee09377f35973872eab581bdb40a08e2c50cd00ffdff181653db621",
+      "code_cells": 8,
+      "all_cells_executed": true,
+      "error_outputs": 0
+    }
+  ],
+  "passed": true,
+  "finished_at": "2026-11-19T18:00:45.283712+00:00"
+}

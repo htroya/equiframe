@@ -155,3 +155,5 @@ with an invalid expected result is still `not_evaluable`. Missing finalization,
 failed publication, resource exhaustion and an unhandled exception are never a
 pass. See [semantics](semantics.md) before using a result to approve a deployment
 or data publication.
+
+[Prueba sobre importes públicos](public-spending-evaluation.md), [fiabilidad](reliability.md) y [antecedentes](research-related-work.md): resultados reales del candidato experimental, sin atribuirlos a la distribución 0.14.0.

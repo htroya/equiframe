@@ -550,3 +550,7 @@ the selected environment. Validation must cover normal and optimized modes,
 direct filter predicates, nested projections, overflow, the valid wider neighbor,
 temporary-style logical names, empty inputs and all-NULL inputs. Candidate source
 or proposed tests alone do not establish a completed regression or publication.
+
+## Development source: grouped profile 1.2
+
+Keep existing 1.0/1.1 profiles and fitted models unchanged. To study the new mean and population variance metrics, create a new `ProfileSpec` with explicit `feature_version="1.2"`, then refit and calibrate on separately identified normal profiles. An older 0.14.0 installation rejects the new version. No automatic migration of fitted model coordinates or thresholds is performed. See the [measured study](public-spending-evaluation.md).

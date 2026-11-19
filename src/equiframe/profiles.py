@@ -464,7 +464,9 @@ def profile_execution(
             execution_sha256=profile_digest(execution.model_dump(mode="json")),
             conversion_receipts=conversions,
             implementation_version=(
-                "equiframe-profiles-1.1"
+                "equiframe-profiles-1.2"
+                if spec.feature_version == "1.2"
+                else "equiframe-profiles-1.1"
                 if spec.feature_version == "1.1"
                 else "equiframe-profiles-1.0"
             ),

@@ -559,3 +559,7 @@ right/full joins, `Deduplicate.keep="first"` and its deterministic `by`,
 `DecimalRound`, Decimal `Arithmetic` multiply/divide, and `LocalizeTimestamp`.
 These expression models are stable public exports in 0.12.0. Engine-specific
 rejections remain part of the capability contract, not fallback behavior.
+
+## Experimental profile 1.2
+
+The unreleased source admits explicit `feature_version="1.2"` for `GroupedProfileFeature` metrics `media_diferencia_relativa_grupo` and `varianza_diferencia_relativa_grupo`. They summarize nonnegative relative changes for common groups with nonzero valid input sums, can exceed one and retain undefined/unavailable states. Version 1.0 remains the default. See [formulas and measured limits](public-spending-evaluation.md) and [exact versus statistical conclusions](reliability.md).

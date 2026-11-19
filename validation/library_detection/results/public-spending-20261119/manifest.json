@@ -1,0 +1,76 @@
+{
+  "created_at": "2026-11-19",
+  "raw_source_rows_published": false,
+  "fitted_models_published": false,
+  "files": [
+    {
+      "file": "primary-protocol.json.gz",
+      "compressed_sha256": "4d338177a35c5b23cb6a282b086e82014dd7ca30a956ed80f0582cebbd18250d",
+      "uncompressed_sha256": "38a233cdebefb40a9cdb3758b601d60e423e12e3630c571b5390d93219ce8f1a",
+      "uncompressed_bytes": 38202
+    },
+    {
+      "file": "primary-report.json.gz",
+      "compressed_sha256": "d12b4a69d523817ce66f77889649c48146c58b4fa87fdba384c573cd168ba743",
+      "uncompressed_sha256": "ddb6327c260130a8408fe33ba4eb651b29ee5d3c12f9f0b7ed190fa53e04da73",
+      "uncompressed_bytes": 81040
+    },
+    {
+      "file": "primary-native-records.json.gz",
+      "compressed_sha256": "e6f0840a35abe5a3d7aa401ae11fb06f3a3e3a323004d0bd513912ecb9625219",
+      "uncompressed_sha256": "904fa6cb65a9f89a28c86ae6105676c57ff1f28552eba0c152bb56b34e19bf5f",
+      "uncompressed_bytes": 4285115
+    },
+    {
+      "file": "primary-scored-records.json.gz",
+      "compressed_sha256": "cfdfb6a641ab43f357f08c93b0dc82edf9f654c77ee50f9fb68314fd7a84ac8c",
+      "uncompressed_sha256": "835ec4af14c8bd0d48f734c5f879507d3c8bd4bdcde962a0fb916023383e697d",
+      "uncompressed_bytes": 9015200
+    },
+    {
+      "file": "severity-protocol.json.gz",
+      "compressed_sha256": "739e4c8a8b25ae00eb52ef41bc51c6b2bbcb6e1a4c1c3d2c44fd43132f413944",
+      "uncompressed_sha256": "c628939d555b72bbe815275061819014ed246e2c00dd494a11166341d5fe816d",
+      "uncompressed_bytes": 2464
+    },
+    {
+      "file": "severity-report.json.gz",
+      "compressed_sha256": "e9b3e7dad5c57814793b6c3c6f84b29c08b533a17290464c850c77f38028bf67",
+      "uncompressed_sha256": "7b294d1a6fb2c015f04e2d50b531bc06250d3e66698e37fcbb2cb1b6a1f0a1d1",
+      "uncompressed_bytes": 31988
+    },
+    {
+      "file": "severity-records.json.gz",
+      "compressed_sha256": "a005779ecef479fd2fe321f528b4d08da7ea6486894575bfb0c41fb8856c7358",
+      "uncompressed_sha256": "9a0f808222d22697a92bdf348f5aa80fcaa9640d912e4156f1198dc661e94afc",
+      "uncompressed_bytes": 608970
+    },
+    {
+      "file": "severity-native-records.json.gz",
+      "compressed_sha256": "c3426f0c61024e1d750f8190bcc9cff6463e9d04221557687d74b9422ca8eb6c",
+      "uncompressed_sha256": "bdf2c9e59a914a470f2ca52f176565b3ff16fadf229c98cee54ce09ea0b22733",
+      "uncompressed_bytes": 692394
+    },
+    {
+      "file": "severity-tree-traces.json.gz",
+      "compressed_sha256": "d89f3d2a82592936215110cc7bda91b9cddc1c9235503aff259eef3e9f009984",
+      "uncompressed_sha256": "2fbdab2dd4bc8e7ffe4b19c82870c4537653faba2b367809b31b6ea2f0369481",
+      "uncompressed_bytes": 52332
+    },
+    {
+      "file": "cost-report.json.gz",
+      "compressed_sha256": "0a7967b3f53f6cfbde99ed79e4fa36a7ad5e69313b849038a6c596d77c4ecc48",
+      "uncompressed_sha256": "69d58482a31c09c249a9e0c10e338a1dfdb652aac9f83d235796b2f70c8784fd",
+      "uncompressed_bytes": 20710
+    }
+  ],
+  "severity_preregistration_sha256": "0b134e2f5d3fccc28a24ddf36e0d06a1e7bd1aaac2f3ac00409af995e1c5f596",
+  "reconciliation": {
+    "passed": true,
+    "primary_unique_test_cases": 1152,
+    "severity_source_groups": 64,
+    "scored_rows_reconciled": 7552,
+    "actual_forest_traces": 10,
+    "scope": "Recorded counts, decisions and identities; source-procedure disjointness is enforced during extraction, not inferred from hashes alone."
+  }
+}

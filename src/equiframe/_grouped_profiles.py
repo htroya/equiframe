@@ -22,7 +22,11 @@ def measure_grouped(feature: GroupedProfileFeature, context: _ProfileContext) ->
     Extraction is cached only within the current profile context. Group keys
     identify sums in this calculation; entity labels never become matrix inputs.
     """
-    key = feature.model_dump_json(exclude={"name", "metric"})
+    distribution = feature.metric in (
+        "media_diferencia_relativa_grupo",
+        "varianza_diferencia_relativa_grupo",
+    )
+    key = feature.model_dump_json(exclude={"name", "metric"}) + str(distribution)
     summary = context.grouped.get(key)
     output = context.tables[feature.table]
     reference = context.tables[feature.reference_table]
@@ -50,7 +54,7 @@ def measure_grouped(feature: GroupedProfileFeature, context: _ProfileContext) ->
                 relative_tolerance=feature.relative_tolerance,
                 null_keys=feature.null_keys,
                 max_groups=context.options.max_distinct,
-                max_examples=0,
+                max_examples=context.options.max_distinct if distribution else 0,
                 max_work=bound,
                 timeout_seconds=remaining,
             ),
@@ -64,7 +68,25 @@ def measure_grouped(feature: GroupedProfileFeature, context: _ProfileContext) ->
         context.grouped[key] = summary
     if not summary.complete:
         raise CapabilityError("invalid common-group measures cannot become model values")
-    if feature.metric == "prop_grupos_suma_modificada":
+    if distribution:
+        if not summary.examples_complete:
+            raise CapabilityError("group distribution requires complete bounded group observations")
+        ratios: list[Fraction] = []
+        for group in summary.examples:
+            context.checkpoint()
+            if group.relative_difference is not None:
+                ratios.append(group.relative_difference)
+        if ratios:
+            mean = sum(ratios, Fraction(0)) / len(ratios)
+            statistic = (
+                mean
+                if feature.metric == "media_diferencia_relativa_grupo"
+                else sum(((ratio - mean) ** 2 for ratio in ratios), Fraction(0)) / len(ratios)
+            )
+            numerator, denominator = statistic.numerator, statistic.denominator
+        else:
+            numerator, denominator = 0, 0
+    elif feature.metric == "prop_grupos_suma_modificada":
         numerator, denominator = summary.modified_groups, summary.comparable_groups
     elif feature.metric == "prop_grupos_cambio_desde_cero":
         numerator, denominator = summary.changed_from_zero_groups, summary.zero_baseline_groups
