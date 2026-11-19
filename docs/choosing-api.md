@@ -2,6 +2,11 @@
 
 ## Start with the smallest workflow
 
+For two complete Spanish-language examples with 10,000 real Kaggle records,
+explicit file types and three native engines, open the
+[public Colab notebooks](notebooks/README.md). They install the identified
+0.14.0 GitHub wheel directly and keep raw data outside the repository.
+
 | Need | Start here | Acceptance boundary |
 | --- | --- | --- |
 | Read a local file and expose another engine | `load_dataset`, `convert_dataset` | Conversion does not execute an independently written ETL |
