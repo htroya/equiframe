@@ -3,6 +3,14 @@
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Security](security.md) ·
 [Release/rollback](releasing.md)
 
+## 0.15.0: exact acceptance receipts
+
+Use `verify accept` with the reference binding. A successful report retains
+the exact comparison policy and snapshots. Use `--require-execution` to
+require a captured execution for each output. Existing verification reports
+keep their original shape. The 0.15.0 pair uses stable profile versions
+1.0 and 1.1. The experimental 1.2 study has its own wheel and results.
+
 ## 0.14.7: required rules and verification bindings
 
 Strict acceptance evaluates required rules on verified captures. Trusted

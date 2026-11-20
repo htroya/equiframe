@@ -1,3 +1,10 @@
+## 0.15.0 - exact ETL acceptance with a retained reference binding
+
+- Add `verify accept` and an equivalent Python acceptance policy.
+- Require exact numeric comparison and retain the reference authorization.
+- Enforce execution plan identity when captured execution evidence is supplied.
+- Refuse strict expected executions from a different contract or input batch.
+
 ## 0.14.7 - complete verification evidence
 
 - Evaluate required contract rules during strict acceptance.
