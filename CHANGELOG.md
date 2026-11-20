@@ -9,6 +9,17 @@
 - Publish separate public-spending measurements, severity controls, tree paths and costs, including negative findings.
 - Simplify both public tutorials to an unversioned PyPI installation, explain their purpose in plain Spanish, and retain fully executed Linux notebook outputs.
 
+## 0.15.1 - verification request compatibility
+
+- Preserve historical verification request serialization when optional execution evidence is absent.
+- Pair both distributions at 0.15.1. The [first acceptance guide](docs/first-acceptance-0.15.1.md) walks through the exact comparison, reference binding and exit codes.
+
+## 0.15.0 - exact ETL acceptance
+
+- Add `verify accept` with exact numeric comparison and a retained reference binding.
+- Verify captured plan identity when execution evidence is required and reject expected executions from a different contract or input batch.
+- See the [temporal evaluation](validation/library_detection/results/temporal-0150/README.md) for observed outcomes with the exact 0.15.0 wheel.
+
 ## 0.14.0 - versioned grouped execution profiles
 
 - Add opt-in feature-version 1.1 grouped-sum metrics from one captured
