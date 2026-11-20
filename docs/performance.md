@@ -87,8 +87,8 @@ measured medians describe this run on the shared host.
 [0.14.0 receipt](../validation/library_detection/results/if-inference-0151/if-0140.json) ·
 [0.15.1 receipt](../validation/library_detection/results/if-inference-0151/if-0151.json)
 
-The 0.15.2 wheel reproduced both result digests and the 40,994 validations
-with the same frozen forest. [0.15.2 receipt](../validation/library_detection/results/if-inference-0151/if-0152.json)
+The 0.15.2 and 0.15.3 wheels reproduced both result digests and the 40,994
+validations with the same frozen forest. [0.15.2 receipt](../validation/library_detection/results/if-inference-0151/if-0152.json) · [0.15.3 receipt](../validation/library_detection/results/if-inference-0151/if-0153.json)
 
 ### Scale tests
 
