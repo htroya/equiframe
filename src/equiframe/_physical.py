@@ -122,12 +122,12 @@ def _verify_columns(observed: _Observation, columns: tuple[PhysicalColumn, ...],
         raise ArtifactIntegrityError("captured physical NULL or NaN counts contradict metadata")
 
 
-def verify_table_metadata(table: TableArtifact) -> None:
+def verify_table_metadata(table: TableArtifact, *, check: Callable[[], None] | None = None) -> None:
     """Verify schema, counts and a separate index against captured table bytes.
 
     Native ``engine_type`` is provenance and cannot be inferred from IPC/Parquet.
     No casts, contract normalization, ETL, plugins or engine imports occur here.
     """
-    _verify_columns(_observe(table.data), table.columns, table.row_count)
+    _verify_columns(_observe(table.data, check=check), table.columns, table.row_count)
     if table.index is not None:
-        _verify_columns(_observe(table.index), table.index_columns, table.row_count)
+        _verify_columns(_observe(table.index, check=check), table.index_columns, table.row_count)

@@ -160,7 +160,7 @@ class RuleEvaluation(_ExplicitOutcome, FrozenModel):
         expected_complete = (
             bool(self.rules)
             and self.diagnostic is None
-            and self.execution_state == "completed"
+            and self.execution_state in ("completed", "captured_artifacts")
             and all(item.complete for item in (*self.preconditions, *self.rules))
             and any(item.state in ("satisfied", "violated") for item in self.rules)
         )

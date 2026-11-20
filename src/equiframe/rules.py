@@ -670,6 +670,31 @@ def evaluate_rules(
     if execution.contract_sha256 != contract_fingerprint(contract):
         raise ValueError("execution contract fingerprint mismatch")
     options = RuleOptions.model_validate(RuleOptions() if options is None else options)
+    return _evaluate_rules(
+        contract,
+        run_id=execution.run_id,
+        execution_id=execution.execution_id,
+        execution_state=execution.state,
+        load_tables=lambda: _verified_tables(execution, options),
+        registry=registry,
+        options=options,
+        work_dir=work_dir,
+        cancellation=cancellation,
+    )
+
+
+def _evaluate_rules(
+    contract: Contract,
+    *,
+    run_id: str,
+    execution_id: str,
+    execution_state: str,
+    load_tables: Callable[[], dict[str, pa.Table]],
+    registry: RuleRegistry | None = None,
+    options: RuleOptions,
+    work_dir: Path | None,
+    cancellation: CancellationToken | None = None,
+) -> RuleEvaluation:
     registry = registry or default_rule_registry()
     cancellation = cancellation or CancellationToken()
     identifier = "rules_" + uuid4().hex
@@ -685,7 +710,9 @@ def evaluate_rules(
     try:
         if cancellation.cancelled:
             raise ExecutionCancelled("rule evaluation cancelled before artifact loading")
-        tables = _verified_tables(execution, options)
+        if execution_state not in ("completed", "captured_artifacts"):
+            raise CapabilityError("completed execution evidence is unavailable")
+        tables = load_tables()
         context = RuleContext(contract, tables, options, cancellation, start)
         context.checkpoint()
     except Exception as error:
@@ -766,13 +793,13 @@ def evaluate_rules(
     )
     result = RuleEvaluation(
         evaluation_id=identifier,
-        run_id=execution.run_id,
-        execution_id=execution.execution_id,
+        run_id=run_id,
+        execution_id=execution_id,
         contract_id=contract.contract_id,
         contract_revision=contract.revision,
-        contract_sha256=execution.contract_sha256,
+        contract_sha256=contract_fingerprint(contract),
         rule_set_sha256=rule_set_fingerprint(contract, registry, options),
-        execution_state=execution.state,
+        execution_state=execution_state,
         options=options,
         decision=decision,
         complete=complete,

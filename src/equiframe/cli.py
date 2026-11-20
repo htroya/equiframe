@@ -1,5 +1,6 @@
 """Operational CLI delegates to the same APIs used by scripts and notebooks."""
 
+import hashlib
 import json
 import sys
 from collections.abc import Callable, Mapping
@@ -16,7 +17,7 @@ from equiframe._first_use import Case, Role, run_demo
 from equiframe.assertion_types import EquivalencePolicy
 from equiframe.assertions import equivalence_decision
 from equiframe.bundle import export_bundle, import_bundle, inspect_bundle
-from equiframe.comparison import compare
+from equiframe.comparison import compare, comparison_fingerprint
 from equiframe.comparison_types import ComparisonSpec
 from equiframe.datasets import (
     DatasetChoiceRequired,
@@ -35,7 +36,7 @@ from equiframe.errors import (
     ContractIOError,
     ContractValidationError,
 )
-from equiframe.evidence import inspect_evidence, load_json, read_pipeline
+from equiframe.evidence import canonical_bytes, inspect_evidence, load_json, read_pipeline
 from equiframe.ingestion import IngestionSpec, ingest_file
 from equiframe.migration import (
     MigrationRequest,
@@ -52,9 +53,14 @@ from equiframe.registry import TransformationRegistry
 from equiframe.reporting import pipeline_summary, write_report
 from equiframe.serialization import contract_fingerprint, read_contract
 from equiframe.tables import ArrowInput, LocalDataSource, read_table
-from equiframe.verification_request import VerificationRequest
-from equiframe.verify import read_verification, verification_summary, verify, verify_migration
-from equiframe.verify_types import VerificationBinding
+from equiframe.verification_request import ReferenceBinding, VerificationRequest
+from equiframe.verify import (
+    VerificationInput,
+    read_verification,
+    verification_summary,
+    verify,
+    verify_migration,
+)
 from equiframe.workflow import read_workflow, run_workflow
 from equiframe.workflow_request import WorkflowRequest
 
@@ -339,27 +345,52 @@ def verification_run(
     """Verify one or more existing artifacts. Exit 0 passed, 1 failed, 2 invalid, 3 unavailable."""
     try:
         document = load_json(VerificationRequest, request)
+        snapshots = {item.name: item.artifact for item in document.snapshots}
+        candidates: dict[str, VerificationInput] = {
+            item.name: item.artifact for item in document.outputs
+        }
         if reference_binding is not None:
-            binding = load_json(VerificationBinding, reference_binding)
+            binding = load_json(ReferenceBinding, reference_binding)
+            comparison_sha256 = comparison_fingerprint(
+                ComparisonSpec(contract=document.contract, policy=document.policy)
+            )
             if not (
                 document.expected is not None
                 and binding.expected_sha256 == document.expected.sha256
                 and binding.contract_sha256 == contract_fingerprint(document.contract)
                 and binding.plan_sha256 is not None
                 and binding.plan_sha256 == document.plan_sha256
-                and binding.snapshots
+                and binding.comparison_spec_sha256 == comparison_sha256
+                and snapshots.keys() == {table.name for table in document.contract.inputs}
                 and dict(binding.snapshots)
-                == {item.name: item.artifact.sha256 for item in document.snapshots}
+                == {name: artifact.sha256 for name, artifact in snapshots.items()}
                 and not binding.outputs
             ):
                 typer.echo(
-                    "reference_binding_mismatch: Check the expected hash, contract, plan "
-                    "and named input snapshots against the trusted document.",
+                    "reference_binding_mismatch: Check the reference, contract, policy, plan "
+                    "and every declared input snapshot against the trusted document.",
                     err=True,
                 )
                 raise typer.Exit(code=3)
+        for name, execution in document.executions:
+            plan_sha256 = hashlib.sha256(
+                canonical_bytes(execution.plan.model_dump(mode="json"))
+            ).hexdigest()
+            if (
+                execution.state != "completed"
+                or execution.output is None
+                or execution.output.data != candidates[name]
+                or plan_sha256 != document.plan_sha256
+                or execution.plan.contract != document.contract
+            ):
+                typer.echo(
+                    "execution_binding_mismatch: Check the captured execution, output and plan.",
+                    err=True,
+                )
+                raise typer.Exit(code=3)
+            candidates[name] = execution
         result = verify(
-            {item.name: item.artifact for item in document.outputs},
+            candidates,
             contract=document.contract,
             expected=document.expected,
             provenance=document.provenance,
@@ -369,7 +400,7 @@ def verification_run(
                 require_expected or document.require_expected or reference_binding is not None
             ),
             require_rules=document.require_rules,
-            snapshots={item.name: item.artifact for item in document.snapshots},
+            snapshots=snapshots,
             plan_sha256=document.plan_sha256,
             policy=document.policy,
             options=document.options,

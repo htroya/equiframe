@@ -14,6 +14,11 @@ control de suma por comprador y moneda detecta una redistribución aunque el
 total general coincida. Conserva la comparación completa para exigir también
 campos y multiplicidad. Consulta [reglas y comparación](api.md).
 
+Para una salida agrupada aplica primero el filtro declarado a las entradas.
+Después compara el conjunto de claves y la suma exacta en centavos. El ejemplo
+instalado acepta los grupos válidos, rechaza un grupo omitido y señala un
+centavo incorrecto. [Ejemplo de comparación agrupada](../examples/grouped_compare.py)
+
 Puedes usar Isolation Forest para priorizar qué casos inspeccionar. La
 comparación exacta establece la aceptación bajo el contrato. Una alerta
 sobre una salida equivalente sigue disponible como diagnóstico; una
