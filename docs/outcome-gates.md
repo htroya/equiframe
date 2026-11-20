@@ -2,7 +2,7 @@
 
 ## Aceptación de cargas ETL
 
-El [ejemplo de primer uso de 0.15.2](https://github.com/htroya/equiframe/blob/v0.15.2/docs/first-acceptance-0.15.2.md) genera
+El [ejemplo de primer uso de 0.15.3](https://github.com/htroya/equiframe/blob/v0.15.3/docs/first-acceptance-0.15.3.md) genera
 el lote, la referencia y solicitudes ejecutables para CI.
 
 Ejecuta `equiframe verify accept request.json --reference-binding binding.json`

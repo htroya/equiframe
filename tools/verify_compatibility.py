@@ -65,6 +65,10 @@ EXACT_RESOURCE_FILES = frozenset(
             "equiframe/examples/integrations/outcome_gates.py",
         ),
         (
+            "examples/integrations/verify_accept.py",
+            "equiframe/examples/integrations/verify_accept.py",
+        ),
+        (
             "examples/integrations/sqlite_snapshot.py",
             "equiframe/examples/integrations/sqlite_snapshot.py",
         ),

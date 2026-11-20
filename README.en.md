@@ -52,8 +52,8 @@ and [supported ranges](https://github.com/htroya/equiframe/blob/v0.14.0/pyprojec
 
 ## Quick start
 
-The [0.15.2 candidate](https://github.com/htroya/equiframe/tree/v0.15.2) includes
-`verify accept`. The [ETL quickstart](https://github.com/htroya/equiframe/blob/v0.15.2/docs/first-acceptance-0.15.2.md)
+The [0.15.3 candidate](https://github.com/htroya/equiframe/tree/v0.15.3) includes
+`verify accept`. The [ETL quickstart](https://github.com/htroya/equiframe/blob/v0.15.3/docs/first-acceptance-0.15.3.md)
 generates a sample CSV, its reference binding and the requests for three CI
 outcomes. The checks return 0 for acceptance, 1 for a difference and 3 for
 unavailable evidence.

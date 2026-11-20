@@ -9,6 +9,11 @@
 - Publish separate public-spending measurements, severity controls, tree paths and costs, including negative findings.
 - Simplify both public tutorials to an unversioned PyPI installation, explain their purpose in plain Spanish, and retain fully executed Linux notebook outputs.
 
+## 0.15.3 - verify the packaged ETL example
+
+- Recognize the exact [acceptance example](https://github.com/htroya/equiframe/blob/v0.15.3/docs/first-acceptance-0.15.3.md) in first-use kit and compatibility verification.
+- Test the resource mapping and byte binding in both verifiers.
+
 ## 0.15.2 - consistent first-use documentation
 
 - Align the packaged first-use guide, README and installation pins with the release.

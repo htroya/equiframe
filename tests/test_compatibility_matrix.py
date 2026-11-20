@@ -723,6 +723,10 @@ def test_sdist_journey_binding_matches_exact_installed_wheel_bytes(runner, tmp_p
         ),
         ("examples/eda_generic.py", "equiframe/examples/integrations/eda_generic.py"),
         ("examples/load_convert_compare.py", "equiframe/examples/load_convert_compare.py"),
+        (
+            "examples/integrations/verify_accept.py",
+            "equiframe/examples/integrations/verify_accept.py",
+        ),
     ],
 )
 @pytest.mark.parametrize("mutation", ["none", "missing", "changed", "extra", "remapped"])
