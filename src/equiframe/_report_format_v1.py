@@ -278,6 +278,11 @@ def verification_summary_v1(result: VerificationResult) -> dict[str, object]:
         "identity_authentication": (
             "Declared identities are not authenticated; hashes prove integrity"
         ),
+        **(
+            {"acceptance": result.acceptance.model_dump(mode="json")}
+            if result.acceptance is not None
+            else {}
+        ),
     }
 
 

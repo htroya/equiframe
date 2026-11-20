@@ -1,6 +1,5 @@
 """Operational CLI delegates to the same APIs used by scripts and notebooks."""
 
-import hashlib
 import json
 import sys
 from collections.abc import Callable, Mapping
@@ -17,7 +16,7 @@ from equiframe._first_use import Case, Role, run_demo
 from equiframe.assertion_types import EquivalencePolicy
 from equiframe.assertions import equivalence_decision
 from equiframe.bundle import export_bundle, import_bundle, inspect_bundle
-from equiframe.comparison import compare, comparison_fingerprint
+from equiframe.comparison import compare
 from equiframe.comparison_types import ComparisonSpec
 from equiframe.datasets import (
     DatasetChoiceRequired,
@@ -36,7 +35,7 @@ from equiframe.errors import (
     ContractIOError,
     ContractValidationError,
 )
-from equiframe.evidence import canonical_bytes, inspect_evidence, load_json, read_pipeline
+from equiframe.evidence import inspect_evidence, load_json, read_pipeline
 from equiframe.ingestion import IngestionSpec, ingest_file
 from equiframe.migration import (
     MigrationRequest,
@@ -56,11 +55,14 @@ from equiframe.tables import ArrowInput, LocalDataSource, read_table
 from equiframe.verification_request import ReferenceBinding, VerificationRequest
 from equiframe.verify import (
     VerificationInput,
+    _execution_plan_sha256,
+    _reference_policy_matches,
     read_verification,
     verification_summary,
     verify,
     verify_migration,
 )
+from equiframe.verify_types import AcceptanceRequirements
 from equiframe.workflow import read_workflow, run_workflow
 from equiframe.workflow_request import WorkflowRequest
 
@@ -343,28 +345,53 @@ def verification_run(
     ),
 ) -> None:
     """Verify one or more existing artifacts. Exit 0 passed, 1 failed, 2 invalid, 3 unavailable."""
+    _verification_command(request, output, reference_binding, require_expected=require_expected)
+
+
+@verify_app.command("accept")
+def verification_accept(
+    request: Path,
+    reference_binding: Path = typer.Option(..., "--reference-binding"),
+    output: Path = typer.Option(Path("equiframe-runs")),
+    require_execution: bool = typer.Option(False, "--require-execution"),
+) -> None:
+    """Accept exact ETL outputs only with a trusted reference and complete evidence."""
+    _verification_command(
+        request,
+        output,
+        reference_binding,
+        require_expected=True,
+        strict_acceptance=True,
+        require_execution=require_execution,
+    )
+
+
+def _verification_command(
+    request: Path,
+    output: Path,
+    reference_binding: Path | None,
+    *,
+    require_expected: bool,
+    strict_acceptance: bool = False,
+    require_execution: bool = False,
+) -> None:
     try:
         document = load_json(VerificationRequest, request)
         snapshots = {item.name: item.artifact for item in document.snapshots}
         candidates: dict[str, VerificationInput] = {
             item.name: item.artifact for item in document.outputs
         }
+        acceptance = None
         if reference_binding is not None:
             binding = load_json(ReferenceBinding, reference_binding)
-            comparison_sha256 = comparison_fingerprint(
-                ComparisonSpec(contract=document.contract, policy=document.policy)
-            )
             if not (
                 document.expected is not None
                 and binding.expected_sha256 == document.expected.sha256
-                and binding.contract_sha256 == contract_fingerprint(document.contract)
-                and binding.plan_sha256 is not None
-                and binding.plan_sha256 == document.plan_sha256
-                and binding.comparison_spec_sha256 == comparison_sha256
-                and snapshots.keys() == {table.name for table in document.contract.inputs}
+                and _reference_policy_matches(
+                    binding, document.contract, document.policy, document.plan_sha256
+                )
                 and dict(binding.snapshots)
                 == {name: artifact.sha256 for name, artifact in snapshots.items()}
-                and not binding.outputs
             ):
                 typer.echo(
                     "reference_binding_mismatch: Check the reference, contract, policy, plan "
@@ -372,15 +399,16 @@ def verification_run(
                     err=True,
                 )
                 raise typer.Exit(code=3)
+            if strict_acceptance:
+                acceptance = AcceptanceRequirements(
+                    reference=binding, require_execution=require_execution
+                )
         for name, execution in document.executions:
-            plan_sha256 = hashlib.sha256(
-                canonical_bytes(execution.plan.model_dump(mode="json"))
-            ).hexdigest()
             if (
                 execution.state != "completed"
                 or execution.output is None
                 or execution.output.data != candidates[name]
-                or plan_sha256 != document.plan_sha256
+                or _execution_plan_sha256(execution) != document.plan_sha256
                 or execution.plan.contract != document.contract
             ):
                 typer.echo(
@@ -405,6 +433,7 @@ def verification_run(
             policy=document.policy,
             options=document.options,
             work_dir=output,
+            acceptance=acceptance,
         )
     except typer.Exit:
         raise

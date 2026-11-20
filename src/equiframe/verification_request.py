@@ -9,15 +9,8 @@ from equiframe.contracts import Contract
 from equiframe.execution_types import ExecutionResult
 from equiframe.pipeline_types import PipelineInput
 from equiframe.types import ArtifactRef, Sha256
-from equiframe.verify_types import (
-    ExpectedProvenance,
-    IndependentReviewEvidence,
-    VerificationBinding,
-)
-
-
-class ReferenceBinding(VerificationBinding):
-    comparison_spec_sha256: Sha256 | None = None
+from equiframe.verify_types import ExpectedProvenance, IndependentReviewEvidence
+from equiframe.verify_types import ReferenceBinding as ReferenceBinding
 
 
 class VerificationRequest(FrozenModel):

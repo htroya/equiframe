@@ -335,7 +335,7 @@ read_migration(path, *, verify=True) -> MigrationResult
 verify(outputs, *, contract, expected=None, provenance=None, reviews=(),
        request_review=False, require_expected=False, require_rules=False,
        snapshots=None, plan_sha256=None, policy=None, options=None,
-       work_dir=None) -> VerificationResult
+       work_dir=None, acceptance=None) -> VerificationResult
 verify_migration(path, *, work_dir=None, provenance=None, reviews=(),
                  request_review=False) -> VerificationResult
 
@@ -402,6 +402,7 @@ equiframe migration run migration-request.json --output migrations
 equiframe migration verify migrations/migration_ID
 equiframe verify validate verification-request.json
 equiframe verify run verification-request.json --require-expected --output verifications
+equiframe verify accept verification-request.json --reference-binding binding.json --output verifications
 equiframe verify migration migrations/migration_ID --output verifications
 equiframe verify inspect verifications/verification_ID
 equiframe ingestion run ingestion-spec.json input.csv --output ingestion
@@ -449,6 +450,21 @@ contract and output must match the request. The plan hash is the SHA-256 of
 `equiframe.evidence.canonical_bytes(execution.plan.model_dump(mode="json"))`.
 Repeat the same plan identity in the reference binding when using one.
 An artifact-only request reports file-based findings and the declared plan hash.
+
+`verify accept` requires a reference binding and exact numeric comparison
+without rounding. It requires exact physical types and rejects separate
+indexes. Include meaningful index values as declared columns. Its JSON
+report and portable evidence retain the acceptance binding and the effective
+scope. Use `--require-execution` when the job also requires captured completed
+executions for every candidate. The plan in each captured execution must
+match the plan fingerprint supplied in the binding.
+
+Python callers can supply `acceptance=AcceptanceRequirements(reference=...)`
+to `verify`, along with the reference artifact, plan hash and all snapshots.
+Use the same trusted reference distribution channel as the CLI. To consume
+stored approval, require both the `acceptance` record and `publishable=true`
+after inspecting the evidence. The binding identifies the artifacts and
+policy supplied by the reference producer.
 
 Verify shares each capture within a run. The disk budget covers snapshots,
 the SQLite work database and finding/difference streams together. JSON and

@@ -274,6 +274,150 @@ def test_cli_captured_execution_must_prove_requested_plan_and_output(tmp_path):
 
 
 @pytest.mark.parametrize(
+    ("case", "exit_code"),
+    [
+        ("match", 0),
+        ("different", 1),
+        ("no_binding", 2),
+        ("relaxed", 2),
+        ("approximate", 2),
+        ("no_execution", 3),
+        ("corrupt", 1),
+    ],
+)
+def test_acceptance_refuses_incomplete_or_nonexact_scope(tmp_path, case, exit_code):
+    declared = contract()
+    if case == "approximate":
+        schema = declared.output.schema_spec
+        approximate = schema.columns[0].model_copy(
+            update={
+                "numeric_policy": ef.NumericPolicy(
+                    comparison="approximate",
+                    unit="identifier",
+                    tolerance=ef.Tolerance(
+                        absolute="1", unit="identifier", justification="Audit threshold"
+                    ),
+                )
+            }
+        )
+        revised = schema.model_copy(update={"columns": (approximate, *schema.columns[1:])})
+        declared = declared.model_copy(
+            update={"output": declared.output.model_copy(update={"schema_spec": revised})}
+        )
+    policy = (
+        ef.ComparisonPolicy(physical_types="lossless", justification="Audit type policy")
+        if (case == "relaxed")
+        else ef.ComparisonPolicy()
+    )
+    expected = artifact(tmp_path, "expected", table())
+    source = artifact(tmp_path, "input", table())
+    candidate = (
+        pa.table({"id": [4, 5, 6], "value": ["a", None, "c"]}) if (case == "different") else table()
+    )
+    path = tmp_path / "request.json"
+    binding_path = tmp_path / "binding.json"
+    binding = ReferenceBinding(
+        contract_sha256=contract_fingerprint(declared),
+        expected_sha256=expected.sha256,
+        plan_sha256="1" * 64,
+        comparison_spec_sha256=ef.comparison_fingerprint(
+            ef.ComparisonSpec(contract=declared, policy=policy)
+        ),
+        snapshots=(("input", source.sha256),),
+        outputs=(),
+    )
+    publish_json(binding, binding_path)
+    publish_json(
+        VerificationRequest(
+            contract=declared,
+            policy=policy,
+            expected=expected,
+            plan_sha256=binding.plan_sha256,
+            snapshots=(PipelineInput(name="input", artifact=source),),
+            outputs=(
+                PipelineInput(
+                    name="candidate", artifact=artifact(tmp_path, "candidate", candidate)
+                ),
+            ),
+        ),
+        path,
+    )
+    if case == "corrupt":
+        local_path(expected).write_bytes(b"replaced")
+    runner = CliRunner()
+    runs = tmp_path / "runs"
+    args = ["verify", "accept", str(path), "--output", str(runs)]
+    if case != "no_binding":
+        args += ["--reference-binding", str(binding_path)]
+    if case == "no_execution":
+        args += ["--require-execution"]
+    result = runner.invoke(app, args)
+    assert result.exit_code == exit_code, result.output
+    if exit_code != 2:
+        summary = json.loads(result.stdout)
+        assert summary["publishable"] is (case == "match")
+        assert summary["acceptance"]["reference"] == binding.model_dump(mode="json")
+        assert summary["acceptance"]["require_execution"] is (case == "no_execution")
+        directory = runs / summary["verification_id"]
+        assert runner.invoke(app, ["verify", "inspect", str(directory)]).exit_code == 0
+        if case == "match":
+            portable = tmp_path / "portable"
+            assert (
+                runner.invoke(app, ["bundle", "export", str(directory), str(portable)]).exit_code
+                == 0
+            )
+            assert runner.invoke(app, ["bundle", "verify", str(portable)]).exit_code == 0
+
+
+def test_acceptance_can_require_completed_execution(tmp_path):
+    migration = run(tmp_path / "migration")
+    execution = migration.target.execution
+    assert execution is not None and execution.output is not None
+    declared = execution.plan.contract
+    digest = hashlib.sha256(canonical_bytes(execution.plan.model_dump(mode="json"))).hexdigest()
+    expected = artifact(tmp_path, "reference", table())
+    binding = ReferenceBinding(
+        contract_sha256=execution.contract_sha256,
+        plan_sha256=digest,
+        comparison_spec_sha256=ef.comparison_fingerprint(ef.ComparisonSpec(contract=declared)),
+        snapshots=tuple((table.name, table.data.sha256) for table in execution.inputs),
+        expected_sha256=expected.sha256,
+        outputs=(),
+    )
+    request = VerificationRequest(
+        contract=declared,
+        plan_sha256=digest,
+        expected=expected,
+        snapshots=tuple(
+            PipelineInput(name=table.name, artifact=table.data) for table in execution.inputs
+        ),
+        outputs=(PipelineInput(name="candidate", artifact=execution.output.data),),
+        executions=(("candidate", execution),),
+    )
+    request_path = tmp_path / "request.json"
+    binding_path = tmp_path / "binding.json"
+    publish_json(request, request_path)
+    publish_json(binding, binding_path)
+    out = CliRunner().invoke(
+        app,
+        [
+            "verify",
+            "accept",
+            str(request_path),
+            "--reference-binding",
+            str(binding_path),
+            "--require-execution",
+            "--output",
+            str(tmp_path / "runs"),
+        ],
+    )
+    assert out.exit_code == 0, out.output
+    report = json.loads(out.stdout)
+    assert report["coverage"]["input_execution_evidence_available"] is True
+    assert report["acceptance"]["require_execution"] is True
+
+
+@pytest.mark.parametrize(
     ("amounts", "buyers", "exit_code"),
     [
         (("30.00", "20.00"), ("B", "A"), 0),

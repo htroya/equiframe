@@ -158,6 +158,7 @@ STABLE_FEATURE_SCOPES = (
 )
 
 STABLE_API = (
+    "AcceptanceRequirements",
     *STABLE_GROUPED_API,
     "AdapterCapability",
     "AggregateCheck",
@@ -317,6 +318,7 @@ STABLE_API = (
     "Transformation",
     "TransformationRegistry",
     "ValidationIssue",
+    "ReferenceBinding",
     "VerificationBinding",
     "VerificationCheck",
     "VerificationCoverage",
@@ -751,7 +753,7 @@ SCHEMA_INVENTORY = (
     (
         "verification-result-1.0.schema.json",
         "stable",
-        "65b5457c5feea88190016e843b780f2382edef7af1f3c8d100fb84de5f01d4b6",
+        "589429dd65f1a1c872b0c8478651170e84278368d529f71d252b8b62279bfd1d",
     ),
     (
         "workflow-request-1.0.schema.json",
@@ -935,6 +937,17 @@ CLI_INVENTORY = (
             "option|registry|--registry|required=True|default=None",
             "option|output|--output|required=False|default=equiframe-runs",
             "option|bundle|--bundle|required=False|default=None",
+        ),
+        (0, 1, 2, 3),
+    ),
+    (
+        "verify accept",
+        "stable",
+        (
+            "argument|request|request|required=True|default=None",
+            "option|reference_binding|--reference-binding|required=True|default=None",
+            "option|output|--output|required=False|default=equiframe-runs",
+            "option|require_execution|--require-execution|required=False|default=False",
         ),
         (0, 1, 2, 3),
     ),
@@ -1256,7 +1269,8 @@ API_SIGNATURES = {
         " False, require_rules: 'bool' = False, snapshots: 'Mapping[str, Artifact"
         "Ref] | None' = None, plan_sha256: 'str | None' = None, policy: 'Comparis"
         "onPolicy | None' = None, options: 'ComparisonOptions | None' = None, wor"
-        "k_dir: 'Path | None' = None) -> 'VerificationResult'"
+        "k_dir: 'Path | None' = None, acceptance: 'AcceptanceRequirements | None' = None)"
+        " -> 'VerificationResult'"
     ),
     "verify_events": (
         "(path: pathlib.Path, *, operation_id: str) -> tuple[equiframe.evidence.EvidenceEvent, ...]"
@@ -1277,6 +1291,8 @@ API_SIGNATURES = {
 }
 
 MODEL_SHAPES = {
+    "AcceptanceRequirements": "b26c64ef25e1e6f0b3e36dc6d53e495c09a5010b67707e8627c523f2861fb3db",
+    "ReferenceBinding": "a0ccae5f2d884586ecdb078e3d37394cab8f808ac9adeedf5f5322f57b0b159e",
     "GroupedProfileFeature": "683740cca68eaa4ac0ea685f410f4b8933c5dba0afd0b4e24e973868df0cd149",
     "GroupedComparisonOptions": "eb873a8ce26dce603ef3ca35166ddd5762df87b56c8540e31fae9f452c96d0b2",
     "GroupedComparisonResult": "111ec9631b150dae0636d2c826e365e682cd565321d8263d7d424cfac62b1a32",
@@ -1453,7 +1469,7 @@ MODEL_SHAPES = {
     "VerificationCheck": "fa8d551a04706db4f402d866a112725f825567fedf31a3557181be2018e923cd",
     "VerificationCoverage": "362b3aef6c3cd874b9ac8e996a482b951895a247eeeeeeeaf50d7e94aef773b0",
     "VerificationRequest": "251f9cb45c3bdd90915608174f12de9ba157c0de12934d755483efc8fddfbfad",
-    "VerificationResult": "65b5457c5feea88190016e843b780f2382edef7af1f3c8d100fb84de5f01d4b6",
+    "VerificationResult": "589429dd65f1a1c872b0c8478651170e84278368d529f71d252b8b62279bfd1d",
     "VerificationReview": "b4ef6bbf2ad01c67e7fcdf6af0ab8f97c27e9bd67c26645d924c0487c33a41a5",
     "VersionInfo": "d535207c7d621e9cd03ae8aefa82e3900d593bc02a36d91cd9413e8279e812d4",
 }

@@ -56,6 +56,17 @@ class VerificationBinding(FrozenModel):
         return self
 
 
+class ReferenceBinding(VerificationBinding):
+    comparison_spec_sha256: Sha256 | None = None
+
+
+class AcceptanceRequirements(FrozenModel):
+    """Exact acceptance policy supplied by the trusted reference producer."""
+
+    reference: ReferenceBinding
+    require_execution: bool = False
+
+
 class ExpectedProvenance(FrozenModel):
     expected_sha256: Sha256
     method: Text
@@ -199,6 +210,9 @@ class VerificationResult(_ExplicitOutcome, FrozenModel):
     input_comparisons: tuple[ComparisonResult, ...] = ()
     executions: tuple[tuple[Identifier, ExecutionResult], ...] = ()
     rule_evaluations: tuple[RuleEvaluation, ...] = ()
+    acceptance: AcceptanceRequirements | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     started_at: Text
     elapsed_seconds: Annotated[float, Field(ge=0)]
     evidence: tuple[EvidenceFile, ...] = ()
@@ -213,7 +227,11 @@ class VerificationResult(_ExplicitOutcome, FrozenModel):
             self.expected_artifact.sha256 if self.expected_artifact else None
         ):
             raise ValueError("verification expected identity mismatch")
-        if self.provenance and self.provenance.expected_sha256 != self.binding.expected_sha256:
+        if (
+            self.provenance is not None
+            and self.binding.expected_sha256 is not None
+            and self.provenance.expected_sha256 != self.binding.expected_sha256
+        ):
             raise ValueError("expected provenance identity mismatch")
         if (
             self.expected_source_engine is not None

@@ -1,5 +1,24 @@
 {
   "$defs": {
+    "AcceptanceRequirements": {
+      "additionalProperties": false,
+      "description": "Exact acceptance policy supplied by the trusted reference producer.",
+      "properties": {
+        "reference": {
+          "$ref": "#/$defs/ReferenceBinding"
+        },
+        "require_execution": {
+          "default": false,
+          "title": "Require Execution",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "reference"
+      ],
+      "title": "AcceptanceRequirements",
+      "type": "object"
+    },
     "AggregateCheck": {
       "additionalProperties": false,
       "properties": {
@@ -2662,6 +2681,100 @@
       "title": "PreconditionSpec",
       "type": "object"
     },
+    "ReferenceBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "comparison_spec_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Comparison Spec Sha256"
+        },
+        "contract_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Contract Sha256",
+          "type": "string"
+        },
+        "expected_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Sha256"
+        },
+        "outputs": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "plan_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Plan Sha256"
+        },
+        "snapshots": {
+          "default": [],
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Snapshots",
+          "type": "array"
+        }
+      },
+      "required": [
+        "contract_sha256",
+        "outputs"
+      ],
+      "title": "ReferenceBinding",
+      "type": "object"
+    },
     "RuleCoverage": {
       "additionalProperties": false,
       "properties": {
@@ -3906,6 +4019,17 @@
   },
   "additionalProperties": false,
   "properties": {
+    "acceptance": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AcceptanceRequirements"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
     "agreement": {
       "$ref": "#/$defs/VerificationCheck"
     },

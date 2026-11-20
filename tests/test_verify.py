@@ -318,6 +318,30 @@ def test_execution_expected_automatically_retains_engine_dependency(tmp_path):
     assert result.independent_review.state == "not_evaluable"
 
 
+def test_required_expected_execution_must_use_same_input_batch(tmp_path):
+    migration = ef.migrate(spec(), source=Provider(), work_dir=tmp_path)
+    expected, candidate = migration.source.execution, migration.target.execution
+    assert expected is not None and candidate is not None
+    arguments = dict(
+        contract=contract(),
+        policy=spec().comparison_policy,
+        require_expected=True,
+        work_dir=tmp_path,
+    )
+    assert verify({"candidate": candidate}, expected=expected, **arguments).publishable
+    changed = artifact(tmp_path, "changed", pa.table({"id": [4, 5, 6], "value": ["a", None, "c"]}))
+    (input_table,) = expected.inputs
+    mismatched = expected.model_copy(
+        update={"inputs": (input_table.model_copy(update={"data": changed}),)}
+    )
+    result = verify({"candidate": candidate}, expected=mismatched, **arguments)
+    assert result.exit_code == 3
+    assert (
+        result.expected[0].reason == "Expected execution used a different contract or input batch"
+    )
+    assert read_verification(tmp_path / result.verification_id) == result
+
+
 def write_forged_verification(root, result):
     """Recompute every file hash so rejection tests semantic binding, not corruption."""
     (root / "report.json").write_bytes(canonical_bytes(verification_summary(result)) + b"\n")
