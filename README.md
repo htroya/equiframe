@@ -61,8 +61,8 @@ and [supported ranges](https://github.com/htroya/equiframe/blob/v0.14.0/pyprojec
 
 ## Quick start
 
-The [0.15.1 candidate](https://github.com/htroya/equiframe/tree/v0.15.1) adds
-`verify accept`. The [ETL quickstart](docs/first-acceptance-0.15.1.md)
+The [0.15.2 candidate](https://github.com/htroya/equiframe/tree/v0.15.2) includes
+`verify accept`. The [ETL quickstart](https://github.com/htroya/equiframe/blob/v0.15.2/docs/first-acceptance-0.15.2.md)
 generates a sample CSV, its reference binding and the requests for three CI
 outcomes. The checks return 0 for acceptance, 1 for a difference and 3 for
 unavailable evidence.
@@ -392,8 +392,8 @@ Las [versiones admitidas](https://github.com/htroya/equiframe/blob/v0.14.0/pypro
 
 ## Primeros pasos
 
-El [candidato 0.15.1](https://github.com/htroya/equiframe/tree/v0.15.1)
-incorpora `verify accept`. La [guía de primera verificación ETL](docs/first-acceptance-0.15.1.md)
+El [candidato 0.15.2](https://github.com/htroya/equiframe/tree/v0.15.2)
+incluye `verify accept`. La [guía de primera verificación ETL](https://github.com/htroya/equiframe/blob/v0.15.2/docs/first-acceptance-0.15.2.md)
 genera un CSV de ejemplo, su vínculo de referencia y tres escenarios de CI.
 La CLI devuelve 0 al aceptar, 1 al detectar una diferencia y 3 cuando falta
 evidencia.
