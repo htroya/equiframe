@@ -3,6 +3,12 @@
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Security](security.md) ·
 [Release/rollback](releasing.md)
 
+## 0.15.1: compatible verification requests
+
+Empty execution evidence uses the historical request representation.
+Captured executions and exact acceptance reports remain available.
+The 0.15.1 benchmark requires core 0.15.1.
+
 ## 0.15.0: exact acceptance receipts
 
 Use `verify accept` with the reference binding. A successful report retains

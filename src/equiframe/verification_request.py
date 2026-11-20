@@ -1,6 +1,6 @@
 """Data-only requests for verification of explicitly supplied external artifacts."""
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 from typing_extensions import Self
 
 from equiframe._base import FrozenModel, Identifier
@@ -26,7 +26,9 @@ class VerificationRequest(FrozenModel):
     require_expected: bool = False
     require_rules: bool = False
     request_review: bool = False
-    executions: tuple[tuple[Identifier, ExecutionResult], ...] = ()
+    executions: tuple[tuple[Identifier, ExecutionResult], ...] = Field(
+        default=(), exclude_if=lambda value: not value
+    )
 
     @model_validator(mode="after")
     def names(self) -> Self:

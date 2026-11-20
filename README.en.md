@@ -1,13 +1,13 @@
 # EquiFrame: semantic comparison and dataframe migration
 
-> **EquiFrame 0.15.0 Beta** adds exact ETL acceptance with a retained reference binding.
-> [Version 0.15.0 handbook](https://github.com/htroya/equiframe/blob/v0.15.0/docs/index.md)
-> · [Documentation by version](https://github.com/htroya/equiframe/blob/v0.15.0/docs/versions.md)
-> [0.14.0 errata](https://github.com/htroya/equiframe/blob/v0.15.0/docs/equiframe-0.14.0-errata.md)
+> **EquiFrame 0.15.1 Beta** adds exact ETL acceptance with a retained reference binding.
+> [Version 0.15.1 handbook](https://github.com/htroya/equiframe/blob/v0.15.1/docs/index.md)
+> · [Documentation by version](https://github.com/htroya/equiframe/blob/v0.15.1/docs/versions.md)
+> [0.14.0 errata](https://github.com/htroya/equiframe/blob/v0.15.1/docs/equiframe-0.14.0-errata.md)
 
-[Documentation](https://github.com/htroya/equiframe/blob/v0.15.0/docs/index.md) |
-[API](https://github.com/htroya/equiframe/blob/v0.15.0/docs/api.md) |
-[Examples](https://github.com/htroya/equiframe/blob/v0.15.0/docs/journeys.md) |
+[Documentation](https://github.com/htroya/equiframe/blob/v0.15.1/docs/index.md) |
+[API](https://github.com/htroya/equiframe/blob/v0.15.1/docs/api.md) |
+[Examples](https://github.com/htroya/equiframe/blob/v0.15.1/docs/journeys.md) |
 [Issues](https://github.com/htroya/equiframe/issues)
 
 **EquiFrame** checks whether tabular data and supported transformations preserve
@@ -26,14 +26,14 @@ explicitly identified. See the [readiness review](https://github.com/htroya/equi
 
 ## Install
 
-EquiFrame 0.15.0 supports **Python 3.10, 3.11, 3.12 and 3.13**.
+EquiFrame 0.15.1 supports **Python 3.10, 3.11, 3.12 and 3.13**.
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.15.0"
+python -m pip install "equiframe[files,engines,ml]==0.15.1"
 python -m pip check
 ```
 
-The base installation is `python -m pip install equiframe==0.15.0`.
+The base installation is `python -m pip install equiframe==0.15.1`.
 Optional engines and machine-learning libraries are loaded when requested.
 
 | Extra | Purpose |
@@ -126,7 +126,7 @@ acceptance with `ef.assert_equivalent(result)`; divergent or incomplete results
 raise `ef.EquivalenceAssertionError`. Operational failures use the
 `ef.EquiFrameError` hierarchy, including `DatasetReadError`,
 `MissingDependencyError` and `InvalidExecutionInput`. See the
-[API reference](https://github.com/htroya/equiframe/blob/v0.15.0/docs/api.md)
+[API reference](https://github.com/htroya/equiframe/blob/v0.15.1/docs/api.md)
 for argument-validation exceptions and command-specific exits.
 
 All six directed combinations of Pandas, Polars and DuckDB are supported.
@@ -208,7 +208,7 @@ python examples/load_convert_compare.py --rows 30000
 
 Installed wheels provide the same example as
 `python -m equiframe.examples.load_convert_compare --rows 30000`. Further
-[examples](https://github.com/htroya/equiframe/blob/v0.15.0/docs/journeys.md)
+[examples](https://github.com/htroya/equiframe/blob/v0.15.1/docs/journeys.md)
 and [recipes](https://github.com/htroya/equiframe/blob/main/docs/recipes.md)
 cover ETL, reconciliation and terminal usage.
 

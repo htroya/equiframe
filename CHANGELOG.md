@@ -1,3 +1,7 @@
+## 0.15.1 - preserve verification request serialization
+
+- Omit the optional execution evidence field when empty.
+
 ## 0.15.0 - exact ETL acceptance with a retained reference binding
 
 - Add `verify accept` and an equivalent Python acceptance policy.
