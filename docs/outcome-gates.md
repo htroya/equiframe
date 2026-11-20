@@ -2,6 +2,9 @@
 
 ## Aceptación de cargas ETL
 
+El [ejemplo de primer uso de 0.15.1](first-acceptance-0.15.1.md) genera
+el lote, la referencia y solicitudes ejecutables para CI.
+
 Ejecuta `equiframe verify accept request.json --reference-binding binding.json`
 con el resultado esperado y el vínculo del generador de referencia.
 Declara claves de negocio,

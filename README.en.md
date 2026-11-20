@@ -7,9 +7,9 @@
 > identify the published files; see the
 > [release procedure](https://github.com/htroya/equiframe/blob/main/docs/releasing.md).
 
-[Documentation by version](https://github.com/htroya/equiframe/blob/main/docs/versions.md) |
-[API](https://github.com/htroya/equiframe/blob/main/docs/api.md) |
-[Examples](https://github.com/htroya/equiframe/blob/main/docs/journeys.md) |
+[0.14.0 documentation](https://github.com/htroya/equiframe/blob/v0.14.0/docs/index.md) |
+[0.14.0 API](https://github.com/htroya/equiframe/blob/v0.14.0/docs/api.md) |
+[Documentation by version](docs/versions.md) |
 [Issues](https://github.com/htroya/equiframe/issues)
 
 **EquiFrame** checks whether tabular data and supported transformations preserve
@@ -47,10 +47,16 @@ Optional engines and machine-learning libraries are loaded when requested.
 | `eda`, `eda-charts` | Experimental exploratory analysis and optional charts |
 
 The independent R reviewer requires an external `Rscript` installation.
-See [dependencies](https://github.com/htroya/equiframe/blob/main/docs/dependencies.md)
-and [supported ranges](https://github.com/htroya/equiframe/blob/main/pyproject.toml).
+See [dependencies](https://github.com/htroya/equiframe/blob/v0.14.0/docs/dependencies.md)
+and [supported ranges](https://github.com/htroya/equiframe/blob/v0.14.0/pyproject.toml).
 
 ## Quick start
+
+The [0.15.1 candidate](https://github.com/htroya/equiframe/tree/v0.15.1) adds
+`verify accept`. The [ETL quickstart](docs/first-acceptance-0.15.1.md)
+generates a sample CSV, its reference binding and the requests for three CI
+outcomes. The checks return 0 for acceptance, 1 for a difference and 3 for
+unavailable evidence.
 
 Local file reading and comparison need no EquiFrame account or API key.
 Install the optional engine extras above; install R separately only for R review.
@@ -128,7 +134,7 @@ acceptance with `ef.assert_equivalent(result)`; divergent or incomplete results
 raise `ef.EquivalenceAssertionError`. Operational failures use the
 `ef.EquiFrameError` hierarchy, including `DatasetReadError`,
 `MissingDependencyError` and `InvalidExecutionInput`. See the
-[API reference](https://github.com/htroya/equiframe/blob/main/docs/api.md)
+[API reference](https://github.com/htroya/equiframe/blob/v0.14.0/docs/api.md)
 for argument-validation exceptions and command-specific exits.
 
 All six directed combinations of Pandas, Polars and DuckDB are supported.
@@ -214,7 +220,7 @@ python examples/load_convert_compare.py --rows 30000
 
 Installed wheels provide the same example as
 `python -m equiframe.examples.load_convert_compare --rows 30000`. Further
-[examples](https://github.com/htroya/equiframe/blob/main/docs/journeys.md)
+[examples](https://github.com/htroya/equiframe/blob/v0.14.0/docs/journeys.md)
 and [recipes](https://github.com/htroya/equiframe/blob/main/docs/recipes.md)
 cover ETL, reconciliation and terminal usage.
 

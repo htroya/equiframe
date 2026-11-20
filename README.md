@@ -12,9 +12,9 @@
 
 # EquiFrame: semantic comparison and dataframe migration
 
-[Documentation](https://github.com/htroya/equiframe/blob/main/docs/index.md) |
-[API](https://github.com/htroya/equiframe/blob/main/docs/api.md) |
-[Examples](https://github.com/htroya/equiframe/blob/main/docs/journeys.md) |
+[0.14.0 documentation](https://github.com/htroya/equiframe/blob/v0.14.0/docs/index.md) |
+[0.14.0 API](https://github.com/htroya/equiframe/blob/v0.14.0/docs/api.md) |
+[Documentation by version](docs/versions.md) |
 [Issues](https://github.com/htroya/equiframe/issues)
 
 **EquiFrame** checks whether tabular data and supported transformations preserve
@@ -56,10 +56,16 @@ Optional engines and machine-learning libraries are loaded when requested.
 | `eda`, `eda-charts` | Experimental exploratory analysis and optional charts |
 
 The independent R reviewer requires an external `Rscript` installation.
-See [dependencies](https://github.com/htroya/equiframe/blob/main/docs/dependencies.md)
-and [supported ranges](https://github.com/htroya/equiframe/blob/main/pyproject.toml).
+See [dependencies](https://github.com/htroya/equiframe/blob/v0.14.0/docs/dependencies.md)
+and [supported ranges](https://github.com/htroya/equiframe/blob/v0.14.0/pyproject.toml).
 
 ## Quick start
+
+The [0.15.1 candidate](https://github.com/htroya/equiframe/tree/v0.15.1) adds
+`verify accept`. The [ETL quickstart](docs/first-acceptance-0.15.1.md)
+generates a sample CSV, its reference binding and the requests for three CI
+outcomes. The checks return 0 for acceptance, 1 for a difference and 3 for
+unavailable evidence.
 
 Local file reading and comparison need no EquiFrame account or API key.
 Install the optional engine extras above; install R separately only for R review.
@@ -137,7 +143,7 @@ acceptance with `ef.assert_equivalent(result)`; divergent or incomplete results
 raise `ef.EquivalenceAssertionError`. Operational failures use the
 `ef.EquiFrameError` hierarchy, including `DatasetReadError`,
 `MissingDependencyError` and `InvalidExecutionInput`. See the
-[API reference](https://github.com/htroya/equiframe/blob/main/docs/api.md)
+[API reference](https://github.com/htroya/equiframe/blob/v0.14.0/docs/api.md)
 for argument-validation exceptions and command-specific exits.
 
 All six directed combinations of Pandas, Polars and DuckDB are supported.
@@ -223,7 +229,7 @@ python examples/load_convert_compare.py --rows 30000
 
 Installed wheels provide the same example as
 `python -m equiframe.examples.load_convert_compare --rows 30000`. Further
-[examples](https://github.com/htroya/equiframe/blob/main/docs/journeys.md)
+[examples](https://github.com/htroya/equiframe/blob/v0.14.0/docs/journeys.md)
 and [recipes](https://github.com/htroya/equiframe/blob/main/docs/recipes.md)
 cover ETL, reconciliation and terminal usage.
 
@@ -276,7 +282,7 @@ and [license scope](https://github.com/htroya/equiframe/blob/main/NOTICE.md).
 
 # EquiFrame: comparación semántica y migración de datos en Python
 
-[Documentación](https://github.com/htroya/equiframe/blob/main/docs/index.md) · [API](https://github.com/htroya/equiframe/blob/main/docs/api.md) · [Ejemplos](https://github.com/htroya/equiframe/blob/main/docs/journeys.md) · [Contribuir](https://github.com/htroya/equiframe/blob/main/CONTRIBUTING.md) · [Licencia MIT](https://github.com/htroya/equiframe/blob/main/LICENSE)
+[Manual de 0.14.0](https://github.com/htroya/equiframe/blob/v0.14.0/docs/index.md) · [API de 0.14.0](https://github.com/htroya/equiframe/blob/v0.14.0/docs/api.md) · [Documentación por versión](docs/versions.md) · [Contribuir](CONTRIBUTING.md) · [Licencia MIT](LICENSE)
 
 
 [Evaluación con datos públicos](docs/public-spending-evaluation.md) · [Fiabilidad y alertas estadísticas](docs/reliability.md).
@@ -375,10 +381,16 @@ Las dependencias de ejecución se seleccionan por capacidad:
 | `eda`, `eda-charts` | Análisis exploratorio y gráficos opcionales. |
 
 La revisión con R requiere una instalación externa de R y acceso a `Rscript`.
-Las [versiones admitidas](https://github.com/htroya/equiframe/blob/main/pyproject.toml) y los
+Las [versiones admitidas](https://github.com/htroya/equiframe/blob/v0.14.0/pyproject.toml) y los
 [detalles de compatibilidad](https://github.com/htroya/equiframe/blob/main/docs/compatibility.md) describen el soporte declarado.
 
 ## Primeros pasos
+
+El [candidato 0.15.1](https://github.com/htroya/equiframe/tree/v0.15.1)
+incorpora `verify accept`. La [guía de primera verificación ETL](docs/first-acceptance-0.15.1.md)
+genera un CSV de ejemplo, su vínculo de referencia y tres escenarios de CI.
+La CLI devuelve 0 al aceptar, 1 al detectar una diferencia y 3 cuando falta
+evidencia.
 
 ### Leer un archivo y elegir el motor
 
@@ -497,16 +509,16 @@ La [revisión con R](https://github.com/htroya/equiframe/blob/main/docs/r_review
 y los componentes que no pudieron evaluarse.
 
 Los planes admitidos, políticas y límites se describen en
-[semántica](https://github.com/htroya/equiframe/blob/main/docs/semantics.md), [API](https://github.com/htroya/equiframe/blob/main/docs/api.md) y [recetas](https://github.com/htroya/equiframe/blob/main/docs/recipes.md).
+[semántica](https://github.com/htroya/equiframe/blob/main/docs/semantics.md), [API](https://github.com/htroya/equiframe/blob/v0.14.0/docs/api.md) y [recetas](https://github.com/htroya/equiframe/blob/main/docs/recipes.md).
 
 ## Documentación
 
-- [Manual de la biblioteca](https://github.com/htroya/equiframe/blob/main/docs/index.md) e [inicio en español](https://github.com/htroya/equiframe/blob/main/docs/inicio.md).
-- [Referencia de la API y CLI](https://github.com/htroya/equiframe/blob/main/docs/api.md).
-- [Ejemplos de uso completos](https://github.com/htroya/equiframe/blob/main/docs/journeys.md).
+- [Manual de la biblioteca](https://github.com/htroya/equiframe/blob/v0.14.0/docs/index.md) e [inicio en español](https://github.com/htroya/equiframe/blob/v0.14.0/docs/inicio.md).
+- [Referencia de la API y CLI](https://github.com/htroya/equiframe/blob/v0.14.0/docs/api.md).
+- [Ejemplos de uso completos](https://github.com/htroya/equiframe/blob/v0.14.0/docs/journeys.md).
 - [Compatibilidad](https://github.com/htroya/equiframe/blob/main/docs/compatibility.md) y [cambios entre versiones](https://github.com/htroya/equiframe/blob/main/CHANGELOG.md).
 - [Seguridad](https://github.com/htroya/equiframe/blob/main/SECURITY.md) y [licencias de terceros](https://github.com/htroya/equiframe/blob/main/THIRD_PARTY_NOTICES.md).
-- [Portal del proyecto y seguimiento técnico](https://github.com/htroya/equiframe/blob/main/docs/index.md).
+- [Portal del proyecto y seguimiento técnico](https://github.com/htroya/equiframe/blob/v0.14.0/docs/index.md).
 
 ## Origen del proyecto
 
