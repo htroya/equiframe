@@ -2,33 +2,42 @@
 
 from __future__ import annotations
 
+import hashlib
 import time
 from collections.abc import Mapping
 from datetime import datetime
 from datetime import timezone as _timezone
+from functools import partial
 from itertools import combinations
 from pathlib import Path
+from typing import TYPE_CHECKING, Literal
 from uuid import uuid4
 
 from typing_extensions import TypeAliasType
 
-from equiframe._comparison_io import snapshot
+from equiframe._comparison_io import batches, snapshot
 from equiframe._error_reporting import report_failure
 from equiframe._physical import verify_table_metadata
 from equiframe._regular_io import local_output_directory
 from equiframe._report_format_v1 import verification_html_v1, verification_summary_v1
-from equiframe.comparison import compare, iter_differences, read_comparison
+from equiframe.comparison import _compare, iter_differences, read_comparison
 from equiframe.comparison_types import ComparisonOptions, ComparisonPolicy, ComparisonResult
 from equiframe.contracts import Contract, TableSpec
-from equiframe.errors import ArtifactIntegrityError
-from equiframe.evidence import inventory, load_json, parse_json, publish_json, verify_files
+from equiframe.errors import ArtifactIntegrityError, ExecutionTimeout, ResourceLimitError
+from equiframe.evidence import (
+    canonical_bytes,
+    inventory,
+    load_json,
+    parse_json,
+    publish_json,
+    verify_files,
+)
 from equiframe.execution_types import ExecutionResult, TableArtifact
 from equiframe.local import local_path
 from equiframe.pipeline_types import PipelineResult
-from equiframe.rule_types import RuleEvaluation
-from equiframe.rules import evaluate_rules, iter_rule_findings, read_rule_evaluation
+from equiframe.rule_types import RuleEvaluation, RuleOptions
+from equiframe.rules import _evaluate_rules, iter_rule_findings, read_rule_evaluation
 from equiframe.serialization import contract_fingerprint
-from equiframe.tables import read_table
 from equiframe.types import ArtifactRef
 from equiframe.verify_types import (
     ExpectedProvenance,
@@ -40,6 +49,8 @@ from equiframe.verify_types import (
 )
 
 UTC = _timezone.utc
+if TYPE_CHECKING:
+    import pyarrow as pa
 
 VerificationInput = TypeAliasType(
     "VerificationInput", ArtifactRef | ExecutionResult | PipelineResult
@@ -62,6 +73,20 @@ def _check(
 def _comparison_check(c: ComparisonResult, output: str | None = None) -> VerificationCheck:
     state = {"equivalent": "passed", "different": "failed", "not_evaluable": "not_evaluable"}
     return _check(state[c.state], f"Complete output comparison: {c.state}", output, c)
+
+
+def _rule_check(evaluation: RuleEvaluation, output: str) -> VerificationCheck:
+    state = (
+        "failed"
+        if evaluation.decision == "alert"
+        else ("passed" if evaluation.complete else "not_evaluable")
+    )
+    return _check(state, "Selected rules: " + evaluation.decision, output)
+
+
+def _artifact_rule_id(binding: VerificationBinding, output: str) -> str:
+    payload = [output, dict(binding.outputs)[output], dict(binding.snapshots)]
+    return "artifact_" + hashlib.sha256(canonical_bytes(payload)).hexdigest()
 
 
 def _aggregate(checks: tuple[VerificationCheck, ...], reason: str) -> VerificationCheck:
@@ -298,19 +323,37 @@ def _validate_dimensions(result: VerificationResult) -> None:
                 raise ValueError("technical outcome contradicts captured execution state")
         elif check.state not in ("not_requested", "not_evaluable"):
             raise ValueError("technical success requires captured execution evidence")
-    evaluations = {r.execution_id: r for r in result.rule_evaluations}
+    evaluations = {(r.run_id, r.execution_id): r for r in result.rule_evaluations}
+    artifact_evaluations = {
+        r.execution_id for r in result.rule_evaluations if r.execution_state == "captured_artifacts"
+    }
     for check in result.rules:
-        execution = executions.get(check.output or "")
-        evaluation = evaluations.get(execution.execution_id) if execution is not None else None
+        name = check.output or ""
+        execution = executions.get(name)
+        evaluation = None
+        if execution is not None:
+            evaluation = evaluations.get((execution.run_id, execution.execution_id))
+            if evaluation is not None and evaluation.execution_state != execution.state:
+                raise ValueError("rule source contradicts captured execution")
+        elif result.rules_required and name in refs:
+            artifact_id = _artifact_rule_id(result.binding, name)
+            evaluation = evaluations.get((result.verification_id, artifact_id))
+            if evaluation is not None:
+                if evaluation.execution_state != "captured_artifacts" or artifact_id not in (
+                    artifact_evaluations
+                ):
+                    raise ValueError("rule source contradicts captured artifacts")
+                if tuple(
+                    (r.check_id, r.revision, r.required, r.severity) for r in evaluation.rules
+                ) != tuple(
+                    (r.rule_id, r.revision, r.required, r.severity) for r in result.contract.rules
+                ) or tuple(c.check_id for c in evaluation.preconditions) != tuple(
+                    c.precondition_id for c in result.contract.preconditions
+                ):
+                    raise ValueError("artifact rules do not cover the declared contract")
+                artifact_evaluations.remove(artifact_id)
         if evaluation is not None:
-            state = (
-                "failed"
-                if evaluation.decision == "alert"
-                else "passed"
-                if evaluation.complete
-                else "not_evaluable"
-            )
-            expected_rule = _check(state, "Selected rules: " + evaluation.decision, check.output)
+            expected_rule = _rule_check(evaluation, name)
             if evaluation.contract_sha256 != result.binding.contract_sha256:
                 raise ValueError("selected rules belong to another contract")
         else:
@@ -325,6 +368,8 @@ def _validate_dimensions(result: VerificationResult) -> None:
                 raise ValueError("captured execution requires its selected rule evaluations")
         if check != expected_rule:
             raise ValueError("rule dimension contradicts selected rule evaluations")
+    if artifact_evaluations:
+        raise ValueError("rule evidence is not bound to a verified output")
     expected_review = _review(
         result.binding,
         result.provenance,
@@ -400,14 +445,17 @@ def verify(
 ) -> VerificationResult:
     """Capture and inspect complete outputs, preserving separate scientific O.
 
-    External artifact checks do not assert that an external ETL completed. Rules
-    require captured execution inputs. No engine, callback or plugin is executed.
+    External artifact checks report observed constraints and rule evidence.
+    No ETL engine, transformation callback or plugin is executed.
     """
     contract = Contract.model_validate(contract)
     if not outputs:
         raise ValueError("verify requires at least one named result")
     opts = ComparisonOptions.model_validate(ComparisonOptions() if options is None else options)
     policy = ComparisonPolicy.model_validate(ComparisonPolicy() if policy is None else policy)
+    require_rules = require_rules or (
+        require_expected and any(rule.required for rule in contract.rules)
+    )
     identifier = "verify_" + uuid4().hex
     directory = (
         local_output_directory(Path.cwd() / "equiframe-runs" if work_dir is None else work_dir)
@@ -421,11 +469,68 @@ def verify(
     executions: dict[str, ExecutionResult] = {}
     errors: list[VerificationCheck] = []
     technical_checks: list[VerificationCheck] = []
+    snapshots_by_source: dict[ArtifactRef, ArtifactRef] = {}
+    retained_bytes = 0
+    deadline = None if opts.timeout_seconds is None else start + opts.timeout_seconds
+
+    def checkpoint() -> None:
+        if deadline is not None and time.perf_counter() >= deadline:
+            raise ExecutionTimeout("verification timeout")
+
+    def capture_problem(
+        error: Exception, message: str, name: str | None = None
+    ) -> VerificationCheck:
+        limited = isinstance(error, (ResourceLimitError, ExecutionTimeout, MemoryError))
+        return _check(
+            "not_evaluable" if limited else "failed",
+            report_failure(error, "Verification resource limit reached" if limited else message),
+            name,
+        )
 
     def capture(ref: ArtifactRef) -> ArtifactRef:
-        value = snapshot(ref, directory, opts, lambda: None)
-        read_table(value)
+        nonlocal retained_bytes
+        if ref in snapshots_by_source:
+            return snapshots_by_source[ref]
+        checkpoint()
+        value = snapshot(
+            ref, directory, opts, checkpoint, max_file_bytes=opts.max_disk_bytes - retained_bytes
+        )
+        try:
+            rows = 0
+            with batches(value, opts, checkpoint) as (_, stream):
+                for batch in stream:
+                    rows += batch.num_rows
+                    if rows > opts.max_rows:
+                        raise ResourceLimitError("verification snapshot exceeds max_rows")
+        except BaseException:
+            local_path(value).unlink(missing_ok=True)
+            raise
+        snapshots_by_source[ref] = value
+        retained_bytes += value.size_bytes
         return value
+
+    def compare_capture(
+        left: ArtifactRef | ExecutionResult,
+        right: ArtifactRef | ExecutionResult,
+        *,
+        declaration: Contract,
+        reference: Literal["peer", "expected"] = "peer",
+    ) -> ComparisonResult:
+        nonlocal retained_bytes
+        comparison = _compare(
+            left,
+            right,
+            contract=declaration,
+            policy=policy,
+            options=opts,
+            reference=reference,
+            work_dir=directory,
+            reuse_captures=True,
+            disk_budget=opts.max_disk_bytes - retained_bytes,
+            checkpoint=checkpoint,
+        )
+        retained_bytes += comparison.differences.size_bytes
+        return comparison
 
     def table(t: TableArtifact) -> TableArtifact:
         copied = TableArtifact.model_validate(
@@ -435,7 +540,7 @@ def verify(
                 "index": capture(t.index) if t.index else None,
             }
         )
-        verify_table_metadata(copied)
+        verify_table_metadata(copied, check=checkpoint)
         return copied
 
     for name, value in outputs.items():
@@ -471,9 +576,7 @@ def verify(
                 technical_checks[-1] = _check(
                     "not_evaluable", "Execution evidence could not be captured", name
                 )
-                errors.append(
-                    _check("failed", report_failure(error, "execution_capture_failed"), name)
-                )
+                errors.append(capture_problem(error, "execution_capture_failed", name))
         else:
             value = ArtifactRef.model_validate(value)
             technical_checks.append(
@@ -487,9 +590,7 @@ def verify(
                 captured[name] = capture(value)
                 output_sources[name] = value
             except Exception as error:
-                errors.append(
-                    _check("failed", report_failure(error, "artifact_capture_failed"), name)
-                )
+                errors.append(capture_problem(error, "artifact_capture_failed", name))
     fixed_expected = None
     expected_engine = None
     expected_unavailable = "Expected comparison unavailable"
@@ -522,8 +623,13 @@ def verify(
             else:
                 fixed_expected = capture(expected)
         except Exception as error:
-            errors.append(_check("failed", report_failure(error, "expected_capture_failed")))
-    fixed_snapshots = {name: capture(ref) for name, ref in (snapshots or {}).items()}
+            errors.append(capture_problem(error, "expected_capture_failed"))
+    fixed_snapshots = {}
+    for name, ref in (snapshots or {}).items():
+        try:
+            fixed_snapshots[name] = capture(ref)
+        except Exception as error:
+            errors.append(capture_problem(error, "input_capture_failed", name))
     if not fixed_snapshots and executions:
         first = next(iter(executions.values()))
         fixed_snapshots = {t.name: t.data for t in first.inputs}
@@ -557,41 +663,27 @@ def verify(
         if declared is None:
             raise ValueError("snapshot is not a declared contract input")
         input_contract = _input_contract(contract, declared)
-        c = compare(
-            ref, ref, contract=input_contract, policy=policy, options=opts, work_dir=directory
-        )
+        c = compare_capture(ref, ref, declaration=input_contract)
         input_comparisons.append(c)
         self_checks.append(_comparison_check(c))
     for name, ref in captured.items():
         value = executions.get(name, ref)
-        c = compare(
-            value, value, contract=contract, policy=policy, options=opts, work_dir=directory
-        )
+        c = compare_capture(value, value, declaration=contract)
         comparisons.append(c)
         self_checks.append(_comparison_check(c, name))
     peer_checks: list[VerificationCheck] = []
     for (a, left), (b, right) in combinations(captured.items(), 2):
-        c = compare(
-            executions.get(a, left),
-            executions.get(b, right),
-            contract=contract,
-            policy=policy,
-            options=opts,
-            work_dir=directory,
-        )
+        c = compare_capture(executions.get(a, left), executions.get(b, right), declaration=contract)
         comparisons.append(c)
         peer_checks.append(_comparison_check(c))
     expected_checks: list[VerificationCheck] = []
     for name in outputs:
         if fixed_expected is not None and name in captured:
-            c = compare(
+            c = compare_capture(
                 executions.get(name, captured[name]),
                 fixed_expected,
-                contract=contract,
-                policy=policy,
-                options=opts,
+                declaration=contract,
                 reference="expected",
-                work_dir=directory,
             )
             comparisons.append(c)
             expected_checks.append(_comparison_check(c, name))
@@ -606,21 +698,68 @@ def verify(
             )
     rules: list[VerificationCheck] = []
     evaluations: list[RuleEvaluation] = []
+
+    def load_rule_tables(refs: Mapping[str, ArtifactRef], byte_limit: int) -> dict[str, pa.Table]:
+        import pyarrow as pa
+
+        measured = 0
+        result = {}
+        for table_name, ref in refs.items():
+            with batches(ref, opts, checkpoint) as (schema, stream):
+                records = []
+                for batch in stream:
+                    measured += batch.nbytes
+                    if measured > byte_limit:
+                        raise ResourceLimitError("decoded rule tables exceed verification budget")
+                    records.append(batch)
+                result[table_name] = pa.Table.from_batches(records, schema=schema)
+        return result
+
     for name in outputs:
-        if name in executions and (contract.rules or require_rules):
-            evaluation = evaluate_rules(executions[name], work_dir=directory)
-            evaluations.append(evaluation)
-            rules.append(
-                _check(
-                    "failed"
-                    if evaluation.decision == "alert"
-                    else "passed"
-                    if evaluation.complete
-                    else "not_evaluable",
-                    "Selected rules: " + evaluation.decision,
-                    name,
-                )
+        rule_execution = executions.get(name)
+        use_artifacts = (
+            require_rules and name in captured and (require_expected or bool(fixed_snapshots))
+        )
+        if (rule_execution is not None and (contract.rules or require_rules)) or use_artifacts:
+            limits = RuleOptions()
+            rule_options = RuleOptions(
+                max_artifact_bytes=min(limits.max_artifact_bytes, opts.max_disk_bytes),
+                max_evidence_bytes=max(
+                    1, min(limits.max_evidence_bytes, opts.max_disk_bytes - retained_bytes)
+                ),
+                timeout_seconds=None
+                if deadline is None
+                else max(1e-9, deadline - time.perf_counter()),
             )
+            rule_inputs = (
+                {item.name: item.data for item in rule_execution.inputs}
+                if rule_execution is not None
+                else fixed_snapshots
+            )
+            refs = dict(rule_inputs)
+            if name in captured:
+                refs[contract.output.name] = captured[name]
+
+            evaluation = _evaluate_rules(
+                contract,
+                run_id=rule_execution.run_id if rule_execution is not None else identifier,
+                execution_id=rule_execution.execution_id
+                if rule_execution is not None
+                else _artifact_rule_id(binding, name),
+                execution_state=rule_execution.state
+                if rule_execution is not None
+                else "captured_artifacts",
+                load_tables=partial(load_rule_tables, refs, rule_options.max_artifact_bytes),
+                options=rule_options,
+                work_dir=directory,
+            )
+            retained_bytes += sum(
+                check.findings.size_bytes
+                for check in (*evaluation.preconditions, *evaluation.rules)
+                if check.findings is not None
+            )
+            evaluations.append(evaluation)
+            rules.append(_rule_check(evaluation, name))
         else:
             rules.append(
                 _check(
@@ -662,7 +801,10 @@ def verify(
         technical=_aggregate(tuple(technical_checks), "Technical outcomes retained separately")
         if any(c.state != "not_requested" for c in technical_checks)
         else _check("not_requested", "Artifact inspection does not assert ETL execution"),
-        integrity=_aggregate(tuple(errors), "Captured bytes verified against SHA-256 and size"),
+        integrity=_aggregate(
+            tuple(errors),
+            errors[0].reason if errors else "Captured bytes verified against SHA-256 and size",
+        ),
         agreement=_aggregate(tuple(peer_checks), "All requested pairs compared independently")
         if len(outputs) > 1 and len(captured) == len(outputs)
         else _check(

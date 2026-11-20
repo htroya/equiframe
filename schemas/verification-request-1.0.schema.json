@@ -747,6 +747,379 @@
       "title": "DecimalValue",
       "type": "object"
     },
+    "EngineCapabilities": {
+      "additionalProperties": false,
+      "properties": {
+        "cancellation": {
+          "enum": [
+            "cooperative",
+            "interrupt_query"
+          ],
+          "title": "Cancellation",
+          "type": "string"
+        },
+        "decimal_precision": {
+          "maximum": 76,
+          "minimum": 1,
+          "title": "Decimal Precision",
+          "type": "integer"
+        },
+        "engine": {
+          "minLength": 1,
+          "title": "Engine",
+          "type": "string"
+        },
+        "lazy": {
+          "title": "Lazy",
+          "type": "boolean"
+        },
+        "required_packages": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Required Packages",
+          "type": "array"
+        },
+        "resource_controls": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Resource Controls",
+          "type": "array"
+        },
+        "timestamp_units": {
+          "items": {
+            "enum": [
+              "s",
+              "ms",
+              "us",
+              "ns"
+            ],
+            "type": "string"
+          },
+          "title": "Timestamp Units",
+          "type": "array"
+        },
+        "zoned_timestamp_units": {
+          "items": {
+            "enum": [
+              "s",
+              "ms",
+              "us",
+              "ns"
+            ],
+            "type": "string"
+          },
+          "title": "Zoned Timestamp Units",
+          "type": "array"
+        }
+      },
+      "required": [
+        "engine",
+        "decimal_precision",
+        "timestamp_units",
+        "zoned_timestamp_units",
+        "lazy",
+        "cancellation",
+        "resource_controls"
+      ],
+      "title": "EngineCapabilities",
+      "type": "object"
+    },
+    "ExecutionOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "duckdb_memory_mb": {
+          "default": 512,
+          "exclusiveMinimum": 0,
+          "title": "Duckdb Memory Mb",
+          "type": "integer"
+        },
+        "duckdb_threads": {
+          "default": 1,
+          "exclusiveMinimum": 0,
+          "title": "Duckdb Threads",
+          "type": "integer"
+        },
+        "duckdb_timezone": {
+          "default": "UTC",
+          "minLength": 1,
+          "title": "Duckdb Timezone",
+          "type": "string"
+        },
+        "max_input_rows": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Input Rows"
+        },
+        "max_output_rows": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Output Rows"
+        },
+        "max_transport_bytes": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Transport Bytes"
+        },
+        "timeout_seconds": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timeout Seconds"
+        }
+      },
+      "title": "ExecutionOptions",
+      "type": "object"
+    },
+    "ExecutionPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "contract": {
+          "$ref": "#/$defs/Contract"
+        },
+        "engine": {
+          "minLength": 1,
+          "title": "Engine",
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/$defs/ExecutionOptions"
+        },
+        "parameters": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Parameter"
+          },
+          "title": "Parameters",
+          "type": "array"
+        },
+        "transformation_id": {
+          "minLength": 1,
+          "title": "Transformation Id",
+          "type": "string"
+        },
+        "transformation_revision": {
+          "default": 1,
+          "exclusiveMinimum": 0,
+          "title": "Transformation Revision",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contract",
+        "engine",
+        "transformation_id"
+      ],
+      "title": "ExecutionPlan",
+      "type": "object"
+    },
+    "ExecutionProblem": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "exception_type": {
+          "minLength": 1,
+          "title": "Exception Type",
+          "type": "string"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "stage": {
+          "minLength": 1,
+          "title": "Stage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "stage",
+        "exception_type",
+        "message"
+      ],
+      "title": "ExecutionProblem",
+      "type": "object"
+    },
+    "ExecutionResult": {
+      "additionalProperties": false,
+      "properties": {
+        "capabilities": {
+          "$ref": "#/$defs/EngineCapabilities"
+        },
+        "contract_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Contract Sha256",
+          "type": "string"
+        },
+        "effective_configuration": {
+          "items": {
+            "$ref": "#/$defs/Parameter"
+          },
+          "title": "Effective Configuration",
+          "type": "array"
+        },
+        "elapsed_seconds": {
+          "minimum": 0,
+          "title": "Elapsed Seconds",
+          "type": "number"
+        },
+        "execution_id": {
+          "minLength": 1,
+          "title": "Execution Id",
+          "type": "string"
+        },
+        "finished_at": {
+          "minLength": 1,
+          "title": "Finished At",
+          "type": "string"
+        },
+        "implementation_version": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Implementation Version"
+        },
+        "inputs": {
+          "items": {
+            "$ref": "#/$defs/TableArtifact"
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "output": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TableArtifact"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "plan": {
+          "$ref": "#/$defs/ExecutionPlan"
+        },
+        "problem": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExecutionProblem"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "run_id": {
+          "minLength": 1,
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "started_at": {
+          "minLength": 1,
+          "title": "Started At",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "completed",
+            "invalid_input",
+            "failed",
+            "timeout",
+            "resource_exhausted",
+            "cancelled"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "timings": {
+          "items": {
+            "$ref": "#/$defs/StageTiming"
+          },
+          "title": "Timings",
+          "type": "array"
+        },
+        "versions": {
+          "items": {
+            "$ref": "#/$defs/VersionInfo"
+          },
+          "title": "Versions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "run_id",
+        "execution_id",
+        "plan",
+        "contract_sha256",
+        "implementation_version",
+        "state",
+        "started_at",
+        "finished_at",
+        "elapsed_seconds",
+        "timings",
+        "versions",
+        "capabilities",
+        "effective_configuration",
+        "inputs",
+        "output",
+        "problem"
+      ],
+      "title": "ExecutionResult",
+      "type": "object"
+    },
     "ExpectedProvenance": {
       "additionalProperties": false,
       "properties": {
@@ -1375,6 +1748,111 @@
       "title": "OrderCheck",
       "type": "object"
     },
+    "Parameter": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "value": {
+          "discriminator": {
+            "mapping": {
+              "boolean": "#/$defs/BooleanValue",
+              "date": "#/$defs/DateValue",
+              "decimal": "#/$defs/DecimalValue",
+              "float": "#/$defs/FloatValue",
+              "infinity": "#/$defs/InfinityValue",
+              "integer": "#/$defs/IntegerValue",
+              "nan": "#/$defs/NaNValue",
+              "null": "#/$defs/NullValue",
+              "string": "#/$defs/StringValue",
+              "timestamp": "#/$defs/TimestampValue"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/NullValue"
+            },
+            {
+              "$ref": "#/$defs/NaNValue"
+            },
+            {
+              "$ref": "#/$defs/InfinityValue"
+            },
+            {
+              "$ref": "#/$defs/BooleanValue"
+            },
+            {
+              "$ref": "#/$defs/IntegerValue"
+            },
+            {
+              "$ref": "#/$defs/StringValue"
+            },
+            {
+              "$ref": "#/$defs/DecimalValue"
+            },
+            {
+              "$ref": "#/$defs/FloatValue"
+            },
+            {
+              "$ref": "#/$defs/DateValue"
+            },
+            {
+              "$ref": "#/$defs/TimestampValue"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "Parameter",
+      "type": "object"
+    },
+    "PhysicalColumn": {
+      "additionalProperties": false,
+      "properties": {
+        "arrow_type": {
+          "minLength": 1,
+          "title": "Arrow Type",
+          "type": "string"
+        },
+        "engine_type": {
+          "minLength": 1,
+          "title": "Engine Type",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "nan_count": {
+          "minimum": 0,
+          "title": "Nan Count",
+          "type": "integer"
+        },
+        "null_count": {
+          "minimum": 0,
+          "title": "Null Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "engine_type",
+        "arrow_type",
+        "null_count",
+        "nan_count"
+      ],
+      "title": "PhysicalColumn",
+      "type": "object"
+    },
     "PipelineInput": {
       "additionalProperties": false,
       "properties": {
@@ -1638,6 +2116,27 @@
       "title": "SortSpec",
       "type": "object"
     },
+    "StageTiming": {
+      "additionalProperties": false,
+      "properties": {
+        "seconds": {
+          "minimum": 0,
+          "title": "Seconds",
+          "type": "number"
+        },
+        "stage": {
+          "minLength": 1,
+          "title": "Stage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "stage",
+        "seconds"
+      ],
+      "title": "StageTiming",
+      "type": "object"
+    },
     "StringType": {
       "additionalProperties": false,
       "properties": {
@@ -1669,6 +2168,78 @@
         "value"
       ],
       "title": "StringValue",
+      "type": "object"
+    },
+    "TableArtifact": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "items": {
+            "$ref": "#/$defs/PhysicalColumn"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "data": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "index": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ArtifactRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "index_columns": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PhysicalColumn"
+          },
+          "title": "Index Columns",
+          "type": "array"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "notes": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        },
+        "origin": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ArtifactRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "row_count": {
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "data",
+        "row_count",
+        "columns"
+      ],
+      "title": "TableArtifact",
       "type": "object"
     },
     "TableKeyScope": {
@@ -2113,12 +2684,52 @@
       ],
       "title": "VerificationReview",
       "type": "object"
+    },
+    "VersionInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "title": "VersionInfo",
+      "type": "object"
     }
   },
   "additionalProperties": false,
   "properties": {
     "contract": {
       "$ref": "#/$defs/Contract"
+    },
+    "executions": {
+      "default": [],
+      "items": {
+        "maxItems": 2,
+        "minItems": 2,
+        "prefixItems": [
+          {
+            "minLength": 1,
+            "type": "string"
+          },
+          {
+            "$ref": "#/$defs/ExecutionResult"
+          }
+        ],
+        "type": "array"
+      },
+      "title": "Executions",
+      "type": "array"
     },
     "expected": {
       "anyOf": [

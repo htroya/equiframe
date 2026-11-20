@@ -9,7 +9,7 @@ import sqlite3
 import tempfile
 import time
 from collections import Counter, deque
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from datetime import datetime
 from datetime import timezone as _timezone
@@ -112,9 +112,16 @@ class _Work:
         cancellation: CancellationToken,
         start: float,
         evidence: BinaryIO,
+        *,
+        reuse_captures: bool = False,
+        disk_budget: int | None = None,
+        checkpoint: Callable[[], None] | None = None,
     ) -> None:
         self.spec, self.options, self.directory = spec, options, directory
         self.cancellation, self.start, self.evidence = cancellation, start, evidence
+        self.reuse_captures = reuse_captures
+        self.disk_budget = options.max_disk_bytes if disk_budget is None else disk_budget
+        self.checkpoint = checkpoint
         self.work = self.pairs = self.peak_disk = self.evidence_bytes = 0
         self.rows = {"left": 0, "right": 0}
         self.matched = self.differences = self.violations = 0
@@ -130,9 +137,17 @@ class _Work:
         self.strategy: Literal["pending", "sequence", "key", "multiset", "matching"] = "pending"
         self.selected_key: str | None = None
         self.db = sqlite3.connect(directory / "work.sqlite")
+        self.sql_error: Exception | None = None
+
+    def prepare_storage(self) -> None:
+        self.page_size = int(self.db.execute("PRAGMA page_size").fetchone()[0])
+        self.sqlite_pages = self.disk_budget // self.page_size
+        if self.sqlite_pages == 0:
+            raise ResourceLimitError("max_disk_bytes")
         self.db.execute("PRAGMA journal_mode=OFF")
         self.db.execute("PRAGMA temp_store=FILE")
-        self.db.execute(f"PRAGMA cache_size=-{options.sqlite_cache_kib}")
+        self.db.execute(f"PRAGMA cache_size=-{self.options.sqlite_cache_kib}")
+        self.db.execute(f"PRAGMA max_page_count={self.sqlite_pages}")
         self.db.executescript("""
             CREATE TABLE rows(side TEXT, pos INTEGER, raw TEXT, norm TEXT, exact BLOB,
                               candidate BLOB, part INTEGER, grp BLOB, PRIMARY KEY(side,pos));
@@ -140,9 +155,8 @@ class _Work:
                               PRIMARY KEY(side,name,phase,value));
             CREATE INDEX grouping ON rows(part,grp,side,pos);
         """)
-        self.db.execute(f"PRAGMA max_page_count={max(1, options.max_disk_bytes // 4096)}")
         self.db.set_progress_handler(self._progress, 1000)
-        self.sql_error: Exception | None = None
+        self.check_disk()
 
     def _progress(self) -> int:
         try:
@@ -166,6 +180,8 @@ class _Work:
         boundaries. Work accounting is identical to the full checkpoint.
         """
         self.work += cost
+        if self.checkpoint is not None:
+            self.checkpoint()
         if self.cancellation.cancelled:
             raise ExecutionCancelled("comparison cancelled at checkpoint")
         if (
@@ -176,7 +192,7 @@ class _Work:
         if self.work > self.options.max_work:
             raise ResourceLimitError("max_work")
 
-    def check_disk(self) -> None:
+    def check_disk(self, growth: int = 0) -> None:
         """Measure current files without consuming an additional work unit."""
         disk = 0
         with os.scandir(self.directory) as entries:
@@ -190,13 +206,19 @@ class _Work:
                 if is_file:
                     disk += entry.stat().st_size
         self.peak_disk = max(self.peak_disk, disk)
-        if disk > self.options.max_disk_bytes:
+        if disk + growth > self.disk_budget:
             raise ResourceLimitError("max_disk_bytes")
 
     def emit(self, difference: ComparisonDifference) -> None:
         block = _json(difference.model_dump(mode="json")) + b"\n"
         if self.evidence_bytes + len(block) > self.options.max_evidence_bytes:
             raise ResourceLimitError("max_evidence_bytes")
+        if self.reuse_captures:
+            self.check_disk(len(block))
+            pages = (self.disk_budget - self.evidence_bytes - len(block)) // self.page_size
+            if pages < self.sqlite_pages:
+                self.db.execute(f"PRAGMA max_page_count={pages}")
+                self.sqlite_pages = pages
         self.evidence.write(block)
         self.evidence.flush()
         self.evidence_bytes += len(block)
@@ -259,7 +281,15 @@ class _Work:
             raise TypeError(
                 "compare accepts ArrowInput, ArtifactRef, TableArtifact, ExecutionResult or Path"
             )
-        data = snapshot(value, self.directory, self.options, self.check)
+        if self.reuse_captures:
+            if (
+                not isinstance(value, ArtifactRef)
+                or local_path(value).parent != self.directory.parent
+            ):
+                raise ArtifactIntegrityError("comparison requires a verified local capture")
+            data = value
+        else:
+            data = snapshot(value, self.directory, self.options, self.check)
         if captured is not None:
             import pyarrow.compute as pc
 
@@ -317,6 +347,10 @@ class _Work:
         ref = table.index if index else table.data
         if not (ref is not None):
             raise AssertionError("Internal invariant check failed.")
+        if self.reuse_captures:
+            if local_path(ref).parent != self.directory.parent:
+                raise ArtifactIntegrityError("comparison requires verified table evidence")
+            return
         copied = snapshot(ref, self.directory, self.options, self.check)
         try:
             self.check_disk()
@@ -732,6 +766,9 @@ def _compare(
     reference: Literal["peer", "expected"] = "peer",
     work_dir: Path | None = None,
     cancellation: CancellationToken | None = None,
+    reuse_captures: bool = False,
+    disk_budget: int | None = None,
+    checkpoint: Callable[[], None] | None = None,
 ) -> ComparisonResult:
     """One comparison kernel; the facade only adds capture and contract construction."""
     spec = ComparisonSpec(
@@ -753,8 +790,19 @@ def _compare(
     side: Side | None = None
     evidence_path = directory / "differences.jsonl"
     with evidence_path.open("xb") as evidence:
-        work = _Work(spec, options, directory, cancellation or CancellationToken(), start, evidence)
+        work = _Work(
+            spec,
+            options,
+            directory,
+            cancellation or CancellationToken(),
+            start,
+            evidence,
+            reuse_captures=reuse_captures,
+            disk_budget=disk_budget,
+            checkpoint=checkpoint,
+        )
         try:
+            work.prepare_storage()
             for column in work.columns:
                 tolerance = column.numeric_policy.tolerance if column.numeric_policy else None
                 if tolerance:

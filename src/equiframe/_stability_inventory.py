@@ -746,7 +746,7 @@ SCHEMA_INVENTORY = (
     (
         "verification-request-1.0.schema.json",
         "stable",
-        "eb0fa1998062944180db55db805c993340736923ceaba5bbb630d2595e047180",
+        "251f9cb45c3bdd90915608174f12de9ba157c0de12934d755483efc8fddfbfad",
     ),
     (
         "verification-result-1.0.schema.json",
@@ -1452,7 +1452,7 @@ MODEL_SHAPES = {
     "VerificationBinding": "849f8b77ca6eb9712143e164caf452a277809db6f51940cc636acf66ff449e4a",
     "VerificationCheck": "fa8d551a04706db4f402d866a112725f825567fedf31a3557181be2018e923cd",
     "VerificationCoverage": "362b3aef6c3cd874b9ac8e996a482b951895a247eeeeeeeaf50d7e94aef773b0",
-    "VerificationRequest": "eb0fa1998062944180db55db805c993340736923ceaba5bbb630d2595e047180",
+    "VerificationRequest": "251f9cb45c3bdd90915608174f12de9ba157c0de12934d755483efc8fddfbfad",
     "VerificationResult": "65b5457c5feea88190016e843b780f2382edef7af1f3c8d100fb84de5f01d4b6",
     "VerificationReview": "b4ef6bbf2ad01c67e7fcdf6af0ab8f97c27e9bd67c26645d924c0487c33a41a5",
     "VersionInfo": "d535207c7d621e9cd03ae8aefa82e3900d593bc02a36d91cd9413e8279e812d4",

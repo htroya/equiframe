@@ -1,5 +1,6 @@
 """CLI distinguishes semantic outcomes from intact evidence and portable inspection."""
 
+import hashlib
 import json
 from decimal import Decimal
 
@@ -11,12 +12,11 @@ from typer.testing import CliRunner
 
 import equiframe as ef
 from equiframe.cli import app
-from equiframe.evidence import publish_json
+from equiframe.evidence import canonical_bytes, publish_json
 from equiframe.local import local_path
 from equiframe.pipeline_types import PipelineInput
 from equiframe.serialization import contract_fingerprint
-from equiframe.verification_request import VerificationRequest
-from equiframe.verify_types import VerificationBinding
+from equiframe.verification_request import ReferenceBinding, VerificationRequest
 
 
 def request(tmp_path, *, wrong=False, require_expected=False):
@@ -113,7 +113,19 @@ def test_required_expected_uses_distinct_source_file(tmp_path, relationship):
 
 
 @pytest.mark.parametrize(
-    "change", [None, "expected", "contract", "plan", "snapshot", "missing", "bytes"]
+    "change",
+    [
+        None,
+        "expected",
+        "contract",
+        "plan",
+        "snapshot",
+        "missing",
+        "bytes",
+        "partial",
+        "policy",
+        "unbound_policy",
+    ],
 )
 def test_cli_reference_binding_requires_matching_reference_and_batch(tmp_path, change):
     expected = artifact(tmp_path, "expected", table())
@@ -122,9 +134,16 @@ def test_cli_reference_binding_requires_matching_reference_and_batch(tmp_path, c
     plan_sha256 = "1" * 64
     request_path = tmp_path / "request.json"
     binding_path = tmp_path / "binding.json"
-    binding = VerificationBinding(
+    declared = contract()
+    if change == "partial":
+        lookup = declared.inputs[0].model_copy(update={"name": "lookup"})
+        declared = declared.model_copy(update={"inputs": (*declared.inputs, lookup)})
+    binding = ReferenceBinding(
         expected_sha256="0" * 64 if change == "expected" else expected.sha256,
-        contract_sha256="0" * 64 if change == "contract" else contract_fingerprint(contract()),
+        contract_sha256="0" * 64 if change == "contract" else contract_fingerprint(declared),
+        comparison_spec_sha256=None
+        if change == "unbound_policy"
+        else ef.comparison_fingerprint(ef.ComparisonSpec(contract=declared)),
         plan_sha256="0" * 64 if change == "plan" else plan_sha256,
         snapshots=(("other" if change == "snapshot" else "input", source.sha256),),
         outputs=(),
@@ -132,11 +151,14 @@ def test_cli_reference_binding_requires_matching_reference_and_batch(tmp_path, c
     publish_json(binding, binding_path)
     publish_json(
         VerificationRequest(
-            contract=contract(),
+            contract=declared,
             outputs=(PipelineInput(name="candidate", artifact=output),),
             expected=None if change == "missing" else expected,
             snapshots=(PipelineInput(name="input", artifact=source),),
             plan_sha256=plan_sha256,
+            policy=ef.ComparisonPolicy(column_order="ignored", justification="Audit policy")
+            if change == "policy"
+            else ef.ComparisonPolicy(),
         ),
         request_path,
     )
@@ -163,6 +185,92 @@ def test_cli_reference_binding_requires_matching_reference_and_batch(tmp_path, c
         if change == "bytes":
             assert summary["dimensions"]["integrity"]["state"] == "failed"
             assert summary["expected"][0]["state"] == "not_evaluable"
+
+
+@pytest.mark.parametrize(
+    ("total", "has_input", "exit_code"), [(6, True, 0), (7, True, 1), (6, False, 3)]
+)
+def test_cli_strict_acceptance_checks_required_rule_even_when_reference_matches(
+    tmp_path, total, has_input, exit_code
+):
+    base = contract()
+    aggregation = ef.RuleSpec(
+        rule_id="balance",
+        revision=1,
+        required=True,
+        severity="error",
+        specification=ef.AggregateCheck(
+            table="input",
+            group_by=(),
+            measure="id",
+            function="sum",
+            output_table="result",
+            output_column="id",
+        ),
+    )
+    result_table = pa.table({"id": [total], "value": pa.array([None], type=pa.string())})
+    path = tmp_path / "request.json"
+    publish_json(
+        VerificationRequest(
+            contract=base.model_copy(update={"rules": (aggregation,)}),
+            outputs=(
+                PipelineInput(
+                    name="candidate", artifact=artifact(tmp_path, "output", result_table)
+                ),
+            ),
+            expected=artifact(tmp_path, "expected", result_table),
+            snapshots=(PipelineInput(name="input", artifact=artifact(tmp_path, "input", table())),)
+            if has_input
+            else (),
+        ),
+        path,
+    )
+    runner = CliRunner()
+    directory = tmp_path / "runs"
+    result = runner.invoke(
+        app, ["verify", "run", str(path), "--require-expected", "--output", str(directory)]
+    )
+    assert result.exit_code == exit_code, result.output
+    summary = json.loads(result.stdout)
+    assert summary["expected"][0]["state"] == "passed"
+    assert summary["rules"][0]["state"] == {0: "passed", 1: "failed", 3: "not_evaluable"}[exit_code]
+    assert summary["rule_evaluations"][0]["execution_state"] == "captured_artifacts"
+    assert summary["coverage"]["input_execution_evidence_available"] is False
+    evidence = directory / summary["verification_id"]
+    assert runner.invoke(app, ["verify", "inspect", str(evidence)]).exit_code == 0
+    portable = tmp_path / "portable"
+    assert runner.invoke(app, ["bundle", "export", str(evidence), str(portable)]).exit_code == 0
+    assert runner.invoke(app, ["bundle", "verify", str(portable)]).exit_code == 0
+
+
+def test_cli_captured_execution_must_prove_requested_plan_and_output(tmp_path):
+    migration = run(tmp_path / "migration")
+    execution = migration.source.execution
+    assert execution is not None and execution.output is not None
+    digest = hashlib.sha256(canonical_bytes(execution.plan.model_dump(mode="json"))).hexdigest()
+    request = VerificationRequest(
+        contract=execution.plan.contract,
+        outputs=(PipelineInput(name="candidate", artifact=execution.output.data),),
+        expected=artifact(tmp_path, "expected", table()),
+        policy=ef.ComparisonPolicy(
+            index="ignore", justification="The index has no business identity."
+        ),
+        executions=(("candidate", execution),),
+        plan_sha256=digest,
+        require_expected=True,
+    )
+    runner = CliRunner()
+    path = tmp_path / "request.json"
+    args = ["verify", "run", str(path), "--output", str(tmp_path / "runs")]
+    publish_json(request, path)
+    result = runner.invoke(app, args)
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.stdout)["coverage"]["input_execution_evidence_available"] is True
+    path.unlink()
+    publish_json(request.model_copy(update={"plan_sha256": "0" * 64}), path)
+    mismatch = runner.invoke(app, args)
+    assert mismatch.exit_code == 3
+    assert "execution_binding_mismatch" in mismatch.stderr
 
 
 @pytest.mark.parametrize(

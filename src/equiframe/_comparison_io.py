@@ -11,6 +11,7 @@ from uuid import uuid4
 
 from equiframe.errors import ArtifactIntegrityError, CapabilityError, ResourceLimitError
 from equiframe.local import local_path
+from equiframe._regular_io import local_input_path, open_regular_file
 from equiframe.tables import ArrowInput, require_dependency
 from equiframe.types import ArtifactRef
 
@@ -53,6 +54,8 @@ def snapshot(
     directory: Path,
     options: ComparisonOptions,
     check: Callable[[], None],
+    *,
+    max_file_bytes: int | None = None,
 ) -> ArtifactRef:
     require_dependency("pyarrow", "arrow")
     import pyarrow as pa
@@ -84,17 +87,29 @@ def snapshot(
     )
     if format_name not in ("arrow", "parquet"):
         raise CapabilityError("comparison supports local Arrow IPC file and Parquet")
+    if max_file_bytes is not None and ref is not None and ref.size_bytes > max_file_bytes:
+        raise ResourceLimitError("verification snapshot disk budget exhausted")
     path = directory / (uuid4().hex + "." + format_name)
     digest = hashlib.sha256()
     size = 0
     try:
-        with source.open("rb") as reader, path.open("xb") as writer:
-            while block := reader.read(min(1024 * 1024, options.max_disk_bytes + 1)):
+        source_file = (
+            source.open("rb")
+            if max_file_bytes is None
+            else open_regular_file(local_input_path(source))
+        )
+        chunk_bytes = min(1024 * 1024, options.max_disk_bytes + 1)
+        with source_file as reader, path.open("xb") as writer:
+            while block := reader.read(chunk_bytes):
                 check()
+                size += len(block)
+                if max_file_bytes is not None and size > max_file_bytes:
+                    raise ResourceLimitError("verification snapshot disk budget exhausted")
+                if ref is not None and size > ref.size_bytes:
+                    raise ArtifactIntegrityError("artifact exceeds its declared size")
                 writer.write(block)
                 writer.flush()
                 digest.update(block)
-                size += len(block)
                 check()
         if ref and (size != ref.size_bytes or digest.hexdigest() != ref.sha256):
             raise ArtifactIntegrityError("artifact SHA-256 or size mismatch")

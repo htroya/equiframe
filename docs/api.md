@@ -426,16 +426,35 @@ the request omits `require_expected`. The expected artifact must be a distinct
 file. The same path or a hard link to a candidate yields exit 3. Separate
 files can contain identical bytes. Set the request contract's full business
 key, multiplicity and numeric policies for the equality the job must enforce.
+Strict acceptance also evaluates declared rules when any rule is required.
+It can use the candidate and its captured input files. If a rule needs a
+missing table the outcome is unavailable. The rule evidence identifies
+direct artifact checks as `captured_artifacts`.
 
 `--reference-binding binding.json` also requires the expected comparison.
-Use a JSON `VerificationBinding` from your trusted reference generator with
-`contract_sha256`, `expected_sha256`, `plan_sha256`, a nonempty list of
-`[name, sha256]` pairs in `snapshots` and an empty list in `outputs`.
-The hashes must match the request and the reference and snapshot bytes are
-checked during capture. A binding mismatch yields exit 3. A reference whose
-bytes fail integrity checks yields exit 1. Obtain the binding through
-a channel the candidate-producing job cannot write to. You can generate the
-reference with SQL, Python or R.
+Obtain the JSON binding through a channel the candidate-producing job cannot
+write to. Supply `contract_sha256`, `expected_sha256`, `plan_sha256`,
+`comparison_spec_sha256`, an empty list in `outputs` and one
+`[name, sha256]` pair in `snapshots` for every input named in the contract.
+Compute `comparison_spec_sha256` with
+`comparison_fingerprint(ComparisonSpec(contract=contract, policy=policy))`.
+The hashes must match the request. Capture verifies the reference and snapshot
+bytes. A binding mismatch, including a missing policy fingerprint, yields
+exit 3. Reference bytes that fail integrity checks yield exit 1. SQL, Python
+or R can produce the reference.
+
+For captured execution evidence, add `executions` to the request with one
+`[output_name, execution_result]` pair per candidate. Its embedded plan,
+contract and output must match the request. The plan hash is the SHA-256 of
+`equiframe.evidence.canonical_bytes(execution.plan.model_dump(mode="json"))`.
+Repeat the same plan identity in the reference binding when using one.
+An artifact-only request reports file-based findings and the declared plan hash.
+
+Verify shares each capture within a run. The disk budget covers snapshots,
+the SQLite work database and finding/difference streams together. JSON and
+HTML receipts remain writable for incomplete runs. The row limit applies to
+each capture and the batch-byte limit applies during Arrow or Parquet reads.
+An Arrow IPC stored batch is decoded as a unit.
 
 | Command category | Exit meaning |
 |---|---|

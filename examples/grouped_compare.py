@@ -3,8 +3,32 @@
 from fractions import Fraction
 
 import pyarrow as pa
+import pyarrow.compute as pc
 
 import equiframe as ef
+
+
+def check_filtered_totals() -> None:
+    """Require every eligible buyer/currency group and its exact total."""
+    inputs = pa.table(
+        {
+            "buyer": ["A", "A", "B", "C"],
+            "currency": ["USD", "USD", "USD", "USD"],
+            "cents": [10_000, 15_000, 12_000, 9_999],
+        }
+    )
+    eligible = inputs.filter(pc.greater_equal(inputs["cents"], 10_000))
+    correct = pa.table({"buyer": ["A", "B"], "currency": ["USD", "USD"], "cents": [25_000, 12_000]})
+    wrong_cent = correct.set_column(2, "cents", pa.array([24_999, 12_000]))
+    for candidate, expected_changes in (
+        (correct, (0, 0, 0)),
+        (correct.slice(0, 1), (0, 1, 0)),
+        (wrong_cent, (0, 0, 1)),
+    ):
+        check = ef.compare_grouped(candidate, eligible, by=("buyer", "currency"), column="cents")
+        assert check.complete
+        assert (check.added_groups, check.removed_groups, check.modified_groups) == expected_changes
+    print("Exact totals accept the valid filtered result and detect a missing group and one cent")
 
 
 def main() -> None:
@@ -42,6 +66,7 @@ def main() -> None:
         assert result.examples == ()
         assert ef.GroupedComparisonResult.model_validate_json(result.model_dump_json()) == result
     print("Four installed grouped consumers passed independent expected metrics")
+    check_filtered_totals()
 
 
 if __name__ == "__main__":

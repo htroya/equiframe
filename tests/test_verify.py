@@ -232,6 +232,31 @@ def test_comparison_budget_cannot_become_success(tmp_path):
     assert read_verification(tmp_path / result.verification_id) == result
 
 
+def test_verify_budgets_total_disk_and_reuses_capture_in_every_pair(tmp_path):
+    outputs = {f"out{i}": artifact(tmp_path, f"out{i}", table()) for i in range(3)}
+    expected = artifact(tmp_path, "expected", table())
+    work = tmp_path / "runs"
+    result = verify(outputs, contract=contract(), expected=expected, work_dir=work)
+    path = work / result.verification_id
+    assert result.publishable and len(result.comparisons) == 9
+    assert len(list(path.rglob("*.arrow"))) == 4
+    assert read_verification(path) == result
+
+    budget = expected.size_bytes * 2
+    result = verify(
+        outputs,
+        contract=contract(),
+        expected=expected,
+        work_dir=work,
+        require_expected=True,
+        options=ef.ComparisonOptions(max_disk_bytes=budget),
+    )
+    path = work / result.verification_id
+    assert result.exit_code == 3
+    assert sum(file.stat().st_size for file in path.rglob("*.arrow")) == budget
+    assert read_verification(path) == result
+
+
 def test_captured_input_contract_violation_is_failed_separately(tmp_path):
     migration = ef.migrate(spec(), source=Provider(), work_dir=tmp_path)
     execution = migration.source.execution
