@@ -672,10 +672,16 @@ def test_local_runtime_binding_records_exact_installed_source_bytes(
     local_runtime: tuple[Path, Path, Path],
 ) -> None:
     python, source, installed = local_runtime
+    for index in range(320):
+        filename = f"bundled_runtime_{index:04d}_artifact_inventory_entry.dat"
+        (source / filename).write_bytes(b"runtime payload")
+        (installed / filename).write_bytes(b"runtime payload")
     binding = candidate_driver["local_dependency_runtime_binding"](
         package, [str(python)], tmp_path / "fresh-bytecode"
     )
     assert binding["verified"] is True
+    assert len(json.dumps(binding["source_dependencies"])) > 32_768
+    assert sum(map(len, binding["command"])) < 32_768
     assert MODULE["runtime_binding_matches"](binding, package)
     imported = binding["resolved_dependencies"][0]["imports"][0]
     assert imported["origin"] == str(installed / "__init__.py")

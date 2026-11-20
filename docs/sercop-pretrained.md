@@ -4,6 +4,7 @@ Una instalación normal incluye el modelo SERCOP ya entrenado y calibrado. El
 comando `model` muestra su contrato, la huella, los años, el tamaño de las
 particiones y el umbral. `score` recibe el JSON de un `ProfileVector` generado
 con las características del modelo y devuelve la puntuación y la decisión.
+Los comandos SERCOP se clasifican como experimentales en esta versión Beta.
 
 ```sh
 python -m pip install equiframe

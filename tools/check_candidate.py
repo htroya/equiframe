@@ -44,7 +44,7 @@ import sys
 from pathlib import Path
 
 resolved = []
-for dependency in json.loads(sys.argv[1]):
+for dependency in json.load(sys.stdin):
     imports = []
     for source in dependency["imports"]:
         name = source["name"]
@@ -108,12 +108,12 @@ def local_dependency_runtime_binding(
         "pycache_prefix=" + str(bytecode_directory),
         "-c",
         _RUNTIME_PROBE,
-        json.dumps(sources),
     ]
     completed = subprocess.run(
         command,
         cwd=package,
         env=environment,
+        input=json.dumps(sources),
         capture_output=True,
         text=True,
         encoding="utf-8",
