@@ -5,7 +5,8 @@ also ships a copy of its handbook under `equiframe/docs/`.
 
 | Version | Handbook at the source tag | Release information |
 | --- | --- | --- |
-| 0.15.0 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.0/docs/index.md) | [Candidate source](https://github.com/htroya/equiframe/tree/v0.15.0) |
+| 0.15.1 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.1/docs/index.md) | [Candidate source](https://github.com/htroya/equiframe/tree/v0.15.1) |
+| 0.15.0 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.0/docs/index.md) | Candidate superseded after the historical request serialization check |
 | 0.14.7 | [Handbook](https://github.com/htroya/equiframe/blob/v0.14.7/docs/index.md) | [Candidate source](https://github.com/htroya/equiframe/tree/v0.14.7) |
 | 0.14.6 | Local candidate | Preflight stopped at the resource-test fixture |
 | 0.14.5 | [Handbook](https://github.com/htroya/equiframe/blob/v0.14.5/docs/index.md) | [Candidate source](https://github.com/htroya/equiframe/tree/v0.14.5) |
