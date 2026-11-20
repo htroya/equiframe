@@ -9,9 +9,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
+from equiframe._regular_io import local_input_path, open_regular_file
 from equiframe.errors import ArtifactIntegrityError, CapabilityError, ResourceLimitError
 from equiframe.local import local_path
-from equiframe._regular_io import local_input_path, open_regular_file
 from equiframe.tables import ArrowInput, require_dependency
 from equiframe.types import ArtifactRef
 

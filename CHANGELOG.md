@@ -1,3 +1,9 @@
+## 0.14.6 - complete verification evidence
+
+- Evaluate required contract rules during strict acceptance.
+- Bind reference acceptance to every input and the comparison policy.
+- Reuse bounded captures and accept optional captured execution evidence.
+
 ## 0.14.5 - verify distinct expected artifacts
 
 - Reject candidate aliases under strict ETL acceptance, including hard links.

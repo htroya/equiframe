@@ -1,7 +1,7 @@
-# EquiFrame Benchmark 0.14.5
+# EquiFrame Benchmark 0.14.6
 
-> **EquiFrame Benchmark 0.14.5 Beta**, paired with EquiFrame 0.14.5.
-> [Documentation by version](https://github.com/htroya/equiframe/blob/v0.14.5/docs/versions.md)
+> **EquiFrame Benchmark 0.14.6 Beta**, paired with EquiFrame 0.14.6.
+> [Documentation by version](https://github.com/htroya/equiframe/blob/v0.14.6/docs/versions.md)
 
 **Experimental evaluation, reproducible evidence and bounded engineering costs.**
 
@@ -22,7 +22,7 @@ detector features.
 
 ## Release scope and compatibility
 
-This distribution is paired exactly with `equiframe[arrow]==0.14.5` and
+This distribution is paired exactly with `equiframe[arrow]==0.14.6` and
 supports Python `>=3.10,<3.14`. Original code is licensed under [MIT](LICENSE);
 dependencies retain their own terms in [third-party notices](THIRD_PARTY_NOTICES.md).
 
@@ -70,8 +70,8 @@ In a fresh directory outside the repository, using a POSIX shell:
 ```bash
 python3.12 -m venv .venv
 . .venv/bin/activate
-CORE=/absolute/path/equiframe-0.14.5-py3-none-any.whl
-BENCH=/absolute/path/equiframe_benchmark-0.14.5-py3-none-any.whl
+CORE=/absolute/path/equiframe-0.14.6-py3-none-any.whl
+BENCH=/absolute/path/equiframe_benchmark-0.14.6-py3-none-any.whl
 WHEELHOUSE=/absolute/path/reviewed-wheelhouse
 python -m pip install --no-index --find-links "$WHEELHOUSE" "${CORE}[engines]" "${BENCH}[resources]"
 python -m pip check
