@@ -215,6 +215,12 @@ sandbox untrusted programs.
 See the [standalone detection benchmark](https://github.com/htroya/equiframe/blob/main/docs/detection-benchmark.md)
 for measured detection, false alarms and component API costs on generated cases,
 including missed errors and correct changes of workload.
+The [executed Isolation Forest notebook](docs/notebooks/03_isolation_forest.ipynb)
+shows training, calibration, false alarms and missed faults. The
+[0.14.0 evaluation receipt](validation/library_detection/results/public-spending-0140/manifest.json)
+and [0.15.0 temporal evaluation](validation/library_detection/results/temporal-0150/README.md)
+identify their respective wheels. The [inference timings](docs/performance.md#frozen-isolation-forest-inference-in-the-0143-candidate)
+describe the synthetic 200-tree experiment.
 
 ## Run a complete example
 
@@ -504,6 +510,12 @@ Isolation Forest requiere ajuste y calibración adecuados a los datos.
 La [evaluación autónoma de detección](https://github.com/htroya/equiframe/blob/main/docs/detection-benchmark.md)
 presenta mediciones de detección, falsas alarmas y costo con casos generados,
 junto con sus errores omitidos y límites de aplicación.
+El [cuaderno ejecutado de Isolation Forest](docs/notebooks/03_isolation_forest.ipynb)
+muestra entrenamiento, calibración, falsas alarmas y omisiones. El
+[recibo de evaluación de 0.14.0](validation/library_detection/results/public-spending-0140/manifest.json)
+y la [evaluación temporal de 0.15.0](validation/library_detection/results/temporal-0150/README.md)
+identifican el wheel de cada estudio. Las [mediciones de inferencia](docs/performance.md#frozen-isolation-forest-inference-in-the-0143-candidate)
+corresponden al escenario sintético de 200 árboles.
 La [revisión con R](https://github.com/htroya/equiframe/blob/main/docs/r_review.md) puede completar la decisión mediante
 `finalize_with_r` o `finalize_execution_with_r`, manteniendo visibles las alertas
 y los componentes que no pudieron evaluarse.
