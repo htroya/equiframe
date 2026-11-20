@@ -15,7 +15,7 @@ actual. No necesitas adoptar el benchmark ni desplegar un servicio.
 Para intercambiar CSV, SQL y otras entradas conservando un contrato, usa el
 [recorrido de universalidad en cinco pasos](universalidad-cinco-pasos.md).
 
-Esta guía corresponde a **0.14.6 Beta**. Identifica los bytes de cada artefacto
+Esta guía corresponde a **0.14.7 Beta**. Identifica los bytes de cada artefacto
 por su revisión y SHA-256. El código propio usa MIT y el propietario autorizó
 preparar y publicar manualmente en TestPyPI/PyPI sujeto a los
 [gates de release](releasing.md); autorización no significa publicación terminada.

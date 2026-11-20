@@ -1,8 +1,13 @@
-## 0.14.6 - complete verification evidence
+## 0.14.7 - complete verification evidence
 
 - Evaluate required contract rules during strict acceptance.
 - Bind reference acceptance to every input and the comparison policy.
 - Reuse bounded captures and accept optional captured execution evidence.
+
+## 0.14.6 - local candidate
+
+The resource-scan test fixture needed to initialize the new budget. The
+candidate stayed local. The next candidate includes that fixture correction.
 
 ## 0.14.5 - verify distinct expected artifacts
 

@@ -21,6 +21,8 @@ def work_for(directory, **options):
     work.work = work.peak_disk = 0
     work.directory = directory
     work.options = ef.ComparisonOptions(**options)
+    work.disk_budget = work.options.max_disk_bytes
+    work.checkpoint = None
     work.cancellation = ef.CancellationToken()
     work.start = time.perf_counter()
     work.sql_error = None

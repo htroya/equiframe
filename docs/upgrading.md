@@ -3,14 +3,14 @@
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Security](security.md) ·
 [Release/rollback](releasing.md)
 
-## 0.14.6: required rules and verification bindings
+## 0.14.7: required rules and verification bindings
 
 Strict acceptance evaluates required rules on verified captures. Trusted
 reference documents now require all declared input hashes and a
 comparison specification fingerprint. Recreate earlier reference
 documents with the producer using the documented policy. New detector
-fits record producer 0.14.6 and the optional benchmark is paired with
-core 0.14.6.
+fits record producer 0.14.7 and the optional benchmark is paired with
+core 0.14.7.
 
 ## 0.14.5: expected artifact and batch identity
 
