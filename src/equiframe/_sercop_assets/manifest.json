@@ -1,0 +1,208 @@
+{
+  "calibration_lots": 144,
+  "contract": {
+    "contract_id": "spending.threshold_aggregation",
+    "family": "aggregations",
+    "inputs": [
+      {
+        "name": "source",
+        "schema_spec": {
+          "columns": [
+            {
+              "allowed_values": [],
+              "logical_type": {
+                "kind": "string"
+              },
+              "name": "ocid",
+              "nan_policy": null,
+              "null_policy": {
+                "justification": null,
+                "representations": [
+                  "null"
+                ]
+              },
+              "nullable": false,
+              "numeric_policy": null,
+              "temporal_policy": null
+            },
+            {
+              "allowed_values": [],
+              "logical_type": {
+                "kind": "string"
+              },
+              "name": "award",
+              "nan_policy": null,
+              "null_policy": {
+                "justification": null,
+                "representations": [
+                  "null"
+                ]
+              },
+              "nullable": false,
+              "numeric_policy": null,
+              "temporal_policy": null
+            },
+            {
+              "allowed_values": [],
+              "logical_type": {
+                "kind": "string"
+              },
+              "name": "buyer",
+              "nan_policy": null,
+              "null_policy": {
+                "justification": null,
+                "representations": [
+                  "null"
+                ]
+              },
+              "nullable": false,
+              "numeric_policy": null,
+              "temporal_policy": null
+            },
+            {
+              "allowed_values": [],
+              "logical_type": {
+                "kind": "string"
+              },
+              "name": "currency",
+              "nan_policy": null,
+              "null_policy": {
+                "justification": null,
+                "representations": [
+                  "null"
+                ]
+              },
+              "nullable": false,
+              "numeric_policy": null,
+              "temporal_policy": null
+            },
+            {
+              "allowed_values": [],
+              "logical_type": {
+                "bits": 64,
+                "kind": "integer",
+                "signed": true
+              },
+              "name": "amount",
+              "nan_policy": null,
+              "null_policy": {
+                "justification": null,
+                "representations": [
+                  "null"
+                ]
+              },
+              "nullable": true,
+              "numeric_policy": {
+                "comparison": "exact",
+                "rounding": null,
+                "rounding_justification": null,
+                "tolerance": null,
+                "unit": "unspecified"
+              },
+              "temporal_policy": null
+            }
+          ],
+          "keys": [],
+          "multiplicity": "preserve",
+          "order": {
+            "kind": "ignored"
+          }
+        }
+      }
+    ],
+    "output": {
+      "name": "result",
+      "schema_spec": {
+        "columns": [
+          {
+            "allowed_values": [],
+            "logical_type": {
+              "kind": "string"
+            },
+            "name": "buyer",
+            "nan_policy": null,
+            "null_policy": {
+              "justification": null,
+              "representations": [
+                "null"
+              ]
+            },
+            "nullable": false,
+            "numeric_policy": null,
+            "temporal_policy": null
+          },
+          {
+            "allowed_values": [],
+            "logical_type": {
+              "kind": "string"
+            },
+            "name": "currency",
+            "nan_policy": null,
+            "null_policy": {
+              "justification": null,
+              "representations": [
+                "null"
+              ]
+            },
+            "nullable": false,
+            "numeric_policy": null,
+            "temporal_policy": null
+          },
+          {
+            "allowed_values": [],
+            "logical_type": {
+              "bits": 64,
+              "kind": "integer",
+              "signed": true
+            },
+            "name": "total",
+            "nan_policy": null,
+            "null_policy": {
+              "justification": null,
+              "representations": [
+                "null"
+              ]
+            },
+            "nullable": false,
+            "numeric_policy": {
+              "comparison": "exact",
+              "rounding": null,
+              "rounding_justification": null,
+              "tolerance": null,
+              "unit": "unspecified"
+            },
+            "temporal_policy": null
+          }
+        ],
+        "keys": [],
+        "multiplicity": "preserve",
+        "order": {
+          "kind": "ignored"
+        }
+      }
+    },
+    "preconditions": [],
+    "revision": 1,
+    "rules": [],
+    "schema_version": "1.0"
+  },
+  "contract_sha256": "1fba3659594facaf134c813b23afb2f4d3dcd8bb5f5cd424925fe9ef0ec460a7",
+  "evaluation_lots": 120,
+  "license": "https://creativecommons.org/licenses/by/3.0/ec/",
+  "model_id": "sercop-award-aggregation-2019-2026",
+  "model_sha256": "242403ed0476e6d45ebf447b958b97978977953864aa65ada5eb829859ae7588",
+  "schema_version": "1.0",
+  "source": "https://data.open-contracting.org/es/publication/110",
+  "source_years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "training_lots": 768,
+  "training_wheel_sha256": "bd9bfa1a9403741f87da4f9ef2b4acf5bb7c5285be890b71ca1f5a9c944c334f"
+}

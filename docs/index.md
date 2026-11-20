@@ -2,6 +2,8 @@
 
 [Documentation by version](versions.md) · [0.14.0 errata](equiframe-0.14.0-errata.md)
 
+[Pretrained SERCOP model and ETL review with R](sercop-pretrained.md)
+
 [Isolation Forest notebook](notebooks/03_isolation_forest.ipynb) shows training,
 calibration, detection, false alarms and missed faults on labeled synthetic lots.
 
@@ -48,7 +50,7 @@ Consulta [fuentes](universal-sources.md), [ventanas](migration-ir.md) y
 
 ## Release status
 
-This handbook describes **0.15.3 Beta**. EquiFrame 0.14.0 was published
+This handbook describes **0.15.4 Beta**. EquiFrame 0.14.0 was published
 on [PyPI](https://pypi.org/project/equiframe/0.14.0/) on 19 November 2026.
 Use the [release notes](https://github.com/htroya/equiframe/releases) for
 artifact hashes and the scope of each version's checks.

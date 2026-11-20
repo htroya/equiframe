@@ -1,7 +1,7 @@
-# EquiFrame Benchmark 0.15.3
+# EquiFrame Benchmark 0.15.4
 
-> **EquiFrame Benchmark 0.15.3 Beta**, paired with EquiFrame 0.15.3.
-> [Documentation by version](https://github.com/htroya/equiframe/blob/v0.15.3/docs/versions.md)
+> **EquiFrame Benchmark 0.15.4 Beta**, paired with EquiFrame 0.15.4.
+> [Documentation by version](https://github.com/htroya/equiframe/blob/v0.15.4/docs/versions.md)
 
 **Experimental evaluation, reproducible evidence and bounded engineering costs.**
 
@@ -22,7 +22,7 @@ detector features.
 
 ## Release scope and compatibility
 
-This distribution is paired exactly with `equiframe[arrow]==0.15.3` and
+This distribution is paired exactly with `equiframe[arrow]==0.15.4` and
 supports Python `>=3.10,<3.14`. Original code is licensed under [MIT](LICENSE);
 dependencies retain their own terms in [third-party notices](THIRD_PARTY_NOTICES.md).
 

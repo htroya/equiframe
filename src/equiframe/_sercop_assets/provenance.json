@@ -1,0 +1,663 @@
+{
+  "alpha": "0.05",
+  "contract": "spending.threshold_aggregation",
+  "detector": {
+    "calibration_batches": 144,
+    "file": "detector.json",
+    "sha256": "242403ed0476e6d45ebf447b958b97978977953864aa65ada5eb829859ae7588",
+    "threshold": 0.6781361604706204,
+    "training_batches": 768,
+    "trees": 200
+  },
+  "feature_version": "1.1",
+  "implementation_sha256": {
+    "operational_replay.py": "9e93fef74a46aa99d17692b54b517c7539eb9b26b50f9a0b414d28c8e9992461",
+    "public_spending.py": "ef0436bcaf7add0963e245f5f2844e319b7f411261b637fe449042f943bf58fd",
+    "run.py": "c47180a4ea5ee2354a325bbecfd9d2cb00e7ee1917f1ed1bbc9f586c844f98f8",
+    "sercop_cohorts.py": "8fae5642ddde9c7c28d1dbe7bab70e5605580a112b28ffb41c3818a13b889b0c",
+    "sercop_thesis.py": "3d7d346c1654233986ece70dbd5fb9d7d4b66ab45ae59f28609b0621bf95525b"
+  },
+  "model_sha256": "242403ed0476e6d45ebf447b958b97978977953864aa65ada5eb829859ae7588",
+  "outcomes_by_scenario": {
+    "drop_group": {
+      "exact_gate": {
+        "cases": 15,
+        "coverage": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": null,
+        "fn": 0,
+        "fp": 0,
+        "fpr_wilson95": null,
+        "precision": 1.0,
+        "recall": 1.0,
+        "recall_wilson95": [
+          0.7961166989641515,
+          1.0
+        ],
+        "tn": 0,
+        "tp": 15,
+        "unavailable": 0
+      },
+      "group_rule": {
+        "cases": 15,
+        "coverage": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": null,
+        "fn": 0,
+        "fp": 0,
+        "fpr_wilson95": null,
+        "precision": 1.0,
+        "recall": 1.0,
+        "recall_wilson95": [
+          0.7961166989641515,
+          1.0
+        ],
+        "tn": 0,
+        "tp": 15,
+        "unavailable": 0
+      },
+      "isolation_forest": {
+        "cases": 15,
+        "coverage": 1.0,
+        "f1": 0.0,
+        "false_positive_rate": null,
+        "fn": 15,
+        "fp": 0,
+        "fpr_wilson95": null,
+        "precision": null,
+        "recall": 0.0,
+        "recall_wilson95": [
+          0.0,
+          0.20388330103584862
+        ],
+        "tn": 0,
+        "tp": 0,
+        "unavailable": 0
+      }
+    },
+    "normal": {
+      "exact_gate": {
+        "cases": 48,
+        "coverage": 1.0,
+        "f1": null,
+        "false_positive_rate": 0.0,
+        "fn": 0,
+        "fp": 0,
+        "fpr_wilson95": [
+          6.938893903907228e-18,
+          0.07410012966611748
+        ],
+        "precision": null,
+        "recall": null,
+        "recall_wilson95": null,
+        "tn": 48,
+        "tp": 0,
+        "unavailable": 0
+      },
+      "group_rule": {
+        "cases": 48,
+        "coverage": 1.0,
+        "f1": null,
+        "false_positive_rate": 0.0,
+        "fn": 0,
+        "fp": 0,
+        "fpr_wilson95": [
+          6.938893903907228e-18,
+          0.07410012966611748
+        ],
+        "precision": null,
+        "recall": null,
+        "recall_wilson95": null,
+        "tn": 48,
+        "tp": 0,
+        "unavailable": 0
+      },
+      "isolation_forest": {
+        "cases": 48,
+        "coverage": 1.0,
+        "f1": 0.0,
+        "false_positive_rate": 0.08333333333333333,
+        "fn": 0,
+        "fp": 4,
+        "fpr_wilson95": [
+          0.032883756818091775,
+          0.1955330179036728
+        ],
+        "precision": 0.0,
+        "recall": null,
+        "recall_wilson95": null,
+        "tn": 44,
+        "tp": 0,
+        "unavailable": 0
+      }
+    },
+    "one_cent": {
+      "exact_gate": {
+        "cases": 15,
+        "coverage": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": null,
+        "fn": 0,
+        "fp": 0,
+        "fpr_wilson95": null,
+        "precision": 1.0,
+        "recall": 1.0,
+        "recall_wilson95": [
+          0.7961166989641515,
+          1.0
+        ],
+        "tn": 0,
+        "tp": 15,
+        "unavailable": 0
+      },
+      "group_rule": {
+        "cases": 15,
+        "coverage": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": null,
+        "fn": 0,
+        "fp": 0,
+        "fpr_wilson95": null,
+        "precision": 1.0,
+        "recall": 1.0,
+        "recall_wilson95": [
+          0.7961166989641515,
+          1.0
+        ],
+        "tn": 0,
+        "tp": 15,
+        "unavailable": 0
+      },
+      "isolation_forest": {
+        "cases": 15,
+        "coverage": 1.0,
+        "f1": 0.6956521739130435,
+        "false_positive_rate": null,
+        "fn": 7,
+        "fp": 0,
+        "fpr_wilson95": null,
+        "precision": 1.0,
+        "recall": 0.5333333333333333,
+        "recall_wilson95": [
+          0.30116980025498397,
+          0.7519046463426261
+        ],
+        "tn": 0,
+        "tp": 8,
+        "unavailable": 0
+      }
+    },
+    "redistribute": {
+      "exact_gate": {
+        "cases": 15,
+        "coverage": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": null,
+        "fn": 0,
+        "fp": 0,
+        "fpr_wilson95": null,
+        "precision": 1.0,
+        "recall": 1.0,
+        "recall_wilson95": [
+          0.7961166989641515,
+          1.0
+        ],
+        "tn": 0,
+        "tp": 15,
+        "unavailable": 0
+      },
+      "group_rule": {
+        "cases": 15,
+        "coverage": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": null,
+        "fn": 0,
+        "fp": 0,
+        "fpr_wilson95": null,
+        "precision": 1.0,
+        "recall": 1.0,
+        "recall_wilson95": [
+          0.7961166989641515,
+          1.0
+        ],
+        "tn": 0,
+        "tp": 15,
+        "unavailable": 0
+      },
+      "isolation_forest": {
+        "cases": 15,
+        "coverage": 1.0,
+        "f1": 0.75,
+        "false_positive_rate": null,
+        "fn": 6,
+        "fp": 0,
+        "fpr_wilson95": null,
+        "precision": 1.0,
+        "recall": 0.6,
+        "recall_wilson95": [
+          0.357468301206246,
+          0.8017550385865841
+        ],
+        "tn": 0,
+        "tp": 9,
+        "unavailable": 0
+      }
+    },
+    "scale_group": {
+      "exact_gate": {
+        "cases": 15,
+        "coverage": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": null,
+        "fn": 0,
+        "fp": 0,
+        "fpr_wilson95": null,
+        "precision": 1.0,
+        "recall": 1.0,
+        "recall_wilson95": [
+          0.7961166989641515,
+          1.0
+        ],
+        "tn": 0,
+        "tp": 15,
+        "unavailable": 0
+      },
+      "group_rule": {
+        "cases": 15,
+        "coverage": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": null,
+        "fn": 0,
+        "fp": 0,
+        "fpr_wilson95": null,
+        "precision": 1.0,
+        "recall": 1.0,
+        "recall_wilson95": [
+          0.7961166989641515,
+          1.0
+        ],
+        "tn": 0,
+        "tp": 15,
+        "unavailable": 0
+      },
+      "isolation_forest": {
+        "cases": 15,
+        "coverage": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": null,
+        "fn": 0,
+        "fp": 0,
+        "fpr_wilson95": null,
+        "precision": 1.0,
+        "recall": 1.0,
+        "recall_wilson95": [
+          0.7961166989641515,
+          1.0
+        ],
+        "tn": 0,
+        "tp": 15,
+        "unavailable": 0
+      }
+    },
+    "shifted_normal": {
+      "exact_gate": {
+        "cases": 12,
+        "coverage": 1.0,
+        "f1": null,
+        "false_positive_rate": 0.0,
+        "fn": 0,
+        "fp": 0,
+        "fpr_wilson95": [
+          2.7755575615628914e-17,
+          0.24249400665524085
+        ],
+        "precision": null,
+        "recall": null,
+        "recall_wilson95": null,
+        "tn": 12,
+        "tp": 0,
+        "unavailable": 0
+      },
+      "group_rule": {
+        "cases": 12,
+        "coverage": 1.0,
+        "f1": null,
+        "false_positive_rate": 0.0,
+        "fn": 0,
+        "fp": 0,
+        "fpr_wilson95": [
+          2.7755575615628914e-17,
+          0.24249400665524085
+        ],
+        "precision": null,
+        "recall": null,
+        "recall_wilson95": null,
+        "tn": 12,
+        "tp": 0,
+        "unavailable": 0
+      },
+      "isolation_forest": {
+        "cases": 12,
+        "coverage": 1.0,
+        "f1": 0.0,
+        "false_positive_rate": 0.08333333333333333,
+        "fn": 0,
+        "fp": 1,
+        "fpr_wilson95": [
+          0.014865094404917095,
+          0.35387991114111694
+        ],
+        "precision": 0.0,
+        "recall": null,
+        "recall_wilson95": null,
+        "tn": 11,
+        "tp": 0,
+        "unavailable": 0
+      }
+    }
+  },
+  "periods": {
+    "2019": {
+      "batches": 96,
+      "months": [
+        "2019-01",
+        "2019-02",
+        "2019-03",
+        "2019-04",
+        "2019-05",
+        "2019-06",
+        "2019-07",
+        "2019-08",
+        "2019-09",
+        "2019-10",
+        "2019-11",
+        "2019-12"
+      ],
+      "partition": "training"
+    },
+    "2020": {
+      "batches": 96,
+      "months": [
+        "2020-01",
+        "2020-02",
+        "2020-03",
+        "2020-04",
+        "2020-05",
+        "2020-06",
+        "2020-07",
+        "2020-08",
+        "2020-09",
+        "2020-10",
+        "2020-11",
+        "2020-12"
+      ],
+      "partition": "training"
+    },
+    "2021": {
+      "batches": 96,
+      "months": [
+        "2021-01",
+        "2021-02",
+        "2021-03",
+        "2021-04",
+        "2021-05",
+        "2021-06",
+        "2021-07",
+        "2021-08",
+        "2021-09",
+        "2021-10",
+        "2021-11",
+        "2021-12"
+      ],
+      "partition": "training"
+    },
+    "2022": {
+      "batches": 96,
+      "months": [
+        "2022-01",
+        "2022-02",
+        "2022-03",
+        "2022-04",
+        "2022-05",
+        "2022-06",
+        "2022-07",
+        "2022-08",
+        "2022-09",
+        "2022-10",
+        "2022-11",
+        "2022-12"
+      ],
+      "partition": "training"
+    },
+    "2023": {
+      "batches": 96,
+      "months": [
+        "2023-01",
+        "2023-02",
+        "2023-03",
+        "2023-04",
+        "2023-05",
+        "2023-06",
+        "2023-07",
+        "2023-08",
+        "2023-09",
+        "2023-10",
+        "2023-11",
+        "2023-12"
+      ],
+      "partition": "training"
+    },
+    "2024": {
+      "batches": 96,
+      "months": [
+        "2024-01",
+        "2024-02",
+        "2024-03",
+        "2024-04",
+        "2024-05",
+        "2024-06",
+        "2024-07",
+        "2024-08",
+        "2024-09",
+        "2024-10",
+        "2024-11",
+        "2024-12"
+      ],
+      "partition": "training"
+    },
+    "2025": {
+      "batches": 96,
+      "months": [
+        "2025-01",
+        "2025-02",
+        "2025-03",
+        "2025-04",
+        "2025-05",
+        "2025-06",
+        "2025-07",
+        "2025-08",
+        "2025-09",
+        "2025-10",
+        "2025-11",
+        "2025-12"
+      ],
+      "partition": "training"
+    },
+    "2026": {
+      "batches": 96,
+      "months": [
+        "2026-01",
+        "2026-02",
+        "2026-03",
+        "2026-04",
+        "2026-05"
+      ],
+      "partition": "training"
+    },
+    "2026-06": {
+      "batches": 48,
+      "months": [
+        "2026-06"
+      ],
+      "partition": "calibration"
+    },
+    "2026-07": {
+      "batches": 48,
+      "months": [
+        "2026-07"
+      ],
+      "partition": "calibration"
+    },
+    "2026-08": {
+      "batches": 48,
+      "months": [
+        "2026-08"
+      ],
+      "partition": "calibration"
+    },
+    "2026-09": {
+      "batches": 40,
+      "months": [
+        "2026-09"
+      ],
+      "partition": "test"
+    },
+    "2026-10": {
+      "batches": 40,
+      "months": [
+        "2026-10"
+      ],
+      "partition": "test"
+    },
+    "2026-11": {
+      "batches": 40,
+      "months": [
+        "2026-11"
+      ],
+      "partition": "test"
+    }
+  },
+  "seed": 7,
+  "source_archives": {
+    "2019": {
+      "bytes": 76155559,
+      "compiled_releases": 172403,
+      "sha256": "e343df328def578559adae9d9726ed76580ffea3ea881763851ceda05d91ece5",
+      "url": "https://fastly.data.open-contracting.org/downloads/ecuador_sercop_bulk/4393/2019.jsonl.gz"
+    },
+    "2020": {
+      "bytes": 84903646,
+      "compiled_releases": 159734,
+      "sha256": "59576f0cc384b4ee7536f75c75188bcb9d50a3a1b12eb71c1efa8c912b03dac8",
+      "url": "https://fastly.data.open-contracting.org/downloads/ecuador_sercop_bulk/4393/2020.jsonl.gz"
+    },
+    "2021": {
+      "bytes": 57007123,
+      "compiled_releases": 122277,
+      "sha256": "0721e6fac70d2a512ece76a72ce727e8a651751e2c755b817ddec9fb3fdd6903",
+      "url": "https://fastly.data.open-contracting.org/downloads/ecuador_sercop_bulk/4393/2021.jsonl.gz"
+    },
+    "2022": {
+      "bytes": 68248749,
+      "compiled_releases": 85579,
+      "sha256": "1755852fcbb293abac1ad96987b6e9a311af71698953c1cf2977b851d76c585f",
+      "url": "https://fastly.data.open-contracting.org/downloads/ecuador_sercop_bulk/4393/2022.jsonl.gz"
+    },
+    "2023": {
+      "bytes": 68840293,
+      "compiled_releases": 130446,
+      "sha256": "56c659b4a3e2f0ca9eeb761b4934f971a5a373ec6e376b44e42bb4a53b3e320a",
+      "url": "https://fastly.data.open-contracting.org/downloads/ecuador_sercop_bulk/4393/2023.jsonl.gz"
+    },
+    "2024": {
+      "bytes": 95520528,
+      "compiled_releases": 170928,
+      "sha256": "771fb341f6d1b7b63ff29f02cf336407ec3fa9c9158ba776725a92b71e522faf",
+      "url": "https://fastly.data.open-contracting.org/downloads/ecuador_sercop_bulk/4393/2024.jsonl.gz"
+    },
+    "2025": {
+      "bytes": 85636300,
+      "compiled_releases": 111983,
+      "sha256": "05104580f33184d8d1d1a63a1f4d99874efebae72f71061b5480bfe27b389c2e",
+      "url": "https://fastly.data.open-contracting.org/downloads/ecuador_sercop_bulk/4393/2025.jsonl.gz"
+    },
+    "2026": {
+      "bytes": 140797854,
+      "compiled_releases": 124584,
+      "sha256": "160d9481e81e54c14b8d5dd640158e199e55c8e635294982088b8019c5996040",
+      "url": "https://fastly.data.open-contracting.org/downloads/ecuador_sercop_bulk/4393/2026.jsonl.gz"
+    }
+  },
+  "training_wheel": "0.15.3",
+  "training_wheel_sha256": "bd9bfa1a9403741f87da4f9ef2b4acf5bb7c5285be890b71ca1f5a9c944c334f",
+  "validation_engines": [
+    "pandas",
+    "polars",
+    "duckdb"
+  ],
+  "validation_outcomes": {
+    "exact_gate": {
+      "cases": 120,
+      "coverage": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "fpr_wilson95": [
+        0.0,
+        0.06017185214208986
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "recall_wilson95": [
+        0.93982814785791,
+        0.9999999999999998
+      ],
+      "tn": 60,
+      "tp": 60,
+      "unavailable": 0
+    },
+    "group_rule": {
+      "cases": 120,
+      "coverage": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "fpr_wilson95": [
+        0.0,
+        0.06017185214208986
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "recall_wilson95": [
+        0.93982814785791,
+        0.9999999999999998
+      ],
+      "tn": 60,
+      "tp": 60,
+      "unavailable": 0
+    },
+    "isolation_forest": {
+      "cases": 120,
+      "coverage": 1.0,
+      "f1": 0.6597938144329897,
+      "false_positive_rate": 0.08333333333333333,
+      "fn": 28,
+      "fp": 5,
+      "fpr_wilson95": [
+        0.03612045660173077,
+        0.1806894201833441
+      ],
+      "precision": 0.8648648648648649,
+      "recall": 0.5333333333333333,
+      "recall_wilson95": [
+        0.4089342702715789,
+        0.6537209395856151
+      ],
+      "tn": 55,
+      "tp": 32,
+      "unavailable": 0
+    }
+  }
+}

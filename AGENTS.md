@@ -20,8 +20,10 @@
 - Git and publication are manual. Do not add or invoke GitHub Actions. TestPyPI
   precedes PyPI; promote identical bytes after downloaded-consumer checks pass.
   Use ephemeral credentials and revoke them afterward.
-- Preserve historical fixtures and archives byte-for-byte. Never publish data,
-  databases, models, credentials, private configurations or private Git history.
+- Preserve historical fixtures and archives byte-for-byte. Keep raw data,
+  databases, private models, credentials, private configurations and private
+  Git history out of distributions. The explicitly authorized declarative SERCOP
+  model may ship with its contract, fingerprint, provenance and attribution.
 - Reuse the Windows QA lab under `equiframe-013-lab`, at most 3 GiB, and clean
   consumed scratch files. Preserve VM services, datasets and unrelated processes.
 - Use only Opera Neon MCP, the dedicated NeonCodexQA profile, loopback port 9222

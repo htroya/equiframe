@@ -247,8 +247,15 @@ def _details_pass(
     gate: str, details: dict[str, Any], target: str, artifacts: list[dict[str, Any]]
 ) -> bool:
     if gate == "license_review":
+        core = details.get("core_license")
         return (
-            details.get("core_license") == "MIT AND Apache-2.0"
+            (
+                core == "MIT AND Apache-2.0"
+                or (
+                    core == "MIT AND Apache-2.0 AND LicenseRef-CC-BY-3.0-EC"
+                    and details.get("sercop_attribution_verified") is True
+                )
+            )
             and details.get("benchmark_license") == "MIT"
             and details.get("third_party_notices_verified") is True
             and details.get("rights_scope_verified") is True

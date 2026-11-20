@@ -27,6 +27,18 @@ Python dependencies and the external R runtime are separate installations;
 their licenses remain their own. EquiFrame's MIT grant does not relicense them.
 Downloaded datasets and the thesis manuscript are not part of this grant.
 
+### Bundled SERCOP statistical model
+
+The declarative Isolation Forest resource comes from **Contrataciones Abiertas
+Ecuador – OCDS**, published by the Servicio Nacional de Contratación Pública
+(SERCOP). EquiFrame selected eligible awards, converted monetary amounts to integer
+cents, generated batch profiles, fitted a forest and calibrated a threshold. The
+resource carries these derived parameters and the contract. Its attribution is
+under Creative Commons Attribution 3.0 Ecuador (`LicenseRef-CC-BY-3.0-EC`).
+[Data publisher](https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/datos-abiertos) ·
+[Archived releases](https://data.open-contracting.org/es/publication/110) ·
+[License](https://creativecommons.org/licenses/by/3.0/ec/legalcode)
+
 ### Optional legacy XLS reader
 
 The optional `files` extra uses the separately installed `xlrd` package for

@@ -47,6 +47,7 @@ from equiframe.migration import (
 )
 from equiframe.pipeline import run_pipeline
 from equiframe.pipeline_types import PipelineRequest
+from equiframe.profile_types import ProfileVector
 from equiframe.reduction import ReductionObservation, ReductionOptions, reduce_case
 from equiframe.registry import TransformationRegistry
 from equiframe.reporting import pipeline_summary, write_report
@@ -75,6 +76,8 @@ migration_app = typer.Typer(no_args_is_help=True)
 app.add_typer(migration_app, name="migration", help="Compile, migrate and compare native ETL.")
 verify_app = typer.Typer(no_args_is_help=True)
 app.add_typer(verify_app, name="verify", help="Inspect semantic dimensions without executing ETL.")
+sercop_app = typer.Typer(no_args_is_help=True)
+app.add_typer(sercop_app, name="sercop", help="Use the bundled, calibrated SERCOP detector.")
 bundle_app = typer.Typer(no_args_is_help=True)
 app.add_typer(bundle_app, name="bundle", help="Export, import and verify portable evidence.")
 ingestion_app = typer.Typer(no_args_is_help=True)
@@ -366,6 +369,53 @@ def verification_accept(
     )
 
 
+@sercop_app.command("model")
+def sercop_model() -> None:
+    """Validate the bundled model and print its scope and threshold."""
+    from equiframe._sercop import bundled_model
+
+    try:
+        info, bundle = bundled_model()
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(json.dumps({**info.model_dump(mode="json"), "threshold": bundle.m.threshold}))
+
+
+@sercop_app.command("score")
+def sercop_score(profile: Path) -> None:
+    """Score a compatible ProfileVector JSON using the preinstalled forest."""
+    from equiframe._sercop import bundled_model, score_profile
+
+    try:
+        _, bundle = bundled_model()
+        decision = score_profile(bundle, load_json(ProfileVector, profile))
+    except Exception as error:
+        _failure(error)
+        return
+    typer.echo(json.dumps(decision, sort_keys=True))
+    raise typer.Exit(code=3 if decision["state"] == "not_evaluable" else 0)
+
+
+@sercop_app.command("accept")
+def sercop_accept(
+    request: Path,
+    reference_binding: Path = typer.Option(..., "--reference-binding"),
+    output: Path = typer.Option(Path("equiframe-runs")),
+    rscript: str = typer.Option("Rscript", help="Trusted base-R executable."),
+) -> None:
+    """Review captured SERCOP ETL using the contract, bundled forest and base R."""
+    _verification_command(
+        request,
+        output,
+        reference_binding,
+        require_expected=True,
+        strict_acceptance=True,
+        require_execution=True,
+        sercop_rscript=rscript,
+    )
+
+
 def _verification_command(
     request: Path,
     output: Path,
@@ -374,6 +424,7 @@ def _verification_command(
     require_expected: bool,
     strict_acceptance: bool = False,
     require_execution: bool = False,
+    sercop_rscript: str | None = None,
 ) -> None:
     try:
         document = load_json(VerificationRequest, request)
@@ -435,6 +486,12 @@ def _verification_command(
             work_dir=output,
             acceptance=acceptance,
         )
+        if sercop_rscript is not None:
+            from equiframe._sercop import assess_capture
+
+            code, report = assess_capture(result, output, sercop_rscript)
+            typer.echo(json.dumps(report, sort_keys=True))
+            raise typer.Exit(code=code)
     except typer.Exit:
         raise
     except Exception as error:

@@ -669,6 +669,12 @@ for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy', 'pyarrow',
              'pytest', 'hypothesis', 'IPython', 'jupyter', 'equiframe_benchmark'):
     assert importlib.util.find_spec(name) is None, name
 print('Installed wheel imports from clean site-packages without engines/ML/dev tools')
+from equiframe._sercop import bundled_model
+sercop_info, sercop_model = bundled_model()
+assert sercop_info.source_years == tuple(range(2019, 2027))
+assert sercop_model.m.state == 'ready'
+assert sercop_info.training_lots == sercop_model.fit.preprocessor.training_rows
+assert sercop_info.calibration_lots == sercop_model.m.sample_count
 assert equiframe.ComparisonOptions().batch_rows > 0
 assert callable(equiframe.compare) and callable(equiframe.iter_differences)
 assert callable(equiframe.assert_equivalent) and callable(equiframe.equivalence_decision)

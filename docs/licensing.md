@@ -12,6 +12,10 @@ Third-party material keeps its existing license. Both core distributions
 include unmodified CycloneDX schemas under Apache-2.0; their upstream license,
 provenance and notices are preserved. See THIRD_PARTY_NOTICES.md in the package.
 
+The core package also attributes the derived SERCOP detector under Creative
+Commons Attribution 3.0 Ecuador (`LicenseRef-CC-BY-3.0-EC`). The model card and
+packaged manifest identify the data publisher and scope.
+
 This decision does not relicense downloaded datasets, the thesis manuscript,
 external dependencies or separately owned components. Publication remains a
 separate owner-authorized task.
