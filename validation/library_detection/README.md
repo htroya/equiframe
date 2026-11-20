@@ -140,3 +140,6 @@ A new profile 1.1 model was trained on January through June 2025 and calibrated
 on July through September. October, November and December formed the holdout.
 See the [temporal experiment](results/temporal-0145/README.md) for the protocol,
 wheel identity and performance by month and fault.
+
+The [0.15.0 wheel replay](results/temporal-0150/README.md) reproduces the
+per-case decisions and records the newer wheel's identity.
