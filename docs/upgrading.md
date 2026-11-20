@@ -3,6 +3,11 @@
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Security](security.md) ·
 [Release/rollback](releasing.md)
 
+## 0.15.2 - consistent first-use documentation
+
+Install `equiframe` and `equiframe-benchmark` at 0.15.2. The
+[first ETL check](first-acceptance-0.15.2.md) uses the same acceptance API.
+
 ## 0.15.1: compatible verification requests
 
 Empty execution evidence uses the historical request representation.

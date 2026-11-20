@@ -806,12 +806,14 @@ def test_runtime_mismatch_stops_driver_after_sync_before_any_source_controls(
     assert document["results"][0]["local_dependency_runtime_binding"]["verified"] is False
 
 
+@pytest.mark.parametrize("uv_name", ["uv", "uv-0.13.6.exe", "uv-wrapper.exe"])
 def test_driver_reinstalls_local_closure_and_holds_sync(
     package: Path,
     tmp_path: Path,
     candidate_driver: dict[str, Any],
     local_runtime: tuple[Path, Path, Path],
     monkeypatch: pytest.MonkeyPatch,
+    uv_name: str,
 ) -> None:
     # Candidate startup requires the synthetic fixture to be committed, too.
     git(package, "add", "..")
@@ -827,7 +829,7 @@ def test_driver_reinstalls_local_closure_and_holds_sync(
             "--package",
             str(package),
             "--uv",
-            "uv",
+            str(tmp_path / uv_name),
             "--output",
             str(tmp_path / "checks.json"),
         ],
@@ -843,9 +845,8 @@ def test_driver_reinstalls_local_closure_and_holds_sync(
     assert all("--no-sync" in command for command in commands[1:])
     artifacts = tuple(sorted((package / "dist").iterdir()))
     commands[7] += [str(path) for path in artifacts]
-    assert [MODULE["check_stage"](command, package, artifacts) for command in commands] == list(
-        STAGES
-    )
+    expected = [None] * len(STAGES) if uv_name == "uv-wrapper.exe" else list(STAGES)
+    assert [MODULE["check_stage"](command, package, artifacts) for command in commands] == expected
 
 
 @pytest.mark.parametrize(

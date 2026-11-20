@@ -2,7 +2,7 @@
 
 [Handbook](index.md) · [Choose an API](choosing-api.md) · [Semantics](semantics.md) · [Compatibility](compatibility.md)
 
-Use `import equiframe as ef`. This reference describes the 0.15.1 implemented
+Use `import equiframe as ef`. This reference describes the 0.15.2 implemented
 entry points and their bounded stability contracts. Signatures below use Python notation;
 `...` in a signature means the other documented optional arguments, not an
 executable example. The exhaustive exported namespace is `ef.__all__` and its

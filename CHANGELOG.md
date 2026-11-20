@@ -1,3 +1,8 @@
+## 0.15.2 - consistent first-use documentation
+
+- Align the packaged first-use guide, README and installation pins with the release.
+- Ship an executable strict ETL acceptance example and document its exit codes.
+
 ## 0.15.1 - preserve verification request serialization
 
 - Omit the optional execution evidence field when empty.
