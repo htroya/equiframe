@@ -70,6 +70,23 @@ an earlier run of the synthetic scenario.
 [Probe script](../validation/library_detection/benchmark_if_inference.py) ·
 [Timings and hashes](../validation/library_detection/results/if-inference-0143)
 
+### Repetition with the 0.15.1 wheel
+
+We ran the same synthetic probe with the published 0.14.0 wheel and the exact
+0.15.1 wheel. Both used the same saved forest, 200 trees, 40,994 nodes, input
+profiles and dependency versions. The probe measured seven calls after warmup
+for each input size on a Windows host running the release tests.
+
+| Installed wheel | One profile | Batch of 16 profiles | Node validations per single call |
+| --- | ---: | ---: | ---: |
+| 0.14.0 | 3.95 s | 3.96 s | 122,982 |
+| 0.15.1 | 1.57 s | 1.38 s | 40,994 |
+
+The forest and complete result digests matched at both input sizes. The
+measured medians describe this run on the shared host.
+[0.14.0 receipt](../validation/library_detection/results/if-inference-0151/if-0140.json) ·
+[0.15.1 receipt](../validation/library_detection/results/if-inference-0151/if-0151.json)
+
 ### Scale tests
 
 The separate `equiframe-benchmark` package offers experimental `ScaleSpec`,

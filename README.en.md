@@ -210,7 +210,7 @@ The [executed Isolation Forest notebook](docs/notebooks/03_isolation_forest.ipyn
 shows training, calibration, false alarms and missed faults. The
 [0.14.0 evaluation receipt](validation/library_detection/results/public-spending-0140/manifest.json)
 and [0.15.0 temporal evaluation](validation/library_detection/results/temporal-0150/README.md)
-identify their respective wheels. The [inference timings](docs/performance.md#frozen-isolation-forest-inference-in-the-0143-candidate)
+identify their respective wheels. The [inference timings](docs/performance.md#repetition-with-the-0151-wheel)
 describe the synthetic 200-tree experiment.
 
 ## Run a complete example
