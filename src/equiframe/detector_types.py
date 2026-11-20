@@ -175,7 +175,8 @@ class DetectorVersions(FrozenModel):
         "0.15.1",
         "0.15.2",
         "0.15.3",
-    ] = "0.15.3"
+        "0.15.5",
+    ] = "0.15.5"
     python: Text
     sklearn: Text | None = None
     numpy: Text | None = None
