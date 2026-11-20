@@ -1,0 +1,70 @@
+# This file created by conda-build 26.7.0
+# meta.yaml template originally from:
+# D:\a\1\s\recipe, last modified Wed Aug  5 05:02:25 2026
+# ------------------------------------------------
+
+package:
+  name: bzip2
+  version: 1.0.8
+source:
+  url: https://gitlab.com/bzip2/bzip2/-/archive/bzip2-1.0.8/bzip2-bzip2-1.0.8.tar.gz
+  sha256: db106b740252669664fd8f3a1c69fe7f689d5cd4b132f82ba82b9afba27627df
+  patches:
+    - patches/0001-cross.patch
+    - patches/0002-Windows-Make-library-name-lowercase.patch
+    - patches/0003-Windows-Add-dyn-lib-build-rename-libbz2_static.patch
+build:
+  number: '10'
+  run_exports:
+    - bzip2 >=1.0.8,<2.0a0
+  string: h0ad9c76_10
+requirements:
+  build:
+    - vs2022_win-64 19.44.35207 ha74f236_41
+    - vs_win-64 2022.14 ha74f236_41
+    - vswhere 3.1.7 h40126e0_1
+  host:
+    - ucrt 10.0.26100.0 h57928b3_0
+    - vc 14.5 ha367084_41
+    - vc14_runtime 14.51.36247 habf1de7_41
+    - vcomp14 14.51.36247 habf1de7_41
+  run:
+    - ucrt >=10.0.20348.0
+    - vc >=14.3,<15
+    - vc14_runtime >=14.44.35208
+test:
+  commands:
+    - if not exist %LIBRARY_INC%\\bzlib.h exit 1
+    - if not exist %LIBRARY_LIB%\\bzip2.lib exit 1
+    - if not exist %LIBRARY_LIB%\\libbz2.lib exit 1
+    - if not exist %LIBRARY_BIN%\\libbz2.dll exit 1
+    - if not exist %LIBRARY_LIB%\\bzip2_static.lib exit 1
+    - if not exist %LIBRARY_LIB%\\libbz2_static.lib exit 1
+about:
+  home: https://gitlab.com/bzip2/bzip2
+  license_family: BSD
+  license_file: LICENSE
+  license: bzip2-1.0.6
+  summary: high-quality data compressor
+  description: 'Bzip2 is a freely available high-quality data compressor. It typically
+
+    compresses files to within 10% to 15% of the best available techniques,
+
+    whilst being around twice as fast at compression and six times faster
+
+    at decompression.
+
+    '
+  dev_url: https://gitlab.com/bzip2/bzip2
+extra:
+  recipe-maintainers:
+    - isuruf
+    - jakirkham
+    - mbargull
+    - msarahan
+    - pelson
+  final: true
+  copy_test_source_files: true
+  flow_run_id: azure_20260805.1.1
+  remote_url: https://github.com/conda-forge/bzip2-feedstock
+  sha: f0f345e062aed39aa7f500c0746efed2dcea6971

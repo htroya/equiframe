@@ -50,7 +50,7 @@ Consulta [fuentes](universal-sources.md), [ventanas](migration-ir.md) y
 
 ## Release status
 
-This handbook describes **0.15.5 Beta**. EquiFrame 0.14.0 was published
+This handbook describes **0.15.6 Beta**. EquiFrame 0.14.0 was published
 on [PyPI](https://pypi.org/project/equiframe/0.14.0/) on 19 November 2026.
 Use the [release notes](https://github.com/htroya/equiframe/releases) for
 artifact hashes and the scope of each version's checks.
@@ -59,9 +59,9 @@ the [manual release procedure](releasing.md). Stable API and persisted-format
 commitments remain unchanged. Historical Alpha materials are preserved under
 `archive/research-a14` and excluded from current distributions.
 
-Project-owned code uses MIT. Included third-party components retain their
-licenses; the core archive expression is `MIT AND Apache-2.0` because it includes
-CycloneDX schemas. See [licensing](licensing.md) and the packaged notices.
+Project-owned code uses MIT. CycloneDX schemas, the SERCOP model and the
+included offline R interpreter and its native libraries retain their own
+licenses. See [licensing](licensing.md) and the packaged notices.
 There is no claimed production certification, scientific accuracy, independent
 human adoption, security-response SLA or accepted real data-warehouse integration.
 

@@ -1,0 +1,64 @@
+# This file created by conda-build 26.9.1
+# ------------------------------------------------
+
+package:
+  name: libblas
+  version: 3.11.0
+source:
+  - url: https://github.com/Reference-LAPACK/lapack/archive/v3.11.0.tar.gz
+    sha256: 4b9ba79bfd4921ca820e83979db76ab3363155709444a787979e81c22285ffa9
+    patches:
+      - patches/0001-Test-BLAS-and-LAPACKE-in-addition-to-LAPACK.patch
+      - patches/0002-read-pipe-as-binary.patch
+      - patches/0003-add-DLL-import-export-machinery-for-RowMajorStrg.patch
+      - patches/0004-fixed-bug-in-array-bounds-in-complex-syl01-test.patch
+      - patches/0005-Use-dynamic-allocation-in-SYL01-tests.patch
+  - url: https://github.com/isuruf/vecLibFort/archive/99af8640e98c829b41c3235e3706760cd5696fe4.tar.gz
+    sha256: 80de7c6e83d1d84d016b4cb299f2c15f5a82b9d36865dd5c16bf221fe9a303ad
+    folder: vecLibFort
+build:
+  string: 12_h4a7cf45_openblas
+  run_exports:
+    - libblas >=3.11.0,<4.0a0
+  track_features: null
+  number: 12
+requirements:
+  host:
+    - _openmp_mutex 4.5 20_gnu
+    - libgcc 16.2.0 ha9f2e26_7
+    - libgfortran 16.2.0 h69a702a_7
+    - libgfortran5 16.2.0 h6b99dfc_7
+    - libgomp 16.2.0 he0feb66_7
+    - libopenblas 0.3.34 pthreads_hf13c14d_2
+  run:
+    - libopenblas >=0.3.34,<0.3.35.0a0
+    - libopenblas >=0.3.34,<1.0a0
+  run_constrained:
+    - blas 2.312   openblas
+    - libcblas   3.11.0   12*_openblas
+    - liblapack  3.11.0   12*_openblas
+    - liblapacke 3.11.0   12*_openblas
+    - mkl <2027
+test:
+  commands:
+    - test -f $PREFIX/lib/libblas.so.3
+about:
+  home: https://github.com/conda-forge/blas-feedstock
+  license: BSD-3-Clause
+  license_file:
+    - LICENSE.txt
+  summary: Metapackage to select the BLAS variant. Use conda's pinning mechanism in
+    your environment to control which variant you want.
+extra:
+  recipe-maintainers:
+    - h-vetinari
+    - isuruf
+    - jakirkham
+    - ocefpaf
+    - pelson
+  feedstock-name: blas
+  final: true
+  copy_test_source_files: true
+  flow_run_id: github_41900819592
+  remote_url: https://github.com/conda-forge/blas-feedstock
+  sha: 6f8ce1ca499857bdc459fcff324bdb4512c9d8d9

@@ -1,0 +1,192 @@
+# This file created by conda-build 26.9.1
+# ------------------------------------------------
+
+package:
+  name: pcre2
+  version: '10.49'
+source:
+  - url: https://github.com/PCRE2Project/pcre2/archive/refs/tags/pcre2-10.49.tar.gz
+    sha256: 69d04dcddcf9e038aeae8f58b0c07ee5e08abb835ee8daa2bd6acee433dc112c
+  - url: https://github.com/zherczeg/sljit/archive/45f910b78c6605ebf5b53d3ec7cb00f2312fe417.tar.gz
+    sha256: ea5a6fb45e050f813f070ecaa098fe0389068beea61ac7dce5410a0c642ccfa3
+    folder: deps/sljit
+build:
+  run_exports:
+    - pcre2 >=10.49,<10.50.0a0
+  number: 0
+  string: h8466c1e_0
+requirements:
+  build:
+    - bzip2 1.0.8 h0ad9c76_10
+    - ca-certificates 2026.10.23 h4c7d964_0
+    - cmake 4.4.5 hde52c71_0
+    - icu 79.1 h5112557_0
+    - krb5 1.22.2 h719d79b_2
+    - libcurl 8.23.0 hdb0ef4a_0
+    - libexpat 2.9.0 hac47afa_0
+    - liblzma 5.8.3 hfd05255_1
+    - libpsl 0.23.1 h4dcadd6_2
+    - libssh2 1.11.1 h734d217_1
+    - libuv 1.52.1 h6a83c73_1
+    - libzlib 1.3.2 hfd05255_3
+    - m2-base 2022.06.1 ha3ae583_11
+    - m2-bash 5.3.20.2 ha3ae583_11
+    - m2-bash-completion 2.18.0.1 ha3ae583_11
+    - m2-brotli 1.2.1.1 ha3ae583_11
+    - m2-bsdtar 3.8.10.2 ha3ae583_11
+    - m2-bzip2 1.0.8.4 ha3ae583_11
+    - m2-ca-certificates 20260816.2 ha3ae583_11
+    - m2-conda-epoch 20261029 0_x86_64
+    - m2-coreutils 8.32.5 ha3ae583_11
+    - m2-curl 8.23.0.1 ha3ae583_11
+    - m2-dash 0.5.13.5.1 ha3ae583_11
+    - m2-file 5.48.1 ha3ae583_11
+    - m2-filesystem 2026.10.17.1 ha3ae583_11
+    - m2-findutils 4.11.0.2 ha3ae583_11
+    - m2-gawk 5.4.1.1 ha3ae583_11
+    - m2-gcc-libs 16.2.0.1 ha3ae583_11
+    - m2-getent 2.18.90.6 ha3ae583_11
+    - m2-gmp 6.3.0.2 ha3ae583_11
+    - m2-grep 1!3.0.7 ha3ae583_11
+    - m2-gzip 1.15.1 ha3ae583_11
+    - m2-inetutils 2.8.1 ha3ae583_11
+    - m2-info 7.2.3 ha3ae583_11
+    - m2-less 710.1 ha3ae583_11
+    - m2-libargp 20260115.1 ha3ae583_11
+    - m2-libbz2 1.0.8.4 ha3ae583_11
+    - m2-libcurl 8.23.0.1 ha3ae583_11
+    - m2-libexpat 2.9.0.1 ha3ae583_11
+    - m2-libffi 3.8.0.1 ha3ae583_11
+    - m2-libgnutls 3.8.13.2 ha3ae583_11
+    - m2-libhogweed 4.0.1 ha3ae583_11
+    - m2-libiconv 1.19.1 ha3ae583_11
+    - m2-libidn2 2.3.8.1 ha3ae583_11
+    - m2-libintl 0.22.5.1 ha3ae583_11
+    - m2-liblz4 1.10.0.1 ha3ae583_11
+    - m2-liblzma 5.8.4.1 ha3ae583_11
+    - m2-libnettle 4.0.1 ha3ae583_11
+    - m2-libnghttp2 1.70.0.1 ha3ae583_11
+    - m2-libnghttp3 1.18.0.1 ha3ae583_11
+    - m2-libngtcp2 1.25.0.1 ha3ae583_11
+    - m2-libopenssl 3.6.5.1 ha3ae583_11
+    - m2-libp11-kit 0.26.5.1 ha3ae583_11
+    - m2-libpcre 8.45.5 ha3ae583_11
+    - m2-libpcre2_8 10.49.1 ha3ae583_11
+    - m2-libpsl 0.23.2.1 ha3ae583_11
+    - m2-libreadline 8.3.006.1 ha3ae583_11
+    - m2-libsqlite 3.54.0.1 ha3ae583_11
+    - m2-libssh2 1.11.1.1 ha3ae583_11
+    - m2-libtasn1 4.21.0.1 ha3ae583_11
+    - m2-libunistring 1.4.2.1 ha3ae583_11
+    - m2-libutil-linux 2.40.2.2 ha3ae583_11
+    - m2-libxcrypt 4.5.2.1 ha3ae583_11
+    - m2-libzstd 1.5.7.1 ha3ae583_11
+    - m2-mintty 1!3.8.3.1 ha3ae583_11
+    - m2-mpfr 4.2.2.1 ha3ae583_11
+    - m2-msys2-keyring 1!20260814.1 ha3ae583_11
+    - m2-msys2-launcher 1.5.3 ha3ae583_11
+    - m2-msys2-runtime 3.6.11.4 ha3ae583_11
+    - m2-nano 9.2.1 ha3ae583_11
+    - m2-ncurses 6.6.2 ha3ae583_11
+    - m2-openssl 3.6.5.1 ha3ae583_11
+    - m2-p11-kit 0.26.5.1 ha3ae583_11
+    - m2-rebase 4.5.0.5 ha3ae583_11
+    - m2-sed 4.9.1 ha3ae583_11
+    - m2-tar 1.35.3 ha3ae583_11
+    - m2-time 1.10.1 ha3ae583_11
+    - m2-tzcode 2026e.1 ha3ae583_11
+    - m2-util-linux 2.40.2.2 ha3ae583_11
+    - m2-wget 1.25.0.4 ha3ae583_11
+    - m2-which 2.25.1 ha3ae583_11
+    - m2-zlib 1.3.2.1 ha3ae583_11
+    - m2-zstd 1.5.7.1 ha3ae583_11
+    - ninja 1.13.2 h477610d_1
+    - openssl 3.6.5 hf411b9b_0
+    - ucrt 10.0.26100.0 h57928b3_0
+    - vc 14.5 ha367084_42
+    - vc14_runtime 14.51.36247 habf1de7_42
+    - vcomp14 14.51.36247 habf1de7_42
+    - vs2022_win-64 19.44.35207 ha74f236_42
+    - vs_win-64 2022.14 ha74f236_42
+    - vswhere 3.1.7 h40126e0_1
+    - zstd 1.5.7 h534d264_7
+  host:
+    - bzip2 1.0.8 h0ad9c76_10
+    - libzlib 1.3.2 hfd05255_3
+    - ucrt 10.0.26100.0 h57928b3_0
+    - vc 14.5 ha367084_42
+    - vc14_runtime 14.51.36247 habf1de7_42
+    - vcomp14 14.51.36247 habf1de7_42
+    - zlib 1.3.2 hfd05255_3
+  run:
+    - bzip2 >=1.0.8,<2.0a0
+    - libzlib >=1.3.2,<2.0a0
+    - ucrt >=10.0.20348.0
+    - vc >=14.3,<15
+    - vc14_runtime >=14.44.35208
+test:
+  requires:
+    - cmake
+    - ninja
+    - pkg-config
+    - vs2022_win-64
+  source_files:
+    - maint/cmake-tests/install-interface/
+  commands:
+    - pcre2test --version
+    - pcre2grep --version
+    - if not exist %LIBRARY_INC%\\pcre2.h exit 1
+    - if not exist %LIBRARY_INC%\\pcre2posix.h exit 1
+    - if not exist %LIBRARY_BIN%\\pcre2-8.dll exit 1
+    - if not exist %LIBRARY_BIN%\\pcre2-16.dll exit 1
+    - if not exist %LIBRARY_BIN%\\pcre2-32.dll exit 1
+    - if not exist %LIBRARY_BIN%\\pcre2-posix.dll exit 1
+    - if not exist %LIBRARY_LIB%\\pcre2-8.lib exit 1
+    - if not exist %LIBRARY_LIB%\\pcre2-16.lib exit 1
+    - if not exist %LIBRARY_LIB%\\pcre2-32.lib exit 1
+    - if not exist %LIBRARY_LIB%\\pcre2-posix.lib exit 1
+    - if not exist %LIBRARY_LIB%\\pkgconfig\\libpcre2-posix.pc exit 1
+    - if not exist %LIBRARY_LIB%\\pkgconfig\\libpcre2-8.pc exit 1
+    - if not exist %LIBRARY_LIB%\\pkgconfig\\libpcre2-16.pc exit 1
+    - if not exist %LIBRARY_LIB%\\pkgconfig\\libpcre2-32.pc exit 1
+    - if not exist %LIBRARY_PREFIX%\\lib\\cmake\\pcre2\\pcre2-config.cmake exit 1
+    - if not exist %LIBRARY_PREFIX%\\lib\\cmake\\pcre2\\pcre2-config-version.cmake
+      exit 1
+    - if not exist %LIBRARY_PREFIX%\\lib\\cmake\\pcre2\\pcre2-targets.cmake exit 1
+    - if not exist %LIBRARY_PREFIX%\\lib\\cmake\\pcre2\\pcre2-targets-release.cmake
+      exit 1
+    - cd maint/cmake-tests/install-interface
+    - cmake -GNinja %CMAKE_ARGS% .
+    - cmake --build .
+about:
+  home: http://www.pcre.org/
+  license: BSD-3-Clause
+  license_family: BSD
+  license_file: COPYING
+  summary: Regular expression pattern matching using Perl 5 syntax and semantics.
+  description: 'The PCRE library is a set of functions that implement regular expression
+    pattern matching
+
+    using the same syntax and semantics as Perl 5. PCRE has its own native API, as
+    well as a set of
+
+    wrapper functions that correspond to the POSIX regular expression API. The PCRE
+    library is
+
+    free, even for building proprietary software.
+
+    '
+  doc_url: http://www.pcre.org/current/doc/html/
+  dev_url: https://github.com/PCRE2Project/pcre2
+extra:
+  feedstock-name: pcre2
+  recipe-maintainers:
+    - dfornika
+    - mariusvniekerk
+    - mgorny
+    - xhochy
+  final: true
+  copy_test_source_files: true
+  flow_run_id: github_42081895551
+  remote_url: https://github.com/conda-forge/pcre2-feedstock
+  sha: e292d69383bee2b81c0956c2d28d17da60249951

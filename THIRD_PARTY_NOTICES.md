@@ -27,6 +27,23 @@ Python dependencies and the external R runtime are separate installations;
 their licenses remain their own. EquiFrame's MIT grant does not relicense them.
 Downloaded datasets and the thesis manuscript are not part of this grant.
 
+### Bundled base R interpreter
+
+`equiframe sercop accept` can call the independently implemented R reviewer as a
+separate process. EquiFrame includes R 4.6.2 and the native libraries needed to
+run that reviewer on Windows x64 and Linux x64 with glibc. The installation
+ships the license texts under `tools/r-runtime/licenses` in its distribution
+metadata. The R files retain their R Project licenses, and each native library
+retains its own terms.
+
+The corresponding R source is available from the
+[R Project archive](https://cran.r-project.org/src/base/R-4/R-4.6.2.tar.gz).
+The exact upstream binary archives, hashes, and files selected into each
+runtime appear in `equiframe/_r_runtime/{win-64,linux-64}/manifest.json`.
+The corresponding public build recipes and patches, including upstream source
+locations and hashes for the redistributed components, are preserved under
+[`tools/r-runtime/recipe`](https://github.com/htroya/equiframe/tree/v0.15.6/tools/r-runtime/recipe).
+
 ### Bundled SERCOP statistical model
 
 The declarative Isolation Forest resource comes from **Contrataciones Abiertas

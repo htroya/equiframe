@@ -4,8 +4,8 @@
 
 ## Current release evidence
 
-The 0.15.5 patch keeps the profile feature versions admitted by 0.14.0 and
-reads its existing detector bundles. New fits record producer 0.15.5. The bundled SERCOP forest retains its original training producer, 0.15.3.
+The 0.15.6 patch keeps the profile feature versions admitted by 0.14.0 and
+reads its existing detector bundles. New fits record producer 0.15.6. The bundled SERCOP forest retains its original training producer, 0.15.3.
 See [upgrading](upgrading.md) and the [documentation by version](versions.md).
 
 EquiFrame 0.14.0 was published as a public Beta on 19 November 2026. Its
@@ -129,9 +129,9 @@ Missing extras fail explicitly with a diagnostic identifying the dependency.
 `files` supplies local file readers and the initial Pandas DataFrame. Select the
 `polars` or `duckdb` extra as well when that engine is the conversion target.
 `equiframe doctor --extra files` checks installed dependency metadata without
-loading a dataset. The optional language-R reviewer requires a user-installed
-`Rscript` executable and base R; it has no Python installation extra and does not
-install R packages. Its result records the R version actually used.
+loading a dataset. The standalone language-R reviewer accepts a user-selected
+`Rscript`. The SERCOP workflow uses the bundled base R on Windows and Linux x64
+with glibc. Each completed review records the actual R version.
 
 File loading and language-R review were introduced on 26 October and exercised
 in the implementation runs above. Their stabilization commits to the admitted

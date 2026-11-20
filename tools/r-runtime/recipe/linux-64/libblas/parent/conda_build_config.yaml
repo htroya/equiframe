@@ -1,0 +1,72 @@
+c_compiler:                # [win]
+- clang                    # [win]
+cxx_compiler:              # [win]
+- clangxx                  # [win]
+
+blas_impl:
+- openblas
+- openblas                 # [win]
+- mkl                      # [x86_64 and not osx]
+- blis                     # [x86_64 or aarch64 or osx]
+- accelerate               # [osx]
+- newaccelerate            # [osx]
+- nvpl                     # [linux and aarch64]
+
+blas_impl_lib:
+- libopenblas.so.0         # [linux]
+- libopenblas.0.dylib      # [osx]
+- openblas.dll             # [win]
+- openblas.dll             # [win]
+
+- libmkl_rt.so             # [linux64]
+- mkl_rt.3.dll             # [win64]
+
+- libblis.so.4             # [linux64 or aarch64]
+- libblis.4.dylib          # [osx]
+- libblis.4.dll            # [win64]
+
+- libvecLibFort-ng.dylib   # [osx]
+- libblas_reexport.dylib   # [osx]
+
+# An ilp64 NVPL ABIs is available, but not compatible with this package (lp64).
+- libnvpl_blas_lp64_gomp.so.0  # [linux and aarch64]
+
+lapack_impl_lib:
+- libopenblas.so.0         # [linux]
+- libopenblas.0.dylib      # [osx]
+- openblas.dll             # [win]
+- openblas.dll             # [win]
+
+- libmkl_rt.so             # [linux64]
+- mkl_rt.3.dll             # [win64]
+
+- notapplicable            # [linux64 or aarch64]
+- notapplicable            # [osx]
+- notapplicable            # [win64]
+
+- libvecLibFort-ng.dylib   # [osx]
+- libblas_reexport.dylib   # [osx]
+
+# An ilp64 NVPL ABIs is available, but not compatible with this package (lp64).
+- libnvpl_lapack_lp64_gomp.so.0  # [linux and aarch64]
+
+blas_default_impl:
+- openblas                 # [not win64]
+- mkl                      # [win64]
+
+MACOSX_SDK_VERSION:
+# openblas
+- 11.0                     # [osx]
+# blis
+- 11.0                     # [osx]
+# accelerate
+- 11.0                     # [osx]
+# newaccelerate
+- 15.5                     # [osx]
+
+zip_keys:
+-
+  - blas_impl
+  - blas_impl_lib
+  - lapack_impl_lib
+  - MACOSX_SDK_VERSION     # [osx]

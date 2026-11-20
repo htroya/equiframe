@@ -10,6 +10,8 @@ import pytest
 from typer.testing import CliRunner
 
 import equiframe as ef
+from equiframe import _sercop
+from equiframe._bundled_r import _platform
 from equiframe._sercop import bundled_model
 from equiframe.cli import app
 from equiframe.evidence import canonical_bytes, describe_file, publish_json
@@ -110,7 +112,7 @@ def request(root: Path, fault: str) -> Path:
     return path
 
 
-def call(root: Path, fault: str, rscript: str) -> tuple[int, dict]:
+def call(root: Path, fault: str, rscript: str | None = None) -> tuple[int, dict]:
     doc = request(root, fault)
     output = root / "review"
     run = CliRunner().invoke(
@@ -121,10 +123,9 @@ def call(root: Path, fault: str, rscript: str) -> tuple[int, dict]:
             str(doc),
             "--reference-binding",
             str(root / "binding.json"),
-            "--rscript",
-            rscript,
             "--output",
             str(output),
+            *(["--rscript", rscript] if rscript is not None else []),
         ],
     )
     report = json.loads(run.stdout)
@@ -157,6 +158,61 @@ def test_unavailable_verification_is_never_a_pass(tmp_path, fault):
 
 
 @pytest.mark.parametrize(
+    "fault,forest,r_state,exit_code,case",
+    [
+        ("", "no_alert", None, 0, "equivalent"),
+        ("one_cent", "alert", None, 1, "difference_detected"),
+        ("", "alert", "equivalent", 0, "false_alarm_confirmed"),
+        ("one_cent", "no_alert", "different", 1, "miss_confirmed"),
+        ("", "alert", "different", 3, "comparators_disagree"),
+        ("", "alert", "not_evaluable", 3, "r_confirmation_unavailable"),
+        ("one_cent", "no_alert", "not_evaluable", 1, "r_confirmation_unavailable"),
+        ("", "not_evaluable", "equivalent", 3, "isolation_forest_unavailable"),
+    ],
+)
+def test_acceptance_reconciles_forest_with_independent_evidence(
+    tmp_path, monkeypatch, fault, forest, r_state, exit_code, case
+):
+    calls = []
+
+    def review(*args, **kwargs):
+        calls.append((args, kwargs))
+        return {"state": r_state}
+
+    monkeypatch.setattr(_sercop, "score_profile", lambda *_: {"state": forest})
+    monkeypatch.setattr(_sercop, "_review_capture_with_r", review)
+    code, report = call(tmp_path, fault)
+    assert code == exit_code and report["publishable"] == (exit_code == 0)
+    assert report["isolation_forest"]["candidate"]["state"] == forest
+    assert report["cases"]["candidate"]["state"] == case
+    assert report["r_review"]["candidate"]["state"] == (r_state or "not_requested")
+    assert len(calls) == (0 if r_state is None else 1)
+
+
+@pytest.mark.parametrize(
+    "fault,detector_state,exit_code,case",
+    [
+        ("", "alert", 0, "false_alarm_confirmed"),
+        ("one_cent", "no_alert", 1, "miss_confirmed"),
+    ],
+)
+def test_bundled_r_resolves_discrepancies(
+    tmp_path, monkeypatch, fault, detector_state, exit_code, case
+):
+    try:
+        _platform()
+    except ef.CapabilityError:
+        pytest.skip("no bundled R distribution for this platform")
+    monkeypatch.setattr(_sercop, "score_profile", lambda *_: {"state": detector_state})
+    code, report = call(tmp_path, fault)
+    assert code == exit_code
+    assert report["cases"]["candidate"]["state"] == case
+    review = report["r_review"]["candidate"]
+    assert review["runtime"] == "bundled" and review["runtime_manifest_sha256"]
+    assert "4.6.2" in review["r_version"] and review["binding"]
+
+
+@pytest.mark.parametrize(
     "fault, expected",
     [
         ("", "equivalent"),
@@ -174,5 +230,10 @@ def test_real_base_r_confirms_expected_captures(tmp_path, fault, expected):
     assert reviewed["state"] == expected and reviewed["r_version"]
     assert reviewed["binding"] and reviewed["python_state"] == expected
     alert = report["isolation_forest"]["candidate"]["state"] == "alert"
-    assert code == (1 if fault else 3 if alert else 0)
+    assert report["cases"]["candidate"]["state"] == (
+        ("difference_detected" if alert else "miss_confirmed")
+        if fault
+        else ("false_alarm_confirmed" if alert else "equivalent")
+    )
+    assert code == (1 if fault else 0)
     assert report["publishable"] == (code == 0)

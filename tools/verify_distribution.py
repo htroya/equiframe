@@ -376,7 +376,9 @@ except ef.EquivalenceAssertionError as error:
     assert scenario != 'equivalent' and error.code == scenario
 else:
     assert scenario == 'equivalent'
-for name in ('pyarrow', 'pandas', 'polars', 'duckdb', 'numpy', 'sklearn', 'pytest'):
+assert importlib.util.find_spec('pyarrow') is not None
+assert 'pyarrow' not in sys.modules
+for name in ('pandas', 'polars', 'duckdb', 'numpy', 'sklearn', 'pytest'):
     assert importlib.util.find_spec(name) is None, name
 print('Base-only installed assertion consumer:', scenario)
 """
@@ -664,7 +666,9 @@ for title in ('index','quickstart','recipes','api','semantics','compatibility',
               'grouped-comparison'):
     assert handbook.joinpath(title + '.md').read_text(encoding='utf-8').strip()
 assert equiframe.__version__ == importlib.metadata.version('equiframe') == sys.argv[1]
-for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy', 'pyarrow',
+assert importlib.util.find_spec('pyarrow') is not None
+assert 'pyarrow' not in sys.modules
+for name in ('pandas', 'polars', 'duckdb', 'sklearn', 'numpy',
              'openpyxl', 'xlrd', 'defusedxml',
              'pytest', 'hypothesis', 'IPython', 'jupyter', 'equiframe_benchmark'):
     assert importlib.util.find_spec(name) is None, name

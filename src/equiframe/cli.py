@@ -402,7 +402,10 @@ def sercop_accept(
     request: Path,
     reference_binding: Path = typer.Option(..., "--reference-binding"),
     output: Path = typer.Option(Path("equiframe-runs")),
-    rscript: str = typer.Option("Rscript", help="Trusted base-R executable."),
+    rscript: str = typer.Option(
+        "auto",
+        help="Review discrepancies automatically, or name an Rscript to review every capture.",
+    ),
 ) -> None:
     """Review captured SERCOP ETL using the contract, bundled forest and base R."""
     _verification_command(

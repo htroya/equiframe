@@ -255,6 +255,16 @@ def _details_pass(
                     core == "MIT AND Apache-2.0 AND LicenseRef-CC-BY-3.0-EC"
                     and details.get("sercop_attribution_verified") is True
                 )
+                or (
+                    core
+                    == (
+                        "MIT AND Apache-2.0 AND LicenseRef-CC-BY-3.0-EC AND GPL-2.0-or-later AND "
+                        "GPL-3.0-only AND (GPL-3.0-only WITH GCC-exception-3.1) AND LGPL-2.1-only "
+                        "AND BSD-3-Clause AND 0BSD AND Zlib AND bzip2-1.0.6 AND X11 AND Unicode-3.0"
+                    )
+                    and details.get("sercop_attribution_verified") is True
+                    and details.get("bundled_r_provenance_verified") is True
+                )
             )
             and details.get("benchmark_license") == "MIT"
             and details.get("third_party_notices_verified") is True

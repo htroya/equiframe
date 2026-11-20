@@ -13,13 +13,11 @@ The minimum supported Pandas range remains available on Python 3.10. A changed
 resolved profile requires fresh native evidence; previous 3.0.6 receipts retain
 their actual version and outcome.
 
-Runtime is deliberately separated from optional engines and ML: base contracts,
-models and CLI depend on Pydantic, Typer and tzdata; Arrow and each native engine
-are opt-in; ML is opt-in; the benchmark is a separate distribution. Build and
-validation tools are development dependencies, not required by a normal core
-import. The benchmark's dependency must resolve to the exact core candidate
-wheel supplied with its evidence, not another private wheel with the same
-version string.
+The base installation supplies Arrow, Pydantic, Typer and tzdata. EquiFrame
+loads Arrow when a selected operation needs it. Native engines and ML remain
+optional, and the benchmark is a separate distribution. Build and validation
+tools are development dependencies. The benchmark's dependency must resolve to
+the exact core candidate wheel supplied with its evidence.
 
 TLS trust is also part of the build and advisory-query environment. The
 [Python security notice for the emSign incident](https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576)
@@ -45,10 +43,10 @@ the [compatibility table](compatibility.md#declared-runtime-dependencies).
 user data. File discovery, inference and conversion are documented in
 [the file guide](lectura-conversion.md).
 
-The optional [language-R review](r_review.md) uses a user-installed `Rscript`
-and base R. It does not add an R package dependency or install a runtime.
-R's observed version and the reviewer source hash belong to each returned
-review; Python wheel metadata alone cannot identify the external R executable.
+The [SERCOP review](sercop-pretrained.md) ships the R runtime for offline use on
+Windows and Linux x64. The standalone [language-R review](r_review.md) accepts an
+existing `Rscript` executable. Each executed review records the observed R
+version and the reviewer source hash.
 Validation of the 26 October source additions and lock updates is reported
 separately; lock resolution alone does not establish native or semantic behavior.
 

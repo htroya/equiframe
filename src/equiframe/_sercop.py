@@ -7,14 +7,16 @@ from pathlib import Path
 from typing import Literal
 
 from equiframe._base import FrozenModel, NonNegativeInt, Text
+from equiframe._bundled_r import bundled_r
+from equiframe.comparison_types import ComparisonResult
 from equiframe.contracts import Contract
 from equiframe.detector_types import DetectorBundle
 from equiframe.detectors import detect_component, read_detector_bundle
-from equiframe.errors import EquiFrameError
+from equiframe.errors import CapabilityError, EquiFrameError
 from equiframe.evidence import publish_json
 from equiframe.profile_types import ProfileVector
 from equiframe.profiles import profile_execution
-from equiframe.r_review import RReviewOptions, review_with_r
+from equiframe.r_review import RReviewOptions, _review_with_r
 from equiframe.serialization import contract_fingerprint
 from equiframe.types import Sha256
 from equiframe.verify import verification_summary
@@ -64,6 +66,47 @@ def unavailable(reason: str) -> dict[str, object]:
     return {"state": "not_evaluable", "reason": reason}
 
 
+def _case(exact_state: str, forest_state: object, r_state: object) -> tuple[str, bool]:
+    """Name the evidence for the ETL decision and whether it needs review."""
+    if exact_state not in {"equivalent", "different"}:
+        return "exact_comparison_unavailable", True
+    if r_state in ("equivalent", "different") and r_state != exact_state:
+        return "comparators_disagree", True
+    if forest_state not in ("alert", "no_alert"):
+        return "isolation_forest_unavailable", True
+    if exact_state == "equivalent" and forest_state == "no_alert":
+        return "equivalent", False
+    if exact_state == "different" and forest_state == "alert":
+        return "difference_detected", False
+    if r_state != exact_state:
+        return "r_confirmation_unavailable", True
+    if exact_state == "equivalent":
+        return "false_alarm_confirmed", False
+    return "miss_confirmed", False
+
+
+def _review_capture_with_r(comparison: ComparisonResult, rscript: str) -> dict[str, object]:
+    assert comparison.left is not None and comparison.right is not None
+    runtime = None
+    origin = "explicit"
+    if rscript == "auto":
+        runtime = bundled_r()
+        rscript = str(runtime.executable)
+        origin = "bundled"
+    review = _review_with_r(
+        comparison.left.data,
+        comparison.right.data,
+        contract=comparison.spec,
+        comparison=comparison,
+        options=RReviewOptions(rscript=rscript),
+        runtime=runtime,
+    )
+    report = {**review.model_dump(mode="json"), "python_state": comparison.state, "runtime": origin}
+    if runtime is not None:
+        report["runtime_manifest_sha256"] = runtime.manifest_sha256
+    return report
+
+
 def assess_capture(
     result: VerificationResult, output: Path, rscript: str
 ) -> tuple[int, dict[str, object]]:
@@ -74,6 +117,7 @@ def assess_capture(
     names = tuple(item.output for item in result.expected if item.output is not None)
     scored: dict[str, dict[str, object]] = {}
     reviewed: dict[str, dict[str, object]] = {}
+    cases: dict[str, dict[str, object]] = {}
     model: SercopModelInfo | None
     bundle: DetectorBundle | None
     try:
@@ -99,6 +143,7 @@ def assess_capture(
             problem = reason or "execution_receipt_unavailable"
             scored[name] = unavailable(problem)
             reviewed[name] = unavailable(problem)
+            cases[name] = {"state": problem, "review_required": True}
             continue
         if bundle is None:
             scored[name] = unavailable("bundled_model_unavailable")
@@ -125,32 +170,41 @@ def assess_capture(
             or comparison.right.data.sha256 != result.binding.expected_sha256
         ):
             reviewed[name] = unavailable("bound_expected_comparison_unavailable")
+            cases[name] = {
+                "state": "bound_expected_comparison_unavailable",
+                "review_required": True,
+            }
             continue
-        try:
-            review = review_with_r(
-                comparison.left.data,
-                comparison.right.data,
-                contract=comparison.spec,
-                comparison=comparison,
-                options=RReviewOptions(rscript=rscript),
-            )
-            reviewed[name] = {**review.model_dump(mode="json"), "python_state": comparison.state}
-        except (OSError, ValueError, EquiFrameError):
-            reviewed[name] = unavailable("r_review_failed")
+        exact_state = comparison.state if comparison.complete else "not_evaluable"
+        forest_state = scored[name]["state"]
+        agreement = (exact_state, forest_state) in (
+            ("equivalent", "no_alert"),
+            ("different", "alert"),
+        )
+        if agreement and rscript == "auto":
+            reviewed[name] = {"state": "not_requested", "reason": "contract_and_model_agree"}
+        else:
+            try:
+                reviewed[name] = _review_capture_with_r(comparison, rscript)
+            except CapabilityError as error:
+                reviewed[name] = unavailable(str(error))
+            except (OSError, ValueError, EquiFrameError):
+                reviewed[name] = unavailable("r_review_failed")
+        case, needs_review = _case(exact_state, forest_state, reviewed[name]["state"])
+        if rscript != "auto" and reviewed[name]["state"] not in ("equivalent", "different"):
+            case, needs_review = "r_confirmation_unavailable", True
+        cases[name] = {"state": case, "review_required": needs_review}
 
-    alerts = any(item["state"] == "alert" for item in scored.values())
-    r_agrees = all(item["state"] == item.get("python_state") for item in reviewed.values())
-    ready = (
-        len(names) == result.coverage.outputs_requested
-        and all(item["state"] == "no_alert" for item in scored.values())
-        and all(item["state"] == "equivalent" for item in reviewed.values())
-        and r_agrees
+    review_required = len(cases) != result.coverage.outputs_requested or any(
+        case["review_required"] is True for case in cases.values()
     )
+    ready = bool(names) and not review_required
     code = result.exit_code or (0 if ready else 3)
     report.update(
         isolation_forest=scored,
         r_review=reviewed,
-        review_required=alerts or not r_agrees or code == 3,
+        cases=cases,
+        review_required=review_required or code == 3,
         coverage_reason=reason,
         publishable=code == 0,
         exit_code=code,

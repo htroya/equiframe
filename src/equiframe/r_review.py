@@ -47,6 +47,8 @@ from equiframe.types import ArtifactRef, ComparisonState, Sha256
 if TYPE_CHECKING:
     import pyarrow as pa
 
+    from equiframe._bundled_r import BundledR
+
 
 class RReviewOptions(FrozenModel):
     """Explicit local executable and cooperative capture/process budgets.
@@ -363,6 +365,26 @@ def review_with_r(
     and invalid contracts raise validation errors. Temporary inputs/results are
     removed on every exit; only compact observations are returned to the caller.
     """
+    return _review_with_r(
+        left,
+        right,
+        contract=contract,
+        comparison=comparison,
+        options=options,
+        cancellation=cancellation,
+    )
+
+
+def _review_with_r(
+    left: object,
+    right: object,
+    *,
+    contract: Contract | DiffContract | ComparisonSpec,
+    comparison: ComparisonResult | None = None,
+    options: RReviewOptions | None = None,
+    cancellation: CancellationToken | None = None,
+    runtime: BundledR | None = None,
+) -> RReviewResult:
     checked = RReviewOptions.model_validate(RReviewOptions() if options is None else options)
     spec = _spec(contract)
     script_resource = files("equiframe").joinpath("_r_review.R")
@@ -499,14 +521,18 @@ def review_with_r(
                     if name.startswith("LC_"):
                         environment[name] = "C"
                 environment.update(LC_ALL="C", LANG="C", LANGUAGE="C")
+                command = [
+                    executable,
+                    "--vanilla",
+                    "--default-packages=NULL",
+                    str(script),
+                    str(directory),
+                ]
+                if runtime is not None:
+                    runtime.patch_environment(environment)
+                    command = runtime.command(script, directory)
                 process = subprocess.Popen(
-                    [
-                        executable,
-                        "--vanilla",
-                        "--default-packages=NULL",
-                        str(script),
-                        str(directory),
-                    ],
+                    command,
                     cwd=directory,
                     stdin=subprocess.DEVNULL,
                     stdout=log,

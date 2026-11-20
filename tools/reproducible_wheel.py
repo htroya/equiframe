@@ -27,6 +27,8 @@ def canonicalize_wheel(path: Path) -> None:
             for original in source.infolist():
                 info = copy(original)
                 info.create_system = 3  # Unix ZIP convention; normalized modes already use it.
+                if info.filename == "equiframe/_r_runtime/linux-64/lib/R/bin/exec/R":
+                    info.external_attr = 0o100755 << 16
                 with source.open(original) as reader, destination.open(info, "w") as writer:
                     shutil.copyfileobj(reader, writer, length=64 * 1024)
         target.replace(path)

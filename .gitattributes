@@ -22,3 +22,8 @@ packages/equiframe-benchmark/schemas/SnapshotManifest-1.0.schema.json -text
 
 # Archived research retains original bytes, including recorded line endings.
 /archive/research-a14/** -text
+
+# Offline runtime assets and upstream package recipes are hash-bound bytes.
+/src/equiframe/_r_runtime/** -text
+/tools/r-runtime/licenses/** -text
+/tools/r-runtime/recipe/** -text

@@ -1,14 +1,14 @@
 # EquiFrame: semantic comparison and dataframe migration
 
-> **EquiFrame 0.15.5 Beta** includes a pretrained SERCOP Isolation Forest and a review flow that can check captured results in R.
-> [Version 0.15.5 handbook](https://github.com/htroya/equiframe/blob/v0.15.5/docs/index.md)
-> · [First ETL check](https://github.com/htroya/equiframe/blob/v0.15.5/docs/first-acceptance-0.15.5.md)
-> · [Documentation by version](https://github.com/htroya/equiframe/blob/v0.15.5/docs/versions.md)
+> **EquiFrame 0.15.6 Beta** includes a pretrained SERCOP Isolation Forest and a review flow that can check captured results in R.
+> [Version 0.15.6 handbook](https://github.com/htroya/equiframe/blob/v0.15.6/docs/index.md)
+> · [First ETL check](https://github.com/htroya/equiframe/blob/v0.15.6/docs/first-acceptance-0.15.6.md)
+> · [Documentation by version](https://github.com/htroya/equiframe/blob/v0.15.6/docs/versions.md)
 > [0.14.0 errata](https://github.com/htroya/equiframe/blob/v0.15.3/docs/equiframe-0.14.0-errata.md)
 
-[Documentation](https://github.com/htroya/equiframe/blob/v0.15.5/docs/index.md) |
-[API](https://github.com/htroya/equiframe/blob/v0.15.5/docs/api.md) |
-[Examples](https://github.com/htroya/equiframe/blob/v0.15.5/docs/journeys.md) |
+[Documentation](https://github.com/htroya/equiframe/blob/v0.15.6/docs/index.md) |
+[API](https://github.com/htroya/equiframe/blob/v0.15.6/docs/api.md) |
+[Examples](https://github.com/htroya/equiframe/blob/v0.15.6/docs/journeys.md) |
 [Issues](https://github.com/htroya/equiframe/issues)
 
 **EquiFrame** checks whether tabular data and supported transformations preserve
@@ -27,18 +27,19 @@ explicitly identified. See the [readiness review](https://github.com/htroya/equi
 
 ## Install
 
-EquiFrame 0.15.5 supports **Python 3.10, 3.11, 3.12 and 3.13**.
+EquiFrame 0.15.6 supports **Python 3.10, 3.11, 3.12 and 3.13**.
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.15.5"
+python -m pip install "equiframe[files,engines,ml]==0.15.6"
 python -m pip check
 ```
 
-The base installation is `python -m pip install equiframe==0.15.5`.
+The base installation is `python -m pip install equiframe==0.15.6`.
 Optional engines and machine-learning libraries are loaded when requested.
 Run `equiframe sercop model` to validate the bundled detector and `equiframe sercop score`
-with a compatible profile to obtain its score. The SERCOP ETL review also needs
-the `arrow` extra and base R. [SERCOP model and ETL review](https://github.com/htroya/equiframe/blob/v0.15.5/docs/sercop-pretrained.md)
+with a compatible profile to obtain its score. The base install brings Arrow
+and includes the R runtime for offline SERCOP discrepancy review on Windows and
+Linux x64. [SERCOP model and ETL review](https://github.com/htroya/equiframe/blob/v0.15.6/docs/sercop-pretrained.md)
 
 | Extra | Purpose |
 | --- | --- |
@@ -48,7 +49,7 @@ the `arrow` extra and base R. [SERCOP model and ETL review](https://github.com/h
 | `ml` | Isolation Forest with scikit-learn and NumPy |
 | `eda`, `eda-charts` | Experimental exploratory analysis and optional charts |
 
-The independent R reviewer requires an external `Rscript` installation.
+The standalone `review_with_r` API accepts an existing `Rscript` executable.
 See [dependencies](https://github.com/htroya/equiframe/blob/main/docs/dependencies.md)
 and [supported ranges](https://github.com/htroya/equiframe/blob/main/pyproject.toml).
 
@@ -130,7 +131,7 @@ acceptance with `ef.assert_equivalent(result)`; divergent or incomplete results
 raise `ef.EquivalenceAssertionError`. Operational failures use the
 `ef.EquiFrameError` hierarchy, including `DatasetReadError`,
 `MissingDependencyError` and `InvalidExecutionInput`. See the
-[API reference](https://github.com/htroya/equiframe/blob/v0.15.5/docs/api.md)
+[API reference](https://github.com/htroya/equiframe/blob/v0.15.6/docs/api.md)
 for argument-validation exceptions and command-specific exits.
 
 All six directed combinations of Pandas, Polars and DuckDB are supported.
@@ -212,7 +213,7 @@ python examples/load_convert_compare.py --rows 30000
 
 Installed wheels provide the same example as
 `python -m equiframe.examples.load_convert_compare --rows 30000`. Further
-[examples](https://github.com/htroya/equiframe/blob/v0.15.5/docs/journeys.md)
+[examples](https://github.com/htroya/equiframe/blob/v0.15.6/docs/journeys.md)
 and [recipes](https://github.com/htroya/equiframe/blob/main/docs/recipes.md)
 cover ETL, reconciliation and terminal usage.
 

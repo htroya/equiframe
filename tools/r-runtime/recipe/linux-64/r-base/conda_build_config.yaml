@@ -1,0 +1,62 @@
+CI: github_actions
+DOCKER_PLATFORM: linux/amd64
+bzip2: '1'
+c_compiler: gcc
+c_compiler_version: '15'
+c_stdlib: sysroot
+c_stdlib_version: '2.17'
+cairo: '1'
+channel_sources: conda-forge
+channel_targets: conda-forge main
+cpu_optimization_target: nocona
+cran_mirror: https://cran.r-project.org
+cxx_compiler: gxx
+cxx_compiler_version: '15'
+docker_image: quay.io/condaforge/linux-anvil-x86_64:alma10
+expat: '2'
+extend_keys:
+- extend_keys
+- ignore_build_only_deps
+- ignore_version
+- pin_run_as_build
+fortran_compiler: gfortran
+fortran_compiler_version: '15'
+freetype: '2'
+glib: '2'
+gsl: '2.8'
+icu: '78'
+ignore_build_only_deps:
+- numpy
+- python
+libblas: 3.9.* *netlib
+libcurl: '8'
+libdeflate: '1.26'
+libiconv: '1'
+libjpeg_turbo: '3'
+liblapack: 3.9.* *netlib
+liblzma_devel: '5'
+libpng: '1.6'
+libtiff: '4.7'
+libuuid: '2'
+lua: '5'
+numpy: '1.26'
+pango: '1'
+pcre2: '10.49'
+perl: 5.26.2
+pin_run_as_build:
+  python:
+    max_pin: x.x
+    min_pin: x.x
+  r-base:
+    max_pin: x.x
+    min_pin: x.x
+python: '3.14'
+r_base: '3.5'
+readline: '8'
+target_platform: linux-64
+tk: '8.6'
+zip_keys:
+- - c_compiler_version
+  - cxx_compiler_version
+  - fortran_compiler_version
+zlib: '1'

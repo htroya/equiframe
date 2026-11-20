@@ -11,13 +11,13 @@ equiframe sercop model
 equiframe sercop score perfil.json
 ```
 
-La revisión de una ejecución materializada usa el extra `arrow` y un `Rscript`
-de base R instalado en el sistema. Si necesitas ejecutar el ETL para generar el
-recibo, instala además el extra del motor que utilice tu plan.
+La instalación normal también incorpora Arrow y el intérprete R para Windows x64
+y Linux x64 con glibc. Después de instalar, la primera revisión puede ejecutarse
+sin conexión. Si vas a generar la ejecución con EquiFrame, elige el extra del
+motor que utilice tu plan.
 
 ```sh
-python -m pip install 'equiframe[arrow]'
-Rscript --version
+python -m pip install equiframe
 equiframe sercop accept solicitud.json --reference-binding referencia.json --output evidencia
 ```
 
@@ -25,15 +25,23 @@ Usa el contrato incluido, los recibos completos de la ejecución y una referenci
 independiente del mismo lote. El contrato agrega las adjudicaciones en centavos
 por comprador y moneda después del filtro de importe mínimo. La revisión R vuelve
 a comparar los artefactos observados contra esa referencia con una implementación
-independiente. El informe conserva el veredicto contractual, la puntuación y el
-umbral del bosque, el dictamen de R y si hace falta revisar la corrida.
+independiente cuando el bosque y la comparación exacta discrepan o falta una
+evaluación. El informe conserva el veredicto contractual, la puntuación y el
+umbral del bosque, el dictamen de R y el caso aplicado a la corrida.
+
+El contrato revisa las claves, la multiplicidad y los totales exactos en
+centavos. Si el bosque guarda silencio ante una diferencia contractual, esa
+diferencia bloquea la corrida. Si el bosque alerta y R confirma la equivalencia
+de la comparación exacta, la corrida puede aprobarse y la alerta queda
+registrada. Un desacuerdo entre comparadores o evidencia incompleta deja
+la decisión pendiente.
 
 | Resultado | Código |
 | --- | ---: |
-| Contrato aprobado, R equivalente y evaluación del bosque sin alerta | `0` |
+| Contrato aprobado y bosque sin alerta, o alerta confirmada como falsa por R | `0` |
 | Diferencia detectada por el contrato | `1` |
 | Solicitud o configuración inválida | `2` |
-| Alerta del bosque, desacuerdo o evidencia insuficiente para aprobar | `3` |
+| Alerta sin confirmación, desacuerdo o evidencia insuficiente para aprobar | `3` |
 
 El modelo describe perfiles de agregación SERCOP. Los lotes de entrenamiento,
 calibración y evaluación se identifican por huella y ventana temporal. La
@@ -55,5 +63,5 @@ huellas de los archivos de origen, el artefacto de entrenamiento, las particione
 y los resultados por escenario. Los valores se refieren al contrato, universo
 y lotes evaluados.
 
-[Revisión con R](r_review.md) · [Prueba ETL con recibos](first-acceptance-0.15.3.md) ·
+[Revisión con R](r_review.md) · [Prueba ETL con recibos](first-acceptance-0.15.6.md) ·
 [Fuente pública SERCOP](https://data.open-contracting.org/es/publication/110)

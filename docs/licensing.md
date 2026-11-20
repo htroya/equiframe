@@ -16,6 +16,12 @@ The core package also attributes the derived SERCOP detector under Creative
 Commons Attribution 3.0 Ecuador (`LicenseRef-CC-BY-3.0-EC`). The model card and
 packaged manifest identify the data publisher and scope.
 
+The offline SERCOP reviewer runs a separate R 4.6.2 interpreter governed by
+the R Project's GPL terms. Its native libraries retain their component licenses.
+The package metadata includes the exact license texts, and the two runtime
+manifests identify the binary sources. The corresponding public build recipes
+and patches are included in the source archive. [R Project licenses](https://www.r-project.org/Licenses/).
+
 This decision does not relicense downloaded datasets, the thesis manuscript,
 external dependencies or separately owned components. Publication remains a
 separate owner-authorized task.
