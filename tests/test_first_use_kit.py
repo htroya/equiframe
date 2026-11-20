@@ -437,6 +437,10 @@ def test_first_use_lock_rejects_unsupported_python_instead_of_reusing_312():
             "schemas/grouped-difference-1.0.schema.json",
             "equiframe/schemas/grouped-difference-1.0.schema.json",
         ),
+        (
+            "examples/integrations/verify_accept.py",
+            "equiframe/examples/integrations/verify_accept.py",
+        ),
     ],
 )
 def test_first_use_kit_binds_only_the_declared_example_mappings(

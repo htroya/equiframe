@@ -1,7 +1,7 @@
-# Primera verificación ETL con EquiFrame 0.15.2
+# Primera verificación ETL con EquiFrame 0.15.3
 
 Usa Python 3.10–3.13 y un entorno virtual vacío. Esta guía usa el extra
-`arrow` y el wheel identificado de EquiFrame 0.15.2.
+`arrow` y el wheel identificado de EquiFrame 0.15.3.
 
 ```bash
 python -m venv .venv
@@ -9,10 +9,10 @@ python -m venv .venv
 
 Activa el entorno con `source .venv/bin/activate` en macOS o Linux, o con
 `\.venv\Scripts\Activate.ps1` en PowerShell de Windows. Instala el wheel
-identificado de 0.15.2 y comprueba las dependencias.
+identificado de 0.15.3 y comprueba las dependencias.
 
 ```bash
-python -m pip install "./equiframe-0.15.2-py3-none-any.whl[arrow]"
+python -m pip install "./equiframe-0.15.3-py3-none-any.whl[arrow]"
 python -m pip check
 ```
 
@@ -64,5 +64,5 @@ El código 2 indica una solicitud o configuración inválida.
   la integridad de un informe guardado. El comando `verify accept` decide la
   aceptación de una carga.
 
-[Manual de 0.15.2](https://github.com/htroya/equiframe/blob/v0.15.2/docs/index.md) ·
-[Formato de la solicitud y la vinculación](https://github.com/htroya/equiframe/blob/v0.15.2/docs/api.md#10-command-line-interface)
+[Manual de 0.15.3](https://github.com/htroya/equiframe/blob/v0.15.3/docs/index.md) ·
+[Formato de la solicitud y la vinculación](https://github.com/htroya/equiframe/blob/v0.15.3/docs/api.md#10-command-line-interface)

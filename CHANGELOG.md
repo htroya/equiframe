@@ -1,3 +1,8 @@
+## 0.15.3 - verify the packaged ETL example
+
+- Recognize the exact acceptance example resource in first-use kit and compatibility verification.
+- Test the resource mapping and byte binding in both verifiers.
+
 ## 0.15.2 - consistent first-use documentation
 
 - Align the packaged first-use guide, README and installation pins with the release.
