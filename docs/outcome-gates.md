@@ -2,11 +2,17 @@
 
 ## Aceptación de cargas ETL
 
-Ejecuta `equiframe verify run request.json --require-expected` con el archivo
-esperado de una implementación de referencia. Declara claves de negocio,
+Ejecuta `equiframe verify accept request.json --reference-binding binding.json`
+con el resultado esperado y el vínculo del generador de referencia.
+Declara claves de negocio,
 conservación de multiplicidad y comparación numérica exacta en el contrato.
 El proceso acepta con código 0, rechaza una diferencia con 1 y devuelve 3
 cuando falta la referencia o la comparación queda incompleta.
+
+El informe guarda el alcance y el vínculo autorizado. Usa
+`--require-execution` si también necesitas comprobar las ejecuciones
+capturadas y el plan de cada salida. La aprobación se refiere al contrato y al
+lote identificado en el informe.
 
 Si la transformación conserva sumas, declara un `AggregateCheck` por las
 claves de negocio sobre las filas que el filtro admite. Por ejemplo, un

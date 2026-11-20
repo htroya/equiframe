@@ -20,8 +20,13 @@ from equiframe._error_reporting import report_failure
 from equiframe._physical import verify_table_metadata
 from equiframe._regular_io import local_output_directory
 from equiframe._report_format_v1 import verification_html_v1, verification_summary_v1
-from equiframe.comparison import _compare, iter_differences, read_comparison
-from equiframe.comparison_types import ComparisonOptions, ComparisonPolicy, ComparisonResult
+from equiframe.comparison import _compare, comparison_fingerprint, iter_differences, read_comparison
+from equiframe.comparison_types import (
+    ComparisonOptions,
+    ComparisonPolicy,
+    ComparisonResult,
+    ComparisonSpec,
+)
 from equiframe.contracts import Contract, TableSpec
 from equiframe.errors import ArtifactIntegrityError, ExecutionTimeout, ResourceLimitError
 from equiframe.evidence import (
@@ -40,8 +45,10 @@ from equiframe.rules import _evaluate_rules, iter_rule_findings, read_rule_evalu
 from equiframe.serialization import contract_fingerprint
 from equiframe.types import ArtifactRef
 from equiframe.verify_types import (
+    AcceptanceRequirements,
     ExpectedProvenance,
     IndependentReviewEvidence,
+    ReferenceBinding,
     VerificationBinding,
     VerificationCheck,
     VerificationCoverage,
@@ -87,6 +94,67 @@ def _rule_check(evaluation: RuleEvaluation, output: str) -> VerificationCheck:
 def _artifact_rule_id(binding: VerificationBinding, output: str) -> str:
     payload = [output, dict(binding.outputs)[output], dict(binding.snapshots)]
     return "artifact_" + hashlib.sha256(canonical_bytes(payload)).hexdigest()
+
+
+def _reference_policy_matches(
+    reference: ReferenceBinding,
+    contract: Contract,
+    policy: ComparisonPolicy,
+    plan_sha256: str | None,
+) -> bool:
+    return (
+        reference.contract_sha256 == contract_fingerprint(contract)
+        and reference.plan_sha256 is not None
+        and reference.plan_sha256 == plan_sha256
+        and reference.comparison_spec_sha256
+        == comparison_fingerprint(ComparisonSpec(contract=contract, policy=policy))
+        and set(dict(reference.snapshots)) == {table.name for table in contract.inputs}
+        and reference.expected_sha256 is not None
+        and not reference.outputs
+    )
+
+
+def _validate_exact_policy(contract: Contract, policy: ComparisonPolicy) -> None:
+    if policy.physical_types != "exact" or policy.index != "reject":
+        raise ValueError("acceptance requires exact physical types and explicit index columns")
+    for table in (*contract.inputs, contract.output):
+        for column in table.schema_spec.columns:
+            numeric = column.numeric_policy
+            if numeric is not None and (numeric.comparison != "exact" or numeric.rounding):
+                raise ValueError("acceptance requires exact numeric comparison without rounding")
+
+
+def _execution_plan_sha256(execution: ExecutionResult) -> str:
+    return hashlib.sha256(canonical_bytes(execution.plan.model_dump(mode="json"))).hexdigest()
+
+
+def _validate_acceptance(result: VerificationResult, acceptance: AcceptanceRequirements) -> None:
+    reference = acceptance.reference
+    _validate_exact_policy(result.contract, result.comparison_policy)
+    if (
+        not result.expected_required
+        or (any(rule.required for rule in result.contract.rules) and not result.rules_required)
+        or not _reference_policy_matches(
+            reference, result.contract, result.comparison_policy, result.binding.plan_sha256
+        )
+    ):
+        raise ValueError("verification does not retain the required acceptance policy")
+    authorized_snapshots = dict(reference.snapshots)
+    if any(authorized_snapshots.get(name) != sha for name, sha in result.binding.snapshots):
+        raise ValueError("verification includes an unauthorized acceptance snapshot")
+    if result.binding.expected_sha256 not in (None, reference.expected_sha256):
+        raise ValueError("verification includes an unauthorized expected artifact")
+    for _, execution in result.executions:
+        if _execution_plan_sha256(execution) != reference.plan_sha256 or any(
+            item.index is not None for item in execution.inputs
+        ):
+            raise ValueError("acceptance execution does not match the authorized plan and inputs")
+    if result.publishable and (
+        dict(result.binding.snapshots) != authorized_snapshots
+        or result.binding.expected_sha256 != reference.expected_sha256
+        or (acceptance.require_execution and not result.coverage.input_execution_evidence_available)
+    ):
+        raise ValueError("approval requires complete acceptance evidence")
 
 
 def _aggregate(checks: tuple[VerificationCheck, ...], reason: str) -> VerificationCheck:
@@ -411,6 +479,8 @@ def _validate_dimensions(result: VerificationResult) -> None:
         len(executions) == result.coverage.outputs_requested
     ):
         raise ValueError("input execution coverage contradicts captured executions")
+    if result.acceptance is not None:
+        _validate_acceptance(result, result.acceptance)
 
 
 def _input_contract(contract: Contract, declared: TableSpec) -> Contract:
@@ -442,6 +512,7 @@ def verify(
     policy: ComparisonPolicy | None = None,
     options: ComparisonOptions | None = None,
     work_dir: Path | None = None,
+    acceptance: AcceptanceRequirements | None = None,
 ) -> VerificationResult:
     """Capture and inspect complete outputs, preserving separate scientific O.
 
@@ -453,6 +524,19 @@ def verify(
         raise ValueError("verify requires at least one named result")
     opts = ComparisonOptions.model_validate(ComparisonOptions() if options is None else options)
     policy = ComparisonPolicy.model_validate(ComparisonPolicy() if policy is None else policy)
+    if acceptance is not None:
+        acceptance = AcceptanceRequirements.model_validate(acceptance)
+        _validate_exact_policy(contract, policy)
+        reference = acceptance.reference
+        if (
+            not isinstance(expected, ArtifactRef)
+            or expected.sha256 != reference.expected_sha256
+            or not _reference_policy_matches(reference, contract, policy, plan_sha256)
+            or {name: ref.sha256 for name, ref in (snapshots or {}).items()}
+            != dict(reference.snapshots)
+        ):
+            raise ValueError("acceptance requires the authorized reference and all input snapshots")
+        require_expected = True
     require_rules = require_rules or (
         require_expected and any(rule.required for rule in contract.rules)
     )
@@ -555,6 +639,13 @@ def verify(
             value = ExecutionResult.model_validate(value)
             if value.plan.contract != contract:
                 raise ValueError("execution and verification contracts differ")
+            if acceptance is not None and (
+                _execution_plan_sha256(value) != plan_sha256
+                or any(item.index is not None for item in value.inputs)
+            ):
+                raise ValueError(
+                    "acceptance execution does not match the authorized plan and inputs"
+                )
             technical_checks.append(
                 _check(
                     "passed" if value.state == "completed" else "not_evaluable",
@@ -591,8 +682,11 @@ def verify(
                 output_sources[name] = value
             except Exception as error:
                 errors.append(capture_problem(error, "artifact_capture_failed", name))
+    if acceptance is not None and acceptance.require_execution and len(executions) != len(outputs):
+        errors.append(_check("not_evaluable", "Acceptance requires completed execution evidence"))
     fixed_expected = None
     expected_engine = None
+    expected_run = None
     expected_unavailable = "Expected comparison unavailable"
     if isinstance(expected, ExecutionResult):
         expected = ExecutionResult.model_validate(expected)
@@ -611,19 +705,9 @@ def verify(
             expected = None
             require_expected = True
         else:
+            if require_expected:
+                expected_run = expected
             expected = expected.output.data
-    if expected is not None:
-        try:
-            # Compare source files: snapshots may legitimately coalesce identical bytes.
-            if require_expected and any(
-                local_path(expected).samefile(local_path(source))
-                for source in output_sources.values()
-            ):
-                expected_unavailable = "Expected and candidate refer to the same file"
-            else:
-                fixed_expected = capture(expected)
-        except Exception as error:
-            errors.append(capture_problem(error, "expected_capture_failed"))
     fixed_snapshots = {}
     for name, ref in (snapshots or {}).items():
         try:
@@ -646,6 +730,34 @@ def verify(
             for e in executions.values()
         ):
             errors.append(_check("failed", "Execution inputs differ from the bound snapshots"))
+    if expected_run is not None:
+        if expected_run.plan.contract != contract or {
+            t.name: t.data.sha256 for t in expected_run.inputs
+        } != {name: ref.sha256 for name, ref in fixed_snapshots.items()}:
+            expected_unavailable = "Expected execution used a different contract or input batch"
+            expected = None
+        elif any(t.index is not None for t in expected_run.inputs):
+            expected_unavailable = "Expected execution requires input indexes as contract columns"
+            expected = None
+    if expected is not None:
+        try:
+            # Compare source files: snapshots may legitimately coalesce identical bytes.
+            if require_expected and any(
+                local_path(expected).samefile(local_path(source))
+                for source in output_sources.values()
+            ):
+                expected_unavailable = "Expected and candidate refer to the same file"
+            elif expected_run is not None and expected_run.output is not None:
+                if expected_run.output.index is not None and policy.index == "reject":
+                    expected_unavailable = "Expected output index is not in the contract columns"
+                else:
+                    for item in expected_run.inputs:
+                        table(item)
+                    fixed_expected = table(expected_run.output).data
+            else:
+                fixed_expected = capture(expected)
+        except Exception as error:
+            errors.append(capture_problem(error, "expected_capture_failed"))
     binding = VerificationBinding.model_validate(
         dict(
             contract_sha256=contract_fingerprint(contract),
@@ -827,6 +939,7 @@ def verify(
         input_comparisons=tuple(input_comparisons),
         executions=tuple(executions.items()),
         rule_evaluations=tuple(evaluations),
+        acceptance=acceptance,
         started_at=started,
         elapsed_seconds=time.perf_counter() - start,
     )

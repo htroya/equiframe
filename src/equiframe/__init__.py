@@ -431,8 +431,10 @@ from equiframe.verify import (
     verify_migration,
 )
 from equiframe.verify_types import (
+    AcceptanceRequirements,
     ExpectedProvenance,
     IndependentReviewEvidence,
+    ReferenceBinding,
     VerificationBinding,
     VerificationCheck,
     VerificationCoverage,
@@ -458,6 +460,7 @@ __version__ = _distribution_version("equiframe")
 __all__ = [
     "CANONICALIZATION",
     "SCHEMA_VERSION",
+    "AcceptanceRequirements",
     "AdapterCapability",
     "Aggregate",
     "AggregateCheck",
@@ -677,6 +680,7 @@ __all__ = [
     "ReductionObservation",
     "ReductionOptions",
     "ReductionResult",
+    "ReferenceBinding",
     "RelationalPlan",
     "ReportCount",
     "ReportEvidenceManifest",
