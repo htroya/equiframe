@@ -5,6 +5,7 @@ also ships a copy of its handbook under `equiframe/docs/`.
 
 | Version | Handbook at the source tag | Release information |
 | --- | --- | --- |
+| 0.14.6 | [Handbook](https://github.com/htroya/equiframe/blob/v0.14.6/docs/index.md) | [Candidate source](https://github.com/htroya/equiframe/tree/v0.14.6) |
 | 0.14.5 | [Handbook](https://github.com/htroya/equiframe/blob/v0.14.5/docs/index.md) | [Candidate source](https://github.com/htroya/equiframe/tree/v0.14.5) |
 | 0.14.4 | [Handbook](https://github.com/htroya/equiframe/blob/v0.14.4/docs/index.md) | [Candidate source](https://github.com/htroya/equiframe/tree/v0.14.4) |
 | 0.14.3 | [Handbook](https://github.com/htroya/equiframe/blob/v0.14.3/docs/index.md) | [Earlier candidate](https://github.com/htroya/equiframe/tree/v0.14.3) |
