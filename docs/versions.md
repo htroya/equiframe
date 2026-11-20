@@ -5,7 +5,7 @@ also ships a copy of its handbook under `equiframe/docs/`.
 
 | Version | Handbook at the source tag | Release information |
 | --- | --- | --- |
-| 0.15.3 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.3/docs/index.md) | [GitHub beta](https://github.com/htroya/equiframe/releases/tag/v0.15.3) · [TestPyPI core](https://test.pypi.org/project/equiframe/0.15.3/) · [TestPyPI benchmark](https://test.pypi.org/project/equiframe-benchmark/0.15.3/) · [First ETL check](https://github.com/htroya/equiframe/blob/v0.15.3/docs/first-acceptance-0.15.3.md) |
+| 0.15.3 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.3/docs/index.md) | [PyPI core](https://pypi.org/project/equiframe/0.15.3/) · [PyPI benchmark](https://pypi.org/project/equiframe-benchmark/0.15.3/) · [GitHub beta and hashes](https://github.com/htroya/equiframe/releases/tag/v0.15.3) · [First ETL check](https://github.com/htroya/equiframe/blob/v0.15.3/docs/first-acceptance-0.15.3.md) |
 | 0.15.2 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.2/docs/index.md) | Candidate superseded after the first-use kit resource check |
 | 0.15.1 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.1/docs/index.md) | Candidate superseded after the packaged first-use guide version check |
 | 0.15.0 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.0/docs/index.md) | Candidate superseded after the historical request serialization check |

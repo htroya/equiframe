@@ -2,9 +2,9 @@
 
 ## Current state
 
-EquiFrame 0.15.3 and the matching benchmark are available on TestPyPI and
-GitHub. The four downloaded artifacts matched their approved SHA-256 hashes.
-A clean consumer installed the two downloaded wheels and passed dependency
+EquiFrame 0.15.3 and the matching benchmark are available on PyPI, TestPyPI
+and GitHub. The four artifacts downloaded from each index matched their
+approved SHA-256 hashes. A clean consumer on each index passed dependency
 checks and the three ETL acceptance cases. [0.15.3 release notes and hashes](https://github.com/htroya/equiframe/releases/tag/v0.15.3) · [Documentation by version](versions.md)
 
 `equiframe 0.14.0` and the exactly paired `equiframe-benchmark 0.14.0` are
