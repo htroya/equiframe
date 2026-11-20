@@ -2,10 +2,10 @@
 
 ## Current state
 
-The 0.14.4 maintenance candidate adds a required expected-artifact check
-for automated ETL acceptance. The maintainer authorizes and verifies the
-manual TestPyPI and PyPI promotions. See [documentation by version](versions.md)
-and the current technical receipts for candidate status.
+EquiFrame 0.15.3 and the matching benchmark are available on TestPyPI and
+GitHub. The four downloaded artifacts matched their approved SHA-256 hashes.
+A clean consumer installed the two downloaded wheels and passed dependency
+checks and the three ETL acceptance cases. [0.15.3 release notes and hashes](https://github.com/htroya/equiframe/releases/tag/v0.15.3) · [Documentation by version](versions.md)
 
 `equiframe 0.14.0` and the exactly paired `equiframe-benchmark 0.14.0` are
 **public Beta releases**, published on TestPyPI and PyPI on **19 November 2026**.

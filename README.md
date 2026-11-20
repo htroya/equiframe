@@ -4,16 +4,19 @@
 
 <a id="english"></a>
 
-> **Public Beta 0.14.0 — published 19 November 2026 on PyPI and TestPyPI.**
+> **Current PyPI beta: 0.14.0.**
 > Install [EquiFrame](https://pypi.org/project/equiframe/0.14.0/) and the optional,
 > exactly paired [equiframe-benchmark](https://pypi.org/project/equiframe-benchmark/0.14.0/).
 > [Release notes and SHA-256 hashes](https://github.com/htroya/equiframe/releases/tag/v0.14.0)
-> identify the published files; see the [release procedure](docs/releasing.md).
+> identify the published files. See the [release procedure](docs/releasing.md).
+>
+> Beta 0.15.3 is available on TestPyPI and GitHub. [TestPyPI core](https://test.pypi.org/project/equiframe/0.15.3/) · [TestPyPI benchmark](https://test.pypi.org/project/equiframe-benchmark/0.15.3/) · [Downloads and SHA-256 hashes](https://github.com/htroya/equiframe/releases/tag/v0.15.3)
 
 # EquiFrame: semantic comparison and dataframe migration
 
 [0.14.0 documentation](https://github.com/htroya/equiframe/blob/v0.14.0/docs/index.md) |
 [0.14.0 API](https://github.com/htroya/equiframe/blob/v0.14.0/docs/api.md) |
+[0.15.3 documentation](https://github.com/htroya/equiframe/blob/v0.15.3/docs/index.md) |
 [Documentation by version](docs/versions.md) |
 [Issues](https://github.com/htroya/equiframe/issues)
 
@@ -33,7 +36,7 @@ explicitly identified. See the [readiness review](https://github.com/htroya/equi
 
 
 [Public-data detection study](docs/public-spending-evaluation.md) · [Exact verdicts and statistical alerts](docs/reliability.md).
-New profile 1.2 work is experimental source; the public index release remains 0.14.0.
+Profile 1.2 is experimental.
 
 ## Install
 
@@ -61,8 +64,7 @@ and [supported ranges](https://github.com/htroya/equiframe/blob/v0.14.0/pyprojec
 
 ## Quick start
 
-The [0.15.3 candidate](https://github.com/htroya/equiframe/tree/v0.15.3) includes
-`verify accept`. The [ETL quickstart](https://github.com/htroya/equiframe/blob/v0.15.3/docs/first-acceptance-0.15.3.md)
+Beta 0.15.3 includes `verify accept`. The [ETL quickstart](https://github.com/htroya/equiframe/blob/v0.15.3/docs/first-acceptance-0.15.3.md)
 generates a sample CSV, its reference binding and the requests for three CI
 outcomes. The checks return 0 for acceptance, 1 for a difference and 3 for
 unavailable evidence.
@@ -280,19 +282,21 @@ and [license scope](https://github.com/htroya/equiframe/blob/main/NOTICE.md).
 
 <a id="espanol"></a>
 
-> **Beta pública 0.14.0 — publicada el 19 de noviembre de 2026 en PyPI y TestPyPI.**
+> **Beta actual en PyPI: 0.14.0.**
 > Instala [EquiFrame](https://pypi.org/project/equiframe/0.14.0/) y, si lo necesitas,
 > [equiframe-benchmark](https://pypi.org/project/equiframe-benchmark/0.14.0/) de la misma versión.
 > Las [notas de publicación y huellas SHA-256](https://github.com/htroya/equiframe/releases/tag/v0.14.0)
-> identifican los archivos; consulta el [procedimiento de publicación](docs/releasing.md).
+> identifican los archivos. Consulta el [procedimiento de publicación](docs/releasing.md).
+>
+> La beta 0.15.3 está disponible en TestPyPI y GitHub. [EquiFrame en TestPyPI](https://test.pypi.org/project/equiframe/0.15.3/) · [Benchmark en TestPyPI](https://test.pypi.org/project/equiframe-benchmark/0.15.3/) · [Descargas y huellas SHA-256](https://github.com/htroya/equiframe/releases/tag/v0.15.3)
 
 # EquiFrame: comparación semántica y migración de datos en Python
 
-[Manual de 0.14.0](https://github.com/htroya/equiframe/blob/v0.14.0/docs/index.md) · [API de 0.14.0](https://github.com/htroya/equiframe/blob/v0.14.0/docs/api.md) · [Documentación por versión](docs/versions.md) · [Contribuir](CONTRIBUTING.md) · [Licencia MIT](LICENSE)
+[Manual de 0.14.0](https://github.com/htroya/equiframe/blob/v0.14.0/docs/index.md) · [API de 0.14.0](https://github.com/htroya/equiframe/blob/v0.14.0/docs/api.md) · [Manual de 0.15.3](https://github.com/htroya/equiframe/blob/v0.15.3/docs/index.md) · [Documentación por versión](docs/versions.md) · [Contribuir](CONTRIBUTING.md) · [Licencia MIT](LICENSE)
 
 
 [Evaluación con datos públicos](docs/public-spending-evaluation.md) · [Fiabilidad y alertas estadísticas](docs/reliability.md).
-Las características 1.2 son experimentales; la versión publicada en los índices sigue siendo 0.14.0.
+Las características 1.2 son experimentales.
 
 ## ¿Qué es EquiFrame?
 
@@ -392,8 +396,7 @@ Las [versiones admitidas](https://github.com/htroya/equiframe/blob/v0.14.0/pypro
 
 ## Primeros pasos
 
-El [candidato 0.15.3](https://github.com/htroya/equiframe/tree/v0.15.3)
-incluye `verify accept`. La [guía de primera verificación ETL](https://github.com/htroya/equiframe/blob/v0.15.3/docs/first-acceptance-0.15.3.md)
+La beta 0.15.3 incluye `verify accept`. La [guía de primera verificación ETL](https://github.com/htroya/equiframe/blob/v0.15.3/docs/first-acceptance-0.15.3.md)
 genera un CSV de ejemplo, su vínculo de referencia y tres escenarios de CI.
 La CLI devuelve 0 al aceptar, 1 al detectar una diferencia y 3 cuando falta
 evidencia.

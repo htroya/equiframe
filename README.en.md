@@ -1,14 +1,17 @@
 # EquiFrame: semantic comparison and dataframe migration
 
-> **Public Beta 0.14.0 — published 19 November 2026 on PyPI and TestPyPI.**
+> **Current PyPI beta: 0.14.0.**
 > Install [EquiFrame](https://pypi.org/project/equiframe/0.14.0/) and the optional,
 > exactly paired [equiframe-benchmark](https://pypi.org/project/equiframe-benchmark/0.14.0/).
 > [Release notes and SHA-256 hashes](https://github.com/htroya/equiframe/releases/tag/v0.14.0)
-> identify the published files; see the
+> identify the published files. See the
 > [release procedure](https://github.com/htroya/equiframe/blob/main/docs/releasing.md).
+>
+> Beta 0.15.3 is available on TestPyPI and GitHub. [TestPyPI core](https://test.pypi.org/project/equiframe/0.15.3/) · [TestPyPI benchmark](https://test.pypi.org/project/equiframe-benchmark/0.15.3/) · [Downloads and SHA-256 hashes](https://github.com/htroya/equiframe/releases/tag/v0.15.3)
 
 [0.14.0 documentation](https://github.com/htroya/equiframe/blob/v0.14.0/docs/index.md) |
 [0.14.0 API](https://github.com/htroya/equiframe/blob/v0.14.0/docs/api.md) |
+[0.15.3 documentation](https://github.com/htroya/equiframe/blob/v0.15.3/docs/index.md) |
 [Documentation by version](docs/versions.md) |
 [Issues](https://github.com/htroya/equiframe/issues)
 
@@ -52,8 +55,7 @@ and [supported ranges](https://github.com/htroya/equiframe/blob/v0.14.0/pyprojec
 
 ## Quick start
 
-The [0.15.3 candidate](https://github.com/htroya/equiframe/tree/v0.15.3) includes
-`verify accept`. The [ETL quickstart](https://github.com/htroya/equiframe/blob/v0.15.3/docs/first-acceptance-0.15.3.md)
+Beta 0.15.3 includes `verify accept`. The [ETL quickstart](https://github.com/htroya/equiframe/blob/v0.15.3/docs/first-acceptance-0.15.3.md)
 generates a sample CSV, its reference binding and the requests for three CI
 outcomes. The checks return 0 for acceptance, 1 for a difference and 3 for
 unavailable evidence.
