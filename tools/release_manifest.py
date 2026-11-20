@@ -429,7 +429,7 @@ def verified_source_commit(package: Path, requested: str | None) -> str:
 def command_parts(command: list[str], package: Path) -> tuple[str, list[str]] | None:
     program = Path(command[0]).name.lower().removesuffix(".exe")
     arguments = command[1:]
-    if program == "uv":
+    if program == "uv" or re.fullmatch(r"uv-[0-9]+\.[0-9]+\.[0-9]+", program):
         if arguments and arguments[0] == "sync":
             return "locked_sync", arguments[1:]
         if not arguments or arguments[0] != "run":
