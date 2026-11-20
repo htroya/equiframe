@@ -301,6 +301,7 @@ wheels = [
 name = "equiframe"
 source = { directory = "../../" }
 dependencies = [
+    { name = "pyarrow" },
     { name = "pydantic" },
     { name = "typer" },
     { name = "typing-extensions" },
@@ -341,6 +342,7 @@ requires-dist = [
     { name = "plotly", marker = "extra == 'eda-charts'", specifier = ">=6.3,<8" },
     { name = "polars", marker = "extra == 'engines'", specifier = ">=1.30,<2" },
     { name = "polars", marker = "extra == 'polars'", specifier = ">=1.30,<2" },
+    { name = "pyarrow", specifier = ">=23.0.1,<26" },
     { name = "pyarrow", marker = "extra == 'arrow'", specifier = ">=23.0.1,<26" },
     { name = "pyarrow", marker = "extra == 'duckdb'", specifier = ">=23.0.1,<26" },
     { name = "pyarrow", marker = "extra == 'eda'", specifier = ">=23.0.1,<26" },
