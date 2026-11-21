@@ -54,9 +54,7 @@ Consulta [fuentes](universal-sources.md), [ventanas](migration-ir.md) y
 
 ## Release status
 
-**0.15.7** is available on [GitHub](https://github.com/htroya/equiframe/releases/tag/v0.15.7). [SERCOP guide](https://github.com/htroya/equiframe/blob/v0.15.7/docs/sercop-pretrained.md).
-
-**0.15.6** is the current PyPI release. [Versioned handbook](https://github.com/htroya/equiframe/blob/v0.15.6/docs/index.md) · [First ETL check](https://github.com/htroya/equiframe/blob/v0.15.6/docs/first-acceptance-0.15.6.md) · [Pretrained model and offline R](https://github.com/htroya/equiframe/blob/v0.15.6/docs/sercop-pretrained.md).
+**0.15.7** is the latest public Beta. [Versioned handbook](https://github.com/htroya/equiframe/blob/v0.15.7/docs/index.md) · [SERCOP execution review](https://github.com/htroya/equiframe/blob/v0.15.7/docs/sercop-pretrained.md).
 
 **0.14.0 is published as public Beta**, together with the exactly paired
 `equiframe-benchmark`, on PyPI and TestPyPI since **19 November 2026**.
