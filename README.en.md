@@ -126,6 +126,8 @@ For example, select Polars when loading invoices and convert the resulting
 native frame to a DuckDB relation.
 
 ```python
+import equiframe as ef
+
 with ef.load_dataset("invoices.parquet", target="polars") as source:
     with ef.convert_dataset(source, target="duckdb") as result:
         print(result.frame.limit(5).df())

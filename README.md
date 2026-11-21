@@ -135,6 +135,8 @@ For example, select Polars when loading invoices and convert the resulting
 native frame to a DuckDB relation.
 
 ```python
+import equiframe as ef
+
 with ef.load_dataset("invoices.parquet", target="polars") as source:
     with ef.convert_dataset(source, target="duckdb") as result:
         print(result.frame.limit(5).df())
@@ -480,6 +482,8 @@ EquiFrame admite las seis direcciones entre Pandas, Polars y DuckDB. Por
 ejemplo, carga tus ventas en Polars y convierte ese objeto nativo a DuckDB.
 
 ```python
+import equiframe as ef
+
 with ef.load_dataset("ventas.parquet", target="polars") as origen:
     with ef.convert_dataset(origen, target="duckdb") as resultado:
         print(resultado.frame.limit(5).df())
