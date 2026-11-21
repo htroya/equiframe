@@ -410,6 +410,20 @@ def installed(tmp_path):
     return package
 
 
+@pytest.mark.parametrize("pyarrow_required", [False, True])
+def test_base_profile_supports_wheels_with_or_without_required_arrow(
+    probe, monkeypatch, pyarrow_required
+):
+    monkeypatch.setattr(
+        probe["importlib"].util,
+        "find_spec",
+        lambda name: object() if name == "pyarrow" and pyarrow_required else None,
+    )
+    assert probe["profile_availability"]("base", pyarrow_required=pyarrow_required)["pyarrow"] is (
+        pyarrow_required
+    )
+
+
 def test_installed_runtime_requires_complete_hash_and_size_inventory(probe, installed):
     expected = records(RUNTIME)
     result = probe["check_runtime_files"](installed, expected)

@@ -87,9 +87,9 @@ def runtime_binding(manifest: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def profile_availability(profile: str) -> dict[str, bool]:
+def profile_availability(profile: str, *, pyarrow_required: bool) -> dict[str, bool]:
     expected = {
-        "pyarrow": profile not in ("base", "ml"),
+        "pyarrow": pyarrow_required or profile not in ("base", "ml"),
         "pandas": profile in ("pandas", "engines", "all"),
         "polars": profile in ("polars", "engines", "all"),
         "duckdb": profile in ("duckdb", "engines", "all"),
@@ -97,7 +97,7 @@ def profile_availability(profile: str) -> dict[str, bool]:
     }
     actual = {name: importlib.util.find_spec(name) is not None for name in expected}
     if actual != expected:
-        raise ValueError(f"profile {profile} does not provide its exact optional extras: {actual}")
+        raise ValueError(f"profile {profile} does not provide its expected dependencies: {actual}")
     if profile == "base" and importlib.util.find_spec("numpy") is not None:
         raise ValueError("base installed an unexpected NumPy dependency")
     if profile in ("ml", "all") and importlib.util.find_spec("numpy") is None:
@@ -259,7 +259,9 @@ def main() -> None:
     args = parser.parse_args()
     manifest = json.loads(args.manifest.read_text("utf-8"))
     result = runtime_binding(manifest)
-    result["extras"] = profile_availability(args.profile)
+    result["extras"] = profile_availability(
+        args.profile, pyarrow_required=manifest.get("pyarrow_required") is True
+    )
     if not args.binding_only:
         if args.source is None:
             raise ValueError("public API probes require the extracted sdist source")

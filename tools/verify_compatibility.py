@@ -1029,7 +1029,9 @@ def execute_cell(
         )
         runner.run([*uv, "pip", "check", "--python", str(python)], stage="runtime-pip-check")
         manifest = directory / "wheel-payload.json"
-        write_json(manifest, {**metadata, "checkout": str(ROOT)})
+        write_json(
+            manifest, {**metadata, "checkout": str(ROOT), "pyarrow_required": "pyarrow" in runtime}
+        )
         binding = directory / "runtime-binding.json"
         runner.run(
             probe_command(python, probe, manifest, profile, binding, source), stage="public-api"
