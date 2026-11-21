@@ -2,7 +2,7 @@
 
 [Handbook](index.md) · [Recipes](recipes.md) · [Semantics](semantics.md)
 
-This guide targets **0.15.3** artifacts and uses synthetic local data. Its
+This guide targets **0.15.6** artifacts and uses synthetic local data. Its
 commands require identified artifacts after the [release gates](releasing.md)
 pass. Check the official index for availability and verify the artifact hashes.
 It works outside a source checkout. The supported range is Python 3.10–3.13;
@@ -18,7 +18,7 @@ route, with normal pip resolution and a separate hash-locked trial. For registry
 installation, use the README after the corresponding [release gates](releasing.md)
 have verified ownership and publication. For an offline delivery, obtain:
 
-- `equiframe-0.15.3-py3-none-any.whl`
+- `equiframe-0.15.6-py3-none-any.whl`
 - A receipt identifying its commit and expected SHA-256, received through a
   channel you trust independently of the artifact
 - A wheelhouse containing the reviewed runtime dependency wheels for your
@@ -29,7 +29,7 @@ same untrusted archive cannot authenticate its sender. Check the supplied wheel
 against the separate receipt before installing. For example, from its directory:
 
 ```bash
-python3.12 -c "from pathlib import Path; import hashlib; p=Path('equiframe-0.15.3-py3-none-any.whl'); print(hashlib.sha256(p.read_bytes()).hexdigest())"
+python3.12 -c "from pathlib import Path; import hashlib; p=Path('equiframe-0.15.6-py3-none-any.whl'); print(hashlib.sha256(p.read_bytes()).hexdigest())"
 ```
 
 Compare the printed value with the receipt. Stop on a mismatch. Do not copy the
@@ -44,9 +44,9 @@ mkdir equiframe-consumer
 cd equiframe-consumer
 python3.12 -m venv .venv
 . .venv/bin/activate
-WHEEL=/absolute/path/equiframe-0.15.3-py3-none-any.whl
+WHEEL=/absolute/path/equiframe-0.15.6-py3-none-any.whl
 WHEELHOUSE=/absolute/path/reviewed-wheelhouse
-python -m pip install --no-index --find-links "$WHEELHOUSE" "${WHEEL}[arrow]"
+python -m pip install --no-index --find-links "$WHEELHOUSE" "$WHEEL"
 python -m pip check
 python -I -c "import equiframe, sys; print(sys.version); print(equiframe.__version__); print(equiframe.__file__)"
 ```
@@ -141,13 +141,13 @@ a visible default rather than inferred from observed rows. Use reviewed explicit
 
 | Extra | Purpose |
 |---|---|
-| None | Contract models/validation, serialization, CLI and local artifact support |
-| `arrow` | Tabular comparison and Arrow capture/readers |
+| None | Contract validation, serialization, CLI, Arrow, the pretrained SERCOP forest and portable R |
+| `arrow` | Retained for existing installation commands. Arrow is included in the base package. |
 | `pandas`, `polars`, `duckdb` | The named native engine plus PyArrow |
 | `engines` | All three native engines plus PyArrow |
 | `ml` | Fit Isolation Forest with scikit-learn and NumPy |
 
-Change `[arrow]` in the local wheel command to the extra you need. Use
+Append the extra you need to the local wheel path in the install command. Use
 `[engines,ml]` when you need both. Extra names do not supply missing binaries in an
 offline wheelhouse. `import equiframe` itself does not import the optional engines,
 Arrow, NumPy or scikit-learn. Missing optional dependencies fail explicitly.

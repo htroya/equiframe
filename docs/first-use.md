@@ -3,7 +3,7 @@
 [Install an identified artifact](installed-private.md) · [Arquitecto](arquitecto.md) ·
 [Científico](cientifico.md) · [API](api.md)
 
-For **0.15.3**, use the identified wheel and its reviewed
+For **0.15.6**, use the identified wheel and its reviewed
 dependencies. Run these commands with the Python of that environment, outside
 the source checkout. On Windows, replace `python` with `.venv\Scripts\python.exe`;
 on Linux use `.venv/bin/python`. Activation is optional.
@@ -12,7 +12,7 @@ on Linux use `.venv/bin/python`. Activation is optional.
 
 1. Sigue [la instalación offline](installed-private.md), comprueba el SHA-256
    recibido por un canal de confianza y ejecuta `python -m pip check`.
-   Para arquitecto instala `[duckdb]`; para científico basta `[arrow]`.
+   Para arquitecto instala `[duckdb]`. Para científico basta la instalación base con Arrow.
    No necesitas ML, benchmark, OCI, una cuenta nueva ni un servicio adicional.
 2. Comprueba el intérprete antes de preparar datos:
 
@@ -61,8 +61,8 @@ una traducción automática de SQL/Python arbitrario ni un servicio desplegado.
 
 ## English: a short installed route
 
-Install the identified wheel with `[duckdb]` for the architect or `[arrow]`
-for the scientist. Run `python -m pip check`, then `doctor --extra duckdb` or
+Install the identified wheel with `[duckdb]` for the architect. The base installation
+includes Arrow for the scientist. Run `python -m pip check`, then `doctor --extra duckdb` or
 `doctor --extra arrow`. A metadata-ready diagnosis is not native validation.
 
 Run `demo --role architect --output sql-good` or

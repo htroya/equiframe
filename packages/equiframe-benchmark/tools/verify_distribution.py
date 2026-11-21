@@ -161,11 +161,11 @@ assert importlib.metadata.version('equiframe') == sys.argv[3]
                 shutil.copy2(project / readme, target / readme)
             for pattern in metadata.get("license-files", []):
                 for path in project.glob(pattern):
-                    if (
-                        path.is_symlink()
-                        or not path.is_file()
-                        or not path.resolve().is_relative_to(project.resolve())
-                    ):
+                    if path.is_symlink() or not path.resolve().is_relative_to(project.resolve()):
+                        raise RuntimeError("declared license source is outside the package")
+                    if path.is_dir():
+                        continue
+                    if not path.is_file():
                         raise RuntimeError("declared license source is not a regular package file")
                     destination = target / path.relative_to(project)
                     destination.parent.mkdir(parents=True, exist_ok=True)

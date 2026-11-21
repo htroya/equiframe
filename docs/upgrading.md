@@ -3,6 +3,12 @@
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Security](security.md) ·
 [Release/rollback](releasing.md)
 
+## 0.15.6 - SERCOP model and offline R review
+
+Install both distributions at 0.15.6. The core package includes Arrow and the
+[pretrained SERCOP forest](sercop-pretrained.md). The SERCOP acceptance command
+can use the included R interpreter offline on Windows or Linux x64 with glibc.
+
 ## 0.15.3 - first-use kit packaging
 
 Install both distributions at 0.15.3. The packaged
