@@ -17,18 +17,27 @@ receipts. No callbacks, models or hidden datasets are downloaded.
 
 ## Installation outside the checkout
 
-The commands below use an identified **0.14.0 offline wheelhouse**, with a
+The commands below use an identified **0.15.8 offline wheelhouse**, with a
 matching identity for the actual CPython 3.10–3.13 minor and platform. Follow
 [installed-private.md](installed-private.md) for normal resolution, `pip check`,
 import verification and the separate complete hash-lock trial. Use `[engines]`
 for the current common journey environment; ML and benchmark are unnecessary.
-Run from a fresh consumer directory outside the checkout:
+From a fresh directory outside the checkout, create and activate a virtual
+environment and install the current wheel from PyPI.
+
+```bash
+python -m pip install "equiframe[engines]==0.15.8"
+python -m pip check
+python -I -m equiframe.examples.journeys.verify_journeys --output acceptance
+```
+
+For offline installation, use these commands with the reviewed wheelhouse.
 
 ```bash
 python3.12 -m venv .venv
 WHEELHOUSE=/absolute/path/reviewed-wheelhouse
 .venv/bin/python -I -m pip install --no-index --find-links "$WHEELHOUSE" \
-  'equiframe[engines]==0.14.0' --report install-report.json
+  'equiframe[engines]==0.15.8' --report install-report.json
 .venv/bin/python -I -m pip check
 .venv/bin/python -I -c 'import equiframe, sys; print(sys.executable); print(equiframe.__file__); print(equiframe.__version__)'
 .venv/bin/python -I -m equiframe.examples.journeys.verify_journeys --output acceptance

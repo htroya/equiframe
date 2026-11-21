@@ -34,6 +34,7 @@ from equiframe.errors import (
     CapabilityError,
     ContractIOError,
     ContractValidationError,
+    MissingDependencyError,
 )
 from equiframe.evidence import describe_file, inspect_evidence, load_json, read_pipeline
 from equiframe.execution_types import ExecutionResult
@@ -166,6 +167,18 @@ def _dataset_load_interactive(source: Path, options: DatasetReadOptions) -> Data
     raise DatasetReadError("Too many unresolved input choices; pass explicit dataset options.")
 
 
+def _dataset_dependency_failure(target: str | None) -> None:
+    extra = {"polars": "files,polars", "duckdb": "files,duckdb"}.get(
+        (target or "").lower(), "files"
+    )
+    typer.echo("operation_failed", err=True)
+    typer.echo(
+        f'hint[optional_dependency]: Install with python -m pip install "equiframe[{extra}]".',
+        err=True,
+    )
+    raise typer.Exit(code=3)
+
+
 @dataset_app.command("load")
 def dataset_load(
     source: Path,
@@ -234,6 +247,8 @@ def dataset_load(
                 }
             )
         )
+    except MissingDependencyError:
+        _dataset_dependency_failure(target)
     except Exception as error:
         _failure(error)
     finally:
@@ -266,6 +281,8 @@ def dataset_inspect(
         )
         result = _dataset_load_interactive(source, options)
         typer.echo(json.dumps(result.info.to_dict(), ensure_ascii=True, default=str))
+    except MissingDependencyError:
+        _dataset_dependency_failure(None)
     except Exception as error:
         _failure(error)
     finally:

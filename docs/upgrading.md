@@ -3,6 +3,14 @@
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Security](security.md) ·
 [Release/rollback](releasing.md)
 
+## 0.15.8 - SERCOP null handling
+
+The SERCOP flow excludes missing source amounts from grouped measurements.
+Original Arrow captures and row counts preserve the input rows. Public grouped
+profiling keeps its existing behavior. The SERCOP report identifies its profile
+policy. Use the [CI gate example](first-acceptance-0.15.8.md) to check the exit
+code and top-level publishability together.
+
 ## 0.15.7 - captured SERCOP execution acceptance
 
 `sercop accept-execution` uses a completed `run.json` with the independent Arrow

@@ -4,16 +4,17 @@
 
 <a id="english"></a>
 
-> **EquiFrame 0.15.7 Beta** includes a pretrained SERCOP Isolation Forest and an ETL review flow with R.
-> [Version 0.15.7 handbook](https://github.com/htroya/equiframe/blob/v0.15.7/docs/index.md)
-> · [Documentation by version](https://github.com/htroya/equiframe/blob/v0.15.7/docs/versions.md)
+> **EquiFrame 0.15.8 Beta** includes a pretrained SERCOP Isolation Forest and an ETL review flow with R.
+> [Version 0.15.8 handbook](https://github.com/htroya/equiframe/blob/v0.15.8/docs/index.md)
+> · [First ETL check and CI gate](https://github.com/htroya/equiframe/blob/v0.15.8/docs/first-acceptance-0.15.8.md)
+> · [Documentation by version](https://github.com/htroya/equiframe/blob/v0.15.8/docs/versions.md)
 > [0.14.0 errata](https://github.com/htroya/equiframe/blob/v0.15.3/docs/equiframe-0.14.0-errata.md)
 
 # EquiFrame: semantic comparison and dataframe migration
 
-[Documentation](https://github.com/htroya/equiframe/blob/v0.15.7/docs/index.md) |
-[API](https://github.com/htroya/equiframe/blob/v0.15.7/docs/api.md) |
-[Examples](https://github.com/htroya/equiframe/blob/v0.15.7/docs/journeys.md) |
+[Documentation](https://github.com/htroya/equiframe/blob/v0.15.8/docs/index.md) |
+[API](https://github.com/htroya/equiframe/blob/v0.15.8/docs/api.md) |
+[Examples](https://github.com/htroya/equiframe/blob/v0.15.8/docs/journeys.md) |
 [Issues](https://github.com/htroya/equiframe/issues)
 
 `equiframe sercop model` checks the pretrained model in the base installation.
@@ -35,18 +36,18 @@ your own data, independently of procurement schemas, warehouses and cloud servic
 
 The distribution is classified **Beta**. Existing stable APIs and persisted
 formats retain their compatibility commitments; experimental workflows remain
-explicitly identified. See the [readiness review](https://github.com/htroya/equiframe/blob/main/docs/review-0132.md).
+explicitly identified. See the [readiness review](https://github.com/htroya/equiframe/blob/v0.15.8/docs/review-0132.md).
 
 ## Install
 
 EquiFrame supports **Python 3.10, 3.11, 3.12 and 3.13**.
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.15.7"
+python -m pip install "equiframe[files,engines,ml]==0.15.8"
 python -m pip check
 ```
 
-The base installation is `python -m pip install equiframe==0.15.7`.
+The base installation is `python -m pip install equiframe==0.15.8`.
 Optional engines and machine-learning libraries are loaded when requested.
 
 | Extra | Purpose |
@@ -58,7 +59,7 @@ Optional engines and machine-learning libraries are loaded when requested.
 | `eda`, `eda-charts` | Experimental exploratory analysis and optional charts |
 
 The standalone `review_with_r` API accepts an existing `Rscript` executable.
-See [dependencies](https://github.com/htroya/equiframe/blob/main/docs/dependencies.md)
+See [dependencies](https://github.com/htroya/equiframe/blob/v0.15.8/docs/dependencies.md)
 and [supported ranges](https://github.com/htroya/equiframe/blob/main/pyproject.toml).
 
 ## Quick start
@@ -102,7 +103,7 @@ with ef.load_dataset("orders.parquet", target="polars") as loaded:
 
 Pass `DatasetReadOptions` for multiple Excel sheets, nested JSON/XML, ambiguous
 delimiters or exact column representations. The
-[file-reading guide](https://github.com/htroya/equiframe/blob/main/docs/lectura-conversion.md)
+[file-reading guide](https://github.com/htroya/equiframe/blob/v0.15.8/docs/lectura-conversion.md)
 describes supported forms, preserved representations and resource limits.
 
 ```bash
@@ -140,7 +141,7 @@ acceptance with `ef.assert_equivalent(result)`; divergent or incomplete results
 raise `ef.EquivalenceAssertionError`. Operational failures use the
 `ef.EquiFrameError` hierarchy, including `DatasetReadError`,
 `MissingDependencyError` and `InvalidExecutionInput`. See the
-[API reference](https://github.com/htroya/equiframe/blob/v0.15.7/docs/api.md)
+[API reference](https://github.com/htroya/equiframe/blob/v0.15.8/docs/api.md)
 for argument-validation exceptions and command-specific exits.
 
 All six directed combinations of Pandas, Polars and DuckDB are supported.
@@ -184,7 +185,7 @@ print(summary.group_coverage, summary.comparison_coverage)
 The same API works for inventory by warehouse, expenses by department or amounts
 by entity and currency. It reports missing and invalid groups explicitly; an
 empty denominator is `None`. Metrics use exact Fractions and do not change the
-existing row-equivalence checks. See the [grouped-comparison guide](https://github.com/htroya/equiframe/blob/main/docs/grouped-comparison.md)
+existing row-equivalence checks. See the [grouped-comparison guide](https://github.com/htroya/equiframe/blob/v0.15.8/docs/grouped-comparison.md)
 for formulas, tolerances, zero references, input types and bounded examples.
 
 ## ETL, rules, anomalies and R review
@@ -202,10 +203,10 @@ for formulas, tolerances, zero references, input types and bounded examples.
   `finalize_execution_with_r` use a real R process and an explicit contract,
   preserving earlier alerts, disagreements and unavailable components.
 
-See [entry points](https://github.com/htroya/equiframe/blob/main/docs/choosing-api.md),
-[semantics](https://github.com/htroya/equiframe/blob/main/docs/semantics.md),
-[migration](https://github.com/htroya/equiframe/blob/main/docs/migration-ir.md)
-and [R review](https://github.com/htroya/equiframe/blob/main/docs/r_review.md).
+See [entry points](https://github.com/htroya/equiframe/blob/v0.15.8/docs/choosing-api.md),
+[semantics](https://github.com/htroya/equiframe/blob/v0.15.8/docs/semantics.md),
+[migration](https://github.com/htroya/equiframe/blob/v0.15.8/docs/migration-ir.md)
+and [R review](https://github.com/htroya/equiframe/blob/v0.15.8/docs/r_review.md).
 Registered callbacks and SQL are trusted application code; EquiFrame does not
 sandbox untrusted programs.
 
@@ -222,13 +223,13 @@ python examples/load_convert_compare.py --rows 30000
 
 Installed wheels provide the same example as
 `python -m equiframe.examples.load_convert_compare --rows 30000`. Further
-[examples](https://github.com/htroya/equiframe/blob/v0.15.7/docs/journeys.md)
-and [recipes](https://github.com/htroya/equiframe/blob/main/docs/recipes.md)
+[examples](https://github.com/htroya/equiframe/blob/v0.15.8/docs/journeys.md)
+and [recipes](https://github.com/htroya/equiframe/blob/v0.15.8/docs/recipes.md)
 cover ETL, reconciliation and terminal usage.
 
 ## Compatibility and development
 
-The [compatibility register](https://github.com/htroya/equiframe/blob/main/docs/compatibility.md)
+The [compatibility register](https://github.com/htroya/equiframe/blob/v0.15.8/docs/compatibility.md)
 distinguishes stable interfaces and experimental capabilities. Advanced
 orchestration, standalone pipelines, EDA and reduction remain experimental.
 The separate `equiframe-benchmark` distribution remains Beta.
@@ -236,7 +237,7 @@ The separate `equiframe-benchmark` distribution remains Beta.
 Releases use `MAJOR.MINOR.PATCH`: patches preserve documented contracts, minor
 releases add compatible functionality, and breaking changes require migration
 notes. During `0.x`, consult the
-[upgrade guide](https://github.com/htroya/equiframe/blob/main/docs/upgrading.md)
+[upgrade guide](https://github.com/htroya/equiframe/blob/v0.15.8/docs/upgrading.md)
 and [changelog](https://github.com/htroya/equiframe/blob/main/CHANGELOG.md).
 Release versions derive from reviewed Git tags.
 
@@ -267,12 +268,12 @@ and [license scope](https://github.com/htroya/equiframe/blob/main/NOTICE.md).
 
 <a id="espanol"></a>
 
-> **EquiFrame 0.15.7 Beta** incorpora un modelo SERCOP preentrenado y revisión ETL con R.
-> [Documentación por versión](docs/versions.md) · [Erratas de 0.14.0](docs/equiframe-0.14.0-errata.md)
+> **EquiFrame 0.15.8 Beta** incorpora un modelo SERCOP preentrenado y revisión ETL con R.
+> [Primera verificación ETL y ejemplo para CI](https://github.com/htroya/equiframe/blob/v0.15.8/docs/first-acceptance-0.15.8.md) · [Documentación por versión](docs/versions.md) · [Erratas de 0.14.0](docs/equiframe-0.14.0-errata.md)
 
 # EquiFrame: comparación semántica y migración de datos en Python
 
-[Documentación](https://github.com/htroya/equiframe/blob/v0.15.7/docs/index.md) · [API](https://github.com/htroya/equiframe/blob/v0.15.7/docs/api.md) · [Ejemplos](https://github.com/htroya/equiframe/blob/v0.15.7/docs/journeys.md) · [Contribuir](https://github.com/htroya/equiframe/blob/main/CONTRIBUTING.md) · [Licencia MIT](https://github.com/htroya/equiframe/blob/main/LICENSE)
+[Documentación](https://github.com/htroya/equiframe/blob/v0.15.8/docs/index.md) · [API](https://github.com/htroya/equiframe/blob/v0.15.8/docs/api.md) · [Ejemplos](https://github.com/htroya/equiframe/blob/v0.15.8/docs/journeys.md) · [Contribuir](https://github.com/htroya/equiframe/blob/main/CONTRIBUTING.md) · [Licencia MIT](https://github.com/htroya/equiframe/blob/main/LICENSE)
 
 ## ¿Qué es EquiFrame?
 
@@ -330,27 +331,27 @@ estables y las capacidades experimentales.
 Instala los extras necesarios para tu trabajo:
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.15.7"
+python -m pip install "equiframe[files,engines,ml]==0.15.8"
 python -m pip check
 ```
 
-La instalación base puede hacerse con `python -m pip install equiframe==0.15.7`.
+La instalación base puede hacerse con `python -m pip install equiframe==0.15.8`.
 Selecciona los extras necesarios para tu trabajo; el núcleo no importa los
 motores opcionales al ejecutar `import equiframe`.
 
 Para instalar un wheel local:
 
 ```bash
-python -m pip install "./equiframe-0.15.7-py3-none-any.whl[files,engines,ml]"
+python -m pip install "./equiframe-0.15.8-py3-none-any.whl[files,engines,ml]"
 ```
 
 El benchmark se instala por separado, después del núcleo:
 
 ```bash
-python -m pip install equiframe-benchmark==0.15.7
+python -m pip install equiframe-benchmark==0.15.8
 ```
 
-Consulta la [guía de instalación](https://github.com/htroya/equiframe/blob/main/docs/installed-private.md) para entornos aislados,
+Consulta la [guía de instalación](https://github.com/htroya/equiframe/blob/v0.15.8/docs/installed-private.md) para entornos aislados,
 dependencias y comprobación de los artefactos recibidos.
 
 ## Dependencias
@@ -372,7 +373,7 @@ conexión en Windows y Linux x64. La API `review_with_r` también admite un
 Usa `equiframe sercop accept-execution` para comprobar un `run.json` con
 la referencia independiente en Arrow y su archivo de vinculación.
 Las [versiones admitidas](https://github.com/htroya/equiframe/blob/main/pyproject.toml) y los
-[detalles de compatibilidad](https://github.com/htroya/equiframe/blob/main/docs/compatibility.md) describen el soporte declarado.
+[detalles de compatibilidad](https://github.com/htroya/equiframe/blob/v0.15.8/docs/compatibility.md) describen el soporte declarado.
 
 ## Primeros pasos
 
@@ -408,7 +409,7 @@ python -m equiframe dataset load ventas.json --target polars
 python -m equiframe dataset inspect ventas.parquet
 ```
 
-La [guía de lectura y conversión](https://github.com/htroya/equiframe/blob/main/docs/lectura-conversion.md) explica las opciones
+La [guía de lectura y conversión](https://github.com/htroya/equiframe/blob/v0.15.8/docs/lectura-conversion.md) explica las opciones
 para Excel, XML, JSON anidado, texto y GeoJSON, junto con los tipos conservados.
 
 ### Comparar resultados de dos motores
@@ -430,7 +431,7 @@ print(resultado.complete)
 
 Para aplicar una aceptación en un proceso automatizado, utiliza
 `ef.assert_equivalent(resultado)`: una diferencia provoca una excepción.
-Consulta [qué API elegir](https://github.com/htroya/equiframe/blob/main/docs/choosing-api.md) para comparar objetos nativos,
+Consulta [qué API elegir](https://github.com/htroya/equiframe/blob/v0.15.8/docs/choosing-api.md) para comparar objetos nativos,
 capturas de archivos o resultados de una ejecución.
 
 ### Comparar montos por grupos
@@ -485,21 +486,21 @@ nativa del plan admitido.
 
 Las reglas y los detectores de anomalías tienen resultados separados.
 Isolation Forest requiere ajuste y calibración adecuados a los datos.
-La [revisión con R](https://github.com/htroya/equiframe/blob/main/docs/r_review.md) puede completar la decisión mediante
+La [revisión con R](https://github.com/htroya/equiframe/blob/v0.15.8/docs/r_review.md) puede completar la decisión mediante
 `finalize_with_r` o `finalize_execution_with_r`, manteniendo visibles las alertas
 y los componentes que no pudieron evaluarse.
 
 Los planes admitidos, políticas y límites se describen en
-[semántica](https://github.com/htroya/equiframe/blob/main/docs/semantics.md), [API](https://github.com/htroya/equiframe/blob/v0.15.7/docs/api.md) y [recetas](https://github.com/htroya/equiframe/blob/main/docs/recipes.md).
+[semántica](https://github.com/htroya/equiframe/blob/v0.15.8/docs/semantics.md), [API](https://github.com/htroya/equiframe/blob/v0.15.8/docs/api.md) y [recetas](https://github.com/htroya/equiframe/blob/v0.15.8/docs/recipes.md).
 
 ## Documentación
 
-- [Manual de la biblioteca](https://github.com/htroya/equiframe/blob/v0.15.7/docs/index.md) e [inicio en español](https://github.com/htroya/equiframe/blob/main/docs/inicio.md).
-- [Referencia de la API y CLI](https://github.com/htroya/equiframe/blob/v0.15.7/docs/api.md).
-- [Ejemplos de uso completos](https://github.com/htroya/equiframe/blob/v0.15.7/docs/journeys.md).
-- [Compatibilidad](https://github.com/htroya/equiframe/blob/main/docs/compatibility.md) y [cambios entre versiones](https://github.com/htroya/equiframe/blob/main/CHANGELOG.md).
+- [Manual de la biblioteca](https://github.com/htroya/equiframe/blob/v0.15.8/docs/index.md) e [inicio en español](https://github.com/htroya/equiframe/blob/v0.15.8/docs/inicio.md).
+- [Referencia de la API y CLI](https://github.com/htroya/equiframe/blob/v0.15.8/docs/api.md).
+- [Ejemplos de uso completos](https://github.com/htroya/equiframe/blob/v0.15.8/docs/journeys.md).
+- [Compatibilidad](https://github.com/htroya/equiframe/blob/v0.15.8/docs/compatibility.md) y [cambios entre versiones](https://github.com/htroya/equiframe/blob/main/CHANGELOG.md).
 - [Seguridad](https://github.com/htroya/equiframe/blob/main/SECURITY.md) y [licencias de terceros](https://github.com/htroya/equiframe/blob/main/THIRD_PARTY_NOTICES.md).
-- [Portal del proyecto y seguimiento técnico](https://github.com/htroya/equiframe/blob/v0.15.7/docs/index.md).
+- [Portal del proyecto y seguimiento técnico](https://github.com/htroya/equiframe/blob/v0.15.8/docs/index.md).
 
 ## Origen del proyecto
 
@@ -529,4 +530,4 @@ y revisión se mantienen en el repositorio.
 El código propio de EquiFrame y EquiFrame Benchmark se distribuye bajo
 [MIT](https://github.com/htroya/equiframe/blob/main/LICENSE). Los componentes de terceros conservan sus licencias:
 los esquemas CycloneDX incluidos mantienen Apache-2.0.
-Consulta los [avisos de terceros](https://github.com/htroya/equiframe/blob/main/THIRD_PARTY_NOTICES.md) y el [alcance de la licencia](https://github.com/htroya/equiframe/blob/main/docs/licensing.md).
+Consulta los [avisos de terceros](https://github.com/htroya/equiframe/blob/main/THIRD_PARTY_NOTICES.md) y el [alcance de la licencia](https://github.com/htroya/equiframe/blob/v0.15.8/docs/licensing.md).

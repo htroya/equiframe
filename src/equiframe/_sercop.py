@@ -15,7 +15,7 @@ from equiframe.detectors import detect_component, read_detector_bundle
 from equiframe.errors import CapabilityError, EquiFrameError
 from equiframe.evidence import publish_json
 from equiframe.profile_types import ProfileVector
-from equiframe.profiles import profile_execution
+from equiframe.profiles import _profile_execution
 from equiframe.r_review import RReviewOptions, _review_with_r
 from equiframe.serialization import contract_fingerprint
 from equiframe.types import Sha256
@@ -149,14 +149,24 @@ def assess_capture(
             scored[name] = unavailable("bundled_model_unavailable")
         else:
             try:
-                profile = profile_execution(
-                    execution, spec=bundle.fit.preprocessor.spec, work_dir=scope
+                profile = _profile_execution(
+                    execution,
+                    spec=bundle.fit.preprocessor.spec,
+                    work_dir=scope,
+                    grouped_nullable_reference=("source", "amount"),
                 )
                 scored[name] = (
                     score_profile(bundle, profile.vector)
                     if profile.complete
                     else unavailable("profile_incomplete")
                 )
+                scored[name]["profile_policy"] = "sercop-grouped-reference-present-amounts-1"
+                if not profile.complete:
+                    scored[name]["unavailable_features"] = [
+                        {"name": observation.name, "reason": observation.reason}
+                        for observation in profile.vector.observations
+                        if observation.state == "not_evaluable"
+                    ]
             except (OSError, ValueError, EquiFrameError):
                 scored[name] = unavailable("profile_or_detection_failed")
 

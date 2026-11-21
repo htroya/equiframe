@@ -1,3 +1,11 @@
+## 0.15.8 - SERCOP null handling and reproducible installation
+
+- Exclude absent reference amounts from grouped SERCOP measurements. Keep NULL
+  and zero distinct in source captures and retain the trained forest and threshold.
+- Record the SERCOP profile policy and identify unavailable profile features.
+- Provide a publication gate example, aligned installation guides and specific
+  dependency hints for dataset commands.
+
 ## 0.15.7 - captured SERCOP execution acceptance
 
 - Add `equiframe sercop accept-execution` for a completed `run.json` and a bound

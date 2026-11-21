@@ -40,6 +40,16 @@ independiente cuando el bosque y la comparación exacta discrepan o falta una
 evaluación. El informe conserva el veredicto contractual, la puntuación y el
 umbral del bosque, el dictamen de R y el caso aplicado a la corrida.
 
+En 0.15.8, el perfil agrupado de SERCOP excluye las filas de entrada con importe
+nulo de las sumas de referencia del modelo. La captura original, el recuento de
+filas y la distinción entre cero y NULL se conservan. El informe identifica la
+política `sercop-grouped-reference-present-amounts-1`. El bosque y su umbral
+provienen del entrenamiento original con importes presentes.
+
+Para autorizar una carga usa el código 0 y el `publishable` del nivel superior.
+Consulta el [ejemplo de CI](first-acceptance-0.15.8.md) para distinguirlo de la
+decisión contractual `contract.publishable`.
+
 El contrato revisa las claves, la multiplicidad y los totales exactos en
 centavos. Si el bosque guarda silencio ante una diferencia contractual, esa
 diferencia bloquea la corrida. Si el bosque alerta y R confirma la equivalencia
@@ -79,5 +89,5 @@ huellas de los archivos de origen, el artefacto de entrenamiento, las particione
 y los resultados por escenario. Los valores se refieren al contrato, universo
 y lotes evaluados.
 
-[Revisión con R](r_review.md) · [Prueba ETL con recibos](first-acceptance-0.15.6.md) ·
+[Revisión con R](r_review.md) · [Prueba ETL con recibos](first-acceptance-0.15.8.md) ·
 [Fuente pública SERCOP](https://data.open-contracting.org/es/publication/110)

@@ -5,6 +5,7 @@ also ships a copy of its handbook under `equiframe/docs/`.
 
 | Version | Handbook at the source tag | Release information |
 | --- | --- | --- |
+| 0.15.8 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.8/docs/index.md) | [First ETL check and CI gate](https://github.com/htroya/equiframe/blob/v0.15.8/docs/first-acceptance-0.15.8.md) |
 | 0.15.7 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.7/docs/index.md) | [Captured SERCOP execution review](https://github.com/htroya/equiframe/blob/v0.15.7/docs/sercop-pretrained.md) |
 | 0.15.6 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.6/docs/index.md) | [Bundled SERCOP model and ETL review](https://github.com/htroya/equiframe/blob/v0.15.6/docs/sercop-pretrained.md) |
 | 0.15.5 | Local candidate | Superseded by the offline R runtime |

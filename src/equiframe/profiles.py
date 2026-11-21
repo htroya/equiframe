@@ -73,6 +73,7 @@ class _ProfileContext:
         self.hashes: dict[str, str] = {}
         self.output_sha256 = ""
         self.grouped: dict[str, GroupedComparisonResult] = {}
+        self.grouped_nullable_reference: tuple[str, str] | None = None
 
     def checkpoint(self, cost: int = 1) -> None:
         self.work += cost
@@ -403,6 +404,26 @@ def profile_execution(
     conversions: tuple[ConversionReceipt, ...] = (),
 ) -> ProfileResult:
     """Materialize the section 3.6 formulas with exact counts and explicit unavailable states."""
+    return _profile_execution(
+        execution,
+        spec=spec,
+        options=options,
+        work_dir=work_dir,
+        cancellation=cancellation,
+        conversions=conversions,
+    )
+
+
+def _profile_execution(
+    execution: ExecutionResult,
+    *,
+    spec: ProfileSpec,
+    options: ProfileOptions | None = None,
+    work_dir: Path | None = None,
+    cancellation: CancellationToken | None = None,
+    conversions: tuple[ConversionReceipt, ...] = (),
+    grouped_nullable_reference: tuple[str, str] | None = None,
+) -> ProfileResult:
     execution = ExecutionResult.model_validate(execution)
     spec = ProfileSpec.model_validate(spec)
     options = ProfileOptions.model_validate(ProfileOptions() if options is None else options)
@@ -423,6 +444,7 @@ def profile_execution(
     )
     directory.mkdir(parents=True, exist_ok=False)
     context = _ProfileContext(options, cancellation or CancellationToken())
+    context.grouped_nullable_reference = grouped_nullable_reference
     context.conversions = {c.feature: c for c in conversions}
     failure: str | None = None
     try:

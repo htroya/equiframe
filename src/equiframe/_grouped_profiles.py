@@ -40,6 +40,17 @@ def measure_grouped(feature: GroupedProfileFeature, context: _ProfileContext) ->
         right = reference.select((*feature.by, feature.reference_column)).rename_columns(
             (*aliases, "measure")
         )
+        if (
+            context.grouped_nullable_reference
+            == (feature.reference_table, feature.reference_column)
+            and right["measure"].null_count
+        ):
+            # Only the workflow's grouped reference excludes absent amounts.
+            # Captures and features such as the input row count keep those rows.
+            import pyarrow.compute as pc
+
+            context.checkpoint(reference.num_rows)
+            right = right.filter(pc.is_valid(right["measure"]))
         summary = compare_grouped(
             left,
             right,

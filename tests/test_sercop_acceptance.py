@@ -31,7 +31,7 @@ def write_arrow(table: pa.Table, path: Path) -> ef.ArtifactRef:
     )
 
 
-def request(root: Path, fault: str) -> Path:
+def request(root: Path, fault: str, *, missing_amount: bool = False) -> Path:
     pytest.importorskip("duckdb")
     info, _ = bundled_model()
     rows = [
@@ -44,6 +44,8 @@ def request(root: Path, fault: str) -> Path:
         }
         for i in range(32)
     ]
+    if missing_amount:
+        rows[-1]["amount"] = None
     # The literal business rule yields 28 groups, in exact integer cents.
     reference = write_arrow(
         pa.table(
@@ -107,7 +109,7 @@ def request(root: Path, fault: str) -> Path:
     )
     path = root / "request.json"
     publish_json(doc, path)
-    if not fault:
+    if not fault and not missing_amount:
         profile = ef.profile_execution(
             execution, spec=bundled_model()[1].fit.preprocessor.spec, work_dir=root / "features"
         )
@@ -116,8 +118,10 @@ def request(root: Path, fault: str) -> Path:
     return path
 
 
-def call(root: Path, fault: str, rscript: str | None = None) -> tuple[int, dict]:
-    doc = request(root, fault)
+def call(
+    root: Path, fault: str, rscript: str | None = None, *, missing_amount: bool = False
+) -> tuple[int, dict]:
+    doc = request(root, fault, missing_amount=missing_amount)
     output = root / "review"
     run = CliRunner().invoke(
         app,
@@ -314,3 +318,15 @@ def test_real_base_r_confirms_expected_captures(tmp_path, fault, expected):
     )
     assert code == (1 if fault else 0)
     assert report["publishable"] == (code == 0)
+
+
+@pytest.mark.parametrize(("fault", "expected"), [("", 0), ("one_cent", 1)])
+def test_sercop_nullable_amount_is_evaluated(tmp_path, fault, expected):
+    if _platform() is None:
+        pytest.skip("bundled R is unavailable")
+    code, report = call(tmp_path, fault, missing_amount=True)
+    assert code == expected
+    assert report["publishable"] is (expected == 0)
+    result = report["isolation_forest"]["candidate"]
+    assert result["state"] in ("alert", "no_alert")
+    assert result["profile_policy"] == "sercop-grouped-reference-present-amounts-1"

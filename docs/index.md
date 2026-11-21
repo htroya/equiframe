@@ -50,7 +50,7 @@ Consulta [fuentes](universal-sources.md), [ventanas](migration-ir.md) y
 
 ## Release status
 
-This handbook describes **0.15.7 Beta**. EquiFrame 0.14.0 was published
+This handbook describes **0.15.8 Beta**. EquiFrame 0.14.0 was published
 on [PyPI](https://pypi.org/project/equiframe/0.14.0/) on 19 November 2026.
 Use the [release notes](https://github.com/htroya/equiframe/releases) for
 artifact hashes and the scope of each version's checks.
@@ -75,6 +75,8 @@ See [maintenance](maintenance.md) and [security](security.md); never submit
 sensitive details in a public issue.
 
 ## Start here
+
+[First ETL check and CI gate](first-acceptance-0.15.8.md).
 
 1. [Quick start](quickstart.md): identified artifacts, a clean environment,
    a complete small comparison and a fail-closed assertion
