@@ -119,6 +119,26 @@ The first command asks for a destination in an interactive terminal. Supply
 `--target` in automated jobs. Invalid inputs return a nonzero exit and an error
 on `stderr`.
 
+### Migrate your own data across engines
+
+EquiFrame supports all six directions among Pandas, Polars and DuckDB.
+For example, select Polars when loading invoices and convert the resulting
+native frame to a DuckDB relation.
+
+```python
+with ef.load_dataset("invoices.parquet", target="polars") as source:
+    with ef.convert_dataset(source, target="duckdb") as result:
+        print(result.frame.limit(5).df())
+```
+
+For ETL, declare the source engine, target engine, contract and a supported
+relational plan. Use `ef.migrate` or `equiframe migration run` to execute it,
+compare the two outputs and check an independent reference. The packaged
+SERCOP detector has its own profile. The conversion and native ETL APIs work
+with other domains using their own contracts.
+[Native ETL](https://github.com/htroya/equiframe/blob/v0.15.8/docs/migration-ir.md) ·
+[Examples](https://github.com/htroya/equiframe/blob/v0.15.8/docs/journeys.md)
+
 ## Compare independently produced results
 
 This example deliberately changes one amount:
