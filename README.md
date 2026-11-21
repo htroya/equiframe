@@ -4,6 +4,9 @@
 
 <a id="english"></a>
 
+> **EquiFrame 0.15.7 is available on GitHub.** It can verify a SERCOP `run.json` directly and identifies breached input and output constraints.
+> [Release files and SHA-256 list](https://github.com/htroya/equiframe/releases/tag/v0.15.7) · [SERCOP guide](https://github.com/htroya/equiframe/blob/v0.15.7/docs/sercop-pretrained.md) · [Core on TestPyPI](https://test.pypi.org/project/equiframe/0.15.7/)
+
 > **Public Beta 0.15.6**
 > Install [EquiFrame](https://pypi.org/project/equiframe/0.15.6/) and the optional,
 > exactly paired [equiframe-benchmark](https://pypi.org/project/equiframe-benchmark/0.15.6/).
@@ -282,6 +285,9 @@ and [license scope](https://github.com/htroya/equiframe/blob/main/NOTICE.md).
 ---
 
 <a id="espanol"></a>
+
+> **EquiFrame 0.15.7 está disponible en GitHub.** El comando SERCOP valida directamente `run.json` e identifica las restricciones de entrada y salida incumplidas.
+> [Archivos y huellas SHA-256](https://github.com/htroya/equiframe/releases/tag/v0.15.7) · [Guía SERCOP](https://github.com/htroya/equiframe/blob/v0.15.7/docs/sercop-pretrained.md) · [EquiFrame en TestPyPI](https://test.pypi.org/project/equiframe/0.15.7/)
 
 > **Beta pública 0.15.6**
 > Instala [EquiFrame](https://pypi.org/project/equiframe/0.15.6/) y, si lo necesitas,

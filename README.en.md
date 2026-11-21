@@ -1,5 +1,8 @@
 # EquiFrame: semantic comparison and dataframe migration
 
+> **EquiFrame 0.15.7 is available on GitHub.** It can verify a SERCOP `run.json` directly and identifies breached input and output constraints.
+> [Release files and SHA-256 list](https://github.com/htroya/equiframe/releases/tag/v0.15.7) · [SERCOP guide](https://github.com/htroya/equiframe/blob/v0.15.7/docs/sercop-pretrained.md) · [Core on TestPyPI](https://test.pypi.org/project/equiframe/0.15.7/)
+
 > **Public Beta 0.15.6**
 > Install [EquiFrame](https://pypi.org/project/equiframe/0.15.6/) and the optional,
 > exactly paired [equiframe-benchmark](https://pypi.org/project/equiframe-benchmark/0.15.6/).

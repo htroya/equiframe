@@ -5,6 +5,7 @@ also ships a copy of its handbook under `equiframe/docs/`.
 
 | Version | Handbook at the source tag | Release information |
 | --- | --- | --- |
+| 0.15.7 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.7/docs/index.md) | [GitHub release and SHA-256 list](https://github.com/htroya/equiframe/releases/tag/v0.15.7) · [Core on TestPyPI](https://test.pypi.org/project/equiframe/0.15.7/) |
 | 0.15.6 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.6/docs/index.md) | [PyPI core](https://pypi.org/project/equiframe/0.15.6/) · [PyPI benchmark](https://pypi.org/project/equiframe-benchmark/0.15.6/) · [First ETL check](https://github.com/htroya/equiframe/blob/v0.15.6/docs/first-acceptance-0.15.6.md) · [Offline SERCOP review](https://github.com/htroya/equiframe/blob/v0.15.6/docs/sercop-pretrained.md) |
 | 0.15.3 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.3/docs/index.md) | [PyPI core](https://pypi.org/project/equiframe/0.15.3/) · [PyPI benchmark](https://pypi.org/project/equiframe-benchmark/0.15.3/) · [GitHub beta and hashes](https://github.com/htroya/equiframe/releases/tag/v0.15.3) · [First ETL check](https://github.com/htroya/equiframe/blob/v0.15.3/docs/first-acceptance-0.15.3.md) |
 | 0.15.2 | [Handbook](https://github.com/htroya/equiframe/blob/v0.15.2/docs/index.md) | Candidate superseded after the first-use kit resource check |
