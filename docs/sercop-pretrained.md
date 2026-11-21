@@ -22,6 +22,16 @@ python -m pip install equiframe
 equiframe sercop accept solicitud.json --reference-binding referencia.json --output evidencia
 ```
 
+En la rama de desarrollo, puedes usar el `run.json` generado por
+`equiframe.execute` con el archivo Arrow IPC de la referencia independiente.
+El comando toma del recibo el plan, las entradas y la salida, y comprueba sus
+huellas junto con el archivo de vinculación preparado para esa referencia.
+Mantén accesibles las rutas a los artefactos indicadas en el recibo.
+
+```sh
+equiframe sercop accept-execution ruta/run.json referencia.arrow --reference-binding referencia.json --output evidencia
+```
+
 Usa el contrato incluido, los recibos completos de la ejecución y una referencia
 independiente del mismo lote. El contrato agrega las adjudicaciones en centavos
 por comprador y moneda después del filtro de importe mínimo. La revisión R vuelve
@@ -36,6 +46,11 @@ diferencia bloquea la corrida. Si el bosque alerta y R confirma la equivalencia
 de la comparación exacta, la corrida puede aprobarse y la alerta queda
 registrada. Un desacuerdo entre comparadores o evidencia incompleta deja
 la decisión pendiente.
+
+Si falla una restricción de entrada o de salida, el caso indica
+`contract_constraints_failed`. `constraint_failures` identifica la tabla y la
+comparación que documenta la infracción. `comparison_case` conserva el resultado
+de contrastar la salida con la referencia, Isolation Forest y R.
 
 | Resultado | Código |
 | --- | ---: |

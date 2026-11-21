@@ -195,6 +195,24 @@ def assess_capture(
             case, needs_review = "r_confirmation_unavailable", True
         cases[name] = {"state": case, "review_required": needs_review}
 
+    # Verification orders input and output self-comparisons by their captured artifacts.
+    input_failures = {
+        name: item
+        for (name, _), item in zip(result.input_artifacts, result.input_comparisons, strict=True)
+        if item.state == "different"
+    }
+    output_failures = {
+        name: item
+        for (name, _), item in zip(
+            result.outputs, result.comparisons[: len(result.outputs)], strict=True
+        )
+        if item.state == "different"
+    }
+    for name, case_report in cases.items():
+        if input_failures or name in output_failures:
+            case_report["comparison_case"] = case_report["state"]
+            case_report["state"] = "contract_constraints_failed"
+
     review_required = len(cases) != result.coverage.outputs_requested or any(
         case["review_required"] is True for case in cases.values()
     )
@@ -204,6 +222,16 @@ def assess_capture(
         isolation_forest=scored,
         r_review=reviewed,
         cases=cases,
+        constraint_failures=[
+            {
+                "scope": scope_name,
+                "name": name,
+                "comparison_id": item.comparison_id,
+                "contract_violations": item.counts.contract_violations,
+            }
+            for scope_name, failures in (("input", input_failures), ("output", output_failures))
+            for name, item in failures.items()
+        ],
         review_required=review_required or code == 3,
         coverage_reason=reason,
         publishable=code == 0,

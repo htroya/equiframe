@@ -62,7 +62,8 @@ def request(root: Path, fault: str) -> Path:
     column = "CASE WHEN buyer = 'buyer-00' THEN total + 1 ELSE total END"
     if fault != "one_cent":
         column = "total"
-    query += f"SELECT buyer, currency, CAST({column} AS BIGINT) AS total FROM grouped"
+    keys = "currency, buyer" if fault == "output_column_order" else "buyer, currency"
+    query += f"SELECT {keys}, CAST({column} AS BIGINT) AS total FROM grouped"
     if fault == "missing_group":
         query += " WHERE buyer <> 'buyer-00'"
     if fault == "duplicate_group":
@@ -73,9 +74,12 @@ def request(root: Path, fault: str) -> Path:
     plan = ef.ExecutionPlan(
         contract=info.contract, engine="duckdb", transformation_id="acceptance_check"
     )
+    source = pa.Table.from_pylist(rows)
+    if fault == "input_column_order":
+        source = source.select(source.column_names[::-1])
     execution = ef.execute(
         plan,
-        source=ef.LocalDataSource({"source": ef.ArrowInput(pa.Table.from_pylist(rows))}),
+        source=ef.LocalDataSource({"source": ef.ArrowInput(source)}),
         registry=registry,
         work_dir=root / "execution",
     )
@@ -187,6 +191,79 @@ def test_acceptance_reconciles_forest_with_independent_evidence(
     assert report["cases"]["candidate"]["state"] == case
     assert report["r_review"]["candidate"]["state"] == (r_state or "not_requested")
     assert len(calls) == (0 if r_state is None else 1)
+
+
+@pytest.mark.parametrize(
+    "fault,forest,scope,name,case",
+    [
+        ("input_column_order", "no_alert", "input", "source", "equivalent"),
+        ("output_column_order", "alert", "output", "candidate", "difference_detected"),
+    ],
+)
+def test_contract_failures_are_visible_in_the_case(
+    tmp_path, monkeypatch, fault, forest, scope, name, case
+):
+    monkeypatch.setattr(_sercop, "score_profile", lambda *_: {"state": forest})
+    code, report = call(tmp_path, fault)
+    assert code == 1 and report["publishable"] is False
+    observed = report["cases"]["candidate"]
+    assert observed["state"] == "contract_constraints_failed"
+    assert observed["comparison_case"] == case
+    (failure,) = report["constraint_failures"]
+    assert failure["scope"] == scope and failure["name"] == name
+    (comparison,) = (
+        item
+        for item in report["contract"]["comparisons"]
+        if item["comparison_id"] == failure["comparison_id"]
+    )
+    assert comparison["counts"]["contract_violations"] == failure["contract_violations"] > 0
+
+
+@pytest.mark.parametrize("changed", [None, "reference", "binding", "receipt", "invalid_json"])
+def test_accept_execution_requires_bound_artifacts(tmp_path, monkeypatch, changed):
+    request(tmp_path, "")
+    monkeypatch.setattr(_sercop, "score_profile", lambda *_: {"state": "no_alert"})
+    (receipt,) = (tmp_path / "execution").rglob("run.json")
+    reference = tmp_path / "reference.arrow"
+    binding = tmp_path / "binding.json"
+    if changed == "reference":
+        reference.write_bytes(reference.read_bytes() + b"different")
+    elif changed == "binding":
+        data = json.loads(binding.read_bytes())
+        data["plan_sha256"] = "0" * 64
+        binding.write_text(json.dumps(data), encoding="utf-8")
+    elif changed == "receipt":
+        receipt = receipt.with_name("unavailable.json")
+    elif changed == "invalid_json":
+        receipt = tmp_path / "invalid.json"
+        receipt.write_text("{", encoding="utf-8")
+    output = tmp_path / "accept"
+    run = CliRunner().invoke(
+        app,
+        [
+            "sercop",
+            "accept-execution",
+            str(receipt),
+            str(reference),
+            "--reference-binding",
+            str(binding),
+            "--output",
+            str(output),
+        ],
+    )
+    if changed:
+        assert run.exit_code == (2 if changed == "invalid_json" else 3), run.output
+        assert not output.exists()
+        if changed in {"reference", "binding"}:
+            assert "reference_binding_mismatch" in run.stderr
+    else:
+        assert run.exit_code == 0, run.output
+        report = json.loads(run.stdout)
+        assert report["publishable"] is True
+        assert report["cases"]["candidate"]["state"] == "equivalent"
+        assert report["constraint_failures"] == []
+        (saved,) = output.glob("*-sercop/report.json")
+        assert json.loads(saved.read_bytes()) == report
 
 
 @pytest.mark.parametrize(

@@ -20,6 +20,9 @@
 On Windows and Linux x64, `equiframe sercop accept` runs the included R reviewer
 offline when the model and exact comparison disagree. [SERCOP guide](docs/sercop-pretrained.md)
 
+The development branch also accepts `run.json` directly with `equiframe sercop
+accept-execution` and the bound independent reference.
+
 **EquiFrame** checks whether tabular data and supported transformations preserve
 their meaning when moving between **Pandas, Polars and DuckDB**. It reads files,
 creates native dataframe objects, converts between engines and reports semantic
@@ -365,6 +368,8 @@ Las dependencias de ejecución se seleccionan por capacidad:
 `equiframe sercop accept` usa el R incluido para revisar discrepancias sin
 conexión en Windows y Linux x64. La API `review_with_r` también admite un
 `Rscript` existente para revisiones independientes de SERCOP.
+La rama de desarrollo también admite `run.json` directamente con
+`equiframe sercop accept-execution` y la referencia independiente vinculada.
 Las [versiones admitidas](https://github.com/htroya/equiframe/blob/main/pyproject.toml) y los
 [detalles de compatibilidad](https://github.com/htroya/equiframe/blob/main/docs/compatibility.md) describen el soporte declarado.
 

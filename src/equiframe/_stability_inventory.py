@@ -951,6 +951,18 @@ CLI_INVENTORY = (
         ),
         (0, 1, 2, 3),
     ),
+    (
+        "sercop accept-execution",
+        "experimental",
+        (
+            "argument|receipt|receipt|required=True|default=None",
+            "argument|expected|expected|required=True|default=None",
+            "option|reference_binding|--reference-binding|required=True|default=None",
+            "option|output|--output|required=False|default=equiframe-runs",
+            "option|rscript|--rscript|required=False|default=auto",
+        ),
+        (0, 1, 2, 3),
+    ),
     ("sercop model", "experimental", (), (0, 2, 3)),
     (
         "sercop score",

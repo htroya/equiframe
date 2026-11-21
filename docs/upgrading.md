@@ -3,6 +3,14 @@
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Security](security.md) ·
 [Release/rollback](releasing.md)
 
+## Unreleased
+
+`sercop accept-execution` uses a completed `run.json` with the independent Arrow
+IPC reference and its binding. SERCOP reports use `contract_constraints_failed`
+for cases with an input or output constraint violation. Consumers can read
+`comparison_case` for the model and comparison diagnosis in those cases and
+`publishable` for the final acceptance decision.
+
 ## 0.15.6 - SERCOP model and offline R review
 
 Install both distributions at 0.15.6. The core package includes Arrow and the

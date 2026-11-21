@@ -1,3 +1,10 @@
+## Unreleased
+
+- Add `equiframe sercop accept-execution` for a completed `run.json` and a bound
+  independent Arrow IPC reference.
+- Identify failed input and output constraints in SERCOP case reports and retain
+  the comparison, Isolation Forest and R findings.
+
 ## 0.15.3 - verify the packaged ETL example
 
 - Recognize the exact acceptance example resource in first-use kit and compatibility verification.

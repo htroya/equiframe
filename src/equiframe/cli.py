@@ -35,7 +35,8 @@ from equiframe.errors import (
     ContractIOError,
     ContractValidationError,
 )
-from equiframe.evidence import inspect_evidence, load_json, read_pipeline
+from equiframe.evidence import describe_file, inspect_evidence, load_json, read_pipeline
+from equiframe.execution_types import ExecutionResult
 from equiframe.ingestion import IngestionSpec, ingest_file
 from equiframe.migration import (
     MigrationRequest,
@@ -46,13 +47,14 @@ from equiframe.migration import (
     read_migration,
 )
 from equiframe.pipeline import run_pipeline
-from equiframe.pipeline_types import PipelineRequest
+from equiframe.pipeline_types import PipelineInput, PipelineRequest
 from equiframe.profile_types import ProfileVector
 from equiframe.reduction import ReductionObservation, ReductionOptions, reduce_case
 from equiframe.registry import TransformationRegistry
 from equiframe.reporting import pipeline_summary, write_report
 from equiframe.serialization import contract_fingerprint, read_contract
 from equiframe.tables import ArrowInput, LocalDataSource, read_table
+from equiframe.types import ArtifactRef
 from equiframe.verification_request import ReferenceBinding, VerificationRequest
 from equiframe.verify import (
     VerificationInput,
@@ -419,8 +421,60 @@ def sercop_accept(
     )
 
 
+@sercop_app.command("accept-execution")
+def sercop_accept_execution(
+    receipt: Path,
+    expected: Path,
+    reference_binding: Path = typer.Option(..., "--reference-binding"),
+    output: Path = typer.Option(Path("equiframe-runs")),
+    rscript: str = typer.Option(
+        "auto",
+        help="Review discrepancies automatically, or name an Rscript to review every capture.",
+    ),
+) -> None:
+    """Review an EquiFrame run.json and an independent Arrow IPC reference."""
+    try:
+        execution = load_json(ExecutionResult, receipt)
+        if execution.state != "completed" or execution.output is None:
+            typer.echo("execution_receipt_unavailable: Supply a completed run.json.", err=True)
+            raise typer.Exit(code=3)
+        expected = expected.absolute()
+        identity = describe_file(expected, expected.parent)
+        request = VerificationRequest(
+            contract=execution.plan.contract,
+            plan_sha256=_execution_plan_sha256(execution),
+            snapshots=tuple(
+                PipelineInput(name=item.name, artifact=item.data) for item in execution.inputs
+            ),
+            expected=ArtifactRef(
+                schema_version="1.0",
+                uri=expected.as_uri(),
+                format="arrow",
+                media_type="application/vnd.apache.arrow.file",
+                sha256=identity.sha256,
+                size_bytes=identity.size_bytes,
+            ),
+            outputs=(PipelineInput(name="candidate", artifact=execution.output.data),),
+            executions=(("candidate", execution),),
+        )
+    except typer.Exit:
+        raise
+    except Exception as error:
+        _failure(error)
+        return
+    _verification_command(
+        request,
+        output,
+        reference_binding,
+        require_expected=True,
+        strict_acceptance=True,
+        require_execution=True,
+        sercop_rscript=rscript,
+    )
+
+
 def _verification_command(
-    request: Path,
+    request: Path | VerificationRequest,
     output: Path,
     reference_binding: Path | None,
     *,
@@ -430,7 +484,7 @@ def _verification_command(
     sercop_rscript: str | None = None,
 ) -> None:
     try:
-        document = load_json(VerificationRequest, request)
+        document = load_json(VerificationRequest, request) if isinstance(request, Path) else request
         snapshots = {item.name: item.artifact for item in document.snapshots}
         candidates: dict[str, VerificationInput] = {
             item.name: item.artifact for item in document.outputs
