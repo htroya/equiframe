@@ -22,7 +22,7 @@ python -m pip install equiframe
 equiframe sercop accept solicitud.json --reference-binding referencia.json --output evidencia
 ```
 
-En la rama de desarrollo, puedes usar el `run.json` generado por
+A partir de EquiFrame 0.15.7, puedes usar el `run.json` generado por
 `equiframe.execute` con el archivo Arrow IPC de la referencia independiente.
 El comando toma del recibo el plan, las entradas y la salida, y comprueba sus
 huellas junto con el archivo de vinculación preparado para esa referencia.

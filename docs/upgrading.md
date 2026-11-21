@@ -3,7 +3,7 @@
 [Handbook](index.md) · [Compatibility](compatibility.md) · [Security](security.md) ·
 [Release/rollback](releasing.md)
 
-## Unreleased
+## 0.15.7 - captured SERCOP execution acceptance
 
 `sercop accept-execution` uses a completed `run.json` with the independent Arrow
 IPC reference and its binding. SERCOP reports use `contract_constraints_failed`

@@ -1,4 +1,4 @@
-## Unreleased
+## 0.15.7 - captured SERCOP execution acceptance
 
 - Add `equiframe sercop accept-execution` for a completed `run.json` and a bound
   independent Arrow IPC reference.

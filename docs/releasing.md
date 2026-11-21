@@ -2,8 +2,8 @@
 
 ## Current state
 
-This procedure applies to the `equiframe 0.15.6` and
-`equiframe-benchmark 0.15.6` pair. Consult [documentation by version](versions.md)
+This procedure applies to the `equiframe 0.15.7` and
+`equiframe-benchmark 0.15.7` pair. Consult [documentation by version](versions.md)
 and the corresponding release notes for artifact checks and index availability.
 Source preparation does not establish validation or publication: verify the
 artifact-bound receipts and official index inventory. The public 0.12.2 tag and

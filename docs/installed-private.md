@@ -1,8 +1,8 @@
-# Install identified 0.15.6 artifacts offline
+# Install identified 0.15.7 artifacts offline
 
 [Quick start](quickstart.md) · [Compatibility](compatibility.md) · [Release policy](releasing.md)
 
-Use `0.15.6` for both `equiframe` and `equiframe-benchmark`. This guide covers the
+Use `0.15.7` for both `equiframe` and `equiframe-benchmark`. This guide covers the
 offline installation route. The [release process](releasing.md) describes how
 to verify public registry files and their SHA-256 hashes.
 Historical A7 introduced the minimum-Polars expression-composition correction;
@@ -30,7 +30,7 @@ cd equiframe-consumer
 python3.12 -m venv .venv
 WHEELHOUSE=/absolute/path/reviewed-wheelhouse
 .venv/bin/python -I -m pip install --no-index --find-links="$WHEELHOUSE" \
-  'equiframe[engines,ml]==0.15.6' --report install-report.json
+  'equiframe[engines,ml]==0.15.7' --report install-report.json
 .venv/bin/python -I -m pip check
 .venv/bin/python -I -c 'import equiframe, importlib.metadata, sys; print(sys.executable); print(equiframe.__file__); print(importlib.metadata.version("equiframe"))'
 ```
@@ -42,7 +42,7 @@ New-Item -ItemType Directory equiframe-consumer
 Set-Location equiframe-consumer
 py -3.12 -m venv .venv
 $Wheelhouse = 'C:\authorized\wheelhouse'
-.\.venv\Scripts\python.exe -I -m pip install --no-index --find-links="$Wheelhouse" 'equiframe[engines,ml]==0.15.6' --report install-report.json
+.\.venv\Scripts\python.exe -I -m pip install --no-index --find-links="$Wheelhouse" 'equiframe[engines,ml]==0.15.7' --report install-report.json
 .\.venv\Scripts\python.exe -I -m pip check
 .\.venv\Scripts\python.exe -I -c 'import equiframe, importlib.metadata, sys; print(sys.executable); print(equiframe.__file__); print(importlib.metadata.version("equiframe"))'
 ```
@@ -60,7 +60,7 @@ For the benchmark, the wheelhouse must contain its exact matching core wheel:
 
 ```bash
 .venv/bin/python -I -m pip install --no-index --find-links="$WHEELHOUSE" \
-  'equiframe-benchmark[engines,ml,resources]==0.15.6' --report benchmark-install.json
+  'equiframe-benchmark[engines,ml,resources]==0.15.7' --report benchmark-install.json
 .venv/bin/python -I -m pip check
 ```
 
@@ -80,7 +80,7 @@ python3.12 -m venv .venv-hashed
 Hash integrity does not authenticate a publisher or establish semantic correctness.
 Minimum-direct and latest-permitted resolutions have separate real locks and
 receipts. They do not prove every cross-product allowed by dependency ranges.
-The `0.15.6` pin resolves without `--pre`. Historical alpha
+The `0.15.7` pin resolves without `--pre`. Historical alpha
 artifacts retain their separate exact pins and hashes. Never change global pip
 configuration or describe an offline installation as a public PyPI installation.
 
