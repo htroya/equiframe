@@ -64,7 +64,8 @@ and [supported ranges](https://github.com/htroya/equiframe/blob/main/pyproject.t
 ## Quick start
 
 Local file reading and comparison need no EquiFrame account or API key.
-Install the optional engine extras above; install R separately only for R review.
+Install the extra for the engine you use. The SERCOP command can run the included
+R reviewer offline on Windows and Linux x64 with glibc.
 
 ### Read a file and choose its destination
 
@@ -368,8 +369,8 @@ Las dependencias de ejecución se seleccionan por capacidad:
 `equiframe sercop accept` usa el R incluido para revisar discrepancias sin
 conexión en Windows y Linux x64. La API `review_with_r` también admite un
 `Rscript` existente para revisiones independientes de SERCOP.
-La rama de desarrollo también admite `run.json` directamente con
-`equiframe sercop accept-execution` y la referencia independiente vinculada.
+Usa `equiframe sercop accept-execution` para comprobar un `run.json` con
+la referencia independiente en Arrow y su archivo de vinculación.
 Las [versiones admitidas](https://github.com/htroya/equiframe/blob/main/pyproject.toml) y los
 [detalles de compatibilidad](https://github.com/htroya/equiframe/blob/main/docs/compatibility.md) describen el soporte declarado.
 
