@@ -1,16 +1,18 @@
 # EquiFrame: semantic comparison and dataframe migration
 
-> **Public Beta 0.15.7**
-> Install [EquiFrame](https://pypi.org/project/equiframe/0.15.7/) and the optional,
-> exactly paired [equiframe-benchmark](https://pypi.org/project/equiframe-benchmark/0.15.7/).
-> [Release notes and SHA-256 hashes](https://github.com/htroya/equiframe/releases/tag/v0.15.7)
+> **Public Beta 0.15.8**
+> SERCOP excludes missing amounts from grouped sums. The
+> [CI example](https://github.com/htroya/equiframe/blob/v0.15.8/docs/first-acceptance-0.15.8.md) checks the final decision.
+> Install [EquiFrame](https://pypi.org/project/equiframe/0.15.8/) and the optional,
+> exactly paired [equiframe-benchmark](https://pypi.org/project/equiframe-benchmark/0.15.8/).
+> [Release notes and SHA-256 hashes](https://github.com/htroya/equiframe/releases/tag/v0.15.8)
 > identify the published files. See the
 > [release procedure](https://github.com/htroya/equiframe/blob/main/docs/releasing.md).
 >
-> Also available on TestPyPI. [EquiFrame](https://test.pypi.org/project/equiframe/0.15.7/) · [Benchmark](https://test.pypi.org/project/equiframe-benchmark/0.15.7/)
+> Also available on TestPyPI. [EquiFrame](https://test.pypi.org/project/equiframe/0.15.8/) · [Benchmark](https://test.pypi.org/project/equiframe-benchmark/0.15.8/)
 
-[0.15.7 documentation](https://github.com/htroya/equiframe/blob/v0.15.7/docs/index.md) |
-[0.15.7 API](https://github.com/htroya/equiframe/blob/v0.15.7/docs/api.md) |
+[0.15.8 documentation](https://github.com/htroya/equiframe/blob/v0.15.8/docs/index.md) |
+[0.15.8 API](https://github.com/htroya/equiframe/blob/v0.15.8/docs/api.md) |
 [Documentation by version](docs/versions.md) |
 [Issues](https://github.com/htroya/equiframe/issues)
 
@@ -30,16 +32,16 @@ explicitly identified. See the [readiness review](https://github.com/htroya/equi
 
 ## Install
 
-EquiFrame 0.15.7 supports **Python 3.10, 3.11, 3.12 and 3.13**.
+EquiFrame 0.15.8 supports **Python 3.10, 3.11, 3.12 and 3.13**.
 
 ```bash
-python -m pip install "equiframe[files,engines,ml]==0.15.7"
+python -m pip install "equiframe[files,engines,ml]==0.15.8"
 python -m pip check
 ```
 
-The base installation is `python -m pip install equiframe==0.15.7`. It includes Arrow and the pretrained SERCOP
+The base installation is `python -m pip install equiframe==0.15.8`. It includes Arrow and the pretrained SERCOP
 Isolation Forest. Discrepancies can be reviewed offline with the bundled R
-runtime on Windows and Linux x64. [SERCOP guide](https://github.com/htroya/equiframe/blob/v0.15.7/docs/sercop-pretrained.md).
+runtime on Windows and Linux x64. [SERCOP guide](https://github.com/htroya/equiframe/blob/v0.15.8/docs/sercop-pretrained.md).
 Optional engines and machine-learning libraries are loaded when requested.
 
 | Extra | Purpose |
@@ -51,8 +53,8 @@ Optional engines and machine-learning libraries are loaded when requested.
 | `eda`, `eda-charts` | Experimental exploratory analysis and optional charts |
 
 The standalone `review_with_r` API accepts an existing `Rscript` executable.
-See [dependencies](https://github.com/htroya/equiframe/blob/v0.15.7/docs/dependencies.md)
-and [supported ranges](https://github.com/htroya/equiframe/blob/v0.15.7/pyproject.toml).
+See [dependencies](https://github.com/htroya/equiframe/blob/v0.15.8/docs/dependencies.md)
+and [supported ranges](https://github.com/htroya/equiframe/blob/v0.15.8/pyproject.toml).
 
 Use `equiframe sercop accept-execution` to check a completed `run.json` with
 an independent Arrow reference and its binding. The report identifies failed
@@ -60,7 +62,7 @@ input or output constraints and retains the comparison, Isolation Forest and R f
 
 ## Quick start
 
-Beta 0.15.7 includes `verify accept`. The [ETL quickstart](https://github.com/htroya/equiframe/blob/v0.15.7/docs/first-acceptance-0.15.6.md)
+Beta 0.15.8 includes `verify accept`. The [ETL quickstart](https://github.com/htroya/equiframe/blob/v0.15.8/docs/first-acceptance-0.15.8.md)
 generates a sample CSV, its reference binding and the requests for three CI
 outcomes. The checks return 0 for acceptance, 1 for a difference and 3 for
 unavailable evidence.
@@ -142,7 +144,7 @@ acceptance with `ef.assert_equivalent(result)`; divergent or incomplete results
 raise `ef.EquivalenceAssertionError`. Operational failures use the
 `ef.EquiFrameError` hierarchy, including `DatasetReadError`,
 `MissingDependencyError` and `InvalidExecutionInput`. See the
-[API reference](https://github.com/htroya/equiframe/blob/v0.15.7/docs/api.md)
+[API reference](https://github.com/htroya/equiframe/blob/v0.15.8/docs/api.md)
 for argument-validation exceptions and command-specific exits.
 
 All six directed combinations of Pandas, Polars and DuckDB are supported.
@@ -234,7 +236,7 @@ python examples/load_convert_compare.py --rows 30000
 
 Installed wheels provide the same example as
 `python -m equiframe.examples.load_convert_compare --rows 30000`. Further
-[examples](https://github.com/htroya/equiframe/blob/v0.15.7/docs/journeys.md)
+[examples](https://github.com/htroya/equiframe/blob/v0.15.8/docs/journeys.md)
 and [recipes](https://github.com/htroya/equiframe/blob/main/docs/recipes.md)
 cover ETL, reconciliation and terminal usage.
 
