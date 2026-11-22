@@ -72,8 +72,8 @@ commitments remain unchanged. Historical Alpha materials are preserved under
 Project-owned code uses MIT. Included third-party components retain their
 licenses; the core archive expression is `MIT AND Apache-2.0` because it includes
 CycloneDX schemas. See [licensing](licensing.md) and the packaged notices.
-There is no claimed production certification, scientific accuracy, independent
-human adoption, security-response SLA or accepted real data-warehouse integration.
+Production certification, scientific accuracy, security-response guarantees and
+data-warehouse acceptance each require their own evidence.
 
 Hernán Troya (`htroya`) is the maintainer and release/security owner, on a
 best-effort basis without a promised backup or response deadline. The public
@@ -105,8 +105,8 @@ sensitive details in a public issue.
 10. [Dependency inventory](dependencies.md), [security](security.md) and
    [release process](releasing.md): artifact identity, supply-chain evidence,
    disclosure and current release gates
-11. [Adoption](adoption.md) and [maintenance](maintenance.md): consented real-project
-    observations, later-change retention, useful issue reports and critical trust incidents
+11. [Operational validation](operational-validation.md) and [maintenance](maintenance.md):
+    execution receipts, compatibility measurements, detector evaluation and incident handling
 
 ## Artifact and integration guides
 

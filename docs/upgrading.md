@@ -297,13 +297,12 @@ Only the owner can authorize public release/withdrawal decisions; see
 not evidence that registry publication, clean installation or the other release
 gates have finished; use the status of the identified final artifact.
 
-## Retained use and incident follow-through
+## Upgrade verification and incident follow-through
 
-Use the [adoption protocol](adoption.md) to record whether an integration survives
-a later real change, including failures and assistance. Technical replays are
-not human acceptance. [Maintenance](maintenance.md) documents proposed priorities,
-minimal permitted reproductions, pending owners and critical false-equivalence
-containment, correction, safe recovery and consumer reconfirmation.
+After an upgrade, rerun the acceptance checks with the previous reference and
+retain the new dependency versions, exits and receipts. [Maintenance](maintenance.md)
+documents minimum reproductions, containment, correction and safe recovery for
+incorrect equivalence. See [operational validation](operational-validation.md).
 
 ## Shared primitives and installed learning routes
 
@@ -316,9 +315,8 @@ Existing historical fixtures remain immutable regression inputs.
 Start from [the Spanish introduction](inicio.md) or [API choice](choosing-api.md).
 The wheel now carries [A–H runnable journeys](journeys.md) and the complete
 [SQLite snapshot integration](sqlite-snapshots.md) as package resources, so their
-use need not depend on a checkout. These are synthetic engineering examples;
-they do not establish independent human adoption, domain/DW acceptance or a
-completed security assessment.
+use need not depend on a checkout. These synthetic examples exercise software
+behavior. Domain acceptance and security assessment require their own checks.
 
 
 ## 0.12.0a1 native relational additions

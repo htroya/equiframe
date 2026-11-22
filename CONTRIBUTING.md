@@ -50,5 +50,5 @@ No GitHub Actions job is used for this release.
 
 Hernán Troya (`htroya`) maintains releases and security coordination without a
 fixed response-time SLA. Original project code is MIT; third-party components
-retain their licenses and notices. Research conclusions and external adoption
-have their own acceptance criteria.
+retain their licenses and notices. Research conclusions have separate
+evaluation criteria.

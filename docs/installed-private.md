@@ -95,4 +95,4 @@ Run the acceptance step with Python `-O` too; use `assert_equivalent`, not a Pyt
 The independent consumer-lab application and permitted frozen real datasets are
 separate artifacts. Its provenance, exact CLI, application return codes and
 mutation outcomes belong to its own delivery receipt. The historical A–H
-examples remain synthetic regression checks, not real-data adoption evidence.
+examples remain synthetic regression checks.

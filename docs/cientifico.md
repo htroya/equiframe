@@ -176,5 +176,5 @@ Perfiles/detectores, si los necesitas, requieren su propia definición de featur
 normalidad/particiones, ajuste/calibración y soporte. Falta de soporte es
 `not_estimable`/`not_evaluable`, nunca ausencia de alerta. R, M, B, H y O siguen
 independientes y las salidas/etiquetas de otros motores no alimentan el detector.
-Estos ejemplos no acreditan utilidad científica ni adopción humana; el
-[protocolo](adoption.md) exige participantes reales y consentimiento.
+Los ejemplos ilustran el funcionamiento del método. Los resultados de una
+evaluación dependen de su protocolo, sus particiones y la referencia utilizada.

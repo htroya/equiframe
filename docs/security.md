@@ -153,8 +153,9 @@ use a hidden interactive prompt or an approved local secret store. Revoke it
 after the authorized upload. Build and inspect without publication credentials,
 then upload only the four approved files to the explicit index endpoint. TestPyPI
 and PyPI have separate accounts. Reconcile every accepted filename/hash and test
-the downloaded artifacts before promoting identical bytes to production. A
-publication credential does not establish software safety or human acceptance.
+the downloaded artifacts before promoting identical bytes to production.
+Publication credentials authenticate the upload. Software safety requires
+separate verification.
 
 Primary references: [TruffleHog usage](https://github.com/trufflesecurity/trufflehog),
 [Bandit CLI](https://bandit.readthedocs.io/en/latest/man/bandit.html),

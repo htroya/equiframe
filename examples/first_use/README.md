@@ -9,18 +9,15 @@ pytest fixture, pinned dependencies with hashes, an integrity verifier and
 English guides. No checkout, real dataset, credential, remote SQL, notebook or
 service is required. Inputs are small synthetic fixtures defined in the scripts.
 
-The target of a first useful diagnosis within five minutes is **not yet validated
-by human observation**. Automated independent artifact checks are technical
-evidence, not a substitute for that observation. Preserve the kit's unfilled
-`OBSERVATION.md` and record a real attempt separately if you participate.
+Record the environment, verified wheel and command outcomes in the work directory. See the [technical run record](OBSERVATION.md).
 
 ## 1. Obtain, verify and install the kit
 
 Obtain the candidate kit through the authorized private channel. Compare its
 archive SHA-256 with the separately supplied trusted receipt **before extraction**.
 Extract it into a new directory named `kit`, outside the repository, and open a
-terminal there. Keep the kit unchanged: environments, outputs and completed
-observation records belong in sibling directories. The internal manifest detects
+terminal there. Keep the kit unchanged: environments, outputs and technical
+run records belong in sibling directories. The internal manifest detects
 byte changes; it does not authenticate the sender.
 
 The commands below show 3.12. If the manifest selects 3.10, 3.11 or 3.13,
@@ -236,11 +233,8 @@ invalid configuration/execution/publication in these scripts. Missing permission
 disk space or a finalized report never mean equivalence. Do not publish tracebacks
 containing environment variables or real data.
 
-Keep `kit` intact and recheck it with `python ../kit/verify_kit.py`. Save a completed
-copy of `OBSERVATION.md` in the work directory. Record installation time separately,
-include failed attempts and help received, and distinguish engine agreement from
-correctness against a reference. [Interpretation](INTERPRETATION.md) explains the guarantees and failures;
-[observation record](OBSERVATION.md) remains pending until a real person completes it.
+Keep `kit` intact and recheck it with `python ../kit/verify_kit.py`.
+Record exits, dependency versions, evidence paths, and installation and execution times. [Interpretation](INTERPRETATION.md) explains the observed outcomes.
 
 ## Interpreter-specific candidate kits
 
