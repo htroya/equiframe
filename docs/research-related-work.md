@@ -73,6 +73,6 @@ software tests confirms these hypotheses.
 The [0.14.0 controlled baseline](detection-benchmark.md) remains unchanged,
 including its low forest recall, missed faults and legitimate-shift false alarms.
 Subsequent experiments must preserve unfavorable results and their original
-versions. Benefits to public reporting can be illustrated by measured prevention
-of controlled distortions; adoption, saved review time or societal impact require
-separate evidence of actual use.
+versions. Preventing controlled distortions illustrates possible benefits to
+public reporting. Saved review time and societal impact require separate
+measurement.

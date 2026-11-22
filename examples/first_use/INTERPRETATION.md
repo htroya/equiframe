@@ -64,5 +64,5 @@ names, keys, paths and values before enabling `include_values` or
 
 Explain why B fails, why engine agreement can still fail against the expected
 output, why `not_evaluable` is not a pass, and how to retain a report before
-failing without uploading private snapshots. Record the answer, observed time
-and help received in a separate copy of [OBSERVATION.md](OBSERVATION.md).
+failing without uploading private snapshots. Record the check and its evidence
+in the [technical run record](OBSERVATION.md).

@@ -74,5 +74,5 @@ the verdict and never replace an existing destination. Full synthetic detail is
 separate from the default redacted report; raw evidence remains private.
 
 Use the role guide for integration with your own Python/SQL and local pytest.
-No automated runtime measurement is presented as a five-minute human observation.
-The independent human-adoption protocol remains [pending](adoption.md).
+See [operational validation](operational-validation.md) for execution receipts,
+artifact compatibility and detector evaluation.

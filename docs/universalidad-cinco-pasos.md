@@ -97,8 +97,8 @@ Los lotes reducen y controlan la lectura; las tablas finales y los recibos de
 ingestión todavía se materializan. Los límites son cooperativos, no una cuota
 dura de RAM ni procesamiento distribuido. Los bloqueos de transporte requieren
 timeouts del cliente. Combinar proveedores no crea una transacción común entre
-bases o APIs. Los contratos admiten dominios distintos, pero un ejemplo
-sintético no acredita adopción real en salud, finanzas ni producción.
+bases o APIs. Los ejemplos sintéticos comprueban los contratos en los casos
+documentados.
 
 Los cinco pasos de implementación no son un porcentaje de Universalidad
 UV01–UV12 ni una declaración de compatibilidad universal al 100 %. Windows,

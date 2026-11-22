@@ -145,15 +145,12 @@ Do not upload to PyPI, deploy a service, grant sharing access or activate a remo
 release flow without the specific authorization and completed gates in
 [releasing.md](releasing.md).
 
-## Adoption and maintenance evidence
+## Maintenance evidence
 
-The [adoption record checker](adoption.md#check-the-structured-record-locally)
-is a developer-only sdist tool. Its exit 0 establishes input consistency, never
-consent, human independence or adoption. Keep the example registry empty and
-real observations outside Git. The [maintenance process](maintenance.md) requires
-minimal permitted reproductions and separate technical/consumer confirmation;
-Hernán Troya (`htroya`) is the confirmed owner; no backup, response deadline or
-SLA is promised.
+Follow the [maintenance process](maintenance.md) for minimal permitted
+reproductions and technical confirmation. Hernán Troya (`htroya`) maintains the
+project. See [operational validation](operational-validation.md) for the
+evidence to retain from execution, compatibility and detector checks.
 
 ## Fast source feedback
 

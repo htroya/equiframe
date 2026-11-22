@@ -1,6 +1,6 @@
 # Maintenance, support and trust incidents
 
-[Handbook](index.md) · [Adoption](adoption.md) · [Compatibility](compatibility.md) ·
+[Handbook](index.md) · [Operational validation](operational-validation.md) · [Compatibility](compatibility.md) ·
 [Upgrading](upgrading.md) · [Security](security.md) · [Release/rollback](releasing.md)
 
 ## Maintainer and best-effort support
@@ -80,11 +80,9 @@ Provide only the minimal permitted reproduction:
 6. Identify the last known-good **artifact**, if known, repeatability and any safe
    workaround. Preserve earlier failures; do not silently replace the baseline
 
-The [adoption guide](adoption.md) describes consent and minimal observation.
-Permission to participate does not authorize sharing the person's data or posting
-to an issue. Do not request additional private data until its necessity, recipient
-and handling have been agreed. Raw exception causes can reveal more than the
-ordinary report; inspect diagnostics before sending them.
+When requesting private diagnostics, agree on the required data, recipient and
+handling before sending them. Inspect raw exception details before sharing a
+report.
 
 ## Triage priorities without response deadlines
 
@@ -221,8 +219,8 @@ MIT licensing and the maintainer role are owner decisions. The reporting routes
 must be enabled and their availability verified for each release. Registry
 ownership, final artifact checks and publication remain separate observable
 steps. Do not claim that authorization fixes a vulnerability or completes a
-security assessment. Scientific acceptance and human adoption are independent
-of interface stability and registry publication.
+security assessment. Scientific acceptance requires evaluation evidence apart
+from interface stability and registry publication.
 
 ## Admitting a new engine or integration
 

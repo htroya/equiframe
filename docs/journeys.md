@@ -356,7 +356,7 @@ private run directory, and let nonzero exits fail the task. No new orchestration
 framework or service is required. Retries require a new output directory and
 must account for any effects added by your own callbacks.
 
-No five-minute human diagnosis, user pilot, performance speedup, general volume
-capacity, universal platform support, producer authenticity, production service
-acceptance or scientific conclusion is established by these small tests.
+These small tests document the behavior of the examples. Performance,
+capacity, platform coverage, producer authenticity, service acceptance and
+scientific conclusions require their own evidence.
 Resource controls are cooperative; use process/OS isolation for hard limits.

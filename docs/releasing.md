@@ -110,10 +110,9 @@ version for compatible new functionality and explicitly document breaking
 changes. During the `0.x` series, read the compatibility and upgrade guides.
 Never move an existing release tag or replace published TestPyPI/PyPI files.
 
-Historical Alpha candidates keep their original results and closed version-1
-policy. STEP10's real-data evaluation, external scientific acceptance and DW
-integration remain separate research/integration deliverables; they are not
-claimed complete by a library release.
+Historical Alpha candidates retain their published results. Real-data
+evaluation, scientific acceptance and data-warehouse integration have separate
+evidence from library publication.
 
 ## Repeatable candidate checks
 

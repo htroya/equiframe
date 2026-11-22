@@ -19,7 +19,7 @@ El alcance estable objetivo es **0.14.0**. Identifica los bytes de cada artefact
 por su revisión y SHA-256. El código propio usa MIT y el propietario autorizó
 preparar y publicar manualmente en TestPyPI/PyPI sujeto a los
 [gates de release](releasing.md); autorización no significa publicación terminada.
-La adopción humana y la aceptación científica/DW real siguen separadas y pendientes.
+La aceptación científica y la integración del almacén de datos requieren evidencia propia.
 
 ## 1. Instala una copia identificada
 
@@ -124,6 +124,5 @@ comparación, ejecución y migración: no extrapoles una etapa a otra.
 
 La referencia técnica única de firmas/políticas es [API](api.md) y
 [semántica](semantics.md). Este inicio es una ruta de lectura; no crea otra API ni
-redefine formatos históricos. El objetivo de diagnóstico en cinco minutos y la
-[adopción real](adoption.md) necesitan participantes con consentimiento y evidencia:
-las ejecuciones automáticas no cuentan como pilotos humanos.
+redefine formatos históricos. Consulta la [validación operativa](operational-validation.md)
+para registrar los recibos, la compatibilidad de la distribución y la evaluación del detector.

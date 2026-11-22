@@ -199,5 +199,5 @@ python -I -O outcome_gates.py --work-dir outcome-evidence
 
 The script exits zero only after observing the expected assertion verdict for
 all four synthetic cases and verifying that implicit approval is rejected. Its
-checks also run with Python assertions disabled (`-O`). This is software behavior
-validation, not a claim of business correctness or human adoption.
+checks also run with Python assertions disabled (`-O`). Business correctness
+requires a contract and a reference for the intended operation.
