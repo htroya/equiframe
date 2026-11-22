@@ -4,6 +4,13 @@
 
 ## Current release evidence
 
+**0.15.8 is available as public Beta.** The [0.15.8 compatibility measurements](compatibility-0.15.8-measurements.md)
+record the exact wheel, dependency combinations, timings and pending cells.
+See the [0.15.8 release notes](https://github.com/htroya/equiframe/releases/tag/v0.15.8)
+for the scope of the release checks.
+
+### Historical 0.14.0 and 0.13.6 evidence
+
 **0.14.0 is published as public Beta** on PyPI and TestPyPI as of 19 November
 2026, together with the exactly paired benchmark package. Downloaded wheel and
 source-archive consumers passed on both indices. See the
