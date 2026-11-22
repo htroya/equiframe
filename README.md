@@ -6,7 +6,7 @@
 
 > **Public Beta 0.15.8**
 > SERCOP excludes missing amounts from grouped sums. The
-> [CI example](https://github.com/htroya/equiframe/blob/v0.15.8/docs/first-acceptance-0.15.8.md) checks the final decision.
+> [CI example](docs/first-acceptance-0.15.8.md) checks the final decision.
 > Install [EquiFrame](https://pypi.org/project/equiframe/0.15.8/) and the optional,
 > exactly paired [equiframe-benchmark](https://pypi.org/project/equiframe-benchmark/0.15.8/).
 > [Release notes and SHA-256 hashes](https://github.com/htroya/equiframe/releases/tag/v0.15.8)
@@ -33,7 +33,7 @@ your own data, independently of procurement schemas, warehouses and cloud servic
 
 The distribution is classified **Beta**. Existing stable APIs and persisted
 formats retain their compatibility commitments; experimental workflows remain
-explicitly identified. See the [readiness review](https://github.com/htroya/equiframe/blob/main/docs/review-0132.md).
+explicitly identified. See the [readiness review](https://github.com/htroya/equiframe/blob/v0.15.8/docs/review-0132.md).
 
 
 [Public-data detection study](docs/public-spending-evaluation.md) · [Exact verdicts and statistical alerts](docs/reliability.md).
@@ -69,9 +69,19 @@ Use `equiframe sercop accept-execution` to check a completed `run.json` with
 an independent Arrow reference and its binding. The report identifies failed
 input or output constraints and retains the comparison, Isolation Forest and R findings.
 
+### Architect demo
+
+Install the DuckDB extra before running the demo. Choose a new output directory for each run.
+
+```bash
+python -m pip install "equiframe[duckdb]==0.15.8"
+python -I -m equiframe doctor --extra duckdb
+python -I -m equiframe demo --role architect --output sql-good
+```
+
 ## Quick start
 
-Beta 0.15.8 includes `verify accept`. The [ETL quickstart](https://github.com/htroya/equiframe/blob/v0.15.8/docs/first-acceptance-0.15.8.md)
+Beta 0.15.8 includes `verify accept`. The [ETL quickstart](docs/first-acceptance-0.15.8.md)
 generates a sample CSV, its reference binding and the requests for three CI
 outcomes. The checks return 0 for acceptance, 1 for a difference and 3 for
 unavailable evidence.
@@ -115,7 +125,7 @@ with ef.load_dataset("orders.parquet", target="polars") as loaded:
 
 Pass `DatasetReadOptions` for multiple Excel sheets, nested JSON/XML, ambiguous
 delimiters or exact column representations. The
-[file-reading guide](https://github.com/htroya/equiframe/blob/main/docs/lectura-conversion.md)
+[file-reading guide](https://github.com/htroya/equiframe/blob/v0.15.8/docs/lectura-conversion.md)
 describes supported forms, preserved representations and resource limits.
 
 ```bash
@@ -219,7 +229,7 @@ print(summary.group_coverage, summary.comparison_coverage)
 The same API works for inventory by warehouse, expenses by department or amounts
 by entity and currency. It reports missing and invalid groups explicitly; an
 empty denominator is `None`. Metrics use exact Fractions and do not change the
-existing row-equivalence checks. See the [grouped-comparison guide](https://github.com/htroya/equiframe/blob/main/docs/grouped-comparison.md)
+existing row-equivalence checks. See the [grouped-comparison guide](https://github.com/htroya/equiframe/blob/v0.15.8/docs/grouped-comparison.md)
 for formulas, tolerances, zero references, input types and bounded examples.
 
 ## ETL, rules, anomalies and R review
@@ -237,14 +247,14 @@ for formulas, tolerances, zero references, input types and bounded examples.
   `finalize_execution_with_r` use a real R process and an explicit contract,
   preserving earlier alerts, disagreements and unavailable components.
 
-See [entry points](https://github.com/htroya/equiframe/blob/main/docs/choosing-api.md),
-[semantics](https://github.com/htroya/equiframe/blob/main/docs/semantics.md),
-[migration](https://github.com/htroya/equiframe/blob/main/docs/migration-ir.md)
-and [R review](https://github.com/htroya/equiframe/blob/main/docs/r_review.md).
+See [entry points](https://github.com/htroya/equiframe/blob/v0.15.8/docs/choosing-api.md),
+[semantics](https://github.com/htroya/equiframe/blob/v0.15.8/docs/semantics.md),
+[migration](https://github.com/htroya/equiframe/blob/v0.15.8/docs/migration-ir.md)
+and [R review](https://github.com/htroya/equiframe/blob/v0.15.8/docs/r_review.md).
 Registered callbacks and SQL are trusted application code; EquiFrame does not
 sandbox untrusted programs.
 
-See the [standalone detection benchmark](https://github.com/htroya/equiframe/blob/main/docs/detection-benchmark.md)
+See the [standalone detection benchmark](https://github.com/htroya/equiframe/blob/aca391da416a2027762d7f5d91d6408f432eb9a7/docs/detection-benchmark.md)
 for measured detection, false alarms and component API costs on generated cases,
 including missed errors and correct changes of workload.
 The [executed Isolation Forest notebook](docs/notebooks/03_isolation_forest.ipynb)
@@ -268,12 +278,12 @@ python examples/load_convert_compare.py --rows 30000
 Installed wheels provide the same example as
 `python -m equiframe.examples.load_convert_compare --rows 30000`. Further
 [examples](https://github.com/htroya/equiframe/blob/v0.15.8/docs/journeys.md)
-and [recipes](https://github.com/htroya/equiframe/blob/main/docs/recipes.md)
+and [recipes](https://github.com/htroya/equiframe/blob/v0.15.8/docs/recipes.md)
 cover ETL, reconciliation and terminal usage.
 
 ## Compatibility and development
 
-The [compatibility register](https://github.com/htroya/equiframe/blob/main/docs/compatibility.md)
+The [compatibility register](https://github.com/htroya/equiframe/blob/v0.15.8/docs/compatibility.md)
 distinguishes stable interfaces and experimental capabilities. Advanced
 orchestration, standalone pipelines, EDA and reduction remain experimental.
 The separate `equiframe-benchmark` distribution remains Beta.
@@ -281,8 +291,8 @@ The separate `equiframe-benchmark` distribution remains Beta.
 Releases use `MAJOR.MINOR.PATCH`: patches preserve documented contracts, minor
 releases add compatible functionality, and breaking changes require migration
 notes. During `0.x`, consult the
-[upgrade guide](https://github.com/htroya/equiframe/blob/main/docs/upgrading.md)
-and [changelog](https://github.com/htroya/equiframe/blob/main/CHANGELOG.md).
+[upgrade guide](https://github.com/htroya/equiframe/blob/v0.15.8/docs/upgrading.md)
+and [changelog](https://github.com/htroya/equiframe/blob/v0.15.8/CHANGELOG.md).
 Release versions derive from reviewed Git tags.
 
 The source distribution includes `src/`, `py.typed`, examples, tests, schemas and
@@ -305,8 +315,8 @@ separate acceptance criteria.
 Original code is licensed under
 [MIT](https://github.com/htroya/equiframe/blob/main/LICENSE).
 Bundled CycloneDX schemas retain Apache-2.0. See
-[third-party notices](https://github.com/htroya/equiframe/blob/main/THIRD_PARTY_NOTICES.md)
-and [license scope](https://github.com/htroya/equiframe/blob/main/NOTICE.md).
+[third-party notices](https://github.com/htroya/equiframe/blob/v0.15.8/THIRD_PARTY_NOTICES.md)
+and [license scope](https://github.com/htroya/equiframe/blob/v0.15.8/NOTICE.md).
 
 ---
 
@@ -314,7 +324,7 @@ and [license scope](https://github.com/htroya/equiframe/blob/main/NOTICE.md).
 
 > **Beta pública 0.15.8**
 > SERCOP excluye de las sumas agrupadas los importes nulos que permite el contrato. El
-> [ejemplo para CI](https://github.com/htroya/equiframe/blob/v0.15.8/docs/first-acceptance-0.15.8.md) comprueba la decisión integral.
+> [ejemplo para CI](docs/first-acceptance-0.15.8.md) comprueba la decisión integral.
 > Instala [EquiFrame](https://pypi.org/project/equiframe/0.15.8/) y, si lo necesitas,
 > [equiframe-benchmark](https://pypi.org/project/equiframe-benchmark/0.15.8/) de la misma versión.
 > Las [notas de publicación y huellas SHA-256](https://github.com/htroya/equiframe/releases/tag/v0.15.8)
@@ -409,7 +419,7 @@ El benchmark se instala por separado, después del núcleo:
 python -m pip install equiframe-benchmark==0.15.8
 ```
 
-Consulta la [guía de instalación](https://github.com/htroya/equiframe/blob/main/docs/installed-private.md) para entornos aislados,
+Consulta la [guía de instalación](https://github.com/htroya/equiframe/blob/v0.15.8/docs/installed-private.md) para entornos aislados,
 dependencias y comprobación de los artefactos recibidos.
 
 ## Dependencias
@@ -427,16 +437,26 @@ Las dependencias de ejecución se seleccionan por capacidad:
 
 La API `review_with_r` también admite un `Rscript` existente.
 Las [versiones admitidas](https://github.com/htroya/equiframe/blob/v0.15.8/pyproject.toml) y los
-[detalles de compatibilidad](https://github.com/htroya/equiframe/blob/main/docs/compatibility.md) describen el soporte declarado.
+[detalles de compatibilidad](https://github.com/htroya/equiframe/blob/v0.15.8/docs/compatibility.md) describen el soporte declarado.
 
 El comando `equiframe sercop accept-execution` valida un `run.json` con la
 referencia independiente en Arrow y su vinculación. El informe identifica
 las restricciones incumplidas y conserva los resultados de la comparación,
 Isolation Forest y R.
 
+### Demo de arquitecto
+
+Instala el extra de DuckDB antes de ejecutar el demo y usa un directorio nuevo para cada corrida.
+
+```bash
+python -m pip install "equiframe[duckdb]==0.15.8"
+python -I -m equiframe doctor --extra duckdb
+python -I -m equiframe demo --role architect --output sql-good
+```
+
 ## Primeros pasos
 
-La beta 0.15.8 incluye `verify accept`. La [guía de primera verificación ETL](https://github.com/htroya/equiframe/blob/v0.15.8/docs/first-acceptance-0.15.8.md)
+La beta 0.15.8 incluye `verify accept`. La [guía de primera verificación ETL](docs/first-acceptance-0.15.8.md)
 genera un CSV de ejemplo, su vínculo de referencia y tres escenarios de CI.
 La CLI devuelve 0 al aceptar, 1 al detectar una diferencia y 3 cuando falta
 evidencia.
@@ -473,7 +493,7 @@ python -m equiframe dataset load ventas.json --target polars
 python -m equiframe dataset inspect ventas.parquet
 ```
 
-La [guía de lectura y conversión](https://github.com/htroya/equiframe/blob/main/docs/lectura-conversion.md) explica las opciones
+La [guía de lectura y conversión](https://github.com/htroya/equiframe/blob/v0.15.8/docs/lectura-conversion.md) explica las opciones
 para Excel, XML, JSON anidado, texto y GeoJSON, junto con los tipos conservados.
 
 ### Migrar tus propios datos entre motores
@@ -516,7 +536,7 @@ print(resultado.complete)
 
 Para aplicar una aceptación en un proceso automatizado, utiliza
 `ef.assert_equivalent(resultado)`: una diferencia provoca una excepción.
-Consulta [qué API elegir](https://github.com/htroya/equiframe/blob/main/docs/choosing-api.md) para comparar objetos nativos,
+Consulta [qué API elegir](https://github.com/htroya/equiframe/blob/v0.15.8/docs/choosing-api.md) para comparar objetos nativos,
 capturas de archivos o resultados de una ejecución.
 
 ### Comparar montos por grupos
@@ -571,7 +591,7 @@ nativa del plan admitido.
 
 Las reglas y los detectores de anomalías tienen resultados separados.
 Isolation Forest requiere ajuste y calibración adecuados a los datos.
-La [evaluación autónoma de detección](https://github.com/htroya/equiframe/blob/main/docs/detection-benchmark.md)
+La [evaluación autónoma de detección](https://github.com/htroya/equiframe/blob/aca391da416a2027762d7f5d91d6408f432eb9a7/docs/detection-benchmark.md)
 presenta mediciones de detección, falsas alarmas y costo con casos generados,
 junto con sus errores omitidos y límites de aplicación.
 El [cuaderno ejecutado de Isolation Forest](docs/notebooks/03_isolation_forest.ipynb)
@@ -580,20 +600,20 @@ muestra entrenamiento, calibración, falsas alarmas y omisiones. El
 y la [evaluación temporal de 0.15.0](validation/library_detection/results/temporal-0150/README.md)
 identifican el wheel de cada estudio. Las [mediciones de inferencia](docs/performance.md#repetition-with-the-0151-wheel)
 corresponden al escenario sintético de 200 árboles.
-La [revisión con R](https://github.com/htroya/equiframe/blob/main/docs/r_review.md) puede completar la decisión mediante
+La [revisión con R](https://github.com/htroya/equiframe/blob/v0.15.8/docs/r_review.md) puede completar la decisión mediante
 `finalize_with_r` o `finalize_execution_with_r`, manteniendo visibles las alertas
 y los componentes que no pudieron evaluarse.
 
 Los planes admitidos, políticas y límites se describen en
-[semántica](https://github.com/htroya/equiframe/blob/main/docs/semantics.md), [API](https://github.com/htroya/equiframe/blob/v0.15.8/docs/api.md) y [recetas](https://github.com/htroya/equiframe/blob/main/docs/recipes.md).
+[semántica](https://github.com/htroya/equiframe/blob/v0.15.8/docs/semantics.md), [API](https://github.com/htroya/equiframe/blob/v0.15.8/docs/api.md) y [recetas](https://github.com/htroya/equiframe/blob/v0.15.8/docs/recipes.md).
 
 ## Documentación
 
 - [Manual de la biblioteca](https://github.com/htroya/equiframe/blob/v0.15.8/docs/index.md) e [inicio en español](https://github.com/htroya/equiframe/blob/v0.15.8/docs/inicio.md).
 - [Referencia de la API y CLI](https://github.com/htroya/equiframe/blob/v0.15.8/docs/api.md).
 - [Ejemplos de uso completos](https://github.com/htroya/equiframe/blob/v0.15.8/docs/journeys.md).
-- [Compatibilidad](https://github.com/htroya/equiframe/blob/main/docs/compatibility.md) y [cambios entre versiones](https://github.com/htroya/equiframe/blob/main/CHANGELOG.md).
-- [Seguridad](https://github.com/htroya/equiframe/blob/main/SECURITY.md) y [licencias de terceros](https://github.com/htroya/equiframe/blob/main/THIRD_PARTY_NOTICES.md).
+- [Compatibilidad](https://github.com/htroya/equiframe/blob/v0.15.8/docs/compatibility.md) y [cambios entre versiones](https://github.com/htroya/equiframe/blob/v0.15.8/CHANGELOG.md).
+- [Seguridad](https://github.com/htroya/equiframe/blob/main/SECURITY.md) y [licencias de terceros](https://github.com/htroya/equiframe/blob/v0.15.8/THIRD_PARTY_NOTICES.md).
 - [Portal del proyecto y seguimiento técnico](https://github.com/htroya/equiframe/blob/v0.15.8/docs/index.md).
 
 ## Origen del proyecto
@@ -624,4 +644,4 @@ y revisión se mantienen en el repositorio.
 El código propio de EquiFrame y EquiFrame Benchmark se distribuye bajo
 [MIT](https://github.com/htroya/equiframe/blob/main/LICENSE). Los componentes de terceros conservan sus licencias:
 los esquemas CycloneDX incluidos mantienen Apache-2.0.
-Consulta los [avisos de terceros](https://github.com/htroya/equiframe/blob/main/THIRD_PARTY_NOTICES.md) y el [alcance de la licencia](https://github.com/htroya/equiframe/blob/main/docs/licensing.md).
+Consulta los [avisos de terceros](https://github.com/htroya/equiframe/blob/v0.15.8/THIRD_PARTY_NOTICES.md) y el [alcance de la licencia](https://github.com/htroya/equiframe/blob/v0.15.8/docs/licensing.md).
